@@ -1,0 +1,27 @@
+{
+  "name": "CoMo Elements",
+  "author": "",
+
+  "clients": {
+    "player": {
+      "target": "browser",
+      "default": true
+    },
+    "designer": {
+      "target": "browser",
+    },
+    "controller": {
+      "target": "browser",
+    },
+    "script-editor": {
+      "target": "browser",
+    },
+    // testing
+    "controller-clients": {
+      "target": "browser",
+    },
+    "controller-projects": {
+      "target": "browser",
+    },
+  },
+}

@@ -1,3 +1,6 @@
+# TLS certificates
+/**/*.pem
+
 # transpiled files and dependencies
 /node_modules
 /public/vendors

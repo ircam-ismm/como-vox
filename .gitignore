@@ -14,6 +14,9 @@
 .data
 .vendors
 
+# dnsmasq temporary files
+/dns/dnsmasq.leases
+
 # junk files
 package-lock.json
 .DS_Store

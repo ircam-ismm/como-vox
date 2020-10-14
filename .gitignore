@@ -16,6 +16,7 @@
 
 # dnsmasq temporary files
 /dns/dnsmasq.leases
+/dns/log
 
 # junk files
 package-lock.json

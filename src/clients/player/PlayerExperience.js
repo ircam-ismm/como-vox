@@ -18,6 +18,9 @@ class PlayerExperience extends AbstractExperience {
     this.config = config;
     this.$container = $container;
 
+    this.sync = this.require('sync');
+    this.rafId = null;
+
     this.player = null;
     this.session = null;
 
@@ -79,17 +82,28 @@ class PlayerExperience extends AbstractExperience {
     // e.g. when displaying the session choice screen
     this.como.project.subscribe(() => this.render());
 
+    this.coMoPlayer.player.set({ sessionId: 'niap' });
+
     window.addEventListener('resize', () => this.render());
-    this.render();
+
+    const updateClock = () => {
+      this.render();
+      this.rafId = window.requestAnimationFrame(updateClock);
+    };
+
+    this.rafId = window.requestAnimationFrame(updateClock);
   }
 
   render() {
+    const syncTime = this.sync.getSyncTime().toFixed(3);
+
     const viewData = {
       config: this.config,
       boundingClientRect: this.$container.getBoundingClientRect(),
       project: this.como.project.getValues(),
       player: this.coMoPlayer.player.getValues(),
       session: this.coMoPlayer.session ? this.coMoPlayer.session.getValues() : null,
+      syncTime,
     };
 
     const listeners = this.listeners;

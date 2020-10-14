@@ -3,6 +3,7 @@ import 'regenerator-runtime/runtime';
 import { Client } from '@soundworks/core/client';
 import CoMo from 'como/client'
 import initQoS from '@soundworks/template-helpers/client/init-qos.js';
+import pluginSyncFactory from '@soundworks/plugin-sync/client';
 import PlayerExperience from './PlayerExperience.js';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -13,7 +14,17 @@ const experiences = new Set();
 
 async function launch($container, index) {
   try {
+
     const client = new Client();
+
+    // // -------------------------------------------------------------------
+    // // register plugins
+    // // -------------------------------------------------------------------
+    // client.pluginManager.register('sync', pluginSyncFactory, {}, []);
+
+    // -------------------------------------------------------------------
+    // launch application
+    // -------------------------------------------------------------------
     await client.init(config);
 
     const como = new CoMo(client, audioContext);

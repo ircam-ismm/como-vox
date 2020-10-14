@@ -52,3 +52,7 @@ body.loading {
   text-align: center;
   font-size: 4rem;
 }
+
+#__soundworks-container .time {
+  font-size: 60px;
+}

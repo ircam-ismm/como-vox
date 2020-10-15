@@ -4,9 +4,9 @@
 import glob
 import os
 
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 
 
@@ -24,7 +24,6 @@ def sensors_read(filename):
         - acceleration as pandas
         - rotation as pandas
     """
-
     data = pd.read_json(filename, lines='true')
 
     metas = pd.DataFrame(data['metas'].to_list(),
@@ -59,7 +58,6 @@ def multiple_sensors_read(filename_pattern):
     Returns:
         dict of sensors values, with filename as index
     """
-
     filenames = glob.iglob(filename_pattern, recursive=True)
     data = {}
 
@@ -80,7 +78,6 @@ def sensors_plot(sensors, figures=None):
     Returns:
         dict of figures {'acceleration', 'rotation'}
     """
-
     index = sensors['index']
     time = sensors['time']
     acceleration = sensors['acceleration']
@@ -102,7 +99,7 @@ def sensors_plot(sensors, figures=None):
                 sharex=acceleration_axes[0])
 
         title = 'Acceleration'
-        window_title = '{0} (Figure {1})'\
+        window_title = '{0} (Figure {1})' \
             .format(title, acceleration_figure.number)
         acceleration_figure.canvas.set_window_title(window_title)
         acceleration_figure.suptitle(title)
@@ -130,7 +127,7 @@ def sensors_plot(sensors, figures=None):
                                            sharex=acceleration_axes[0])
 
         title = 'Rotation'
-        window_title = '{0} (Figure {1})'\
+        window_title = '{0} (Figure {1})' \
             .format(title, rotation_figure.number)
         rotation_figure.canvas.set_window_title(window_title)
         rotation_figure.suptitle(title)
@@ -159,7 +156,6 @@ def multiple_sensors_plot(mutiple_sensors, figures=None):
     Returns:
         dict of figures {'acceleration', 'rotation'}
     """
-
     for sensors in mutiple_sensors.values():
         figures = sensors_plot(sensors, figures)
 

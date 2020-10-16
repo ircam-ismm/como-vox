@@ -35,12 +35,12 @@ def sensors_read(filename):
     data_frame.rename(columns={'metas.id': 'id',
                                'metas.time': 'time',
                                'metas.period': 'period',
-                               'accelerationIncludingGravity.x': 'x',
-                               'accelerationIncludingGravity.y': 'y',
-                               'accelerationIncludingGravity.z': 'z',
-                               'rotationRate.alpha': 'alpha',
-                               'rotationRate.beta': 'beta',
-                               'rotationRate.gamma': 'gamma'},
+                               'accelerationIncludingGravity.x': 'acc.x',
+                               'accelerationIncludingGravity.y': 'acc.y',
+                               'accelerationIncludingGravity.z': 'acc.z',
+                               'rotationRate.alpha': 'rot.alpha',
+                               'rotationRate.beta': 'rot.beta',
+                               'rotationRate.gamma': 'rot.gamma'},
                       inplace=True)
 
     index = data_frame.loc[0, 'id']

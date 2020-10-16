@@ -12,7 +12,10 @@ export function player(data, listeners, {
     }
 
     <!-- HEADER -->
-    <h2 style="${styles.h2}">Session: ${data.session.name}</h2>
+    <h2 style="${styles.h2}">
+      <div>PlayerId: ${data.player.id}</div><br>
+      <div>Session: ${data.session.name}</div>
+    </h2>
 
     <div style="position: relative; min-height: 50px">
       <h3 style="${styles.h3}">PlayerId: ${data.player.id}</h3>
@@ -34,6 +37,10 @@ export function player(data, listeners, {
         ` : ``
       }
     </div>
+
+   <div class="time">
+     ${data.syncTime}
+   </div>
 
     ${verbose ?
       html`

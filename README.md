@@ -27,4 +27,20 @@ intensity is handled by the player (use or not the value)
 -> start | pause | stop
     -> we need to speak to the audio engine from outside...
 
+## Network
 
+### TLS
+
+`apps.ismm.ircam.fr` for Let'e Encrypt TLS certificate. Register a simpler domain name?
+
+If there is an error related to certificate, check system clock first, then on-line certificate at <https://apps.ismm.ircam.fr/>
+
+### Subnetwork
+
+Currently 192.168.1.110-253 in order to comply with R-IoT.
+
+Should we change to 10.0.*.* or event 10.149.*.* to avoid collision?
+
+## Sensors
+
+- [ ] Check that there is no interruption on orientation, when web page refreshes.

@@ -1,0 +1,6 @@
+ipython
+matplotlib
+numpy
+pandas
+pyqt5
+python-osc

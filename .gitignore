@@ -1,3 +1,6 @@
+# TLS certificates
+/**/*.pem
+
 # transpiled files and dependencies
 /node_modules
 /public/vendors
@@ -10,6 +13,10 @@
 .build
 .data
 .vendors
+
+# dnsmasq temporary files
+/dns/dnsmasq.leases
+/dns/log
 
 # junk files
 package-lock.json

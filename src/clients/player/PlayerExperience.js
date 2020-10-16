@@ -102,7 +102,7 @@ class PlayerExperience extends AbstractExperience {
 
 
     // @note - prevent session choice for development
-    this.coMoPlayer.player.set({ sessionId: 'niap' });
+    this.coMoPlayer.player.set({ sessionId: 'test' });
 
     // test bridge
     // this.coMoPlayer.graph.modules['bridge'].addListener(frame => {

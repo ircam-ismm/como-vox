@@ -1,0 +1,4 @@
+[submodule "dns/dnsmasq"]
+  path = dns/dnsmasq
+  url = git://thekelleys.org.uk/dnsmasq.git
+  branch = master

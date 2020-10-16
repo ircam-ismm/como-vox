@@ -16,5 +16,8 @@
     "script-editor": {
       "target": "browser",
     },
+    "controller-measures": {
+      "target": "browser",
+    },
   },
 }

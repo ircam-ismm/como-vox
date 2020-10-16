@@ -33,6 +33,24 @@ class PlayerExperience extends AbstractExperience {
 
     // 1. create a como player instance w/ a unique id (we default to the nodeId)
     const player = await this.como.project.createPlayer(this.como.client.id);
+    const voxPlayerState = await this.client.stateManager.create('vox-player');
+
+    voxPlayerState.subscribe(updates => {
+      for (let [key, value] of Object.entries(updates)) {
+        switch (key) {
+          case 'record': {
+            if (updates['record'] && this.coMoPlayer && this.coMoPlayer.graph) {
+              this.coMoPlayer.graph.modules['bridge'].addListener(frame => {
+                // console.log(frame);
+              });
+            } else {
+              voxPlayerState.set({ record: false });
+            }
+            break;
+         }
+        }
+      }
+    });
 
     // 2. create a sensor source to be used within the graph.
     // We create a `RandomSource` if deviceMotion is not available for development
@@ -66,10 +84,10 @@ class PlayerExperience extends AbstractExperience {
         const sessionId = await this.como.project.createSession(sessionName, sessionPreset);
         return sessionId;
       },
+      'setPlayerParams': async updates => await this.coMoPlayer.player.set(updates),
       // these 2 ones are only for the designer...
       // 'clearSessionExamples': async () => this.coMoPlayer.session.clearExamples(),
       // 'clearSessionLabel': async label => this.coMoPlayer.session.clearLabel(label),
-      'setPlayerParams': async updates => await this.coMoPlayer.player.set(updates),
     };
 
 
@@ -78,6 +96,14 @@ class PlayerExperience extends AbstractExperience {
     // if we want to track the sessions that are created and deleted
     // e.g. when displaying the session choice screen
     this.como.project.subscribe(() => this.render());
+
+    // @note - prevent session choice for development
+    await this.coMoPlayer.player.set({ sessionId: 'test' });
+
+    // test bridge
+    // this.coMoPlayer.graph.modules['bridge'].addListener(frame => {
+    //   // console.log(frame);
+    // });
 
     window.addEventListener('resize', () => this.render());
     this.render();
@@ -99,9 +125,15 @@ class PlayerExperience extends AbstractExperience {
     if (!this.como.hasDeviceMotion && !MOCK_SENSORS) {
       screen = views.sorry(viewData, listeners);
     } else if (this.coMoPlayer.session === null) {
-      screen = views.manageSessions(viewData, listeners, { enableCreation: false });
+      screen = views.manageSessions(viewData, listeners, {
+        enableCreation: false,
+        enableSelection: true,
+      });
     } else {
-      screen = views[this.client.type](viewData, listeners, { verbose: false });
+      screen = views[this.client.type](viewData, listeners, {
+        verbose: false,
+        enableSelection: true,
+      });
     }
 
     render(html`

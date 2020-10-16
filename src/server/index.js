@@ -9,9 +9,12 @@ import JSON5 from 'json5';
 
 import CoMoExperience from './CoMoExperience';
 
+import voxPlayerSchema from './schemas/voxPlayer';
+
 import getConfig from './utils/getConfig.js';
 const ENV = process.env.ENV || 'default';
 const config = getConfig(ENV);
+
 // get CoMo specific config
 try {
   let comoConfigPath = path.join('config', 'como.json');
@@ -82,6 +85,8 @@ console.log(`
 - [pid: ${process.pid}]
 --------------------------------------------------------
 `);
+
+server.stateManager.registerSchema('vox-player', voxPlayerSchema);
 
 const como = new CoMo(server, projectsDirectory, projectName);
 

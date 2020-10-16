@@ -1,6 +1,6 @@
 {
-  name: 'niap',
-  id: 'niap',
+  name: 'test',
+  id: 'test',
   audioFiles: [
     {
       name: '5beats.mp3',
@@ -114,12 +114,16 @@
         id: 'beat-detection',
         type: 'ScriptData',
         options: {
-          scriptName: 'beat-auto',
+          scriptName: 'kick',
         },
       },
       {
         id: 'merge-mapping',
         type: 'Merge',
+      },
+      {
+        id: 'bridge',
+        type: 'Bridge',
       },
       {
         id: 'logger',
@@ -137,8 +141,7 @@
         id: 'audio-destination',
         type: 'AudioDestination',
         options: {
-          scriptName: 'fx-gain-energy',
-          volume: 1,
+          volume: -4,
           mute: false,
         },
       },
@@ -162,6 +165,10 @@
       ],
       [
         'input-resampler',
+        'stream-recorder',
+      ],
+      [
+        'input-resampler',
         'motion-descriptors',
       ],
       [
@@ -198,7 +205,15 @@
       ],
       [
         'merge-mapping',
+        'bridge',
+      ],
+      [
+        'merge-mapping',
         'synth',
+      ],
+      [
+        'synth',
+        'audio-destination',
       ],
     ],
   },

@@ -17,6 +17,8 @@ class ControllerExperience extends AbstractExperience {
     this.remoteCoMoPlayers = new Map(); // <playerId, CoMoPlayer>
     this.localCoMoPlayers = new Map(); // <playerId, CoMoPlayer>
 
+    this.voxPlayerStates = new Map();
+
     como.configureExperience(this, {
       // bypass some plugins if not needed
       checkin: false,
@@ -31,6 +33,18 @@ class ControllerExperience extends AbstractExperience {
     // we need these to diplay the list of available scripts
     this.scriptsDataService = this.como.experience.plugins['scripts-data'];
     this.scriptsAudioService = this.como.experience.plugins['scripts-audio'];
+
+    this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
+      if (schemaName === 'vox-player') {
+        const voxPlayerState = await this.client.stateManager.attach(schemaName, stateId);
+
+        voxPlayerState.subscribe(() => this.render());
+        voxPlayerState.onDetach(() => this.voxPlayerStates.delete(nodeId));
+
+        this.voxPlayerStates.set(nodeId, voxPlayerState);
+        this.render();
+      }
+    });
 
     this.eventListeners = {
       'project:createSession': async e => {
@@ -381,6 +395,7 @@ class ControllerExperience extends AbstractExperience {
                     <h2 style="font-size: 14px">> players</h2>
                     ${sessionPlayers.map(playerState => {
                       const player = playerState.getValues();
+                      const voxPlayerState = this.voxPlayerStates.get(player.id);
 
                       return html`
                         <p>
@@ -515,6 +530,16 @@ class ControllerExperience extends AbstractExperience {
                               <input type="checkbox"
                                 .checked="${player.streamRecord}"
                                 @change="${e => this.eventListeners['player:set'](player.id, 'streamRecord', !!e.target.checked)}"
+                              />
+                            </div>
+                            <div>
+                              record stream (bridge)
+                              <input type="checkbox"
+                                .checked="${voxPlayerState.get('record')}"
+                                @change="${e => {
+                                  console.log('record', e.target.checked);
+                                  voxPlayerState.set({ 'record': !!e.target.checked })
+                                }}"
                               />
                             </div>
                           `

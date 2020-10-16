@@ -115,7 +115,7 @@ class PlayerExperience extends AbstractExperience {
               background-color: #565656;
             "
           >
-            ${['audio', 'data'].map(type => {
+            ${['data', 'audio'].map(type => {
               return html`
                 <sc-text readonly value="${type}"></sc-text>
                 <sc-text

@@ -15,10 +15,10 @@ function beatAuto(graph, helpers, outputFrame) {
 
     // allow a small jitter coming from the resampler
     if (now - lastBeatTime >= period - 0.005) {
-      outputFrame.data['beat'] = [1];
+      outputFrame.data['beat'] = 1;
       lastBeatTime = now;
     } else {
-      outputFrame.data['beat'] = [0];
+      outputFrame.data['beat'] = 0;
     }
     
 //     console.log(outputFrame.data);

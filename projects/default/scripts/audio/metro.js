@@ -1,27 +1,30 @@
 function metro(graph, helpers, audioInNode, audioOutNode, outputFrame) {
-  console.clear();
   const audioContext = graph.como.audioContext;
   // @example
   let lastIntensity = 0;
   let index = 0;
+  
+//   const $p = document.createElement('p');
+//   document.body.appendChild($p);
 
   return {
     // called on each sensor frame
     process(inputFrame, outputFrame) {
-      const beat = inputFrame.data['beat'][0] === 1;
+//       const beat = inputFrame.data['beat'] === 1;
+      const beat = inputFrame.data['kick'] === 1;
 
       if (beat) {
         // we should trigger the next beat, taking latency into account...
         // we have a lot of jitter in Android
-        const now = audioContext.currentTime;
+        // adding 0.02 to currentCurrent time seems to prevent 
+        // dropouts in Android (at least less than using currentTime only...
+        const now = audioContext.currentTime + 0.02;
         
         const env = audioContext.createGain();
-        // @todo - fix audio chain in CoMo, cf. Fred, 
-//         env.connect(audioContext.destination);
+        env.connect(audioOutNode);
         env.gain.value = 0;
-        env.gain.setValueAtTime(0, now);
-        env.gain.linearRampToValueAtTime(1, now + 0.001);
-        env.gain.exponentialRampToValueAtTime(0.0001, now + 0.01);
+        env.gain.setValueAtTime(1, now);
+        env.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
         
         const sine = audioContext.createOscillator();
         sine.connect(env);
@@ -29,9 +32,11 @@ function metro(graph, helpers, audioInNode, audioOutNode, outputFrame) {
         sine.start(now);
         sine.stop(now + 0.03);
         
-        lastIntensity = Math.sqrt(inputFrame.data['intensity'][0]);
+//         lastIntensity = Math.sqrt(inputFrame.data['intensity'][0]);
         
+//         $p.textContent = index;
         index = (index + 1) % 4;
+        
       }
     },
     destroy() {

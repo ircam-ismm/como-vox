@@ -4,6 +4,11 @@ import { playerControls } from './playerControls';
 
 export function sessionPlayers(data, listeners, {
   sessionId = null,
+  showMetas = true,
+  showRecordingControls = true,
+  showDuplicate = true,
+  showRecordStream = true,
+  showGraphOptionsControls = true,
 } = {}) {
   const session = data.sessions.get(sessionId).getValues();
   const players = Array.from(data.players.values())
@@ -16,10 +21,11 @@ export function sessionPlayers(data, listeners, {
 
     ${players.map(player => playerControls(data, listeners, {
       playerId: player.get('id'),
-      showMetas: true,
-      showRecordingControls: true,
-      showDuplicate: true,
-      showRecordStream: true,
+      showMetas,
+      showRecordingControls,
+      showDuplicate,
+      showRecordStream,
+      showGraphOptionsControls,
     }))}
   `;
 }

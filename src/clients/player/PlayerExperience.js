@@ -2,7 +2,7 @@ import { AbstractExperience } from '@soundworks/core/client';
 import { render, html } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
-import views from '../como-helpers/views/index.js';
+import views from '../como-helpers/views-mobile/index.js';
 
 
 // for simple debugging in browser...

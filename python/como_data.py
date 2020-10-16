@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import glob
+import json
 import os
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -24,22 +25,29 @@ def sensors_read(filename):
         - acceleration as pandas
         - rotation as pandas
     """
-    data = pd.read_json(filename, lines='true')
+    data = []
+    with open(filename) as f:
+        for line in f:
+            data.append(json.loads(line))
 
-    metas = pd.DataFrame(data['metas'].to_list(),
-                         index=data.index,
-                         columns=['id', 'time', 'deltaT'])
+    data_frame = pd.json_normalize(data)
 
-    index = metas['id'][0]
-    time = metas['time']
+    data_frame.rename(columns={'metas.id': 'id',
+                               'metas.time': 'time',
+                               'metas.period': 'period',
+                               'accelerationIncludingGravity.x': 'x',
+                               'accelerationIncludingGravity.y': 'y',
+                               'accelerationIncludingGravity.z': 'z',
+                               'rotationRate.alpha': 'alpha',
+                               'rotationRate.beta': 'beta',
+                               'rotationRate.gamma': 'gamma'},
+                      inplace=True)
 
-    acceleration = pd.DataFrame(data['accelerationIncludingGravity'].to_list(),
-                                index=data.index,
-                                columns=['ax', 'ay', 'az'])
+    index = data_frame.loc[0, 'id']
+    time = data_frame.loc[:, 'time']
 
-    rotation = pd.DataFrame(data['rotationRate'].to_list(),
-                            index=data.index,
-                            columns=['gx', 'gy', 'gz'])
+    acceleration = data_frame.loc[:, ['x', 'y', 'z']]
+    rotation = data_frame.loc[:, ['alpha', 'beta', 'gamma']]
 
     return {'index': index, 'time': time,
             'acceleration': acceleration,

@@ -1,5 +1,6 @@
 ipython
-pandas
-numpy
 matplotlib
+numpy
+pandas
 pyqt5
+python-osc

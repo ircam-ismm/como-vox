@@ -1,17 +1,12 @@
 function metro(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const audioContext = graph.como.audioContext;
-  // @example
-  let lastIntensity = 0;
+  
   let index = 0;
   
-//   const $p = document.createElement('p');
-//   document.body.appendChild($p);
-
   return {
     // called on each sensor frame
     process(inputFrame, outputFrame) {
-//       const beat = inputFrame.data['beat'] === 1;
-      const beat = inputFrame.data['kick'] === 1;
+      const beat = inputFrame.data['beat'] === 1;
 
       if (beat) {
         // we should trigger the next beat, taking latency into account...

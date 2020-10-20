@@ -4,12 +4,13 @@
  * Mainly wrap the default logic to bind player, sessions, graphs and sources together
  */
 class CoMoPlayer {
-  constructor(como, player) {
+  constructor(como, player, isDuplicated = false) {
     this.como = como;
     this.player = player;
     this.source = null;
     this.session = null;
     this.graph = null;
+    this.isDuplicated = isDuplicated;
     this._subscriptions = new Set();
 
     this.player.subscribe(async updates => {
@@ -62,7 +63,7 @@ class CoMoPlayer {
         this.player.set({ sessionId: null });
       });
 
-      this.graph = await this.como.project.createGraph(this.session, this.player);
+      this.graph = await this.como.project.createGraph(this.session, this.player, this.isDuplicated);
 
       if (this.source) {
         this.graph.setSource(this.source);

@@ -9,20 +9,20 @@ function kickSamples(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   let triggered = false;
   let peak = 0;
 
-  let currentLabel = null;
   const synth = new helpers.synth.BufferPlayer(audioContext);
   synth.connect(audioOutNode);
 
   const bufferNames = Object.keys(buffers);
-  //console.log(bufferNames)
 
   return {
+    updateParams(updates) {
+
+    },
     process(inputFrame) {
       const enhancedIntensity = inputFrame.data['intensity'].compressed;
-      // var gain = Math.pow(inputFrame.data['intensity'][0];,1/2) * 10 ; // to add
+      // const gain = Math.pow(inputFrame.data['intensity'].high, 1/2) * 10; // to add
       const median = movingAverage.process(enhancedIntensity);
       const delta = enhancedIntensity - median;
-      console.log(delta);
 
       if (delta > threshold) {
         if (enhancedIntensity > peak && !triggered) {
@@ -30,12 +30,13 @@ function kickSamples(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           triggered = true;
           const bufferName = bufferNames[Math.floor(bufferNames.length * Math.random())];
           const buffer = buffers[bufferName][0];
+
           synth.start(buffer, { fadeInDuration: 0.2, loop: false });
         }
       }  else {
-      triggered = false;
-      peak = 0;
-      synth.stop({ fadeOutDuration: 1 });
+        triggered = false;
+        peak = 0;
+        synth.stop({ fadeOutDuration: 1 });
       }
     },
     destroy() {

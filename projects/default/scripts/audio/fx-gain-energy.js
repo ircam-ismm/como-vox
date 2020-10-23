@@ -1,5 +1,5 @@
 function fxGainEnergy(graph, helpers, audioInNode, audioOutNode, outputFrame) {
-
+  
   const audioContext = graph.como.audioContext;
   const movingAverage = new helpers.algo.MovingAverage(12);
   const envelop = audioContext.createGain();
@@ -10,13 +10,16 @@ function fxGainEnergy(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   envelop.gain.setValueAtTime(0, audioContext.currentTime);
 
   return {
+    updateParams(updates) {
+
+    },
     process(inputFrame, outputFrame) {
-      const now = audioContext.currentTime;
-      const enhancedIntensity = inputFrame.data['intensity'].compressed;
-      const avg = movingAverage.process(enhancedIntensity);
+      var now = audioContext.currentTime;
+      var enhancedIntensity = inputFrame.data['intensity'].compressed;
+      var avg = movingAverage.process(enhancedIntensity);
 
       // we know that we have a frame every 20ms so a ramp of 10ms should be safe
-      envelop.gain.linearRampToValueAtTime(avg, now + 0.01);
+      envelop.gain.setTargetAtTime(avg, now, 0.05);
     },
     destroy() {
       envelop.gain.setValueAtTime(0, audioContext.currentTime);

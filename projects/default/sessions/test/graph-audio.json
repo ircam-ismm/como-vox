@@ -6,34 +6,22 @@
       id: 'synth',
       type: 'ScriptAudio',
       options: {
-        scriptName: 'synth-likeliest-loop',
+        scriptName: 'metro',
         bypass: false,
-      },
-    },
-    {
-      id: 'fx-1',
-      type: 'ScriptAudio',
-      options: {
-        scriptName: 'fx-gain-energy',
-        bypass: true,
       },
     },
     {
       id: 'audio-destination',
       type: 'AudioDestination',
       options: {
-        volume: -30,
-        mute: true,
+        volume: -5,
+        mute: false,
       },
     },
   ],
   connections: [
     [
       'synth',
-      'fx-1',
-    ],
-    [
-      'fx-1',
       'audio-destination',
     ],
   ],

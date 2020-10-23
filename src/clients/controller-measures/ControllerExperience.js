@@ -265,7 +265,7 @@ class ControllerExperience extends AbstractExperience {
           </div>`
         : ``}
 
-        <div>
+        <div style="margin-top: 4px;">
           <sc-text
             value="record all clients"
             readonly
@@ -285,8 +285,6 @@ class ControllerExperience extends AbstractExperience {
               ${views.sessionHeader(viewData, listeners, { sessionId })}
               ${this.viewOptions.layout === 'full' ?
                 html`
-                  <!-- ${views.graphOptionsControls(viewData, listeners, { sessionId })} -->
-                  <!-- ${views.sessionMLExamples(viewData, listeners, { sessionId })} -->
                   ${views.sessionPlayers(viewData, listeners, {
                     sessionId,
                     showMetas: false,
@@ -331,39 +329,5 @@ class ControllerExperience extends AbstractExperience {
     });
   }
 }
-
-/*
-  <div style="margin: 10px 0">
-    <h2 style="font-size: 14px">> audio files</h2>
-    ${session.audioFiles.map((audioFile, index) => {
-      return html`
-        <form
-          @submit="${this.listeners['session:updateAudioFiles']}"
-        >
-          <input type="hidden" name="id" value="${session.id}" />
-          <input type="hidden" name="index" value="${index}" />
-          <input type="hidden" name="url" value="${audioFile.url}" />
-          <span>${audioFile.name}</span>
-          <label>
-            active
-            <input
-              type="checkbox"
-              name="active"
-              ?checked="${audioFile.active}"
-            />
-          </label>
-          <label>
-            label
-            <input
-              type="text"
-              name="label"
-              .value="${audioFile.label}"
-            />
-          </label>
-          <input type="submit" value="save" />
-        </form>
-      `;
-    })}
-*/
 
 export default ControllerExperience;

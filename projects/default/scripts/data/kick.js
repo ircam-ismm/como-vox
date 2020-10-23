@@ -7,24 +7,32 @@ function kick(graph, helpers, outputFrame) {
   let lastKickTime = null;
   let lastMedian = +Infinity; // prevent kick on first frame
 
-  return function(inputFrame, outputFrame) {
-    const now = Date.now() / 1000;
-    const intensity = inputFrame.data['intensity'].linear;
-    const delta = intensity - lastMedian;
+  return {
+    updateParams(updates) {
 
-    outputFrame.data['beat'] = 0;
+    },
+    process(inputFrame, outputFrame) {
+      const now = Date.now() / 1000;
+      const intensity = inputFrame.data['intensity'].linear;
+      const delta = intensity - lastMedian;
 
-    if (delta > threshold && lastKickTime === null) {
-      lastKickTime = now;
-      outputFrame.data['beat'] = 1;
-    }
+      outputFrame.data['beat'] = 0;
 
-    if (lastKickTime !== null && now - lastKickTime > minInter) {
-      lastKickTime = null;
-    }
+      if (delta > threshold && lastKickTime === null) {
+        lastKickTime = now;
+        outputFrame.data['beat'] = 1;
+      }
 
-    lastMedian = movingMedian.process(intensity);
+      if (lastKickTime !== null && now - lastKickTime > minInter) {
+        lastKickTime = null;
+      }
 
-    return outputFrame;
+      lastMedian = movingMedian.process(intensity);
+
+      return outputFrame;
+    },
+    destroy() {
+
+    },
   }
 }

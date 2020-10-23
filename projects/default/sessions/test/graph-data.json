@@ -11,7 +11,7 @@
       type: 'MotionDescriptors',
     },
     {
-      id: 'merge-ml-data',
+      id: 'merge-descriptors',
       type: 'Merge',
     },
     {
@@ -26,14 +26,28 @@
       type: 'MLDecoder',
     },
     {
+      id: 'beat-detection',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'kick',
+      },
+    },
+    {
       id: 'output',
       type: 'Output',
+    },
+    {
+      id: 'full-stream',
+      type: 'StreamRecorder',
+      options: {
+        name: 'full-stream/player',
+      },
     },
   ],
   connections: [
     [
       'input',
-      'merge-ml-data',
+      'merge-descriptors',
     ],
     [
       'input',
@@ -41,15 +55,19 @@
     ],
     [
       'motion-descriptors',
-      'merge-ml-data',
+      'merge-descriptors',
     ],
     [
-      'merge-ml-data',
+      'merge-descriptors',
       'select-ml-data',
     ],
     [
       'select-ml-data',
       'ml-decoder',
+    ],
+    [
+      'merge-descriptors',
+      'beat-detection',
     ],
     [
       'input',
@@ -62,6 +80,14 @@
     [
       'ml-decoder',
       'output',
+    ],
+    [
+      'beat-detection',
+      'output',
+    ],
+    [
+      'output',
+      'full-stream',
     ],
   ],
 }

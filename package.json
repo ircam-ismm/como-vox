@@ -15,6 +15,8 @@
     "watch-process:inspect": "soundworks-template-build -i -p",
     "dev": "npm run build && (npm run watch-process:inspect server & soundworks-template-build -b -w)",
     "postinstall": "mkdir -p .vendors/public && cp -R node_modules/@webcomponents/webcomponentsjs .vendors/public",
+    "test": "mocha 'tests/**/*.js'",
+    "test-watch": "mocha --watch 'tests/**/*.js'",
     "start": "node .build/server/index.js"
   },
   "repository": {
@@ -36,6 +38,14 @@
     "template-literal": "^1.0.3"
   },
   "devDependencies": {
-    "@soundworks/template-build": "^3.0.1"
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-export-default-from": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/register": "^7.12.1",
+    "@soundworks/template-build": "^3.0.1",
+    "babel-eslint": "^10.1.0",
+    "chai": "^4.2.0",
+    "eslint": "^7.12.0",
+    "mocha": "^8.2.0"
   }
 }

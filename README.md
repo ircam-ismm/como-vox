@@ -44,3 +44,27 @@ Should we change to 10.0.*.* or event 10.149.*.* to avoid collision?
 ## Sensors
 
 - [ ] Check that there is no interruption on orientation, when web page refreshes.
+
+# Todo
+
+See:
+- [ ] projet radio france
+  + [ ] `client/index.js`
+  + [ ] `src/ScorePlayer.js`
+
+- [ ] MIDI parser
+  + [ ] metas
+  + [ ] master track
+  + [ ] one track per channel
+
+- [ ] MIDI player
+
+
+Sensors:
+- [ ] calibrate senssors and audio
+- [ ] record users gestures with annotated video
+- [ ] prototype with user scripts
+
+Tests:
+- [ ] use Mocha & Chai
+

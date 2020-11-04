@@ -31,6 +31,8 @@
     "como": "github:ircam-ismm/como#develop",
     "core-js": "^3.6.5",
     "json5": "^2.1.0",
+    "jzz": "^1.1.2",
+    "jzz-midi-smf": "^1.4.0",
     "lit-element": "^2.2.1",
     "lit-html": "^1.1.2",
     "regenerator-runtime": "^0.13.7",

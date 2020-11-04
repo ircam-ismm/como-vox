@@ -4,6 +4,7 @@ module.exports = {
     "node": true,
     "es6": true
   },
+  "parser": "babel-eslint",
   "overrides": [
     {
       "files": ["src/client/**/*"],
@@ -20,6 +21,5 @@ module.exports = {
         "es6": true
       },
     },
-
-    "parser": "babel-eslint",
+  ],
 };

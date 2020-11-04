@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime';
 import 'source-map-support/register';
 import { Server } from '@soundworks/core/server';
 import CoMo from 'como/server';

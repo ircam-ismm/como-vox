@@ -1,7 +1,7 @@
 import {describe, it} from 'mocha';
 import {assert, should} from 'chai';
 
-import {assertBeatEqual} from './utils.js';
+import {assertWithin} from '../shared/utils.js';
 
 import fs from 'fs';
 import path from 'path';
@@ -51,7 +51,7 @@ describe(`Parse ${file}`, () => {
             assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 1],
                              'last noteOn');
             assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 4.75, 5, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 4.75, 5, 'last noteOff beat');
             break;
 
           case 1:
@@ -64,7 +64,7 @@ describe(`Parse ${file}`, () => {
             assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 1],
                              'last noteOn');
             assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 2.75, 3, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 2.75, 3, 'last noteOff beat');
             break;
 
           case 2:
@@ -77,7 +77,7 @@ describe(`Parse ${file}`, () => {
             assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 3],
                              'last noteOn');
             assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
             break;
 
           case 3:
@@ -90,7 +90,7 @@ describe(`Parse ${file}`, () => {
             assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 3],
                              'last noteOn');
             assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
             break;
 
           case 4:
@@ -103,7 +103,7 @@ describe(`Parse ${file}`, () => {
             assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 4],
                              'last noteOn');
             assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 4.75, 5, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 4.75, 5, 'last noteOff beat');
             break;
 
           case 5:
@@ -116,7 +116,7 @@ describe(`Parse ${file}`, () => {
             assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 1],
                              'last noteOn');
             assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
             break;
 
           default:

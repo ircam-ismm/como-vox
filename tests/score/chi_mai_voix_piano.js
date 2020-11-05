@@ -1,7 +1,7 @@
 import {describe, it} from 'mocha';
 import {assert, should} from 'chai';
 
-import {assertBeatEqual} from './utils.js';
+import {assertWithin} from '../shared/utils.js';
 
 import fs from 'fs';
 import path from 'path';
@@ -42,68 +42,68 @@ describe(`Parse ${file}`, () => {
         switch(p) {
           case 0:
             assert.equal(noteOnFirst.bar, 4, 'first noteOn bar');
-            assertBeatEqual(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
+            assertWithin(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
 
             assert.equal(noteOnLast.bar, 82, 'last noteOn bar');
-            assertBeatEqual(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
+            assertWithin(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
 
             assert.equal(noteOffLast.bar, 82, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 2.75, 3.05, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 2.75, 3.05, 'last noteOff beat');
             break;
 
           case 1:
             assert.equal(noteOnFirst.bar, 4, 'first noteOn bar');
-            assertBeatEqual(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
+            assertWithin(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
 
             assert.equal(noteOnLast.bar, 82, 'last noteOn bar');
-            assertBeatEqual(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
+            assertWithin(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
 
             assert.equal(noteOffLast.bar, 82, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 2.75, 3.05, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 2.75, 3.05, 'last noteOff beat');
             break;
 
           case 2:
             assert.equal(noteOnFirst.bar, 4, 'first noteOn bar');
-            assertBeatEqual(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
+            assertWithin(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
 
             assert.equal(noteOnLast.bar, 82, 'last noteOn bar');
-            assertBeatEqual(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
+            assertWithin(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
 
             assert.equal(noteOffLast.bar, 82, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 2.75, 3.05, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 2.75, 3.05, 'last noteOff beat');
             break;
 
           case 3:
             assert.equal(noteOnFirst.bar, 4, 'first noteOn bar');
-            assertBeatEqual(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
+            assertWithin(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
 
             assert.equal(noteOnLast.bar, 82, 'last noteOn bar');
-            assertBeatEqual(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
+            assertWithin(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
 
             assert.equal(noteOffLast.bar, 82, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 2.75, 3.05, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 2.75, 3.05, 'last noteOff beat');
             break;
 
           case 4:
             assert.equal(noteOnFirst.bar, 1, 'first noteOn bar');
-            assertBeatEqual(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
+            assertWithin(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
 
             assert.equal(noteOnLast.bar, 94, 'last noteOn bar');
-            assertBeatEqual(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
+            assertWithin(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
 
             assert.equal(noteOffLast.bar, 94, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 1.75, 2.05, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 1.75, 2.05, 'last noteOff beat');
             break;
 
           case 5:
             assert.equal(noteOnFirst.bar, 1, 'first noteOn bar');
-            assertBeatEqual(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
+            assertWithin(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
 
             assert.equal(noteOnLast.bar, 94, 'last noteOn bar');
-            assertBeatEqual(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
+            assertWithin(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
 
             assert.equal(noteOffLast.bar, 94, 'last noteOff bar');
-            assertBeatEqual(noteOffLast.beat, 1.75, 2.05, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 1.75, 2.05, 'last noteOff beat');
             break;
 
           default:

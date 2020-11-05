@@ -8,6 +8,7 @@ import { parse } from '../../src/shared/score/midi.js'
 
 const files = [
   'tests/score/assets/chi_mai_voix_piano.mid',
+  'tests/score/assets/coule-la-seine.midi',
   'tests/score/assets/test_voix_et_piano.mid',
 ];
 

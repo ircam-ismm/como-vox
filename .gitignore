@@ -19,6 +19,9 @@
 /dns/log
 /dns/bin
 
+# python
+/**/__pycache__/
+
 # junk files
 package-lock.json
 .DS_Store

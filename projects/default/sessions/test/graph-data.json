@@ -33,18 +33,31 @@
       },
     },
     {
-      id: 'noop',
+      id: 'constant',
       type: 'ScriptData',
       options: {
-        scriptName: 'noop',
+        scriptName: 'constant',
       },
+    },
+    {
+      id: 'constant2',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'constant',
+        // @TODO: initial parameters?
+        name: 'constant2',
+        value: 12,
+      },
+    },
+    {
+      // allow for direct connections
+      // (in addition to connection from 'output')
+      id: 'bridge-merge',
+      type: 'Merge',
     },
     {
       id: 'bridge',
       type: 'Bridge',
-      options: {
-        scriptName: 'noop',
-      },
     },
     {
       id: 'output',
@@ -97,19 +110,36 @@
     ],
     [
       'beat-detection',
-      'noop',
+      'constant',
     ],
     [
-      'noop',
+      'beat-detection',
       'output',
     ],
     [
-      'noop',
-      'bridge',
+      'constant',
+      'output',
+    ],
+    [
+      // must connect to an input
+      'input',
+      'constant2',
+    ],
+    [
+      'constant2',
+      'output',
     ],
     [
       'output',
       'full-stream',
+    ],
+    [
+      'output',
+      'bridge-merge'
+    ],
+    [
+      'bridge-merge',
+      'bridge',
     ],
   ],
 }

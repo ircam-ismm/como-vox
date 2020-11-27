@@ -43,15 +43,31 @@ export function player(data, listeners, {
     </div>
 
     <div class="test">
+
+      <div class="test constant">Test constant: ${data.constant}</div>
+
       <button
         style="
           ${styles.button}
           width: 200px;
           margin: 0;
         "
-        @click="${e => listeners.setGraphOptions()}">
-        update noop param
+        @click="${e => listeners.setConstant()}">
+        Update constant param
       </button>
+
+      <div class="test constant">Test constant2: ${data.constant2}</div>
+
+      <button
+        style="
+          ${styles.button}
+          width: 200px;
+          margin: 0;
+        "
+        @click="${e => listeners.setConstant2()}">
+        Update constant2 param
+      </button>
+
     </div>
 
     ${verbose ?

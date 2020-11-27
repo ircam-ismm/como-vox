@@ -24,6 +24,9 @@ class PlayerExperience extends AbstractExperience {
     this.player = null;
     this.session = null;
 
+    this.constant;
+    this.constant2;
+
     // configure como w/ the given experience
     this.como.configureExperience(this);
     // default initialization views
@@ -91,9 +94,14 @@ class PlayerExperience extends AbstractExperience {
       // these 2 ones are only for the designer...
       // 'clearSessionExamples': async () => this.coMoPlayer.session.clearExamples(),
       // 'clearSessionLabel': async label => this.coMoPlayer.session.clearLabel(label),
-      setGraphOptions: async () => {
-        this.coMoPlayer.player.setGraphOptions('noop', {
-          scriptParams: { rand: Math.random() },
+      setConstant: async () => {
+        this.coMoPlayer.player.setGraphOptions('constant', {
+          scriptParams: { value: Math.random() },
+        });
+      },
+      setConstant2: async () => {
+        this.coMoPlayer.player.setGraphOptions('constant2', {
+          scriptParams: { value: Math.random() },
         });
       },
     };
@@ -111,8 +119,13 @@ class PlayerExperience extends AbstractExperience {
 
     // quick and drity fix...
     this.coMoPlayer.onGraphCreated(() => {
+      this.coMoPlayer.player.setGraphOptions('constant2', {
+        scriptParams: { name: 'constant2' },
+      });
+
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
-        // console.log('bridge', frame);
+        this.constant = frame.constant;
+        this.constant2 = frame.constant2;
       });
     });
 
@@ -136,6 +149,8 @@ class PlayerExperience extends AbstractExperience {
       player: this.coMoPlayer.player.getValues(),
       session: this.coMoPlayer.session ? this.coMoPlayer.session.getValues() : null,
       syncTime,
+      constant: this.constant,
+      constant2: this.constant2,
     };
 
     const listeners = this.listeners;

@@ -38,9 +38,21 @@ export function player(data, listeners, {
       }
     </div>
 
-   <div class="time">
-     ${data.syncTime}
-   </div>
+    <div class="time">
+      ${data.syncTime}
+    </div>
+
+    <div class="test">
+                <button
+            style="
+              ${styles.button}
+              width: 200px;
+              margin: 0;
+            "
+            @click="${e => listeners.setGraphOptions()}">
+            update noop param
+          </button>
+    </div>
 
     ${verbose ?
       html`

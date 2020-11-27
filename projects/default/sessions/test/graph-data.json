@@ -33,6 +33,20 @@
       },
     },
     {
+      id: 'noop',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'noop',
+      },
+    },
+    {
+      id: 'bridge',
+      type: 'Bridge',
+      options: {
+        scriptName: 'noop',
+      },
+    },
+    {
       id: 'output',
       type: 'Output',
     },
@@ -83,7 +97,15 @@
     ],
     [
       'beat-detection',
+      'noop',
+    ],
+    [
+      'noop',
       'output',
+    ],
+    [
+      'noop',
+      'bridge',
     ],
     [
       'output',

@@ -39,7 +39,7 @@ If there is an error related to certificate, check system clock first, then on-l
 
 Currently 192.168.1.110-253 in order to comply with R-IoT.
 
-Should we change to 10.0.*.* or event 10.149.*.* to avoid collision?
+Should we change to 10.0.*.* or even 10.149.*.* to avoid collision?
 
 ## Sensors
 

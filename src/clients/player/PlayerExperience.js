@@ -83,14 +83,19 @@ class PlayerExperience extends AbstractExperience {
     // 4. react to gui controls.
     this.listeners = {
       // this one is needed for the enableCreation option
-      'createSession': async (sessionName, sessionPreset) => {
+      createSession: async (sessionName, sessionPreset) => {
         const sessionId = await this.como.project.createSession(sessionName, sessionPreset);
         return sessionId;
       },
-      'setPlayerParams': async updates => await this.coMoPlayer.player.set(updates),
+      setPlayerParams: async updates => await this.coMoPlayer.player.set(updates),
       // these 2 ones are only for the designer...
       // 'clearSessionExamples': async () => this.coMoPlayer.session.clearExamples(),
       // 'clearSessionLabel': async label => this.coMoPlayer.session.clearLabel(label),
+      setGraphOptions: async () => {
+        this.coMoPlayer.player.setGraphOptions('noop', {
+          scriptParams: { rand: Math.random() },
+        });
+      },
     };
 
 
@@ -102,12 +107,14 @@ class PlayerExperience extends AbstractExperience {
 
 
     // @note - prevent session choice for development
-    this.coMoPlayer.player.set({ sessionId: 'test' });
+    await this.coMoPlayer.player.set({ sessionId: 'test' });
 
-    // test bridge
-    // this.coMoPlayer.graph.modules['bridge'].addListener(frame => {
-    //   // console.log(frame);
-    // });
+    // quick and drity fix...
+    this.coMoPlayer.onGraphCreated(() => {
+      this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
+        // console.log('bridge', frame);
+      });
+    });
 
     window.addEventListener('resize', () => this.render());
 

@@ -14,6 +14,7 @@ class CoMoPlayer {
     this.graph = null;
     this.isDuplicated = isDuplicated;
     this._subscriptions = new Set();
+    this._graphCreatedSubscriptions = new Set();
 
     this._unsubscribePlayer = this.player.subscribe(async updates => {
       for (let name in updates) {
@@ -78,6 +79,8 @@ class CoMoPlayer {
         this.graph.setSource(this.source);
       }
 
+      this._emitGraphChange();
+
       this.player.set({ loading: false });
     }
   }
@@ -98,9 +101,17 @@ class CoMoPlayer {
     }
   }
 
+  onGraphCreated(func) {
+    this._graphCreatedSubscriptions.add(func);
+    return () => this._graphCreatedSubscriptions.delete(func);
+  }
+
+  _emitGraphChange() {
+    this._graphCreatedSubscriptions.forEach(func => func(this));
+  }
+
   onChange(func) {
     this._subscriptions.add(func);
-
     return () => this._subscriptions.delete(func);
   }
 

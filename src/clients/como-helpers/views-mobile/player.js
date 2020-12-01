@@ -49,7 +49,6 @@ export function player(data, listeners, {
       <button
         style="
           ${styles.button}
-          width: 200px;
           margin: 0;
         "
         @click="${e => listeners.setConstant()}">
@@ -61,7 +60,6 @@ export function player(data, listeners, {
       <button
         style="
           ${styles.button}
-          width: 200px;
           margin: 0;
         "
         @click="${e => listeners.setConstant2()}">

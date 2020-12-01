@@ -44,9 +44,10 @@
       type: 'ScriptData',
       options: {
         scriptName: 'constant',
-        // @TODO: initial parameters?
-        name: 'constant2',
-        value: 12,
+        scriptParams: {
+          name: 'constant2',
+          value: 12,
+        },
       },
     },
     {

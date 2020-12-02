@@ -1,4 +1,4 @@
-function constant(graph, helpers, outputFrame) {
+export function constant(graph, helpers, outputFrame) {
   const parameters = {
     name: 'constant',
     value: 0,
@@ -17,3 +17,6 @@ function constant(graph, helpers, outputFrame) {
     },
   }
 }
+
+export default {constant};
+

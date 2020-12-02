@@ -55,18 +55,9 @@ export function player(data, listeners, {
         Update constant param
       </button>
 
-      <div class="test constant">Test constant2: ${data.constant2}</div>
-
-      <button
-        style="
-          ${styles.button}
-          margin: 0;
-        "
-        @click="${e => listeners.setConstant2()}">
-        Update constant2 param
-      </button>
-
-    </div>
+    <div class="position">Position: ${data.position
+      ? `${data.position[0]} / ${data.position[1]}`
+      : '? / ?'}</div>
 
     ${verbose ?
       html`

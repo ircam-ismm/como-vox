@@ -4,6 +4,9 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
 import views from '../como-helpers/views-mobile/index.js';
 
+// ../shared is not included by ../../server
+// include everything from ../../server
+import '../../server/imports.js';
 
 // for simple debugging in browser...
 const MOCK_SENSORS = window.location.hash === '#mock-sensors';
@@ -25,7 +28,8 @@ class PlayerExperience extends AbstractExperience {
     this.session = null;
 
     this.constant;
-    this.constant2;
+
+    this.position = [0, 0];
 
     // configure como w/ the given experience
     this.como.configureExperience(this);
@@ -95,13 +99,10 @@ class PlayerExperience extends AbstractExperience {
       // 'clearSessionExamples': async () => this.coMoPlayer.session.clearExamples(),
       // 'clearSessionLabel': async label => this.coMoPlayer.session.clearLabel(label),
       setConstant: async () => {
-        this.coMoPlayer.player.setGraphOptions('constant', {
-          scriptParams: { value: Math.random() },
-        });
-      },
-      setConstant2: async () => {
-        this.coMoPlayer.player.setGraphOptions('constant2', {
-          scriptParams: { value: Math.random() },
+        await this.coMoPlayer.player.setGraphOptions('main', {
+          scriptParams: {
+            constant: { value: Math.random() },
+          },
         });
       },
     };
@@ -119,13 +120,9 @@ class PlayerExperience extends AbstractExperience {
 
     // quick and drity fix...
     this.coMoPlayer.onGraphCreated(() => {
-      this.coMoPlayer.player.setGraphOptions('constant2', {
-        scriptParams: { name: 'constant2' },
-      });
-
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
         this.constant = frame.constant;
-        this.constant2 = frame.constant2;
+        this.position = frame.position;
       });
     });
 
@@ -150,7 +147,7 @@ class PlayerExperience extends AbstractExperience {
       session: this.coMoPlayer.session ? this.coMoPlayer.session.getValues() : null,
       syncTime,
       constant: this.constant,
-      constant2: this.constant2,
+      position: this.position,
     };
 
     const listeners = this.listeners;

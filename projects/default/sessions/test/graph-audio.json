@@ -2,11 +2,19 @@
   name: 'default',
   version: '0.0.0',
   modules: [
+    // {
+    //   id: 'synth',
+    //   type: 'ScriptAudio',
+    //   options: {
+    //     scriptName: 'metro',
+    //     bypass: false,
+    //   },
+    // },
     {
-      id: 'synth',
+      id: 'click-synth',
       type: 'ScriptAudio',
       options: {
-        scriptName: 'metro',
+        scriptName: 'click-synth',
         bypass: false,
       },
     },
@@ -21,7 +29,7 @@
   ],
   connections: [
     [
-      'synth',
+      'click-synth',
       'audio-destination',
     ],
   ],

@@ -68,3 +68,11 @@ Sensors:
 Tests:
 - [ ] use Mocha & Chai
 
+## CoMo
+
+
+- [ ] connect *from* output?
+- [ ] restart `npm run dev` after graph change?
+- [ ] graph broken?
+- [ ] script node?
+- [ ] initial parameters for scripts

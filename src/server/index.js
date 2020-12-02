@@ -13,6 +13,9 @@ import CoMoExperience from './CoMoExperience';
 import voxPlayerSchema from './schemas/voxPlayer';
 
 import getConfig from './utils/getConfig.js';
+
+import './imports.js';
+
 const ENV = process.env.ENV || 'default';
 const config = getConfig(ENV);
 

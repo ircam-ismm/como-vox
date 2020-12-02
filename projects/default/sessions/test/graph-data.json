@@ -26,39 +26,11 @@
       type: 'MLDecoder',
     },
     {
-      id: 'beat-detection',
+      id: 'main',
       type: 'ScriptData',
       options: {
-        scriptName: 'kick',
+        scriptName: 'main-data',
       },
-    },
-    {
-      id: 'constant',
-      type: 'ScriptData',
-      options: {
-        scriptName: 'constant',
-      },
-    },
-    {
-      id: 'constant2',
-      type: 'ScriptData',
-      options: {
-        scriptName: 'constant',
-        scriptParams: {
-          name: 'constant2',
-          value: 12,
-        },
-      },
-    },
-    {
-      // allow for direct connections
-      // (in addition to connection from 'output')
-      id: 'bridge-merge',
-      type: 'Merge',
-    },
-    {
-      id: 'bridge',
-      type: 'Bridge',
     },
     {
       id: 'output',
@@ -70,6 +42,10 @@
       options: {
         name: 'full-stream/player',
       },
+    },
+    {
+      id: 'bridge',
+      type: 'Bridge',
     },
   ],
   connections: [
@@ -95,7 +71,11 @@
     ],
     [
       'merge-descriptors',
-      'beat-detection',
+      'main',
+    ],
+    [
+      'main',
+      'output',
     ],
     [
       'input',
@@ -110,36 +90,11 @@
       'output',
     ],
     [
-      'beat-detection',
-      'constant',
-    ],
-    [
-      'beat-detection',
-      'output',
-    ],
-    [
-      'constant',
-      'output',
-    ],
-    [
-      // must connect to an input
-      'input',
-      'constant2',
-    ],
-    [
-      'constant2',
-      'output',
-    ],
-    [
       'output',
       'full-stream',
     ],
     [
       'output',
-      'bridge-merge'
-    ],
-    [
-      'bridge-merge',
       'bridge',
     ],
   ],

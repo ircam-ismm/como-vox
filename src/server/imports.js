@@ -1,4 +1,6 @@
-import {constant} from './scripts/constant.js'
+import {metronome} from './scripts/metronome.js'
+import {clickGenerator} from './scripts/clickGenerator.js';
+import conversion from './helpers/conversion.js';
 
 let app;
 if(typeof window !== 'undefined') {
@@ -10,6 +12,12 @@ if(typeof window !== 'undefined') {
 }
 
 app.imports = {
-  constant,
+  scripts: {
+    metronome,
+    clickGenerator,
+  },
+  helpers: {
+    conversion,
+  },
 };
 

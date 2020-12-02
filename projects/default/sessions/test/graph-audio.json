@@ -14,7 +14,7 @@
       id: 'click-synth',
       type: 'ScriptAudio',
       options: {
-        scriptName: 'click-synth',
+        scriptName: 'clickSynth',
         bypass: false,
       },
     },

@@ -29,14 +29,17 @@ function clickGenerator(graph, helpers, outputFrame) {
 
       let trigger = false;
 
-      if(barLast === 0) {
-        // start on a beat
-        trigger = (beat % 1 > 0.95 && beat % 1 < 0.05);
-        barLast = bar;
-        beatLast = beat;
-      } else {
-        // on beat change
-        trigger = Math.floor(beat) !== Math.floor(beatLast);
+      // always on a beat, to avoid late beats
+      if(beat % 1 > 0.95 || beat % 1 < 0.05) {
+        if(barLast === 0) {
+          // start
+          barLast = bar;
+          beatLast = beat;
+          trigger = true;
+        } else {
+          // on beat change
+          trigger = Math.floor(beat) !== Math.floor(beatLast);
+        }
       }
 
       if(!trigger) {

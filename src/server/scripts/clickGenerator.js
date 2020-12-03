@@ -9,7 +9,7 @@ export function clickGenerator(graph, helpers, outputFrame) {
 
   const channel = 'click';
   let pitch = pitchLow;
-  const intensity = 1;
+  const intensity = 127;
   const duration = 50e-3;
 
   return {

@@ -42,19 +42,6 @@ export function player(data, listeners, {
       ${data.syncTime}
     </div>
 
-    <div class="test">
-
-      <div class="test constant">Test constant: ${data.constant}</div>
-
-      <button
-        style="
-          ${styles.button}
-          margin: 0;
-        "
-        @click="${e => listeners.setConstant()}">
-        Update constant param
-      </button>
-
     <div class="position">Position: ${data.position
       ? `${data.position[0]} / ${data.position[1]}`
       : '? / ?'}</div>

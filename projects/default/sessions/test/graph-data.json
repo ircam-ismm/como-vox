@@ -26,10 +26,17 @@
       type: 'MLDecoder',
     },
     {
-      id: 'main',
+      id: 'metronome',
       type: 'ScriptData',
       options: {
-        scriptName: 'main-data',
+        scriptName: 'metronome',
+      },
+    },
+    {
+      id: 'click-generator',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'clickGenerator',
       },
     },
     {
@@ -51,6 +58,10 @@
   connections: [
     [
       'input',
+      'output',
+    ],
+    [
+      'input',
       'merge-descriptors',
     ],
     [
@@ -59,30 +70,38 @@
     ],
     [
       'motion-descriptors',
+      'output',
+    ],
+    [
+      'motion-descriptors',
       'merge-descriptors',
     ],
     [
       'merge-descriptors',
+      'output',
+    ],
+    [
+      'merge-descriptors',
       'select-ml-data',
+    ],
+    [
+      'merge-descriptors',
+      'metronome',
     ],
     [
       'select-ml-data',
       'ml-decoder',
     ],
     [
-      'merge-descriptors',
-      'main',
-    ],
-    [
-      'main',
+      'metronome',
       'output',
     ],
     [
-      'input',
-      'output',
+      'metronome',
+      'click-generator',
     ],
     [
-      'motion-descriptors',
+      'click-generator',
       'output',
     ],
     [

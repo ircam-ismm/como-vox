@@ -27,8 +27,6 @@ class PlayerExperience extends AbstractExperience {
     this.player = null;
     this.session = null;
 
-    this.constant;
-
     this.position = [0, 0];
 
     // configure como w/ the given experience
@@ -98,13 +96,6 @@ class PlayerExperience extends AbstractExperience {
       // these 2 ones are only for the designer...
       // 'clearSessionExamples': async () => this.coMoPlayer.session.clearExamples(),
       // 'clearSessionLabel': async label => this.coMoPlayer.session.clearLabel(label),
-      setConstant: async () => {
-        await this.coMoPlayer.player.setGraphOptions('main', {
-          scriptParams: {
-            constant: { value: Math.random() },
-          },
-        });
-      },
     };
 
 
@@ -122,7 +113,6 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer.onGraphCreated(() => {
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
         this.position = frame.position;
-        console.log('frame from bridge', frame);
       });
     });
 
@@ -146,7 +136,6 @@ class PlayerExperience extends AbstractExperience {
       player: this.coMoPlayer.player.getValues(),
       session: this.coMoPlayer.session ? this.coMoPlayer.session.getValues() : null,
       syncTime,
-      constant: this.constant,
       position: this.position,
     };
 

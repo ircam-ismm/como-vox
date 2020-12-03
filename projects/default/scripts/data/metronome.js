@@ -1,13 +1,4 @@
-export function metronome(graph, helpers, outputFrame) {
-  outputFrame.data = {};
-
-  // reset outputData, here `outputFrame.data` is an array to comply
-  // with the data format accepted by the xmm encoder / decoder
-  // outputFrame.data = [];
-
-  // we can do additionnal things here such as creating filters, etc., e.g.
-  // var movingAverage = new helpers.algo.MovingAverage(12);
-
+function metronome(graph, helpers, outputFrame) {
   let tempo = 60;
 
   let timeSignature = [4, 4];
@@ -15,7 +6,6 @@ export function metronome(graph, helpers, outputFrame) {
   let positionLast = [1, 1]; // bar, beat
   let positionLastTime = 0; // in seconds
 
-  // return the function that will executed on each frame
   return {
     updateParams(updates) {
       if(typeof updates.tempo) {
@@ -65,5 +55,3 @@ export function metronome(graph, helpers, outputFrame) {
     },
   };
 }
-
-export default {metronome};

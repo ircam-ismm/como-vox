@@ -1,6 +1,4 @@
-export function clickGenerator(graph, helpers, outputFrame) {
-  outputFrame.data = {};
-
+function clickGenerator(graph, helpers, outputFrame) {
   let barLast = 0;
   let beatLast = 0;
 
@@ -24,9 +22,6 @@ export function clickGenerator(graph, helpers, outputFrame) {
       const outputData = outputFrame.data;
 
       const position = inputData['position'];
-      // const notes = (inputData['notes']
-      //                ? inputData['notes'].slice()
-      //                : []);
       const notes = [];
 
       const bar = position[0];
@@ -65,9 +60,6 @@ export function clickGenerator(graph, helpers, outputFrame) {
       outputData['notes'] = notes;
       barLast = bar;
       beatLast = beat;
-
-      console.log('notes', notes);
-
       return outputFrame;
     },
 
@@ -76,5 +68,3 @@ export function clickGenerator(graph, helpers, outputFrame) {
     },
   }
 }
-
-export default {clickGenerator};

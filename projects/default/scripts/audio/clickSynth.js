@@ -4,8 +4,6 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const midiPichToHertz = app.imports.helpers.conversion.midiPitchToHertz;
   const midiIntensityToAmplitude = app.imports.helpers.conversion.midiIntensityToAmplitude;
 
-  outputFrame.data = {};
-
   const audioContext = graph.como.audioContext;
 
   return {

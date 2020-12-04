@@ -24,8 +24,8 @@ function clickGenerator(graph, helpers, outputFrame) {
       const position = inputData['position'];
       const notes = [];
 
-      const bar = position[0];
-      const beat = position[1];
+      const bar = position.bar;
+      const beat = position.beat;
 
       let trigger = false;
 

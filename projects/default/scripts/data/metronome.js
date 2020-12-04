@@ -1,9 +1,15 @@
 function metronome(graph, helpers, outputFrame) {
   let tempo = 60;
 
-  let timeSignature = [4, 4];
+  let timeSignature = {
+    count: 4,
+    division: 4,
+  };
 
-  let positionLast = [1, 1]; // bar, beat
+  let positionLast = {
+    bar: 1,
+    beat: 1,
+  };
   let positionLastTime = 0; // in seconds
 
   return {
@@ -35,16 +41,16 @@ function metronome(graph, helpers, outputFrame) {
       }
 
       const timeDelta = now - positionLastTime;
-      const beatDelta = timeDelta / (60 / tempo) * timeSignature[1] / 4;
+      const beatDelta = timeDelta / (60 / tempo) * timeSignature.division / 4;
 
       // modulo shifted by 1, for bar starting at 1
-      const beat = (positionLast[1] + beatDelta - 1 + timeSignature[0])
-            % timeSignature[0] + 1;
+      const beat = (positionLast.beat + beatDelta - 1 + timeSignature.count)
+            % timeSignature.count + 1;
 
-      const barDelta = (positionLast[1] - 1 + beatDelta) / timeSignature[0];
-      const bar = Math.floor(positionLast[0] + barDelta);
+      const barDelta = (positionLast.beat - 1 + beatDelta) / timeSignature.count;
+      const bar = Math.floor(positionLast.bar + barDelta);
 
-      positionLast = [bar, beat];
+      positionLast = {bar, beat};
       positionLastTime = now;
 
       outputData['position'] = positionLast;

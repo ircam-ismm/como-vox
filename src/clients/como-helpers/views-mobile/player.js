@@ -43,7 +43,7 @@ export function player(data, listeners, {
     </div>
 
     <div class="position">Position: ${data.position
-      ? `${data.position[0]} / ${data.position[1]}`
+      ? `${data.position.bar} / ${data.position.beat}`
       : '? / ?'}</div>
 
     ${verbose ?

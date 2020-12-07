@@ -13,15 +13,19 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     // called on each sensor frame
     process(inputFrame, outputFrame) {
       const inputData = inputFrame.data;
-      // const inputData = window.app.data;
 
-      const notes = inputData['notes'];
-      if(!notes) {
+      const notesContainer = inputData['notes'];
+      if(!notesContainer) {
         return;
       }
 
-      notes.forEach( (note) => {
-        if(note.channel === 'click') {
+      for(const channel in notesContainer) {
+        if(channel !== 'click' && channel !== 'clack') {
+          continue;
+        }
+
+        const notes = notesContainer[channel];
+        notes.forEach( (note) => {
           // we should trigger the next beat, taking latency into account...
           // we have a lot of jitter in Android
           // adding 0.02 to currentCurrent time seems to prevent
@@ -39,8 +43,8 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           sine.frequency.value = midiPichToHertz(note.pitch);
           sine.start(now);
           sine.stop(now + note.duration);
-        }
-      });
+        });
+      }
     },
 
     destroy() {

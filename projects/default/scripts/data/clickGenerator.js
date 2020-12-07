@@ -23,6 +23,8 @@ function clickGenerator(graph, helpers, outputFrame) {
 
       const position = inputData['position'];
       const notes = [];
+      const notesContainer = {};
+      notesContainer[channel] = notes;
 
       const bar = position.bar;
       const beat = position.beat;
@@ -54,13 +56,12 @@ function clickGenerator(graph, helpers, outputFrame) {
       }
 
       notes.push({
-        channel,
         pitch,
         intensity,
         duration,
       });
 
-      outputData['notes'] = notes;
+      outputData['notes'] = notesContainer;
       barLast = bar;
       beatLast = beat;
       return outputFrame;

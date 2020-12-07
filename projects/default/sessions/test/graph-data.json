@@ -26,13 +26,6 @@
       type: 'MLDecoder',
     },
     {
-      id: 'frameCount',
-      type: 'ScriptData',
-      options: {
-        scriptName: 'frameCount',
-      },
-    },
-    {
       id: 'metronome',
       type: 'ScriptData',
       options: {
@@ -58,13 +51,6 @@
       type: 'ScriptData',
       options: {
         scriptName: 'clackFromBeat',
-      },
-    },
-    {
-      id: 'mergeAppend',
-      type: 'ScriptData',
-      options: {
-        scriptName: 'mergeAppend',
       },
     },
     {
@@ -106,10 +92,6 @@
     ],
     [
       'merge-descriptors',
-      'frameCount',
-    ],
-    [
-      'merge-descriptors',
       'output',
     ],
     [
@@ -130,7 +112,7 @@
     ],
     [
       'metronome',
-      'mergeAppend',
+      'output',
     ],
     [
       'metronome',
@@ -138,7 +120,7 @@
     ],
     [
       'click-generator',
-      'mergeAppend',
+      'output',
     ],
     [
       'beatTriggerFromGesture',
@@ -146,18 +128,10 @@
     ],
     [
       'clackFromBeat',
-      'mergeAppend',
-    ],
-    [
-      'frameCount',
-      'mergeAppend',
-    ],
-    [
-      'ml-decoder',
       'output',
     ],
     [
-      'mergeAppend',
+      'ml-decoder',
       'output',
     ],
     [

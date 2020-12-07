@@ -2,8 +2,8 @@ function clickGenerator(graph, helpers, outputFrame) {
   let barLast = 0;
   let beatLast = 0;
 
-  const pitchHigh = 91; // D6
-  const pitchLow = 86; // G6
+  const pitchHigh = 91; // G6
+  const pitchLow = 86; // E6
 
   const channel = 'click';
   let pitch = pitchLow;

@@ -112,7 +112,8 @@ class PlayerExperience extends AbstractExperience {
     // quick and drity fix...
     this.coMoPlayer.onGraphCreated(() => {
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
-        this.position = frame.position;
+        // console.log('frame', JSON.parse(JSON.stringify(frame)));
+        this.position = frame['position'];;
       });
     });
 

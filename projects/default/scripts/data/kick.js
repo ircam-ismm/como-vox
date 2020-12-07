@@ -16,11 +16,11 @@ function kick(graph, helpers, outputFrame) {
       const intensity = inputFrame.data['intensity'].linear;
       const delta = intensity - lastMedian;
 
-      outputFrame.data['beat'] = 0;
+      outputFrame.data['beat-trigger'] = 0;
 
       if (delta > threshold && lastKickTime === null) {
         lastKickTime = now;
-        outputFrame.data['beat'] = 1;
+        outputFrame.data['beat-trigger'] = 1;
       }
 
       if (lastKickTime !== null && now - lastKickTime > minInter) {

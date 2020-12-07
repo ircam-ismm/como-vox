@@ -2,7 +2,7 @@ const e = {};
 
 export class MasterTrack {
   constructor({ppqn = 96,
-               timeSignature = [4, 4],
+               timeSignature = {count: 4, division: 4},
                tempo = 120} = {}) {
     this.events = [];
     this.ppqn = ppqn;

@@ -44,7 +44,10 @@ export function parse(data) {
     let instrument;
     let name;
     let tempo = 120;
-    let timeSignature = [4, 4];
+    let timeSignature = {
+      count:4,
+      division: 4,
+    };
     let tick = 0;
     let bar = 1;
     let beat = 1;
@@ -145,7 +148,8 @@ export function parse(data) {
               `(${tick})`,
               'tempo:', tempo, '>', Math.round(tempo) );
         } else if(timeSignatureChange) {
-          timeSignature = [...event.getTimeSignature()]; // clone
+          const [count, division] = event.getTimeSignature()
+          timeSignature = {count, division};
 
           masterTrack.events.push(new TimeSignature({
             tick,
@@ -164,7 +168,7 @@ export function parse(data) {
               'bar:', bar, '>', display.bar,
               'beat:', beat, '>', display.beat,
               `(${tick})`,
-              'time signature:', timeSignature[0], '/', timeSignature[1]);
+              'time signature:', timeSignature.count, '/', timeSignature.division);
         } else {
           // do no keep unknown events
           log('channel', 'master',
@@ -451,15 +455,15 @@ function barBeatAdvance({ppqn, timeSignature, last, tick}) {
 
   // resolution per quarter note
   // do not round to avoid drift
-  const beatDelta = tickDelta / ppqn * timeSignature[1] / 4;
+  const beatDelta = tickDelta / ppqn * timeSignature.division / 4;
 
   // modulo shifted by 1, for bar starting at 1
-  const beat = (last.beat + beatDelta - 1 + timeSignature[0])
-        % timeSignature[0] + 1;
+  const beat = (last.beat + beatDelta - 1 + timeSignature.count)
+        % timeSignature.count + 1;
 
   // lastChange.beat is start offset from lastChange.bar
   // duration starts from beat 1
-  const barDelta = ((last.beat - 1 + beatDelta) / timeSignature[0]);
+  const barDelta = ((last.beat - 1 + beatDelta) / timeSignature.count);
 
   const bar = Math.floor(last.bar + barDelta);
 
@@ -491,14 +495,16 @@ function hexadecimalAndDecimal(number) {
 }
 
 // Do not round, except for display
-function beatRound(value, timeSignature = [4, 4], ppqn = 1024) {
-  const resolution = ppqn * 4 / timeSignature[1];
+function beatRound(value, timeSignature = {count: 4, division: 4},
+                   ppqn = 1024) {
+  const resolution = ppqn * 4 / timeSignature.division;
   return Math.round(value * resolution) / resolution;
 }
 
-function barBeatRound(bar, beat, timeSignature = [4, 4], ppqn = 1024) {
+function barBeatRound(bar, beat, timeSignature = {count: 4, division: 4},
+                      ppqn = 1024) {
   let beatRounded = beatRound(beat, timeSignature, ppqn);
-  const barExtra = (Math.floor(beatRounded) > timeSignature[0]
+  const barExtra = (Math.floor(beatRounded) > timeSignature.count
                     ? 1
                     : 0);
   let barRounded = bar;

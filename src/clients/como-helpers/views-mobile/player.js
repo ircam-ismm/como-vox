@@ -42,6 +42,14 @@ export function player(data, listeners, {
       ${data.syncTime}
     </div>
 
+    <div class="timeSignature">Time signature: ${data.timeSignature
+      ? `${data.timeSignature.count} / ${data.timeSignature.division}`
+      : '? / ?'}</div>
+
+    <div class="tempo">Tempo: ${data.tempo
+      ? `${data.tempo}`
+      : '?'}</div>
+
     <div class="position">Position: ${data.position
       ? `${data.position.bar} / ${data.position.beat}`
       : '? / ?'}</div>

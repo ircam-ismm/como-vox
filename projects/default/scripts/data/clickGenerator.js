@@ -8,7 +8,7 @@ function clickGenerator(graph, helpers, outputFrame) {
   const channel = 'click';
   let pitch = pitchLow;
   const intensity = 127;
-  const duration = 50e-3;
+  const duration = 0.5; // in beats
 
   return {
     updateParams(updates) {
@@ -18,7 +18,6 @@ function clickGenerator(graph, helpers, outputFrame) {
     // called on each sensor frame
     process(inputFrame, outputFrame) {
       const inputData = inputFrame.data;
-
       const outputData = outputFrame.data;
 
       const position = inputData['position'];
@@ -56,6 +55,10 @@ function clickGenerator(graph, helpers, outputFrame) {
       }
 
       notes.push({
+        position: {
+          bar: position.bar,
+          beat: Math.floor(position.beat),
+        },
         pitch,
         intensity,
         duration,

@@ -27,7 +27,19 @@ class PlayerExperience extends AbstractExperience {
     this.player = null;
     this.session = null;
 
-    this.position = [0, 0];
+    this.position = {
+      bar: 0,
+      beat: 0,
+    };
+
+    this.tempo = 120;
+    this.timeSignature = {
+      count: 4,
+      division: 4,
+    };
+
+    this.latency = 0.2; // in seconds
+    this.lookAheadBeats = 1; // in beats, not taking account latency
 
     // configure como w/ the given experience
     this.como.configureExperience(this);
@@ -96,6 +108,13 @@ class PlayerExperience extends AbstractExperience {
       // these 2 ones are only for the designer...
       // 'clearSessionExamples': async () => this.coMoPlayer.session.clearExamples(),
       // 'clearSessionLabel': async label => this.coMoPlayer.session.clearLabel(label),
+
+      setConstantParams: async updates => await this.coMoPlayer.player.setGraphOptions('main', {
+        scriptParams: {
+          constant: { value: Math.random() },
+        },
+      }),
+
     };
 
 
@@ -113,7 +132,9 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer.onGraphCreated(() => {
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
         // console.log('frame', JSON.parse(JSON.stringify(frame)));
-        this.position = frame['position'];;
+        this.position = frame['position'];
+        this.tempo = frame['tempo'];
+        this.timeSignature = frame['timeSignature'];
       });
     });
 
@@ -138,6 +159,8 @@ class PlayerExperience extends AbstractExperience {
       session: this.coMoPlayer.session ? this.coMoPlayer.session.getValues() : null,
       syncTime,
       position: this.position,
+      tempo: this.tempo,
+      timeSignature: this.timeSignature,
     };
 
     const listeners = this.listeners;

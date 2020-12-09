@@ -33,6 +33,10 @@
       },
     },
     {
+      id: 'merge-descriptors-position',
+      type: 'Merge',
+    },
+    {
       id: 'click-generator',
       type: 'ScriptData',
       options: {
@@ -104,6 +108,14 @@
     ],
     [
       'merge-descriptors',
+      'merge-descriptors-position',
+    ],
+    [
+      'metronome',
+      'merge-descriptors-position',
+    ],
+    [
+      'merge-descriptors-position',
       'beatTriggerFromGesture',
     ],
     [
@@ -115,7 +127,7 @@
       'output',
     ],
     [
-      'metronome',
+      'merge-descriptors-position',
       'click-generator',
     ],
     [

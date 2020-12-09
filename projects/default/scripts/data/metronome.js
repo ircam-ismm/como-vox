@@ -29,9 +29,11 @@ function metronome(graph, helpers, outputFrame) {
     },
 
     process(inputFrame, outputFrame) {
+      const outputData = outputFrame.data;
       const now = performance.now() * 0.001;
 
-      const outputData = outputFrame.data;
+      outputData['tempo'] = tempo;
+      outputData['timeSignature'] = timeSignature;
 
       // start
       if(positionLastTime === 0) {

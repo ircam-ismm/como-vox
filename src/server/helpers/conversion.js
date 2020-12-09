@@ -38,32 +38,90 @@ Object.assign(e, {midiPitchToHertz});
 
 const c1Over127 = 1 / 127;
 
+const midiDBRangeDefault = 60;
+
 export function midiIntensityToDB(
   intensity,
-  {range = 60} = {} ) {
+  {range = midiDBRangeDefault} = {} ) {
   return intensity * c1Over127 * range - range;
 }
 Object.assign(e, {midiIntensityToDB});
 
 export function midiIntensityToAmplitude(
   intensity,
-  {range = 60} = {} ) {
+  {range = midiDBRangeDefault} = {} ) {
   return dBToAmplitude(midiIntensityToDB(intensity, {range}) );
 }
 Object.assign(e, {midiIntensityToAmplitude});
 
 export function intensityToDB(
   intensity,
-  {range = 60} = {} ) {
+  {range = midiDBRangeDefault} = {} ) {
   return intensity * range - range;
 }
 Object.assign(e, {intensityToDB});
 
 export function intensityToAmplitude(
   intensity,
-  {range = 60} = {} ) {
+  {range = midiDBRangeDefault} = {} ) {
   return dBToAmplitude(intensityToDB(intensity, {range}) );
 }
 Object.assign(e, {intensityToAmplitude});
+
+const tempoDefault = 120;
+const positionDefault = {bar: 1, beat: 1};
+const timeSignatureDefault = {count: 4, division: 4};
+
+export function beatsToSeconds(beats = 1, {
+  tempo = tempoDefault,
+  timeSignature = timeSignatureDefault,
+} = {}) {
+  return (60 / tempo) * beats * (4 / timeSignature.division);
+}
+Object.assign(e, {beatsToSeconds});
+
+export function secondsToBeats(seconds = 1, {
+  tempo = tempoDefault,
+  timeSignature = timeSignatureDefault,
+} = {}) {
+  return seconds / (60 / tempo) * (timeSignature.division / 4);
+}
+Object.assign(e, {secondsToBeats});
+
+export function positionsToBeatDelta(position, reference = positionDefault, {
+  timeSignature = timeSignatureDefault,
+} = {}) {
+  const barDelta = position.bar - reference.bar;
+  const beatDelta = barDelta * timeSignature.count
+        + position.beat - reference.beat;
+  return beatDelta;
+}
+Object.assign(e, {positionsToBeatDelta});
+
+export function positionsToSecondsDelta(position, reference = positionDefault, {
+  timeSignature = timeSignatureDefault,
+  tempo = tempoDefault,
+} = {}) {
+  const beats = positionsToBeatDelta(position, reference, {timeSignature});
+  const seconds = beatsToSeconds(beats, {tempo, timeSignature});
+  return seconds;
+}
+Object.assign(e, {positionsToSecondsDelta});
+
+export function performanceToAudioContextTime(performanceTime, {audioContext}) {
+  let performanceTimeDelta;
+  let contextTimeReference;
+  if(typeof audioContext.getOutputTimestamp !== 'function') {
+    performanceTimeDelta = performanceTime - performance.now();
+    contextTimeReference = audioContext.currentTime;
+  } else {
+    const stamp = audioContext.getOutputTimestamp();
+    performanceTimeDelta = performanceTime - stamp.performanceTime;
+    contextTimeReference = stamp.contextTime;
+  }
+  return contextTimeReference + 1e-3 * performanceTimeDelta;
+}
+Object.assign(e, {performanceToAudioContextTime});
+
 
 export default e;

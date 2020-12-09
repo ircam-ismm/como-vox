@@ -65,14 +65,4 @@ Sensors:
 - [ ] record users gestures with annotated video
 - [ ] prototype with user scripts
 
-Tests:
-- [ ] use Mocha & Chai
-
-## CoMo
-
-
-- [ ] connect *from* output?
-- [ ] restart `npm run dev` after graph change?
-- [ ] graph broken?
-- [ ] script node?
-- [ ] initial parameters for scripts
+- [x] long loading time on iOS (1 minute): pinned certificate? connected once to https://apps.cosima.ircam.fr and update local certificates

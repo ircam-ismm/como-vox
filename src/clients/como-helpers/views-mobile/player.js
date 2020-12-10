@@ -1,6 +1,23 @@
 import { html } from 'lit-html';
 import * as styles from './styles.js';
 
+function getTimeSignature (event) {
+  const parentElement = event.srcElement.parentElement;
+  const count = parseFloat(parentElement.querySelector('.count').value) || 4;
+  const division = parseFloat(parentElement.querySelector('.division').value) || 4;
+  return {count, division};
+}
+
+function selfSelect(event) {
+  const element = event.srcElement;
+  try {
+    // mainly for mobile
+    element.setSelectionRange(0, element.value.length);
+  } catch (error) {
+    // forget it
+  }
+}
+
 export function player(data, listeners, {
   verbose = false,
   enableSelection = true,
@@ -38,21 +55,72 @@ export function player(data, listeners, {
       }
     </div>
 
-    <div class="time">
-      ${data.syncTime}
+    <div class="audioLatency">Audio Latency:
+      <input type="number"
+             min="0"
+             max="500"
+             step="10"
+             .value="${data.audioLatency * 1e3}"
+             @click="${e => selfSelect(e)}"
+             @change="${e => {
+                   listeners.setAudioLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
+                   } }">
+      ms
     </div>
 
-    <div class="timeSignature">Time signature: ${data.timeSignature
-      ? `${data.timeSignature.count} / ${data.timeSignature.division}`
-      : '? / ?'}</div>
+    <div class="lookAhead">Look-ahead:
+      <input type="number"
+             min="0"
+             max="32"
+             step="1"
+             .value="${data.lookAheadBeats}"
+             @click="${e => selfSelect(e)}"
+             @change="${e => {
+                   listeners.setLookAheadBeats(parseFloat(e.srcElement.value) || 0);
+                   } }">
+      beat${data.lookAheadBeats > 1 ? 's' : ''}
+      (${data.lookAheadSeconds * 1e3} ms)
+    </div>
 
-    <div class="tempo">Tempo: ${data.tempo
-      ? `${data.tempo}`
-      : '?'}</div>
+    <div class="time">
+      ${data.syncTime.toFixed(3)}
+    </div>
 
-    <div class="position">Position: ${data.position
-      ? `${data.position.bar} / ${data.position.beat}`
-      : '? / ?'}</div>
+    <div class="tempo">Tempo:
+      <input type="number"
+             min="10"
+             max="300"
+             step="10"
+             .value="${data.tempo}"
+             @click="${e => selfSelect(e)}"
+             @change="${e => {
+                   listeners.setTempo(parseFloat(e.srcElement.value) || 60);
+                   } }">
+    </div>
+
+    <div class="timeSignature">Time signature:
+      <input class="count"
+             type="number"
+             min="1"
+             max="32"
+             step="1"
+             .value="${data.timeSignature.count}"
+             @click="${e => selfSelect(e)}"
+             @change="${e => listeners.setTimeSignature(getTimeSignature(e) )}">
+      /
+      <input class="division"
+             type="number"
+             min="1"
+             max="32"
+             step="1"
+             .value="${data.timeSignature.division}"
+             @click="${e => selfSelect(e)}"
+             @change="${e => listeners.setTimeSignature(getTimeSignature(e) )}">
+    </div>
+
+    <div class="position">Position: <span class="time">${data.position
+      ? `${data.position.bar}/${data.position.beat.toFixed(2)}`
+      : '?/?'}<span></div>
 
     ${verbose ?
       html`

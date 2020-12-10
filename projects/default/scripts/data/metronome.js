@@ -14,15 +14,15 @@ function metronome(graph, helpers, outputFrame) {
 
   return {
     updateParams(updates) {
-      if(typeof updates.tempo) {
+      if(typeof updates.tempo !== 'undefined') {
         tempo = updates.tempo;
       }
 
-      if(typeof updates.timeSignature) {
-        tempotimeSignature = updates.timeSignature;
+      if(typeof updates.timeSignature !== 'undefined') {
+        timeSignature = updates.timeSignature;
       }
 
-      if(typeof updates.position) {
+      if(typeof updates.position !== 'undefined') {
         positionLast = updates.position;
         positionLastTime = 0;
       }

@@ -1,5 +1,5 @@
 function clackFromBeat(graph, helpers, outputFrame) {
-  const pitch = 83; // B5
+  const pitch = 82; // Bb5
 
   const channel = 'clack';
 

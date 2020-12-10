@@ -6,12 +6,18 @@ import views from '../como-helpers/views-mobile/index.js';
 
 // ../shared is not included by ../../server
 // include everything from ../../server
-import '../../server/imports.js';
+import '../../server/imports.js'; // for scripts in graph
+const app = window.app;
+const conversion = app.imports.helpers.conversion;
+const beatsToSeconds = conversion.beatsToSeconds;
 
 // for simple debugging in browser...
 const MOCK_SENSORS = window.location.hash === '#mock-sensors';
 console.info('> to mock sensors for debugging purpose, use https://127.0.0.1:8000/designer#mock-sensors');
 console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
+
+const tempoDefault = 60;
+const timeSignatureDefault = {count: 4, division: 4};
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -32,14 +38,25 @@ class PlayerExperience extends AbstractExperience {
       beat: 0,
     };
 
-    this.tempo = 120;
-    this.timeSignature = {
-      count: 4,
-      division: 4,
-    };
+    this.tempo = tempoDefault;
+    this.timeSignature = timeSignatureDefault;
 
-    this.latency = 0.2; // in seconds
-    this.lookAheadBeats = 1; // in beats, not taking account latency
+    // default values
+
+    // in beats, not taking account of audioLatency
+    this.lookAheadBeats = 1;
+
+    // in seconds, taking audioLatency into account
+    this.lookAheadSeconds = 1;
+     // otherwise some events may be missing in Android
+    this.lookAheadSecondsMin = 0e-3;
+
+    // sensors running at 60 Hz?
+    this.sensorsLatency = 1 / 60;
+
+    // in seconds
+    // @TODO discover
+    this.audioLatency = 0;
 
     // configure como w/ the given experience
     this.como.configureExperience(this);
@@ -109,11 +126,13 @@ class PlayerExperience extends AbstractExperience {
       // 'clearSessionExamples': async () => this.coMoPlayer.session.clearExamples(),
       // 'clearSessionLabel': async label => this.coMoPlayer.session.clearLabel(label),
 
-      setConstantParams: async updates => await this.coMoPlayer.player.setGraphOptions('main', {
-        scriptParams: {
-          constant: { value: Math.random() },
-        },
-      }),
+      setAudioLatency: latency => this.setAudioLatency(latency),
+
+      setLookAheadBeats: lookAheadBeats => this.setLookAheadBeats(lookAheadBeats),
+
+      setTempo: tempo => this.setTempo(tempo),
+
+      setTimeSignature: timeSignature => this.setTimeSignature(timeSignature),
 
     };
 
@@ -130,6 +149,11 @@ class PlayerExperience extends AbstractExperience {
 
     // quick and drity fix...
     this.coMoPlayer.onGraphCreated(() => {
+      this.setTempo(tempoDefault);
+      this.setTimeSignature(timeSignatureDefault);
+
+      this.updateLookAhead();
+
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
         // console.log('frame', JSON.parse(JSON.stringify(frame)));
         this.position = frame['position'];
@@ -148,8 +172,69 @@ class PlayerExperience extends AbstractExperience {
     this.rafId = window.requestAnimationFrame(updateClock);
   }
 
+  setAudioLatency(audioLatency) {
+    this.audioLatency = audioLatency;
+    this.updateLookAhead();
+  }
+
+  setLookAheadBeats(lookAheadBeats) {
+    this.lookAheadBeats = lookAheadBeats;
+    this.updateLookAhead();
+  }
+
+  updateLookAhead() {
+    const lookAheadSecondsLast = this.lookAheadSeconds;
+
+    if(this.lookAheadBeats === 0) {
+      this.lookAheadSeconds = this.lookAheadSecondsMin;
+    } else {
+      while(
+        (this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
+          tempo: this.tempo,
+          timeSignature: this.timeSignature,
+        })
+         - this.audioLatency)
+          <= this.lookAheadSecondsMin) {
+        ++this.lookAheadBeats;
+      }
+    }
+
+    if(lookAheadSecondsLast !== this.lookAheadSeconds) {
+      this.coMoPlayer.player.setGraphOptions('clickSynth', {
+        scriptParams: {
+          lookAheadSeconds: this.lookAheadSeconds,
+        },
+      });
+
+    }
+
+  }
+
+  setTempo(tempo) {
+    this.tempo = tempo;
+
+    // @TODO: how to propagate to all relevant scripts that are in graph?
+    // (server crashes with non-instantiated scripts)
+    this.coMoPlayer.player.setGraphOptions('metronome', {
+        scriptParams: {
+          tempo,
+        },
+    });
+    this.updateLookAhead();
+  }
+
+  setTimeSignature(timeSignature) {
+    this.timeSignature = timeSignature;
+    this.coMoPlayer.player.setGraphOptions('metronome', {
+        scriptParams: {
+          timeSignature,
+        },
+    });
+    this.updateLookAhead();
+  }
+
   render() {
-    const syncTime = this.sync.getSyncTime().toFixed(3);
+    const syncTime = this.sync.getSyncTime();
 
     const viewData = {
       config: this.config,
@@ -161,6 +246,9 @@ class PlayerExperience extends AbstractExperience {
       position: this.position,
       tempo: this.tempo,
       timeSignature: this.timeSignature,
+      audioLatency: this.audioLatency,
+      lookAheadBeats: this.lookAheadBeats,
+      lookAheadSeconds: this.lookAheadSeconds,
     };
 
     const listeners = this.listeners;

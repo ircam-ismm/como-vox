@@ -11,7 +11,7 @@
     //   },
     // },
     {
-      id: 'click-synth',
+      id: 'clickSynth',
       type: 'ScriptAudio',
       options: {
         scriptName: 'clickSynth',
@@ -29,7 +29,7 @@
   ],
   connections: [
     [
-      'click-synth',
+      'clickSynth',
       'audio-destination',
     ],
   ],

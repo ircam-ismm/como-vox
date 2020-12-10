@@ -3,7 +3,7 @@ function clickGenerator(graph, helpers, outputFrame) {
   let beatLast = 0;
 
   const pitchHigh = 91; // G6
-  const pitchLow = 86; // E6
+  const pitchLow = 86; // D6
 
   const channel = 'click';
   let pitch = pitchLow;
@@ -39,7 +39,8 @@ function clickGenerator(graph, helpers, outputFrame) {
           trigger = true;
         } else {
           // on beat change
-          trigger = Math.floor(beat) !== Math.floor(beatLast);
+          trigger = (Math.floor(beat) !== Math.floor(beatLast)
+                     || bar !== barLast); // count to 1
         }
       }
 
@@ -54,6 +55,7 @@ function clickGenerator(graph, helpers, outputFrame) {
         pitch = pitchLow;
       }
 
+      // put beat back in time (with look-ahead for playback)
       notes.push({
         position: {
           bar: position.bar,

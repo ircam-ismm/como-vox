@@ -11,11 +11,15 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const audioContext = graph.como.audioContext;
 
+  const parameters = {
+    lookAheadSeconds: 0,
+  };
+
   let noteTimeLast = 0;
 
   return {
     updateParams(updates) {
-
+      Object.assign(parameters, updates);
     },
 
     // called on each sensor frame
@@ -25,8 +29,6 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       const currentPosition = inputData['position'];
       const timeSignature = inputData['timeSignature'];
       const tempo = inputData['tempo'];
-
-      const lookAhead = 1; // in seconds
 
       const notesContainer = inputData['notes'];
       if(!notesContainer) {
@@ -43,7 +45,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
           const notePosition = note.position;
 
-          const delay = positionsToSecondsDelta(currentPosition, notePosition, {
+          const noteDelay = positionsToSecondsDelta(currentPosition, notePosition, {
             tempo,
             timeSignature
           });
@@ -51,9 +53,17 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           const currentTime = performanceToAudioContextTime(performance.now(),
                                                             {audioContext});
 
-          const noteTime = currentTime + lookAhead - delay;
+          const noteTime = Math.max(audioContext.currentTime,
+                                    currentTime + parameters.lookAheadSeconds - noteDelay);
 
-          // console.log('currentTime', currentTime, 'lookAhead', lookAhead,
+          // console.log('time', audioContext.currentTime,
+          //             'compensated time', currentTime + parameters.lookAheadSeconds - noteDelay);
+
+          // console.log('note', 'time', noteTime, 'delay', noteDelay,
+          //             'pitch', note.pitch, 'intensity', note.intensity,
+          //             'duration', note.duration);
+
+          // console.log('currentTime', currentTime, 'lookAheadSeconds', lookAheadSeconds,
           //             'delay', delay);
           // console.log('noteTime', noteTime, 'delta', noteTime - noteTimeLast);
 
@@ -63,7 +73,8 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
           const env = audioContext.createGain();
           env.connect(audioOutNode);
-          env.gain.value = 0;
+
+          // env.gain.value = 0; // bug in Chrome? no sound when set
           env.gain.setValueAtTime(midiIntensityToAmplitude(note.intensity), noteTime);
           env.gain.exponentialRampToValueAtTime(0.0001, noteTime + noteDuration);
 

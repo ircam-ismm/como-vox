@@ -6,9 +6,13 @@ function clackFromBeat(graph, helpers, outputFrame) {
   const intensity = 127;
   const duration = 0.25; // in beats
 
+  const parameters = {
+    mute: false,
+  };
+
   return {
     updateParams(updates) {
-
+      Object.assign(parameters, updates);
     },
 
     // called on each sensor frame
@@ -18,7 +22,7 @@ function clackFromBeat(graph, helpers, outputFrame) {
 
       const beat = inputData['beat'];
       const position = beat.position;
-      const trigger = beat.trigger;
+      const trigger = !parameters.mute && beat.trigger;
 
       const notes = [];
       const notesContainer = {};

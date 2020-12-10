@@ -10,9 +10,13 @@ function clickGenerator(graph, helpers, outputFrame) {
   const intensity = 127;
   const duration = 0.5; // in beats
 
+  const parameters = {
+    mute: false,
+  };
+
   return {
     updateParams(updates) {
-
+      Object.assign(parameters, updates);
     },
 
     // called on each sensor frame
@@ -30,17 +34,19 @@ function clickGenerator(graph, helpers, outputFrame) {
 
       let trigger = false;
 
-      // always on a beat, to avoid late beats
-      if(beat % 1 > 0.95 || beat % 1 < 0.05) {
-        if(barLast === 0) {
-          // start
-          barLast = bar;
-          beatLast = beat;
-          trigger = true;
-        } else {
-          // on beat change
-          trigger = (Math.floor(beat) !== Math.floor(beatLast)
-                     || bar !== barLast); // count to 1
+      if(!parameters.mute) {
+        // always on a beat, to avoid late beats
+        if(beat % 1 > 0.95 || beat % 1 < 0.05) {
+          if(barLast === 0) {
+            // start
+            barLast = bar;
+            beatLast = beat;
+            trigger = true;
+          } else {
+            // on beat change
+            trigger = (Math.floor(beat) !== Math.floor(beatLast)
+                       || bar !== barLast); // count to 1
+          }
         }
       }
 

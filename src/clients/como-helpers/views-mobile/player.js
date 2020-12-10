@@ -27,26 +27,19 @@ export function player(data, listeners, {
     ${data.player.loading ?
       html`<div style="${styles.loadingBanner}">loading...</div>` : ''
     }
-
     <!-- HEADER -->
-    <h2 style="${styles.h2}">
-      <div>PlayerId: ${data.player.id}</div><br>
-      <div>Session: ${data.session.name}</div>
-    </h2>
 
-    <div style="position: relative; min-height: 50px">
-      <h3 style="${styles.h3}">PlayerId: ${data.player.id}</h3>
+    <div style="position: relative">
+      <div class="info">
+        <span style="${styles.h3}" class="session">Session: ${data.session.name}</span>
+        <span style="${styles.h3}" class="session">PlayerId: ${data.player.id}</span>
+      </div>
 
       ${enableSelection ?
         html`
           <button
             style="
               ${styles.button}
-              width: 200px;
-              position: absolute;
-              top: 0px;
-              right: 0px;
-              margin: 0;
             "
             @click="${e => listeners.setPlayerParams({ sessionId: null })}">
             change session
@@ -134,6 +127,25 @@ export function player(data, listeners, {
     <div class="position">Position: <span class="time">${data.position
       ? `${data.position.bar}/${data.position.beat.toFixed(2)}`
       : '?/?'}<span></div>
+
+
+    <div class="controls-container">
+
+      <div class="onoff metronome control">Metronome:
+        <sc-toggle
+          .active="${!data.metronome.mute}"
+          @change="${e => listeners.setMetronomeMute(!e.detail.value)}"
+        ></sc-toggle>
+      </div>
+
+      <div class="onoff beating control">Beating:
+        <sc-toggle
+          .active="${!data.beating.mute}"
+          @change="${e => listeners.setBeatingMute(!e.detail.value)}"
+        ></sc-toggle>
+      </div>
+
+    </div>
 
     ${verbose ?
       html`

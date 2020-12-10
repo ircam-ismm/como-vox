@@ -56,3 +56,8 @@ body.loading {
 #__soundworks-container .time {
   font-size: 60px;
 }
+
+#__soundworks-container .controls-container {
+  display: inline-flex;
+}
+

@@ -56,6 +56,9 @@ class PlayerExperience extends AbstractExperience {
     // @TODO discover
     this.audioLatency = 0;
 
+    this.metronomeMute = false;
+    this.beatingMute = false;
+
     // configure como w/ the given experience
     this.como.configureExperience(this);
     // default initialization views
@@ -131,6 +134,10 @@ class PlayerExperience extends AbstractExperience {
       setTempo: tempo => this.setTempo(tempo),
 
       setTimeSignature: timeSignature => this.setTimeSignature(timeSignature),
+
+      setMetronomeMute: mute => this.setMetronomeMute(mute),
+
+      setBeatingMute: mute => this.setBeatingMute(mute),
 
     };
 
@@ -247,6 +254,26 @@ class PlayerExperience extends AbstractExperience {
     this.updateLookAhead();
   }
 
+  setMetronomeMute(mute) {
+    this.metronomeMute = mute;
+    this.coMoPlayer.player.setGraphOptions('clickGenerator', {
+        scriptParams: {
+          mute,
+        },
+    });
+
+  }
+
+  setBeatingMute(mute) {
+    this.beatingMute = mute;
+    this.coMoPlayer.player.setGraphOptions('clackFromBeat', {
+        scriptParams: {
+          mute,
+        },
+    });
+
+  }
+
   render() {
     const syncTime = this.sync.getSyncTime();
 
@@ -264,6 +291,9 @@ class PlayerExperience extends AbstractExperience {
       audioLatency: this.audioLatency,
       lookAheadBeats: this.lookAheadBeats,
       lookAheadSeconds: this.lookAheadSeconds,
+
+      metronome: { mute: this.metronomeMute},
+      beating: { mute: this.beatingMute},
     };
 
     const listeners = this.listeners;

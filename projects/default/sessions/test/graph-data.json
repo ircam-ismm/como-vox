@@ -37,7 +37,7 @@
       type: 'Merge',
     },
     {
-      id: 'click-generator',
+      id: 'clickGenerator',
       type: 'ScriptData',
       options: {
         scriptName: 'clickGenerator',
@@ -128,10 +128,10 @@
     ],
     [
       'merge-descriptors-position',
-      'click-generator',
+      'clickGenerator',
     ],
     [
-      'click-generator',
+      'clickGenerator',
       'output',
     ],
     [

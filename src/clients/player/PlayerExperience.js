@@ -18,6 +18,7 @@ console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
 
 const tempoDefault = 60;
 const timeSignatureDefault = {count: 4, division: 4};
+const lookAheadBeatsDefault = 1;
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -44,7 +45,7 @@ class PlayerExperience extends AbstractExperience {
     // default values
 
     // in beats, not taking account of audioLatency
-    this.lookAheadBeats = 1;
+    this.lookAheadBeats = lookAheadBeatsDefault;
 
     // in seconds, taking audioLatency into account
     this.lookAheadSeconds = 1;
@@ -151,8 +152,7 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer.onGraphCreated(() => {
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);
-
-      this.updateLookAhead();
+      this.setLookAheadBeats(lookAheadBeatsDefault);
 
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
         // console.log('frame', JSON.parse(JSON.stringify(frame)));

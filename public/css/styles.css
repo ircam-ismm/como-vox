@@ -13,7 +13,7 @@ html {
 
 * {
   box-sizing: border-box;
-  font-family: Consolas, monaco, monospace;
+  font-family: Consolas, monaco, monospace, monospace;
 }
 
 body.loading {

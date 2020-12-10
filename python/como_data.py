@@ -46,8 +46,8 @@ def sensors_read(filename):
     index = data_frame.loc[0, 'id']
     time = data_frame.loc[:, 'time']
 
-    acceleration = data_frame.loc[:, ['x', 'y', 'z']]
-    rotation = data_frame.loc[:, ['alpha', 'beta', 'gamma']]
+    acceleration = data_frame.loc[:, ['acc.x', 'acc.y', 'acc.z']]
+    rotation = data_frame.loc[:, ['rot.alpha', 'rot.beta', 'rot.gamma']]
 
     return {'index': index, 'time': time,
             'acceleration': acceleration,

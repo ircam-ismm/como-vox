@@ -18,7 +18,7 @@ console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
 
 const tempoDefault = 60;
 const timeSignatureDefault = {count: 4, division: 4};
-const lookAheadBeatsDefault = 1;
+const lookAheadBeatsDefault = 0;
 const sensorsLatencyDefault = 1 / 60; // 60 Hz?
 
 class PlayerExperience extends AbstractExperience {

@@ -19,6 +19,7 @@ console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
 const tempoDefault = 60;
 const timeSignatureDefault = {count: 4, division: 4};
 const lookAheadBeatsDefault = 1;
+const sensorsLatencyDefault = 1 / 60; // 60 Hz?
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -46,14 +47,10 @@ class PlayerExperience extends AbstractExperience {
 
     // in beats, not taking account of audioLatency
     this.lookAheadBeats = lookAheadBeatsDefault;
-
     // in seconds, taking audioLatency into account
-    this.lookAheadSeconds = 1;
-     // otherwise some events may be missing in Android
-    this.lookAheadSecondsMin = 0e-3;
+    this.lookAheadSeconds = 0;
 
-    // sensors running at 60 Hz?
-    this.sensorsLatency = 1 / 60;
+    this.sensorsLatency = sensorsLatencyDefault;
 
     // in seconds
     // @TODO discover
@@ -149,13 +146,16 @@ class PlayerExperience extends AbstractExperience {
     await this.coMoPlayer.player.set({ sessionId: 'test' });
 
     // quick and drity fix...
-    this.coMoPlayer.onGraphCreated(() => {
+    this.coMoPlayer.onGraphCreated(async () => {
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);
       this.setLookAheadBeats(lookAheadBeatsDefault);
 
+      this.setSensorsLatency(sensorsLatencyDefault);
+
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
         // console.log('frame', JSON.parse(JSON.stringify(frame)));
+
         this.position = frame['position'];
         this.tempo = frame['tempo'];
         this.timeSignature = frame['timeSignature'];
@@ -200,7 +200,7 @@ class PlayerExperience extends AbstractExperience {
     const lookAheadSecondsLast = this.lookAheadSeconds;
 
     if(this.lookAheadBeats === 0) {
-      this.lookAheadSeconds = this.lookAheadSecondsMin;
+      this.lookAheadSeconds = 0;
     } else {
       while(
         (this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {

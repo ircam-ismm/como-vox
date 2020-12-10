@@ -172,6 +172,20 @@ class PlayerExperience extends AbstractExperience {
     this.rafId = window.requestAnimationFrame(updateClock);
   }
 
+  setSensorsLatency(sensorsLatency) {
+    const sensorsLatencyLast = this.sensorsLatency
+    this.sensorsLatency = sensorsLatency;
+
+    if(this.sensorsLatency !== sensorsLatencyLast) {
+      this.coMoPlayer.player.setGraphOptions('beatTriggerFromGesture', {
+        scriptParams: {
+          sensorsLatency: this.sensorsLatency,
+        },
+      });
+
+    }
+  }
+
   setAudioLatency(audioLatency) {
     this.audioLatency = audioLatency;
     this.updateLookAhead();
@@ -246,6 +260,7 @@ class PlayerExperience extends AbstractExperience {
       position: this.position,
       tempo: this.tempo,
       timeSignature: this.timeSignature,
+      sensorsLatency: this.sensorsLatency,
       audioLatency: this.audioLatency,
       lookAheadBeats: this.lookAheadBeats,
       lookAheadSeconds: this.lookAheadSeconds,

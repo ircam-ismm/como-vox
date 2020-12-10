@@ -16,8 +16,9 @@ function clackFromBeat(graph, helpers, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
 
-      const position = inputData['position'];
-      const trigger = inputData['beat'];
+      const beat = inputData['beat'];
+      const position = beat.position;
+      const trigger = beat.trigger;
 
       const notes = [];
       const notesContainer = {};

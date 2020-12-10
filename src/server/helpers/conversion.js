@@ -108,6 +108,20 @@ export function positionsToSecondsDelta(position, reference = positionDefault, {
 }
 Object.assign(e, {positionsToSecondsDelta});
 
+export function positionAddBeats(position, beats, {
+  timeSignature = timeSignatureDefault,
+} = {}) {
+  let beatRaw = position.beat + beats;
+
+  // modulo of beat that starts at 1
+  // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder
+  const count = timeSignature.count;
+  const beat = ( ( ( (beatRaw - 1) % count ) + count) % count) + 1;
+  const bar = position.bar + Math.floor((beatRaw - 1)/ timeSignature.count);
+  return {bar, beat};
+}
+Object.assign(e, {positionAddBeats});
+
 export function performanceToAudioContextTime(performanceTime, {audioContext}) {
   let performanceTimeDelta;
   let contextTimeReference;

@@ -1,11 +1,16 @@
 import {describe, it} from 'mocha';
 import {assert, should} from 'chai';
 
+import {assertWithRelativeError} from '../shared/utils.js';
+
+const epsilon = 1e-3;
+
 import {
   beatsToSeconds,
   secondsToBeats,
   positionsToBeatDelta,
   positionsToSecondsDelta,
+  positionAddBeats,
 } from '../../src/server/helpers/conversion.js';
 
 describe(`Check beats conversion helpers`, () => {
@@ -14,9 +19,15 @@ describe(`Check beats conversion helpers`, () => {
     [{tempo: 120},
      4,
      2],
+    [{tempo: 120},
+     -4,
+     -2],
     [{tempo: 60},
      1,
      1],
+    [{tempo: 60},
+     -1,
+     -1],
     [{tempo: 60, timeSignature: {division: 2}},
      1,
      2],
@@ -26,6 +37,9 @@ describe(`Check beats conversion helpers`, () => {
     [{tempo: 60, timeSignature: {division: 8}},
      1,
      0.5],
+    [{tempo: 60, timeSignature: {division: 8}},
+     -1,
+     -0.5],
     [{tempo: 60, timeSignature: {division: 8}},
      2,
      1],
@@ -37,8 +51,8 @@ describe(`Check beats conversion helpers`, () => {
   it(`should convert and back from`, () => {
     testValues.forEach( (values) => {
       assert.equal(
-        values[1],
         secondsToBeats(beatsToSeconds(values[1], values[0]), values[0]),
+        values[1],
         `secondsToBeats and beatsToSeconds values: ${JSON.stringify(values[0])}, ${values[1]}` );
     });
   });
@@ -46,8 +60,8 @@ describe(`Check beats conversion helpers`, () => {
   it(`should convert from beats`, () => {
     testValues.forEach( (values) => {
       assert.equal(
-        values[2],
         beatsToSeconds(values[1], values[0]),
+        values[2],
         `beatsToSeconds values: ${JSON.stringify(values[0])}, ${values[1]}`);
     });
   });
@@ -55,8 +69,8 @@ describe(`Check beats conversion helpers`, () => {
   it(`should convert from seconds`, () => {
     testValues.forEach( (values) => {
       assert.equal(
-        values[1],
         secondsToBeats(values[2], values[0]),
+        values[1],
         `secondsToBeats values ${JSON.stringify(values[0])}, ${values[2]}`);
     });
   });
@@ -106,8 +120,8 @@ describe(`Check positionsToBeatDelta conversion helper`, () => {
 
   it(`should validate values`, () => {
     testValues.forEach( (values) => {
-      assert.equal(values[3],
-                   positionsToBeatDelta(values[1], values[2], values[0]),
+      assert.equal(positionsToBeatDelta(values[1], values[2], values[0]),
+                   values[3],
                    `values ${
 JSON.stringify({...values[0], position: values[1], reference: values[2]})
     }`);
@@ -161,10 +175,72 @@ describe(`Check positionsToSecondsDelta conversion helper`, () => {
 
   it(`should validate values`, () => {
     testValues.forEach( (values) => {
-      assert.equal(values[3],
-                   positionsToSecondsDelta(values[1], values[2], values[0]),
+      assert.equal(positionsToSecondsDelta(values[1], values[2], values[0]),
+                   values[3],
                    `values ${
 JSON.stringify({...values[0], position: values[1], reference: values[2]})
+    }`);
+    });
+
+  });
+
+});
+
+
+describe(`Check positionsAddBeats conversion helper`, () => {
+
+  const testValues = [
+    [{timeSignature: {count: 4} },
+     {bar:1, beat: 1},
+     1,
+     {bar: 1, beat: 2}],
+    [{timeSignature: {count: 4} },
+     {bar:1, beat: 4},
+     1,
+     {bar: 2, beat: 1}],
+    [{timeSignature: {count: 4} },
+     {bar:1, beat: 4},
+     1.2,
+     {bar: 2, beat: 1.2}],
+    [{timeSignature: {count: 3} },
+     {bar:5, beat: 2},
+     3,
+     {bar: 6, beat: 2}],
+    [{timeSignature: {count: 3} },
+     {bar:5, beat: 2},
+     0,
+     {bar: 5, beat: 2}],
+    [{timeSignature: {count: 4} },
+     {bar:5, beat: 2},
+     -3,
+     {bar: 4, beat: 3}],
+    [{timeSignature: {count: 4} },
+     {bar:5, beat: 2},
+     -3.5,
+     {bar: 4, beat: 2.5}],
+    [{timeSignature: {count: 4} },
+     {bar:2, beat: 1},
+     -8,
+     {bar: 0, beat: 1}],
+    [{timeSignature: {count: 4} },
+     {bar:2, beat: 1},
+     -16,
+     {bar: -2, beat: 1}],
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const position = positionAddBeats(values[1], values[2], values[0]);
+      assert.equal(position.bar,
+                   values[3].bar,
+                   `bar ${
+JSON.stringify({...values[0], position: values[1], beats: values[2]})
+    }`);
+      assertWithRelativeError(position.beat,
+                              values[3].beat,
+                              epsilon,
+                              `beat ${
+JSON.stringify({...values[0], position: values[1], beats: values[2]})
     }`);
     });
 

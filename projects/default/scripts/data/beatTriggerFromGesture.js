@@ -27,18 +27,16 @@ function beatTriggerFromGesture(graph, helpers, outputFrame) {
 
       const now = performance.now() * 1e-3;
 
-      let position = inputData['position'];
       const timeSignature = inputData['timeSignature'];
 
       const intensity = inputData['intensity'].linear;
       const delta = intensity - lastMedian;
 
       // @TODO should compensate latency depending on algorithm
-      const positionCompensation = secondsToBeats(-parameters.sensorsLatency);
-      position = positionAddBeats(position, positionCompensation, {timeSignature});
+      const time = now - parameters.sensorsLatency;
 
       const beat = {
-        position,
+        time,
         trigger: 0,
       };
 

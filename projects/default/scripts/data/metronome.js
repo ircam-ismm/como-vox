@@ -34,6 +34,7 @@ function metronome(graph, helpers, outputFrame) {
 
       outputData['tempo'] = tempo;
       outputData['timeSignature'] = timeSignature;
+      outputData['time'] = now;
 
       // start
       if(positionLastTime === 0) {

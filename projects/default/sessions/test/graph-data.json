@@ -115,7 +115,7 @@
       'merge-descriptors-position',
     ],
     [
-      'merge-descriptors-position',
+      'merge-descriptors',
       'beatTriggerFromGesture',
     ],
     [

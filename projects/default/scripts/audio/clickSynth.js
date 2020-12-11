@@ -42,19 +42,24 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
         const notes = notesContainer[channel];
         notes.forEach( (note) => {
+          const now = performance.now() * 1e-3;
 
-          const notePosition = note.position;
+          let noteOffset = 0;
+          if(note.position) {
+            const notePosition = note.position;
 
-          const noteDelay = positionsToSecondsDelta(currentPosition, notePosition, {
-            tempo,
-            timeSignature
-          });
+            noteOffset = positionsToSecondsDelta(notePosition, currentPosition, {
+              tempo,
+              timeSignature
+            });
+          } else {
+            noteOffset = note.time - now;
+          }
 
-          const currentTime = performanceToAudioContextTime(performance.now(),
-                                                            {audioContext});
+          const currentTime = performanceToAudioContextTime(now * 1e3, {audioContext});
 
           const noteTime = Math.max(audioContext.currentTime,
-                                    currentTime + parameters.lookAheadSeconds - noteDelay);
+                                    currentTime + parameters.lookAheadSeconds + noteOffset);
 
           // console.log('time', audioContext.currentTime,
           //             'compensated time', currentTime + parameters.lookAheadSeconds - noteDelay);
@@ -63,9 +68,11 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           //             'pitch', note.pitch, 'intensity', note.intensity,
           //             'duration', note.duration);
 
-          // console.log('currentTime', currentTime, 'lookAheadSeconds', lookAheadSeconds,
-          //             'delay', delay);
-          // console.log('noteTime', noteTime, 'delta', noteTime - noteTimeLast);
+          // console.log('currentTime', currentTime,
+          //             'lookAheadSeconds', parameters.lookAheadSeconds,
+          //             'noteOffset', noteOffset);
+          // console.log('noteTime', noteTime,
+          //             'delta', noteTime - noteTimeLast);
 
           noteTimeLast = noteTime;
 

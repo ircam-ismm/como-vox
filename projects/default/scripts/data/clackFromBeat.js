@@ -21,7 +21,8 @@ function clackFromBeat(graph, helpers, outputFrame) {
       const outputData = outputFrame.data;
 
       const beat = inputData['beat'];
-      const position = beat.position;
+      const time = beat.time;
+
       const trigger = !parameters.mute && beat.trigger;
 
       const notes = [];
@@ -30,7 +31,7 @@ function clackFromBeat(graph, helpers, outputFrame) {
 
       if(trigger) {
         notes.push({
-          position,
+          time,
           pitch,
           intensity,
           duration,

@@ -1,3 +1,6 @@
+// ../shared is not included by ../../server
+// include everything from ../../server
+import '../../server/imports.js'; // for scripts in graph
 
 /**
  * Simple wrapper around low-level CoMo API:

@@ -4,9 +4,7 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
 import views from '../como-helpers/views-mobile/index.js';
 
-// ../shared is not included by ../../server
-// include everything from ../../server
-import '../../server/imports.js'; // for scripts in graph
+// window.app from CoMoPlayer
 const app = window.app;
 const conversion = app.imports.helpers.conversion;
 const beatsToSeconds = conversion.beatsToSeconds;

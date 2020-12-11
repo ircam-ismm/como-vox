@@ -3,11 +3,6 @@ import { render, html } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
 
-// ../shared is not included by ../../server
-// include everything from ../../server
-import '../../server/imports.js'; // for scripts in graph
-const app = window.app;
-
 import views from '../como-helpers/views-desktop/index.js';
 // import stylesDesktop from '../como-helpers/views/stylesDesktop.js';
 

@@ -234,7 +234,7 @@ class PlayerExperience extends AbstractExperience {
 
     // @TODO: how to propagate to all relevant scripts that are in graph?
     // (server crashes with non-instantiated scripts)
-    this.coMoPlayer.player.setGraphOptions('metronome', {
+    this.coMoPlayer.player.setGraphOptions('transport', {
         scriptParams: {
           tempo,
         },
@@ -244,7 +244,7 @@ class PlayerExperience extends AbstractExperience {
 
   setTimeSignature(timeSignature) {
     this.timeSignature = timeSignature;
-    this.coMoPlayer.player.setGraphOptions('metronome', {
+    this.coMoPlayer.player.setGraphOptions('transport', {
         scriptParams: {
           timeSignature,
         },

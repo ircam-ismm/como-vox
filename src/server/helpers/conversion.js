@@ -88,7 +88,7 @@ export function secondsToBeats(seconds = 1, {
 }
 Object.assign(e, {secondsToBeats});
 
-export function positionsToBeatDelta(position, reference = positionDefault, {
+export function positionsToBeatsDelta(position, reference = positionDefault, {
   timeSignature = timeSignatureDefault,
 } = {}) {
   const barDelta = position.bar - reference.bar;
@@ -96,13 +96,13 @@ export function positionsToBeatDelta(position, reference = positionDefault, {
         + position.beat - reference.beat;
   return beatDelta;
 }
-Object.assign(e, {positionsToBeatDelta});
+Object.assign(e, {positionsToBeatsDelta});
 
 export function positionsToSecondsDelta(position, reference = positionDefault, {
   timeSignature = timeSignatureDefault,
   tempo = tempoDefault,
 } = {}) {
-  const beats = positionsToBeatDelta(position, reference, {timeSignature});
+  const beats = positionsToBeatsDelta(position, reference, {timeSignature});
   const seconds = beatsToSeconds(beats, {tempo, timeSignature});
   return seconds;
 }
@@ -121,6 +121,17 @@ export function positionAddBeats(position, beats, {
   return {bar, beat};
 }
 Object.assign(e, {positionAddBeats});
+
+export function positionRoundBeats(position, {timeSignature = timeSignatureDefault}) {
+  return positionAddBeats(
+    {
+      bar: position.bar,
+      beat: Math.round(position.beat),
+    },
+    0, // conform beat to [1, timeSignature.count]
+    {timeSignature});
+}
+Object.assign(e, {positionRoundBeats});
 
 export function performanceToAudioContextTime(performanceTime, {audioContext}) {
   let performanceTimeDelta;

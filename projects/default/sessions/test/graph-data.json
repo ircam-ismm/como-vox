@@ -26,10 +26,14 @@
       type: 'MLDecoder',
     },
     {
-      id: 'metronome',
+      id: 'to-transport',
+      type: 'Merge',
+    },
+    {
+      id: 'transport',
       type: 'ScriptData',
       options: {
-        scriptName: 'metronome',
+        scriptName: 'transport',
       },
     },
     {
@@ -104,14 +108,18 @@
     ],
     [
       'merge-descriptors',
-      'metronome',
+      'to-transport',
+    ],
+    [
+      'to-transport',
+      'transport',
     ],
     [
       'merge-descriptors',
       'merge-descriptors-position',
     ],
     [
-      'metronome',
+      'transport',
       'merge-descriptors-position',
     ],
     [
@@ -123,7 +131,7 @@
       'ml-decoder',
     ],
     [
-      'metronome',
+      'transport',
       'output',
     ],
     [
@@ -137,6 +145,10 @@
     [
       'beatTriggerFromGesture',
       'clackFromBeat',
+    ],
+    [
+      'beatTriggerFromGesture',
+      'to-transport',
     ],
     [
       'clackFromBeat',

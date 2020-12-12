@@ -8,9 +8,10 @@ const epsilon = 1e-3;
 import {
   beatsToSeconds,
   secondsToBeats,
-  positionsToBeatDelta,
+  positionsToBeatsDelta,
   positionsToSecondsDelta,
   positionAddBeats,
+  positionRoundBeats,
 } from '../../src/server/helpers/conversion.js';
 
 describe(`Check beats conversion helpers`, () => {
@@ -77,7 +78,7 @@ describe(`Check beats conversion helpers`, () => {
 
 });
 
-describe(`Check positionsToBeatDelta conversion helper`, () => {
+describe(`Check positionsToBeatsDelta conversion helper`, () => {
 
   const testValues = [
     [{timeSignature: {count: 4} },
@@ -120,7 +121,7 @@ describe(`Check positionsToBeatDelta conversion helper`, () => {
 
   it(`should validate values`, () => {
     testValues.forEach( (values) => {
-      assert.equal(positionsToBeatDelta(values[1], values[2], values[0]),
+      assert.equal(positionsToBeatsDelta(values[1], values[2], values[0]),
                    values[3],
                    `values ${
 JSON.stringify({...values[0], position: values[1], reference: values[2]})
@@ -210,6 +211,7 @@ describe(`Check positionsAddBeats conversion helper`, () => {
      {bar:5, beat: 2},
      0,
      {bar: 5, beat: 2}],
+    // negative values
     [{timeSignature: {count: 4} },
      {bar:5, beat: 2},
      -3,
@@ -226,7 +228,33 @@ describe(`Check positionsAddBeats conversion helper`, () => {
      {bar:2, beat: 1},
      -16,
      {bar: -2, beat: 1}],
-  ];
+    // keep bar 0 for computation (and may offset display by -1)
+    [{timeSignature: {count: 4} },
+     {bar:-1, beat: 4},
+     1,
+     {bar: 0, beat: 1}],
+    [{timeSignature: {count: 4} },
+     {bar:1, beat: 1},
+     -1,
+     {bar: 0, beat: 4}],
+     // conform bar and beat
+     [{timeSignature: {count: 4} },
+      {bar:2, beat: 0},
+      0,
+      {bar: 1, beat: 4}],
+     [{timeSignature: {count: 4} },
+      {bar:2, beat: 5},
+      0,
+      {bar: 3, beat: 1}],
+     [{timeSignature: {count: 4} },
+      {bar:1, beat: 0},
+      0,
+      {bar: 0, beat: 4}],
+     [{timeSignature: {count: 4} },
+      {bar:0, beat: 0},
+      0,
+      {bar: -1, beat: 4}],
+    ];
 
   it(`should validate values`, () => {
     testValues.forEach( (values) => {
@@ -246,4 +274,46 @@ JSON.stringify({...values[0], position: values[1], beats: values[2]})
 
   });
 
+  describe(`Check positionsRoundBeats conversion helper`, () => {
+
+    const testValues = [
+      [{timeSignature: {count: 4} },
+       {bar:1, beat: 1.1},
+       {bar: 1, beat: 1}],
+      [{timeSignature: {count: 4} },
+       {bar:1, beat: 4.5},
+       {bar: 2, beat: 1}],
+      [{timeSignature: {count: 4} },
+       {bar:1, beat: 1.1},
+       {bar: 1, beat: 1}],
+      [{timeSignature: {count: 3} },
+       {bar:5, beat: 2.4},
+       {bar: 5, beat: 2}],
+      [{timeSignature: {count: 3} },
+       {bar:5, beat: 3.8},
+       {bar: 6, beat: 1}],
+      // negative values
+      [{timeSignature: {count: 4} },
+       {bar:-5, beat: 2.3},
+       {bar: -5, beat: 2}],
+      [{timeSignature: {count: 4} },
+       {bar:-5, beat: 2.7},
+       {bar: -5, beat: 3}],
+      [{timeSignature: {count: 4} },
+       {bar:-5, beat: 4.7},
+       {bar: -4, beat: 1}],
+    ];
+
+    it(`should validate values`, () => {
+      testValues.forEach( (values) => {
+        const position = positionRoundBeats(values[1], values[0]);
+        assert.deepEqual(position, values[2], `bar ${
+JSON.stringify({...values[0], position: values[1] })
+    }`);
+      });
+    });
+
+  });
+
 });
+

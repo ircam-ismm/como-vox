@@ -2,7 +2,6 @@ function beatTriggerFromGesture(graph, helpers, outputFrame) {
   const app = (typeof process !== 'undefined' ? process.app : window.app);
   const conversion = app.imports.helpers.conversion;
   const secondsToBeats = conversion.secondsToBeats;
-  const positionAddBeats = conversion.positionAddBeats;
 
   const medianOrder = 5;
   const medianThreshold = 0.003;

@@ -125,18 +125,6 @@ class PlayerExperience extends AbstractExperience {
       // 'clearSessionExamples': async () => this.coMoPlayer.session.clearExamples(),
       // 'clearSessionLabel': async label => this.coMoPlayer.session.clearLabel(label),
 
-      setAudioLatency: latency => this.setAudioLatency(latency),
-
-      setLookAheadBeats: lookAheadBeats => this.setLookAheadBeats(lookAheadBeats),
-
-      setTempo: tempo => this.setTempo(tempo),
-
-      setTimeSignature: timeSignature => this.setTimeSignature(timeSignature),
-
-      setMetronomeMute: mute => this.setMetronomeMute(mute),
-
-      setBeatingMute: mute => this.setBeatingMute(mute),
-
     };
 
 
@@ -281,6 +269,8 @@ class PlayerExperience extends AbstractExperience {
       project: this.como.project.getValues(),
       player: this.coMoPlayer.player.getValues(),
       session: this.coMoPlayer.session ? this.coMoPlayer.session.getValues() : null,
+      experience: this,
+
       syncTime,
       position: this.position,
       tempo: this.tempo,

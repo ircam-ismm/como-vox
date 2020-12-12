@@ -22,6 +22,8 @@ export function player(data, listeners, {
   verbose = false,
   enableSelection = true,
 } = {}) {
+  const experience = data.experience;
+
   return html`
     <!-- LOADER -->
     ${data.player.loading ?
@@ -56,7 +58,7 @@ export function player(data, listeners, {
              .value="${data.sensorsLatency * 1e3}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
-                   listeners.setAudioLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
+                   experience.setSensorsLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
                    } }">
       ms
     </div>
@@ -69,7 +71,7 @@ export function player(data, listeners, {
              .value="${data.audioLatency * 1e3}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
-                   listeners.setAudioLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
+                   experience.setAudioLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
                    } }">
       ms
     </div>
@@ -82,7 +84,7 @@ export function player(data, listeners, {
              .value="${data.lookAheadBeats}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
-                   listeners.setLookAheadBeats(parseFloat(e.srcElement.value) || 0);
+                   experience.setLookAheadBeats(parseFloat(e.srcElement.value) || 0);
                    } }">
       beat${data.lookAheadBeats > 1 ? 's' : ''}
       (${data.lookAheadSeconds * 1e3} ms)
@@ -100,7 +102,7 @@ export function player(data, listeners, {
              .value="${data.tempo}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
-                   listeners.setTempo(parseFloat(e.srcElement.value) || 60);
+                   experience.setTempo(parseFloat(e.srcElement.value) || 60);
                    } }">
     </div>
 
@@ -112,7 +114,7 @@ export function player(data, listeners, {
              step="1"
              .value="${data.timeSignature.count}"
              @click="${e => selfSelect(e)}"
-             @change="${e => listeners.setTimeSignature(getTimeSignature(e) )}">
+             @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
       /
       <input class="division"
              type="number"
@@ -121,7 +123,7 @@ export function player(data, listeners, {
              step="1"
              .value="${data.timeSignature.division}"
              @click="${e => selfSelect(e)}"
-             @change="${e => listeners.setTimeSignature(getTimeSignature(e) )}">
+             @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
     </div>
 
     <div class="position">Position: <span class="time">${data.position
@@ -134,14 +136,14 @@ export function player(data, listeners, {
       <div class="onoff metronome control">Metronome:
         <sc-toggle
           .active="${!data.metronome.mute}"
-          @change="${e => listeners.setMetronomeMute(!e.detail.value)}"
+          @change="${e => experience.setMetronomeMute(!e.detail.value)}"
         ></sc-toggle>
       </div>
 
       <div class="onoff beating control">Beating:
         <sc-toggle
           .active="${!data.beating.mute}"
-          @change="${e => listeners.setBeatingMute(!e.detail.value)}"
+          @change="${e => experience.setBeatingMute(!e.detail.value)}"
         ></sc-toggle>
       </div>
 

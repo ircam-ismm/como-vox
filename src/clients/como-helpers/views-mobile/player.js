@@ -133,14 +133,21 @@ export function player(data, listeners, {
 
     <div class="controls-container">
 
-      <div class="onoff metronome control">Metronome:
+      <div class="onoff beating audio">Gesture controls beat:
+        <sc-toggle
+          .active="${data.gesture.controlsBeat}"
+          @change="${e => experience.setGestureControlsBeat(e.detail.value)}"
+        ></sc-toggle>
+      </div>
+
+      <div class="onoff metronome audio">Metronome click:
         <sc-toggle
           .active="${!data.metronome.mute}"
           @change="${e => experience.setMetronomeMute(!e.detail.value)}"
         ></sc-toggle>
       </div>
 
-      <div class="onoff beating control">Beating:
+      <div class="onoff beating audio">Beating clack:
         <sc-toggle
           .active="${!data.beating.mute}"
           @change="${e => experience.setBeatingMute(!e.detail.value)}"

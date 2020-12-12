@@ -51,8 +51,10 @@ class PlayerExperience extends AbstractExperience {
     this.sensorsLatency = sensorsLatencyDefault;
 
     // in seconds
-    // @TODO discover
+    // @TODO discover and store in localStorage
     this.audioLatency = 0;
+
+    this.gestureControlsBeat = true;
 
     this.metronomeMute = false;
     this.beatingMute = false;
@@ -240,6 +242,15 @@ class PlayerExperience extends AbstractExperience {
     this.updateLookAhead();
   }
 
+  setGestureControlsBeat(control) {
+    this.gestureControlsBeat = control;
+    this.coMoPlayer.player.setGraphOptions('transport', {
+        scriptParams: {
+          gestureControlsBeat: this.gestureControlsBeat,
+        },
+    });
+  }
+
   setMetronomeMute(mute) {
     this.metronomeMute = mute;
     this.coMoPlayer.player.setGraphOptions('clickGenerator', {
@@ -280,8 +291,10 @@ class PlayerExperience extends AbstractExperience {
       lookAheadBeats: this.lookAheadBeats,
       lookAheadSeconds: this.lookAheadSeconds,
 
-      metronome: { mute: this.metronomeMute},
-      beating: { mute: this.beatingMute},
+      gesture: {controlsBeat: this.gestureControlsBeat},
+
+      metronome: {mute: this.metronomeMute},
+      beating: {mute: this.beatingMute},
     };
 
     const listeners = this.listeners;

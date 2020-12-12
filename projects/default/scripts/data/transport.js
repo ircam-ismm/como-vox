@@ -32,6 +32,8 @@ function transport(graph, helpers, outputFrame) {
   };
   let positionRequestTime = 0;
 
+  let gestureControlsBeat = true;
+
   return {
     updateParams(updates) {
       if(typeof updates.tempo !== 'undefined') {
@@ -47,6 +49,10 @@ function transport(graph, helpers, outputFrame) {
         positionLastTime = 0;
         beatGesturePositionLast = updates.position;
         beatGesturePositionLastTime = 0;
+      }
+
+      if(typeof updates.gestureControlsBeat !== 'undefined') {
+        gestureControlsBeat = updates.gestureControlsBeat;
       }
     },
 
@@ -79,7 +85,7 @@ function transport(graph, helpers, outputFrame) {
       let position = {bar, beat};
 
       const beatGesture = inputData['beat'];
-      if(beatGesture && beatGesture.trigger) {
+      if(gestureControlsBeat && beatGesture && beatGesture.trigger) {
         // first, get position with look-behind
         let beatGestureDeltaFromNow = secondsToBeats(beatGesture.time - now, {
           timeSignature,

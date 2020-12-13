@@ -127,8 +127,8 @@ export function player(data, listeners, {
     </div>
 
     <div class="position">Position: <span class="time">${data.position
-      ? `${data.position.bar}/${data.position.beat.toFixed(2)}`
-      : '?/?'}<span></div>
+      ? `${data.position.bar}:${data.position.beat.toFixed(2)}`
+      : '?:?'}<span></div>
 
 
     <div class="controls-container">

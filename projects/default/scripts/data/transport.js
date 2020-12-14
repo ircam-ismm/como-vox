@@ -6,11 +6,23 @@ function transport(graph, helpers, outputFrame) {
   const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
   const positionRoundBeats = conversion.positionRoundBeats;
 
-  let tempo = 60;
+  const parameters = {
+    tempo: 60,
+    timeSignature: {
+      count: 4,
+      division: 4,
+    },
 
-  let timeSignature = {
-    count: 4,
-    division: 4,
+    playback: true,
+
+    gestureControlsBeat: true,
+
+    // in beats, around current beat
+    // @TODO: for tempo also?
+    beatGestureWindow:  {
+      min: -0.5,
+      max: 0.5,
+    },
   };
 
   let positionLast = {
@@ -19,41 +31,23 @@ function transport(graph, helpers, outputFrame) {
   };
   let positionLastTime = 0; // in seconds
 
-  // in beats, around current beat
-  // @TODO: for tempo also?
-  let beatGestureWindow = {
-    min: -0.5,
-    max: 0.5,
-  };
-
   let positionRequest = {
     bar: 1,
     beat: 1,
   };
   let positionRequestTime = 0;
 
-  let gestureControlsBeat = true;
-
   return {
     updateParams(updates) {
-      if(typeof updates.tempo !== 'undefined') {
-        tempo = updates.tempo;
-      }
-
-      if(typeof updates.timeSignature !== 'undefined') {
-        timeSignature = updates.timeSignature;
-      }
-
       if(typeof updates.position !== 'undefined') {
         positionLast = updates.position;
         positionLastTime = 0;
         beatGesturePositionLast = updates.position;
         beatGesturePositionLastTime = 0;
+      } else {
+        Object.assign(parameters, updates);
       }
 
-      if(typeof updates.gestureControlsBeat !== 'undefined') {
-        gestureControlsBeat = updates.gestureControlsBeat;
-      }
     },
 
     process(inputFrame, outputFrame) {
@@ -61,12 +55,21 @@ function transport(graph, helpers, outputFrame) {
       const outputData = outputFrame.data;
       const now = performance.now() * 0.001;
 
+      const tempo = parameters.tempo;
+      const timeSignature = parameters.timeSignature;
+
+      // do not alias playback as it may change
+
+      const gestureControlsBeat = parameters.gestureControlsBeat;
+      const beatGestureWindow = parameters.beatGestureWindow;
+
       outputData['tempo'] = tempo;
       outputData['timeSignature'] = timeSignature;
       outputData['time'] = now;
+      outputData['playback'] = parameters.playback;
 
       // start
-      if(positionLastTime === 0) {
+      if(!parameters.playback || positionLastTime === 0) {
         outputData['position'] = positionLast;
         positionLastTime = now;
         return outputFrame;
@@ -85,7 +88,8 @@ function transport(graph, helpers, outputFrame) {
       let position = {bar, beat};
 
       const beatGesture = inputData['beat'];
-      if(gestureControlsBeat && beatGesture && beatGesture.trigger) {
+      if(parameters.gestureControlsBeat
+         && beatGesture && beatGesture.trigger) {
         // first, get position with look-behind
         let beatGestureDeltaFromNow = secondsToBeats(beatGesture.time - now, {
           timeSignature,

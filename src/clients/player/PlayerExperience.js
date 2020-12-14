@@ -17,6 +17,9 @@ console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
 
 const tempoDefault = 60;
 const timeSignatureDefault = {count: 4, division: 4};
+
+const transportPlaybackDefault = true;
+
 const lookAheadBeatsDefault = 0;
 const sensorsLatencyDefault = 1 / 60; // 60 Hz?
 
@@ -38,6 +41,8 @@ class PlayerExperience extends AbstractExperience {
       bar: 0,
       beat: 0,
     };
+
+    this.transportPlayback = transportPlaybackDefault;
 
     this.tempo = tempoDefault;
     this.timeSignature = timeSignatureDefault;
@@ -143,6 +148,7 @@ class PlayerExperience extends AbstractExperience {
 
     // quick and drity fix...
     this.coMoPlayer.onGraphCreated(async () => {
+      this.setTransportPlayback(transportPlaybackDefault);
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);
       this.setLookAheadBeats(lookAheadBeatsDefault);
@@ -153,6 +159,7 @@ class PlayerExperience extends AbstractExperience {
         // console.log('frame', JSON.parse(JSON.stringify(frame)));
 
         this.position = frame['position'];
+        this.transportPlayback = frame['playback'];
         this.tempo = frame['tempo'];
         this.timeSignature = frame['timeSignature'];
       });
@@ -252,6 +259,15 @@ class PlayerExperience extends AbstractExperience {
     });
   }
 
+  setTransportPlayback(playback) {
+    this.transportPlayback = playback;
+    this.coMoPlayer.player.setGraphOptions('transport', {
+        scriptParams: {
+          playback,
+        },
+    });
+  }
+
   setMetronomeSound(onOff) {
     this.metronomeSound = onOff;
     this.coMoPlayer.player.setGraphOptions('clickGenerator', {
@@ -287,6 +303,7 @@ class PlayerExperience extends AbstractExperience {
       experience: this,
 
       syncTime,
+      transportPlayback: this.transportPlayback,
       position: positionCompensated,
       tempo: this.tempo,
       timeSignature: this.timeSignature,

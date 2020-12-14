@@ -126,6 +126,17 @@ export function player(data, listeners, {
              @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
     </div>
 
+    <div class="controls-container">
+
+      <div class="onoff transport">Playback:
+        <sc-toggle
+          .active="${data.transportPlayback}"
+          @change="${e => experience.setTransportPlayback(e.detail.value)}"
+        ></sc-toggle>
+      </div>
+
+    </div>
+
     <div class="position">Position: <span class="time">${data.position
       ? `${data.position.bar}:${data.position.beat.toFixed(2)}`
       : '?:?'}<span></div>

@@ -8,9 +8,6 @@
       options: {
         scriptName: 'clickSynth',
         bypass: false,
-        scriptParams: {
-          lookAheadSeconds: 0.76,
-        },
       },
     },
     {

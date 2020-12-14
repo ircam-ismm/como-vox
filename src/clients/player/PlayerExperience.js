@@ -56,8 +56,8 @@ class PlayerExperience extends AbstractExperience {
 
     this.gestureControlsBeat = true;
 
-    this.metronomeMute = false;
-    this.beatingMute = false;
+    this.metronomeSound = true;
+    this.beatingSound = true;
 
     // configure como w/ the given experience
     this.como.configureExperience(this);
@@ -251,21 +251,21 @@ class PlayerExperience extends AbstractExperience {
     });
   }
 
-  setMetronomeMute(mute) {
-    this.metronomeMute = mute;
+  setMetronomeSound(onOff) {
+    this.metronomeSound = onOff;
     this.coMoPlayer.player.setGraphOptions('clickGenerator', {
         scriptParams: {
-          mute,
+          onOff,
         },
     });
 
   }
 
-  setBeatingMute(mute) {
-    this.beatingMute = mute;
+  setBeatingSound(onOff) {
+    this.beatingSound = onOff;
     this.coMoPlayer.player.setGraphOptions('clackFromBeat', {
         scriptParams: {
-          mute,
+          onOff,
         },
     });
 
@@ -293,8 +293,8 @@ class PlayerExperience extends AbstractExperience {
 
       gesture: {controlsBeat: this.gestureControlsBeat},
 
-      metronome: {mute: this.metronomeMute},
-      beating: {mute: this.beatingMute},
+      metronomeSound: {onOff: this.metronomeSound},
+      beatingSound: {onOff: this.beatingSound},
     };
 
     const listeners = this.listeners;

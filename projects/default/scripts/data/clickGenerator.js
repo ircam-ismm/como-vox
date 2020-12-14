@@ -11,7 +11,7 @@ function clickGenerator(graph, helpers, outputFrame) {
   const duration = 0.5; // in beats
 
   const parameters = {
-    mute: false,
+    onOff: true,
   };
 
   return {
@@ -34,7 +34,7 @@ function clickGenerator(graph, helpers, outputFrame) {
 
       let trigger = false;
 
-      if(!parameters.mute) {
+      if(parameters.onOff) {
         // always on a beat, to avoid late beats
         if(beat % 1 > 0.95 || beat % 1 < 0.05) {
           if(barLast === 0) {

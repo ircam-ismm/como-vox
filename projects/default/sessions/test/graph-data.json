@@ -34,6 +34,9 @@
       type: 'ScriptData',
       options: {
         scriptName: 'transport',
+        scriptParams: {
+          gestureControlsBeat: false,
+        },
       },
     },
     {
@@ -45,13 +48,16 @@
       type: 'ScriptData',
       options: {
         scriptName: 'clickGenerator',
+        scriptParams: {
+          mute: false,
+        },
       },
     },
     {
       id: 'beatTriggerFromGesture',
       type: 'ScriptData',
       options: {
-        scriptName: 'beatTriggerFromGesture',
+        scriptName: 'beatTriggerFromGestureMax',
       },
     },
     {

@@ -1,4 +1,4 @@
-function beatTriggerFromGesture(graph, helpers, outputFrame) {
+function beatTriggerFromGestureOnset(graph, helpers, outputFrame) {
   const app = (typeof process !== 'undefined' ? process.app : window.app);
   const conversion = app.imports.helpers.conversion;
   const secondsToBeats = conversion.secondsToBeats;

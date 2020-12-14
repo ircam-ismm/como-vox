@@ -2,20 +2,15 @@
   name: 'default',
   version: '0.0.0',
   modules: [
-    // {
-    //   id: 'synth',
-    //   type: 'ScriptAudio',
-    //   options: {
-    //     scriptName: 'metro',
-    //     bypass: false,
-    //   },
-    // },
     {
       id: 'clickSynth',
       type: 'ScriptAudio',
       options: {
         scriptName: 'clickSynth',
         bypass: false,
+        scriptParams: {
+          lookAheadSeconds: 0.76,
+        },
       },
     },
     {

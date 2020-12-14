@@ -8,6 +8,7 @@ import views from '../como-helpers/views-mobile/index.js';
 const app = window.app;
 const conversion = app.imports.helpers.conversion;
 const beatsToSeconds = conversion.beatsToSeconds;
+const positionAddBeats = conversion.positionAddBeats;
 
 // for simple debugging in browser...
 const MOCK_SENSORS = window.location.hash === '#mock-sensors';
@@ -274,6 +275,9 @@ class PlayerExperience extends AbstractExperience {
   render() {
     const syncTime = this.sync.getSyncTime();
 
+    // warning: syncTime is NOT compensated
+    const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
+                                                 {timeSignature: this.timeSignature});
     const viewData = {
       config: this.config,
       boundingClientRect: this.$container.getBoundingClientRect(),
@@ -283,7 +287,7 @@ class PlayerExperience extends AbstractExperience {
       experience: this,
 
       syncTime,
-      position: this.position,
+      position: positionCompensated,
       tempo: this.tempo,
       timeSignature: this.timeSignature,
       sensorsLatency: this.sensorsLatency,

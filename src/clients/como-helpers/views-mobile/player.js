@@ -50,7 +50,7 @@ export function player(data, listeners, {
       }
     </div>
 
-    <div class="audioLatency">Sensors Latency:
+    <div class="sensorsLatency">Sensors Latency:
       <input type="number"
              min="0"
              max="100"

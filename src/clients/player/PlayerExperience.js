@@ -54,7 +54,7 @@ class PlayerExperience extends AbstractExperience {
     // @TODO discover and store in localStorage
     this.audioLatency = 0;
 
-    this.gestureControlsBeat = true;
+    this.gestureControlsBeat = false;
 
     this.metronomeSound = true;
     this.beatingSound = true;

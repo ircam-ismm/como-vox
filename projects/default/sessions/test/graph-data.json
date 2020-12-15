@@ -160,6 +160,10 @@
       'to-transport',
     ],
     [
+      'beatTriggerFromGesture',
+      'output',
+    ],
+    [
       'clackFromBeat',
       'output',
     ],

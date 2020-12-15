@@ -37,6 +37,10 @@ function beatTriggerFromGestureOnset(graph, helpers, outputFrame) {
       const beat = {
         time,
         trigger: 0,
+        // for off-line analysis
+        type: 'onset',
+        delta,
+        median: lastMedian,
       };
 
       if (delta > medianThreshold && lastBeatTime === null) {

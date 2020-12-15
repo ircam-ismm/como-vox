@@ -45,6 +45,11 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
       const beat = {
         time,
         trigger: 0,
+        // for off-line analysis
+        type: 'peak',
+        intensity,
+        delta,
+        median: lastMedian,
       };
 
       if (overMedian === 0) {

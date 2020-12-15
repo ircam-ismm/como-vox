@@ -1,4 +1,5 @@
 import conversion from './helpers/conversion.js';
+import math from './helpers/math.js';
 
 let app;
 if(typeof window !== 'undefined') {
@@ -12,6 +13,7 @@ if(typeof window !== 'undefined') {
 app.imports = {
   helpers: {
     conversion,
+    math,
   },
 };
 

@@ -24,6 +24,9 @@ export function player(data, listeners, {
 } = {}) {
   const experience = data.experience;
 
+  const bar = data.position.bar;
+  const beat = data.position.beat;
+
   return html`
     <!-- LOADER -->
     ${data.player.loading ?
@@ -138,7 +141,7 @@ export function player(data, listeners, {
     </div>
 
     <div class="position">Position: <span class="time">${data.position
-      ? `${data.position.bar}:${data.position.beat.toFixed(2)}`
+      ? `${data.position.bar}:${Math.floor(beat * 100) / 100}`
       : '?:?'}<span></div>
 
 

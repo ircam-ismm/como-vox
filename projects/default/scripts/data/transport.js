@@ -1,10 +1,14 @@
 function transport(graph, helpers, outputFrame) {
   const app = (typeof process !== 'undefined' ? process.app : window.app);
+
   const conversion = app.imports.helpers.conversion;
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;
   const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
   const positionRoundBeats = conversion.positionRoundBeats;
+
+  const math = app.imports.helpers.math;
+  const modulo = math.modulo;
 
   const parameters = {
     tempo: 60,
@@ -78,14 +82,7 @@ function transport(graph, helpers, outputFrame) {
       const timeDelta = now - positionLastTime;
       const beatDelta = timeDelta / (60 / tempo) * timeSignature.division / 4;
 
-      // modulo shifted by 1, for bar starting at 1
-      const beat = (positionLast.beat + beatDelta - 1 + timeSignature.count)
-            % timeSignature.count + 1;
-
-      const barDelta = (positionLast.beat - 1 + beatDelta) / timeSignature.count;
-      const bar = Math.floor(positionLast.bar + barDelta);
-
-      let position = {bar, beat};
+      const position = positionAddBeats(positionLast, beatDelta);
 
       const beatGesture = inputData['beat'];
       if(parameters.gestureControlsBeat

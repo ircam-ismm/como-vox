@@ -457,9 +457,12 @@ function barBeatAdvance({ppqn, timeSignature, last, tick}) {
   // do not round to avoid drift
   const beatDelta = tickDelta / ppqn * timeSignature.division / 4;
 
-  // modulo shifted by 1, for bar starting at 1
-  const beat = (last.beat + beatDelta - 1 + timeSignature.count)
-        % timeSignature.count + 1;
+  const count = timeSignature.count;
+  const beatRaw = last.beat + beatDelta;
+
+  // modulo of beat that starts at 1
+  // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder
+  const beat =  ( ( ( (beatRaw - 1) % count ) + count) % count) + 1;
 
   // lastChange.beat is start offset from lastChange.bar
   // duration starts from beat 1

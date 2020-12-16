@@ -102,7 +102,7 @@ export function player(data, listeners, {
              min="10"
              max="300"
              step="10"
-             .value="${data.tempo}"
+             .value="${Math.round(data.tempo)}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
                    experience.setTempo(parseFloat(e.srcElement.value) || 60);
@@ -141,7 +141,7 @@ export function player(data, listeners, {
     </div>
 
     <div class="position">Position: <span class="time">${data.position
-      ? `${data.position.bar}:${Math.floor(beat * 100) / 100}`
+      ? `${data.position.bar}:${(Math.floor(beat * 100) / 100).toFixed(2)}`
       : '?:?'}<span></div>
 
 
@@ -151,6 +151,13 @@ export function player(data, listeners, {
         <sc-toggle
           .active="${data.gesture.controlsBeat}"
           @change="${e => experience.setGestureControlsBeat(e.detail.value)}"
+        ></sc-toggle>
+      </div>
+
+      <div class="onoff beating audio">Gesture controls tempo:
+        <sc-toggle
+          .active="${data.gesture.controlsTempo}"
+          @change="${e => experience.setGestureControlsTempo(e.detail.value)}"
         ></sc-toggle>
       </div>
 

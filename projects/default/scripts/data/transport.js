@@ -1,14 +1,16 @@
 function transport(graph, helpers, outputFrame) {
-  const app = (typeof process !== 'undefined' ? process.app : window.app);
+  const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;
   const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
   const positionRoundBeats = conversion.positionRoundBeats;
+  const timeDeltaToTempo = conversion.timeDeltaToTempo;
 
   const math = app.imports.helpers.math;
   const modulo = math.modulo;
+  const median = math.median;
 
   const parameters = {
     tempo: 60,
@@ -19,13 +21,20 @@ function transport(graph, helpers, outputFrame) {
 
     playback: true,
 
-    gestureControlsBeat: true,
+    gestureControlsBeat: false,
 
     // in beats, around current beat
     // @TODO: for tempo also?
-    beatGestureWindow:  {
+    beatGestureWindow: {
       min: -0.5,
       max: 0.5,
+    },
+
+    gestureControlsTempo: false,
+
+    tempoGestureWindow: {
+      bar: 1,
+      beat: 0,
     },
   };
 
@@ -41,13 +50,27 @@ function transport(graph, helpers, outputFrame) {
   };
   let positionRequestTime = 0;
 
+  let tempoGestures = [];
+
+  const setPosition = (positionRequest) => {
+    positionLast = updates.positionRequest;
+    positionLastTime = 0;
+    beatGesturePositionLast = updates.positionRequest;
+    beatGesturePositionLastTime = 0;
+    tempoGestures.length = 0;
+  };
+
+  const setTimeSignature = (timeSignatureRequest) => {
+    parameters.timeSignature = timeSignatureRequest;
+    tempoGestures.length = 0;
+  }
+
   return {
     updateParams(updates) {
       if(typeof updates.position !== 'undefined') {
-        positionLast = updates.position;
-        positionLastTime = 0;
-        beatGesturePositionLast = updates.position;
-        beatGesturePositionLastTime = 0;
+        setPosition(updates.position);
+      } else if(typeof updates.timeSignature !== 'undefined') {
+        setTimeSignature(updates.timeSignature);
       } else {
         Object.assign(parameters, updates);
       }
@@ -59,15 +82,13 @@ function transport(graph, helpers, outputFrame) {
       const outputData = outputFrame.data;
       const now = performance.now() * 0.001;
 
-      const tempo = parameters.tempo;
+      let tempo = parameters.tempo;
       const timeSignature = parameters.timeSignature;
 
       // do not alias playback as it may change
 
-      const gestureControlsBeat = parameters.gestureControlsBeat;
       const beatGestureWindow = parameters.beatGestureWindow;
 
-      outputData['tempo'] = tempo;
       outputData['timeSignature'] = timeSignature;
       outputData['time'] = now;
       outputData['playback'] = parameters.playback;
@@ -82,18 +103,53 @@ function transport(graph, helpers, outputFrame) {
       const timeDelta = now - positionLastTime;
       const beatDelta = timeDelta / (60 / tempo) * timeSignature.division / 4;
 
-      const position = positionAddBeats(positionLast, beatDelta);
+      let position = positionAddBeats(positionLast, beatDelta);
 
       const beatGesture = inputData['beat'];
+      const beatGestureDeltaFromNow = secondsToBeats(beatGesture.time - now, {
+        timeSignature,
+        tempo,
+      });
+      const beatGesturePosition = positionAddBeats(position, beatGestureDeltaFromNow,
+                                                   {timeSignature});
+
+      // tempo
+      if(parameters.gestureControlsTempo && beatGesture && beatGesture.trigger) {
+        tempoGestures.push({
+          time: beatGesture.time,
+          position: beatGesturePosition
+        });
+
+        const deltaMax = parameters.tempoGestureWindow.bar * timeSignature.count
+              + parameters.tempoGestureWindow.beat;
+
+        tempoGestures = tempoGestures.filter( (gesture) => {
+          return deltaMax >= positionsToBeatsDelta(position, gesture.position);
+        });
+
+        let tempos = [];
+        for(let g = 1; g < tempoGestures.length; ++g) {
+          const timeDelta = tempoGestures[g].time - tempoGestures[g - 1].time;
+          const beatDelta = Math.round(
+            positionsToBeatsDelta(tempoGestures[g].position,
+                                  tempoGestures[g - 1].position,
+                                  {timeSignature}));
+          if(beatDelta >= 1) {
+            const tempoCurrent = timeDeltaToTempo(timeDelta, beatDelta, {timeSignature});
+            tempos.push(tempoCurrent);
+          }
+        }
+
+        if(tempos.length > 0) {
+          tempo = median(tempos);;
+        }
+
+      }
+
+      // beat position
       if(parameters.gestureControlsBeat
          && beatGesture && beatGesture.trigger) {
         // first, get position with look-behind
-        let beatGestureDeltaFromNow = secondsToBeats(beatGesture.time - now, {
-          timeSignature,
-          tempo,
-        });
-        const beatGesturePosition = positionAddBeats(position, beatGestureDeltaFromNow,
-                                                     {timeSignature});
         const beatGesturePositionRounded = positionRoundBeats(beatGesturePosition,
                                                               {timeSignature});
         const beatGestureDeltaFromRounded = positionsToBeatsDelta(beatGesturePosition,
@@ -129,8 +185,16 @@ function transport(graph, helpers, outputFrame) {
         outputData['position'] = position;
       }
 
+      outputData['tempo'] = tempo;
+      parameters.tempo = tempo;
+
       positionLast = position;
       positionLastTime = now;
+
+      if(position &&
+         (isNaN(position.bar) || isNaN(position.beat) ) ) {
+        debugger;
+      }
 
       return outputFrame;
     },

@@ -61,6 +61,7 @@ class PlayerExperience extends AbstractExperience {
     this.audioLatency = 0;
 
     this.gestureControlsBeat = false;
+    this.gestureControlsTempo = false;
 
     this.metronomeSound = true;
     this.beatingSound = true;
@@ -259,6 +260,15 @@ class PlayerExperience extends AbstractExperience {
     });
   }
 
+  setGestureControlsTempo(control) {
+    this.gestureControlsTempo = control;
+    this.coMoPlayer.player.setGraphOptions('transport', {
+        scriptParams: {
+          gestureControlsTempo: this.gestureControlsTempo,
+        },
+    });
+  }
+
   setTransportPlayback(playback) {
     this.transportPlayback = playback;
     this.coMoPlayer.player.setGraphOptions('transport', {
@@ -312,7 +322,10 @@ class PlayerExperience extends AbstractExperience {
       lookAheadBeats: this.lookAheadBeats,
       lookAheadSeconds: this.lookAheadSeconds,
 
-      gesture: {controlsBeat: this.gestureControlsBeat},
+      gesture: {
+        controlsBeat: this.gestureControlsBeat,
+        controlsTempo: this.gestureControlsTempo,
+      },
 
       metronomeSound: {onOff: this.metronomeSound},
       beatingSound: {onOff: this.beatingSound},

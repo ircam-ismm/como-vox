@@ -1,9 +1,9 @@
 import {describe, it} from 'mocha';
 import {assert, should} from 'chai';
 
-import {assertWithRelativeError} from '../shared/utils.js';
+import {assertWithRelativeError} from '../../shared/utils.js';
 
-import {amplitudeToDB, dBToAmplitude} from '../../src/server/helpers/conversion.js';
+import {amplitudeToDB, dBToAmplitude} from '../../../src/server/helpers/conversion.js';
 
 const epsilon = 1e-3;
 

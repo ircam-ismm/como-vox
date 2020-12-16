@@ -133,11 +133,20 @@ export function positionRoundBeats(position, {timeSignature = timeSignatureDefau
 }
 Object.assign(e, {positionRoundBeats});
 
+export function timeDeltaToTempo(timeDelta, beatDelta = 1, {
+  timeSignature = timeSignatureDefault,
+} = {}) {
+  return (timeDelta !== 0 && beatDelta !== 0
+          ? 4 / timeSignature.division * 60 * beatDelta / timeDelta
+          : undefined);
+};
+Object.assign(e, {timeDeltaToTempo});
+
 export function performanceToAudioContextTime(performanceTime, {audioContext}) {
   let performanceTimeDelta;
   let contextTimeReference;
   if(typeof audioContext.getOutputTimestamp !== 'function') {
-    performanceTimeDelta = performanceTime - performance.now();
+    performanceTimeDelta = performanceTime - window.performance.now();
     contextTimeReference = audioContext.currentTime;
   } else {
     const stamp = audioContext.getOutputTimestamp();

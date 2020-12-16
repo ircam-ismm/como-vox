@@ -1,5 +1,5 @@
 function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
-  const app = (typeof process !== 'undefined' ? process.app : window.app);
+  const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
 

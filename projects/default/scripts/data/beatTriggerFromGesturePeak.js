@@ -1,5 +1,5 @@
 function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
-  const app = (typeof process !== 'undefined' ? process.app : window.app);
+  const app = (typeof global !== 'undefined' ? global.app : window.app);
   const conversion = app.imports.helpers.conversion;
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;

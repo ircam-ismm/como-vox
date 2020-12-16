@@ -1,7 +1,7 @@
 import {describe, it} from 'mocha';
 import {assert, should} from 'chai';
 
-import {assertWithRelativeError} from '../shared/utils.js';
+import {assertWithRelativeError} from '../../shared/utils.js';
 
 const epsilon = 1e-3;
 
@@ -12,7 +12,8 @@ import {
   positionsToSecondsDelta,
   positionAddBeats,
   positionRoundBeats,
-} from '../../src/server/helpers/conversion.js';
+  timeDeltaToTempo,
+} from '../../../src/server/helpers/conversion.js';
 
 describe(`Check beats conversion helpers`, () => {
 
@@ -277,47 +278,111 @@ JSON.stringify({...values[0], position: values[1], beats: values[2]})
     });
 
   });
+});
 
-  describe(`Check positionsRoundBeats conversion helper`, () => {
+describe(`Check positionsRoundBeats conversion helper`, () => {
 
-    const testValues = [
-      [{timeSignature: {count: 4} },
-       {bar:1, beat: 1.1},
-       {bar: 1, beat: 1}],
-      [{timeSignature: {count: 4} },
-       {bar:1, beat: 4.5},
-       {bar: 2, beat: 1}],
-      [{timeSignature: {count: 4} },
-       {bar:1, beat: 1.1},
-       {bar: 1, beat: 1}],
-      [{timeSignature: {count: 3} },
-       {bar:5, beat: 2.4},
-       {bar: 5, beat: 2}],
-      [{timeSignature: {count: 3} },
-       {bar:5, beat: 3.8},
-       {bar: 6, beat: 1}],
-      // negative values
-      [{timeSignature: {count: 4} },
-       {bar:-5, beat: 2.3},
-       {bar: -5, beat: 2}],
-      [{timeSignature: {count: 4} },
-       {bar:-5, beat: 2.7},
-       {bar: -5, beat: 3}],
-      [{timeSignature: {count: 4} },
-       {bar:-5, beat: 4.7},
-       {bar: -4, beat: 1}],
-    ];
+  const testValues = [
+    [{timeSignature: {count: 4} },
+     {bar:1, beat: 1.1},
+     {bar: 1, beat: 1}],
+    [{timeSignature: {count: 4} },
+     {bar:1, beat: 4.5},
+     {bar: 2, beat: 1}],
+    [{timeSignature: {count: 4} },
+     {bar:1, beat: 1.1},
+     {bar: 1, beat: 1}],
+    [{timeSignature: {count: 3} },
+     {bar:5, beat: 2.4},
+     {bar: 5, beat: 2}],
+    [{timeSignature: {count: 3} },
+     {bar:5, beat: 3.8},
+     {bar: 6, beat: 1}],
+    // negative values
+    [{timeSignature: {count: 4} },
+     {bar:-5, beat: 2.3},
+     {bar: -5, beat: 2}],
+    [{timeSignature: {count: 4} },
+     {bar:-5, beat: 2.7},
+     {bar: -5, beat: 3}],
+    [{timeSignature: {count: 4} },
+     {bar:-5, beat: 4.7},
+     {bar: -4, beat: 1}],
+  ];
 
-    it(`should validate values`, () => {
-      testValues.forEach( (values) => {
-        const position = positionRoundBeats(values[1], values[0]);
-        assert.deepEqual(position, values[2], `bar ${
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const position = positionRoundBeats(values[1], values[0]);
+      assert.deepEqual(position, values[2], `bar ${
 JSON.stringify({...values[0], position: values[1] })
     }`);
-      });
     });
-
   });
 
 });
 
+describe(`Check beatTimeDeltaToTempo conversion helper`, () => {
+
+  const testValues = [
+    [{timeSignature: {division: 4} },
+     1,
+     1,
+     60],
+    [{timeSignature: {division: 4} },
+     2,
+     1,
+     30],
+    [{timeSignature: {division: 4} },
+     0.5,
+     1,
+     120],
+    [{timeSignature: {division: 2} },
+     1,
+     1,
+     120],
+    [{timeSignature: {division: 8} },
+     1,
+     1,
+     30],
+    [{timeSignature: {division: 8} },
+     2,
+     1,
+     15],
+    [undefined,
+     2,
+     1,
+     30],
+    // default values
+    [{timeSignature: {division: 4} },
+     2,
+     undefined,
+     30],
+    [undefined,
+     2,
+     undefined,
+     30],
+    // exceptions
+    [{timeSignature: {division: 4} },
+     0,
+     1,
+     undefined],
+    [{timeSignature: {division: 4} },
+     0,
+     0,
+     undefined],
+    [{timeSignature: {division: 4} },
+     1,
+     0,
+     undefined],
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const tempo = timeDeltaToTempo(values[1], values[2], values[0]);
+      assert.equal(tempo, values[3], `beatTimeDelta ${
+JSON.stringify({...values[0], timeDelta: values[1], beatDelta: values[2] })
+    }`);
+    });
+  });
+
+});

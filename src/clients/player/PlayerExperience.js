@@ -163,6 +163,7 @@ class PlayerExperience extends AbstractExperience {
         this.transportPlayback = frame['playback'];
         this.tempo = frame['tempo'];
         this.timeSignature = frame['timeSignature'];
+        this.updateLookAhead({allowMoreBeats: false});
       });
     });
 
@@ -200,20 +201,30 @@ class PlayerExperience extends AbstractExperience {
     this.updateLookAhead();
   }
 
-  updateLookAhead() {
+  updateLookAhead({
+    allowMoreBeats = true,
+  } = {}) {
     const lookAheadSecondsLast = this.lookAheadSeconds;
 
     if(this.lookAheadBeats === 0) {
       this.lookAheadSeconds = 0;
     } else {
-      while(
-        (this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
+      if(allowMoreBeats) {
+        while(
+          (this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
+            tempo: this.tempo,
+            timeSignature: this.timeSignature,
+          })
+           - this.audioLatency)
+           <= this.lookAheadSecondsMin) {
+            ++this.lookAheadBeats;
+        }
+      } else {
+        this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
           tempo: this.tempo,
           timeSignature: this.timeSignature,
         })
-         - this.audioLatency)
-          <= this.lookAheadSecondsMin) {
-        ++this.lookAheadBeats;
+          - this.audioLatency;
       }
     }
 

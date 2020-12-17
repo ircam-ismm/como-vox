@@ -120,28 +120,44 @@ function transport(graph, helpers, outputFrame) {
           position: beatGesturePosition
         });
 
+        // maximum number of beats from now
+        // and minimum number of tempo gestures
         const deltaMax = parameters.tempoGestureWindow.bar * timeSignature.count
               + parameters.tempoGestureWindow.beat;
 
+        // remove old gestures but keep the same number as deltaMax
+        // in order to be able to halve tempo
+        for(let g = 0, gesturesKept = tempoGestures.length;
+            g < tempoGestures.length && gesturesKept > deltaMax;
+            ++g) {
+          const gesture = tempoGestures[g];
+          if(deltaMax < positionsToBeatsDelta(position, gesture.position) ) {
+            tempoGestures[g] = undefined;
+            --gesturesKept;
+          }
+        }
         tempoGestures = tempoGestures.filter( (gesture) => {
-          return deltaMax >= positionsToBeatsDelta(position, gesture.position);
+          return typeof gesture !== 'undefined';
         });
 
         let tempos = [];
+        let beatDeltas = [];
         for(let g = 1; g < tempoGestures.length; ++g) {
           const timeDelta = tempoGestures[g].time - tempoGestures[g - 1].time;
           const beatDelta = Math.round(
             positionsToBeatsDelta(tempoGestures[g].position,
                                   tempoGestures[g - 1].position,
                                   {timeSignature}));
-          if(beatDelta >= 1) {
+          if(beatDelta === 1 || beatDelta === 2) {
             const tempoCurrent = timeDeltaToTempo(timeDelta, beatDelta, {timeSignature});
             tempos.push(tempoCurrent);
+            beatDeltas.push(beatDelta);
           }
         }
 
         if(tempos.length > 0) {
-          tempo = median(tempos);;
+          // use median for beatDeltas for integer result to halve tempo
+          tempo = median(tempos) / median(beatDeltas);
         }
 
       }
@@ -190,11 +206,6 @@ function transport(graph, helpers, outputFrame) {
 
       positionLast = position;
       positionLastTime = now;
-
-      if(position &&
-         (isNaN(position.bar) || isNaN(position.beat) ) ) {
-        debugger;
-      }
 
       return outputFrame;
     },

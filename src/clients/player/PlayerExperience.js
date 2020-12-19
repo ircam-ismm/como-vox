@@ -19,6 +19,7 @@ console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
 
 const tempoDefault = 60;
 const timeSignatureDefault = {count: 4, division: 4};
+const positionDefault = {bar: 1, beat: 1};
 
 const transportPlaybackDefault = true;
 
@@ -45,10 +46,7 @@ class PlayerExperience extends AbstractExperience {
     this.score = null;
     this.scoreReady = false;
 
-    this.position = {
-      bar: 0,
-      beat: 0,
-    };
+    this.position = positionDefault;
 
     this.transportPlayback = transportPlaybackDefault;
 
@@ -184,6 +182,7 @@ class PlayerExperience extends AbstractExperience {
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);
       this.setLookAheadBeats(lookAheadBeatsDefault);
+      this.seekPosition(positionDefault);
 
       this.setSensorsLatency(sensorsLatencyDefault);
 
@@ -215,7 +214,6 @@ class PlayerExperience extends AbstractExperience {
       return Promise.resolve(null);
     }
 
-    console.log("setScore", scoreURI);
     const promise = new Promise( (resolve, reject) => {
       const request = new window.XMLHttpRequest();
       request.open('GET', scoreURI, true);
@@ -225,6 +223,7 @@ class PlayerExperience extends AbstractExperience {
         reject(new Error(`Unable to GET ${sourceUrl}, status ${request.status} `
                          + `${request.responseText}`) );
       };
+
       request.onload = () => {
         if (request.status < 200 || request.status >= 300) {
           request.onerror();
@@ -234,14 +233,20 @@ class PlayerExperience extends AbstractExperience {
         try {
           this.score = midi.parse(request.response);
           this.scoreReady = true;
+          this.coMoPlayer.player.setGraphOptions('score', {
+            scriptParams: {
+              score: this.score,
+            },
+          });
+
         } catch (error) {
           reject(new Error(`Error while parsing midi file ${scoreURI}: `
                            + error.message) );
         }
       };
 
-      this.score = null;
       this.scoreReady = false;
+      this.score = null;
       request.send(null);
     });
 
@@ -331,6 +336,16 @@ class PlayerExperience extends AbstractExperience {
         },
     });
     this.updateLookAhead();
+  }
+
+  seekPosition(position) {
+    ['transport', 'score'].forEach( (script) => {
+      this.coMoPlayer.player.setGraphOptions(script, {
+        scriptParams: {
+          seekPosition: position,
+        },
+      });
+    });
   }
 
   setGestureControlsBeat(control) {
@@ -430,7 +445,7 @@ class PlayerExperience extends AbstractExperience {
     } else {
       screen = views[this.client.type](viewData, listeners, {
         verbose: false,
-        enableSelection: true,
+        enableSelection: false,
       });
     }
 

@@ -52,23 +52,22 @@ function transport(graph, helpers, outputFrame) {
 
   let tempoGestures = [];
 
-  const setPosition = (positionRequest) => {
-    positionLast = updates.positionRequest;
+  const seekPosition = (position) => {
+    positionLast = position;
+    positionRequest = position;
     positionLastTime = 0;
-    beatGesturePositionLast = updates.positionRequest;
-    beatGesturePositionLastTime = 0;
     tempoGestures.length = 0;
   };
 
-  const setTimeSignature = (timeSignatureRequest) => {
-    parameters.timeSignature = timeSignatureRequest;
+  const setTimeSignature = (timeSignature) => {
+    parameters.timeSignature = timeSignature;
     tempoGestures.length = 0;
   }
 
   return {
     updateParams(updates) {
-      if(typeof updates.position !== 'undefined') {
-        setPosition(updates.position);
+      if(typeof updates.seekPosition !== 'undefined') {
+        seekPosition(updates.seekPosition);
       } else if(typeof updates.timeSignature !== 'undefined') {
         setTimeSignature(updates.timeSignature);
       } else {
@@ -95,6 +94,7 @@ function transport(graph, helpers, outputFrame) {
 
       // start
       if(!parameters.playback || positionLastTime === 0) {
+        outputData['tempo'] = parameters.tempo;
         outputData['position'] = positionLast;
         positionLastTime = now;
         return outputFrame;
@@ -156,7 +156,7 @@ function transport(graph, helpers, outputFrame) {
         }
 
         if(tempos.length > 0) {
-          // use median for beatDeltas for integer result to halve tempo
+          // use median of beatDeltas for integer result to halve tempo
           tempo = median(tempos) / median(beatDeltas);
         }
 
@@ -179,9 +179,11 @@ function transport(graph, helpers, outputFrame) {
             // backward
             // use positionRequest for monotonic output until current position is
             // reached again
+            // @TODO: smooth
             [position, positionRequest] = [positionRequest, position];
           } else {
             // forward
+            // @TODO: smooth
             position = positionRequest;
           }
 
@@ -192,8 +194,6 @@ function transport(graph, helpers, outputFrame) {
       // max(positionRequest, position) to ensure monotonic output
       const positionRequestDelta = positionsToBeatsDelta(positionRequest,
                                                          position, {timeSignature});
-      // console.log("positionRequestDelta = ", positionRequestDelta);
-
       if(positionRequestDelta > 0) {
         // wait
         outputData['position'] = positionRequest;

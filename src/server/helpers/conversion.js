@@ -133,6 +133,15 @@ export function positionRoundBeats(position, {timeSignature = timeSignatureDefau
 }
 Object.assign(e, {positionRoundBeats});
 
+export function barBeatToPosition(event) {
+  const position = {
+    bar: event.bar,
+    beat: event.beat,
+  };
+  return { ...{position}, ...event};
+};
+Object.assign(e, {barBeatToPosition});
+
 export function timeDeltaToTempo(timeDelta, beatDelta = 1, {
   timeSignature = timeSignatureDefault,
 } = {}) {

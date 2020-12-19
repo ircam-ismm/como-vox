@@ -65,3 +65,7 @@ body.loading {
   display: inline-flex;
 }
 
+#__soundworks-container .invalid {
+  background-color: red;
+}
+

@@ -23,6 +23,8 @@ export function player(data, listeners, {
   enableSelection = true,
 } = {}) {
   const experience = data.experience;
+  const voxApplicationState = data.voxApplicationState;
+  const voxPlayerState = data.voxPlayerState;
 
   const bar = data.position.bar;
   const beat = data.position.beat;
@@ -95,6 +97,26 @@ export function player(data, listeners, {
 
     <div class="time">
       ${data.syncTime.toFixed(3)}
+    </div>
+
+    <div class="score-container">
+      <select class="${!experience.scoreReady ? 'invalid' : ''}"
+        style="${styles.select}"
+        @change="${e => {
+          const score = (e.target.value === 'none' ? null : e.target.value);
+          voxPlayerState.set({score});
+        }}"
+      >
+        ${['none', ...voxApplicationState.get('scores')].map( (score) => {
+        return html`
+        <option
+          value="${score}"
+          ?selected="${voxPlayerState.get('score')
+            === (score === 'none' ? null : score)}"
+        >${score}</option>
+        `;
+        })}
+     </select>
     </div>
 
     <div class="tempo">Tempo:

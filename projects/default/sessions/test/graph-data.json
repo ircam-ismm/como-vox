@@ -54,6 +54,16 @@
       },
     },
     {
+      id: 'score',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'score',
+        scriptParams: {
+          onOff: false,
+        },
+      },
+    },
+    {
       id: 'beatTriggerFromGesture',
       type: 'ScriptData',
       options: {
@@ -149,6 +159,14 @@
     ],
     [
       'clickGenerator',
+      'output',
+    ],
+    [
+      'merge-descriptors-position',
+      'score',
+    ],
+    [
+      'score',
       'output',
     ],
     [

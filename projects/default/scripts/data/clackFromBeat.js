@@ -3,7 +3,7 @@ function clackFromBeat(graph, helpers, outputFrame) {
 
   const channel = 'clack';
 
-  const intensity = 127;
+  const intensity = 80;
   const duration = 0.25; // in beats
 
   const parameters = {

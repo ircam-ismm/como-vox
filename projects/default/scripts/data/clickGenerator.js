@@ -7,7 +7,7 @@ function clickGenerator(graph, helpers, outputFrame) {
 
   const channel = 'click';
   let pitch = pitchLow;
-  const intensity = 127;
+  const intensity = 60;
   const duration = 0.5; // in beats
 
   const parameters = {

@@ -101,7 +101,7 @@ function transport(graph, helpers, outputFrame) {
       }
 
       const timeDelta = now - positionLastTime;
-      const beatDelta = timeDelta / (60 / tempo) * timeSignature.division / 4;
+      const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
 
       let position = positionAddBeats(positionLast, beatDelta);
 
@@ -131,7 +131,7 @@ function transport(graph, helpers, outputFrame) {
             g < tempoGestures.length && gesturesKept > deltaMax;
             ++g) {
           const gesture = tempoGestures[g];
-          if(deltaMax < positionsToBeatsDelta(position, gesture.position) ) {
+          if(deltaMax < positionsToBeatsDelta(position, gesture.position, {timeSignature}) ) {
             tempoGestures[g] = undefined;
             --gesturesKept;
           }
@@ -169,7 +169,8 @@ function transport(graph, helpers, outputFrame) {
         const beatGesturePositionRounded = positionRoundBeats(beatGesturePosition,
                                                               {timeSignature});
         const beatGestureDeltaFromRounded = positionsToBeatsDelta(beatGesturePosition,
-                                                                  beatGesturePositionRounded);
+                                                                  beatGesturePositionRounded,
+                                                                  {timeSignature});
         if(beatGestureDeltaFromRounded >= beatGestureWindow.min
            && beatGestureDeltaFromRounded <= beatGestureWindow.max) {
           positionRequest = beatGesturePositionRounded;

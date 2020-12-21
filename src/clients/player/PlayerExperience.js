@@ -211,6 +211,11 @@ class PlayerExperience extends AbstractExperience {
     if(!scoreURI) {
       this.score = null;
       this.scoreReady = true;
+      this.coMoPlayer.player.setGraphOptions('score', {
+        scriptParams: {
+          score: this.score,
+        },
+      });
       return Promise.resolve(null);
     }
 

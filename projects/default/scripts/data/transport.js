@@ -103,7 +103,7 @@ function transport(graph, helpers, outputFrame) {
       const timeDelta = now - positionLastTime;
       const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
 
-      let position = positionAddBeats(positionLast, beatDelta);
+      let position = positionAddBeats(positionLast, beatDelta, {timeSignature});
 
       const beatGesture = inputData['beat'];
       const beatGestureDeltaFromNow = secondsToBeats(beatGesture.time - now, {

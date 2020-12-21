@@ -3,4 +3,9 @@ export default {
     type: 'boolean',
     default: false,
   },
+  score: {
+    type: 'string',
+    default: null,
+    nullable: true,
+  },
 }

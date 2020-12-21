@@ -1,6 +1,5 @@
 import jzz from 'jzz';;
 import jzzMidiSmf from 'jzz-midi-smf';
-jzzMidiSmf(jzz);
 
 import {Event, Tempo, TimeSignature, Note} from './event.js';
 
@@ -8,18 +7,49 @@ import {Part} from './Part.js';
 import {PartSet} from './PartSet.js';
 import {MasterTrack} from './MasterTrack.js';
 
+jzzMidiSmf(jzz);
+
+const e = {};
+
 /**
  * Parse data form a MIDI file to return a PartSet and a MasterTrack.
  *
  * Each Part in partSet is a single track, a single channel,
  * and a single instrument from data.
  *
- * @param {Object} data is a binary from a MIDI file
+ * @param {String|ArrayBuffer} data is binary from a MIDI file: either a
+ * string of bytes (8 bits characters), or an ArrayBuffer.
+ * @example <caption> in node.js </caption>
+ * // note the 'binary' encoding
+ * const byteString = fs.readFileSync(filePath, 'binary');
+ * const {masterTrack, partSet} =  midi.parse(byteString);
+ * @example <caption> in browser </caption>
+ * const request = new window.XMLHttpRequest();
+ * request.open('GET', fileURI, true);
+ * // note the 'arraybuffer' response type
+ * request.responseType = 'arraybuffer';
+ * request.onload = () => {
+ *   const {masterTrack, partSet} = midi.parse(request.response);
+ * }
+ * request.send(null);
  * @returns {MasterTrack, PartSet}
  * @throws {Error} when data is not a valid midi file
  */
 export function parse(data) {
-  const smf = new jzz.MIDI.SMF(data);
+  let byteString;
+
+  if(typeof data === 'string') {
+    byteString = data;
+  } else if(data.constructor === ArrayBuffer) {
+    // jzz needs a string of bytes (8 bits characters)
+    const byteArray = new Uint8Array(data);
+    byteString = String.fromCharCode(...byteArray);
+  } else {
+    throw new Error(`Incompatible data type for midi.parse function: \
+${typeof data}, ${data.constructor}`);
+  }
+
+  const smf = new jzz.MIDI.SMF(byteString);
 
   const validation = smf.validate();
   if(validation) {
@@ -447,6 +477,7 @@ export function parse(data) {
 
   return {masterTrack, partSet};
 }
+Object.assign(e, {parse});
 
 /************ helpers **********/
 
@@ -526,4 +557,7 @@ function barBeatRound(bar, beat, timeSignature = {count: 4, division: 4},
 function roundFixed(value, decimals = 0) {
   return parseFloat(value.toFixed(decimals) );
 }
+
+
+export default e;
 

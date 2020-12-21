@@ -4,6 +4,8 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
 import views from '../como-helpers/views-mobile/index.js';
 
+import midi from '../../shared/score/midi.js';
+
 // window.app from CoMoPlayer
 const app = window.app;
 const conversion = app.imports.helpers.conversion;
@@ -17,6 +19,7 @@ console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
 
 const tempoDefault = 60;
 const timeSignatureDefault = {count: 4, division: 4};
+const positionDefault = {bar: 1, beat: 1};
 
 const transportPlaybackDefault = true;
 
@@ -37,10 +40,13 @@ class PlayerExperience extends AbstractExperience {
     this.player = null;
     this.session = null;
 
-    this.position = {
-      bar: 0,
-      beat: 0,
-    };
+    this.voxApplicationState = null;
+
+    this.voxPlayerState = null;
+    this.score = null;
+    this.scoreReady = false;
+
+    this.position = positionDefault;
 
     this.transportPlayback = transportPlaybackDefault;
 
@@ -76,11 +82,16 @@ class PlayerExperience extends AbstractExperience {
     super.start();
     // console.log('hasDeviceMotion', this.como.hasDeviceMotion);
 
+    this.voxApplicationState = await this.client.stateManager.attach('vox-application');
+    this.voxApplicationState.subscribe( (updates) => {
+      // ...
+    })
+
     // 1. create a como player instance w/ a unique id (we default to the nodeId)
     const player = await this.como.project.createPlayer(this.como.client.id);
-    const voxPlayerState = await this.client.stateManager.create('vox-player');
+    this.voxPlayerState = await this.client.stateManager.create('vox-player');
 
-    voxPlayerState.subscribe(updates => {
+    this.voxPlayerState.subscribe(updates => {
       for (let [key, value] of Object.entries(updates)) {
         switch (key) {
           case 'record': {
@@ -89,10 +100,28 @@ class PlayerExperience extends AbstractExperience {
                 // console.log(frame);
               });
             } else {
-              voxPlayerState.set({ record: false });
+              this.voxPlayerState.set({ record: false });
             }
             break;
-         }
+          }
+
+          case 'score': {
+            let scoreURI;
+            const scoreURIbase = this.voxPlayerState.get('score');
+            if(!scoreURIbase || scoreURIbase === 'none') {
+              scoreURI = null;
+            } else {
+              scoreURI = this.voxApplicationState.get('scoresPath')
+                + '/'
+                + scoreURIbase;
+            }
+            try {
+              this.setScore(scoreURI)
+            } catch (error) {
+              console.error(error.message);
+            }
+            break;
+          }
         }
       }
     });
@@ -153,6 +182,7 @@ class PlayerExperience extends AbstractExperience {
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);
       this.setLookAheadBeats(lookAheadBeatsDefault);
+      this.seekPosition(positionDefault);
 
       this.setSensorsLatency(sensorsLatencyDefault);
 
@@ -163,6 +193,7 @@ class PlayerExperience extends AbstractExperience {
         this.transportPlayback = frame['playback'];
         this.tempo = frame['tempo'];
         this.timeSignature = frame['timeSignature'];
+        this.updateLookAhead({allowMoreBeats: false});
       });
     });
 
@@ -174,6 +205,52 @@ class PlayerExperience extends AbstractExperience {
     };
 
     this.rafId = window.requestAnimationFrame(updateClock);
+  }
+
+  async setScore(scoreURI) {
+    if(!scoreURI) {
+      this.score = null;
+      this.scoreReady = true;
+      return Promise.resolve(null);
+    }
+
+    const promise = new Promise( (resolve, reject) => {
+      const request = new window.XMLHttpRequest();
+      request.open('GET', scoreURI, true);
+      request.responseType = 'arraybuffer'; // binary data
+
+      request.onerror = () => {
+        reject(new Error(`Unable to GET ${sourceUrl}, status ${request.status} `
+                         + `${request.responseText}`) );
+      };
+
+      request.onload = () => {
+        if (request.status < 200 || request.status >= 300) {
+          request.onerror();
+          return;
+        }
+
+        try {
+          this.score = midi.parse(request.response);
+          this.scoreReady = true;
+          this.coMoPlayer.player.setGraphOptions('score', {
+            scriptParams: {
+              score: this.score,
+            },
+          });
+
+        } catch (error) {
+          reject(new Error(`Error while parsing midi file ${scoreURI}: `
+                           + error.message) );
+        }
+      };
+
+      this.scoreReady = false;
+      this.score = null;
+      request.send(null);
+    });
+
+    return promise;
   }
 
   setSensorsLatency(sensorsLatency) {
@@ -200,20 +277,30 @@ class PlayerExperience extends AbstractExperience {
     this.updateLookAhead();
   }
 
-  updateLookAhead() {
+  updateLookAhead({
+    allowMoreBeats = true,
+  } = {}) {
     const lookAheadSecondsLast = this.lookAheadSeconds;
 
     if(this.lookAheadBeats === 0) {
       this.lookAheadSeconds = 0;
     } else {
-      while(
-        (this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
+      if(allowMoreBeats) {
+        while(
+          (this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
+            tempo: this.tempo,
+            timeSignature: this.timeSignature,
+          })
+           - this.audioLatency)
+           <= this.lookAheadSecondsMin) {
+            ++this.lookAheadBeats;
+        }
+      } else {
+        this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
           tempo: this.tempo,
           timeSignature: this.timeSignature,
         })
-         - this.audioLatency)
-          <= this.lookAheadSecondsMin) {
-        ++this.lookAheadBeats;
+          - this.audioLatency;
       }
     }
 
@@ -249,6 +336,16 @@ class PlayerExperience extends AbstractExperience {
         },
     });
     this.updateLookAhead();
+  }
+
+  seekPosition(position) {
+    ['transport', 'score'].forEach( (script) => {
+      this.coMoPlayer.player.setGraphOptions(script, {
+        scriptParams: {
+          seekPosition: position,
+        },
+      });
+    });
   }
 
   setGestureControlsBeat(control) {
@@ -312,6 +409,9 @@ class PlayerExperience extends AbstractExperience {
       session: this.coMoPlayer.session ? this.coMoPlayer.session.getValues() : null,
       experience: this,
 
+      voxApplicationState: this.voxApplicationState,
+      voxPlayerState: this.voxPlayerState,
+
       syncTime,
       transportPlayback: this.transportPlayback,
       position: positionCompensated,
@@ -345,7 +445,7 @@ class PlayerExperience extends AbstractExperience {
     } else {
       screen = views[this.client.type](viewData, listeners, {
         verbose: false,
-        enableSelection: true,
+        enableSelection: false,
       });
     }
 

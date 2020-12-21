@@ -13,6 +13,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const parameters = {
     lookAheadSeconds: 0,
+    intensityRange: 30, // in dB
   };
 
   let noteTimeLast = 0;
@@ -35,10 +36,15 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
         return;
       }
 
+      // if(notesContainer['score'] && notesContainer['score'].length > 0) {
+      //   console.log("notesContainer['score'] = ", notesContainer['score']);
+      // }
+
       for(const channel in notesContainer) {
-        if(channel !== 'click' && channel !== 'clack') {
+        if(channel !== 'click' && channel !== 'clack' && channel !== 'score') {
           continue;
         }
+
 
         const notes = notesContainer[channel];
         notes.forEach( (note) => {
@@ -82,7 +88,10 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           env.connect(audioOutNode);
 
           // env.gain.value = 0; // bug in Chrome? no sound when set
-          env.gain.setValueAtTime(midiIntensityToAmplitude(note.intensity), noteTime);
+          env.gain.setValueAtTime(midiIntensityToAmplitude(note.intensity, {
+            range: parameters.intensityRange,
+          }),
+                                  noteTime);
           env.gain.exponentialRampToValueAtTime(0.0001, noteTime + noteDuration);
 
           const sine = audioContext.createOscillator();

@@ -53,8 +53,38 @@ body.loading {
   font-size: 4rem;
 }
 
+#__soundworks-container button {
+  background-color: #454545;
+  color: #ffffff;
+  border: 1px solid #989898;
+  border-radius: 3px;
+}
+
+#__soundworks-container select {
+  border: 1px solid #686868;
+  border-radius: 3px;
+  width: 100%;
+}
+
+#__soundworks-container input {
+  font-size: 16px;
+  border: 1px solid #686868;
+  border-radius: 3px;
+}
+
 #__soundworks-container .time {
   font-size: 60px;
+}
+
+#__soundworks-container .position>button {
+  width: auto;
+}
+
+#__soundworks-container .position>.bar,
+#__soundworks-container .position>.beat {
+  font-size: 48px;
+  width: 2.5em;
+  padding: 0;
 }
 
 #__soundworks-container .sensorsLatency {
@@ -63,5 +93,9 @@ body.loading {
 
 #__soundworks-container .controls-container {
   display: inline-flex;
+}
+
+#__soundworks-container .invalid {
+  background-color: red;
 }
 

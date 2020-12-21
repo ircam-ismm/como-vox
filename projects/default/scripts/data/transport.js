@@ -52,23 +52,22 @@ function transport(graph, helpers, outputFrame) {
 
   let tempoGestures = [];
 
-  const setPosition = (positionRequest) => {
-    positionLast = updates.positionRequest;
+  const seekPosition = (position) => {
+    positionLast = position;
+    positionRequest = position;
     positionLastTime = 0;
-    beatGesturePositionLast = updates.positionRequest;
-    beatGesturePositionLastTime = 0;
     tempoGestures.length = 0;
   };
 
-  const setTimeSignature = (timeSignatureRequest) => {
-    parameters.timeSignature = timeSignatureRequest;
+  const setTimeSignature = (timeSignature) => {
+    parameters.timeSignature = timeSignature;
     tempoGestures.length = 0;
   }
 
   return {
     updateParams(updates) {
-      if(typeof updates.position !== 'undefined') {
-        setPosition(updates.position);
+      if(typeof updates.seekPosition !== 'undefined') {
+        seekPosition(updates.seekPosition);
       } else if(typeof updates.timeSignature !== 'undefined') {
         setTimeSignature(updates.timeSignature);
       } else {
@@ -95,13 +94,14 @@ function transport(graph, helpers, outputFrame) {
 
       // start
       if(!parameters.playback || positionLastTime === 0) {
+        outputData['tempo'] = parameters.tempo;
         outputData['position'] = positionLast;
         positionLastTime = now;
         return outputFrame;
       }
 
       const timeDelta = now - positionLastTime;
-      const beatDelta = timeDelta / (60 / tempo) * timeSignature.division / 4;
+      const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
 
       let position = positionAddBeats(positionLast, beatDelta);
 
@@ -120,28 +120,44 @@ function transport(graph, helpers, outputFrame) {
           position: beatGesturePosition
         });
 
+        // maximum number of beats from now
+        // and minimum number of tempo gestures
         const deltaMax = parameters.tempoGestureWindow.bar * timeSignature.count
               + parameters.tempoGestureWindow.beat;
 
+        // remove old gestures but keep the same number as deltaMax
+        // in order to be able to halve tempo
+        for(let g = 0, gesturesKept = tempoGestures.length;
+            g < tempoGestures.length && gesturesKept > deltaMax;
+            ++g) {
+          const gesture = tempoGestures[g];
+          if(deltaMax < positionsToBeatsDelta(position, gesture.position, {timeSignature}) ) {
+            tempoGestures[g] = undefined;
+            --gesturesKept;
+          }
+        }
         tempoGestures = tempoGestures.filter( (gesture) => {
-          return deltaMax >= positionsToBeatsDelta(position, gesture.position);
+          return typeof gesture !== 'undefined';
         });
 
         let tempos = [];
+        let beatDeltas = [];
         for(let g = 1; g < tempoGestures.length; ++g) {
           const timeDelta = tempoGestures[g].time - tempoGestures[g - 1].time;
           const beatDelta = Math.round(
             positionsToBeatsDelta(tempoGestures[g].position,
                                   tempoGestures[g - 1].position,
                                   {timeSignature}));
-          if(beatDelta >= 1) {
+          if(beatDelta === 1 || beatDelta === 2) {
             const tempoCurrent = timeDeltaToTempo(timeDelta, beatDelta, {timeSignature});
             tempos.push(tempoCurrent);
+            beatDeltas.push(beatDelta);
           }
         }
 
         if(tempos.length > 0) {
-          tempo = median(tempos);;
+          // use median of beatDeltas for integer result to halve tempo
+          tempo = median(tempos) / median(beatDeltas);
         }
 
       }
@@ -153,7 +169,8 @@ function transport(graph, helpers, outputFrame) {
         const beatGesturePositionRounded = positionRoundBeats(beatGesturePosition,
                                                               {timeSignature});
         const beatGestureDeltaFromRounded = positionsToBeatsDelta(beatGesturePosition,
-                                                                  beatGesturePositionRounded);
+                                                                  beatGesturePositionRounded,
+                                                                  {timeSignature});
         if(beatGestureDeltaFromRounded >= beatGestureWindow.min
            && beatGestureDeltaFromRounded <= beatGestureWindow.max) {
           positionRequest = beatGesturePositionRounded;
@@ -163,9 +180,11 @@ function transport(graph, helpers, outputFrame) {
             // backward
             // use positionRequest for monotonic output until current position is
             // reached again
+            // @TODO: smooth
             [position, positionRequest] = [positionRequest, position];
           } else {
             // forward
+            // @TODO: smooth
             position = positionRequest;
           }
 
@@ -176,8 +195,6 @@ function transport(graph, helpers, outputFrame) {
       // max(positionRequest, position) to ensure monotonic output
       const positionRequestDelta = positionsToBeatsDelta(positionRequest,
                                                          position, {timeSignature});
-      // console.log("positionRequestDelta = ", positionRequestDelta);
-
       if(positionRequestDelta > 0) {
         // wait
         outputData['position'] = positionRequest;
@@ -190,11 +207,6 @@ function transport(graph, helpers, outputFrame) {
 
       positionLast = position;
       positionLastTime = now;
-
-      if(position &&
-         (isNaN(position.bar) || isNaN(position.beat) ) ) {
-        debugger;
-      }
 
       return outputFrame;
     },

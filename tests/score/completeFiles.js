@@ -6,10 +6,12 @@ import path from 'path';
 
 import { parse } from '../../src/shared/score/midi.js'
 
+const assets = 'tests/score/assets';
 const files = [
-  'tests/score/assets/chi_mai_voix_piano.mid',
-  'tests/score/assets/coule-la-seine.midi',
-  'tests/score/assets/test_voix_et_piano.mid',
+  `${assets}/chi_mai_voix_piano.mid`,
+  `${assets}/coule-la-seine.midi`,
+  `${assets}/test_voix_et_piano.mid`,
+  `${assets}/fourmi_piano.mid`,
 ];
 
 describe('Parse complete MIDI files', () => {

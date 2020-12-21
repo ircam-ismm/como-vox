@@ -116,5 +116,53 @@ describe(`Parse ${file}`, () => {
 
   });
 
+  describe('Check the piano parts', () => {
+
+    const pianoPartSet = partSet.selectPiano();
+    pianoPartSet.forEach( (part, p) => {
+      it(`should verify for part ${p} "${part.name}"`, () => {
+
+        let noteOnCount = 0;
+        let noteOffCount = 0;
+
+        let noteOnFirst;
+        let noteOnLast;
+        let noteOffLast;
+        part.events.forEach( (event) => {
+          if(event.type === 'noteOn') {
+            if(noteOnCount === 0) {
+              noteOnFirst = event;
+            }
+            noteOnLast = event;
+            ++noteOnCount;
+          } else if(event.type === 'noteOff') {
+            ++noteOffCount;
+            noteOffLast = event;
+          }
+        });
+
+        switch(p) {
+
+          case 0:
+            assert.equal(noteOnFirst.bar, 1, 'first noteOn bar');
+            assertWithin(noteOnFirst.beat, 1, 1.05, 'first noteOn beat');
+
+            assert.equal(noteOnLast.bar, 94, 'last noteOn bar');
+            assertWithin(noteOnLast.beat, 1, 1.05, 'last noteOn beat');
+
+            assert.equal(noteOffLast.bar, 94, 'last noteOff bar');
+            assertWithin(noteOffLast.beat, 1.75, 2.05, 'last noteOff beat');
+            break;
+
+          default:
+            assert.fail(`extra part ${p} ${part.name}`);
+            break;
+        }
+      });
+
+    });
+
+  });
+
 });
 

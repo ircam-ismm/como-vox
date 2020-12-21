@@ -87,10 +87,10 @@ describe(`Parse ${file}`, () => {
 
             assert.deepEqual([noteOnFirst.bar, noteOnFirst.beat], [1, 2],
                              'first noteOn');
-            assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 3],
+            assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 4],
                              'last noteOn');
             assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
-            assertWithin(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
+            assertWithin(noteOffLast.beat, 4.75, 5, 'last noteOff beat');
             break;
 
           case 4:
@@ -129,5 +129,154 @@ describe(`Parse ${file}`, () => {
 
   });
 
-});
+  describe('Check the piano parts', () => {
 
+    const pianoPartSet = partSet.selectPiano();
+    pianoPartSet.forEach( (part, p) => {
+      it(`should verify for part ${p} "${part.name}"`, () => {
+
+        let noteOnCount = 0;
+        let noteOffCount = 0;
+
+        let noteOnFirst;
+        let noteOnLast;
+        let noteOffLast;
+        part.events.forEach( (event) => {
+          if(event.type === 'noteOn') {
+            if(noteOnCount === 0) {
+              noteOnFirst = event;
+            }
+            noteOnLast = event;
+            ++noteOnCount;
+          } else if(event.type === 'noteOff') {
+            ++noteOffCount;
+            noteOffLast = event;
+          }
+        });
+
+        switch(p) {
+          case 0:
+            assert.equal(part.name, 'Piano', 'part name');
+
+            assert.equal(noteOnCount, 9, 'noteOn count');
+
+            assert.deepEqual([noteOnFirst.bar, noteOnFirst.beat], [1, 1],
+                             'first noteOn');
+            assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 1],
+                             'last noteOn');
+            assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
+            assertWithin(noteOffLast.beat, 4.75, 5, 'last noteOff beat');
+            break;
+
+          case 1:
+            assert.equal(part.name, 'Piano', 'part name');
+
+            assert.equal(noteOnCount, 9, 'noteOn count');
+
+            assert.deepEqual([noteOnFirst.bar, noteOnFirst.beat], [1, 1],
+                             'first noteOn');
+            assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 1],
+                             'last noteOn');
+            assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
+            assertWithin(noteOffLast.beat, 2.75, 3, 'last noteOff beat');
+            break;
+
+          default:
+            assert.fail(`extra part ${p} ${part.name}`);
+            break;
+        }
+      });
+
+    });
+
+  });
+
+  describe('Check the voice parts', () => {
+
+    const voicePartSet = partSet.selectVoice();
+    voicePartSet.forEach( (part, p) => {
+      it(`should verify for part ${p} "${part.name}"`, () => {
+
+        let noteOnCount = 0;
+        let noteOffCount = 0;
+
+        let noteOnFirst;
+        let noteOnLast;
+        let noteOffLast;
+        part.events.forEach( (event) => {
+          if(event.type === 'noteOn') {
+            if(noteOnCount === 0) {
+              noteOnFirst = event;
+            }
+            noteOnLast = event;
+            ++noteOnCount;
+          } else if(event.type === 'noteOff') {
+            ++noteOffCount;
+            noteOffLast = event;
+          }
+        });
+
+        switch(p) {
+          case 0:
+            assert.equal(part.name, 'Soprano', 'part name');
+
+            assert.equal(noteOnCount, 18, 'noteOn count');
+
+            assert.deepEqual([noteOnFirst.bar, noteOnFirst.beat], [1, 1],
+                             'first noteOn');
+            assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 3],
+                             'last noteOn');
+            assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
+            assertWithin(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
+            break;
+
+          case 1:
+            assert.equal(part.name, 'Alto', 'part name');
+
+            assert.equal(noteOnCount, 18, 'noteOn count');
+
+            assert.deepEqual([noteOnFirst.bar, noteOnFirst.beat], [1, 2],
+                             'first noteOn');
+            assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 4],
+                             'last noteOn');
+            assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
+            assertWithin(noteOffLast.beat, 4.75, 5, 'last noteOff beat');
+            break;
+
+          case 2:
+            assert.equal(part.name, 'Ténor', 'part name');
+
+            assert.equal(noteOnCount, 36, 'noteOn count');
+
+            assert.deepEqual([noteOnFirst.bar, noteOnFirst.beat], [1, 1],
+                             'first noteOn');
+            assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 4],
+                             'last noteOn');
+            assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
+            assertWithin(noteOffLast.beat, 4.75, 5, 'last noteOff beat');
+            break;
+
+          case 3:
+            assert.equal(part.name, 'Baryton', 'part name');
+
+            assert.equal(noteOnCount, 9, 'noteOn count');
+
+            assert.deepEqual([noteOnFirst.bar, noteOnFirst.beat], [1, 1],
+                             'first noteOn');
+            assert.deepEqual([noteOnLast.bar, noteOnLast.beat], [9, 1],
+                             'last noteOn');
+            assert.equal(noteOffLast.bar, 9, 'last noteOff bar');
+            assertWithin(noteOffLast.beat, 3.75, 4, 'last noteOff beat');
+            break;
+
+          default:
+            assert.fail(`extra part ${p} ${part.name}`);
+            break;
+        }
+      });
+
+    });
+
+  });
+
+});

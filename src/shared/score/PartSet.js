@@ -3,8 +3,10 @@ import {Part} from './Part.js';
 const e = {};
 
 export class PartSet {
-  constructor() {
-    this.parts = [];
+  constructor({
+    parts = [],
+  } = {}) {
+    this.parts = parts;
   }
 
   create({

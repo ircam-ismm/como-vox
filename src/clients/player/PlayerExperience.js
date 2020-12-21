@@ -17,7 +17,7 @@ const MOCK_SENSORS = window.location.hash === '#mock-sensors';
 console.info('> to mock sensors for debugging purpose, use https://127.0.0.1:8000/designer#mock-sensors');
 console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
 
-const tempoDefault = 60;
+const tempoDefault = 80;
 const timeSignatureDefault = {count: 4, division: 4};
 const positionDefault = {bar: 1, beat: 1};
 

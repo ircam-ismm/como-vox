@@ -11,6 +11,7 @@ function transport(graph, helpers, outputFrame) {
   const math = app.imports.helpers.math;
   const modulo = math.modulo;
   const median = math.median;
+  const mean = math.mean;
 
   const parameters = {
     tempo: 60,
@@ -156,8 +157,9 @@ function transport(graph, helpers, outputFrame) {
         }
 
         if(tempos.length > 0) {
-          // use median of beatDeltas for integer result to halve tempo
-          tempo = median(tempos) / median(beatDeltas);
+          // use median(tempos) to smooth variations
+          // use median(beatDeltas) for integer result to halve tempo
+          tempo = mean(tempos) / median(beatDeltas);
         }
 
       }

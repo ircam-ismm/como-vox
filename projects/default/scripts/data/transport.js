@@ -159,7 +159,7 @@ function transport(graph, helpers, outputFrame) {
         if(tempos.length > 0) {
           // use median(tempos) to smooth variations
           // use median(beatDeltas) for integer result to halve tempo
-          tempo = mean(tempos) / median(beatDeltas);
+          tempo = median(tempos) / median(beatDeltas);
         }
 
       }

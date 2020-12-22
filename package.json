@@ -24,6 +24,7 @@
     "url": "https://github.com/ircam-ismm/como-elements"
   },
   "dependencies": {
+    "@ircam/blocked": "^1.1.2",
     "@ircam/simple-components": "^1.1.4",
     "@soundworks/core": "^3.0.0",
     "@soundworks/template-helpers": "^1.0.1",

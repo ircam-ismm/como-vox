@@ -1,6 +1,10 @@
 import { AbstractExperience } from '@soundworks/core/client';
 import { render, html } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
+
+import {Blocked} from '@ircam/blocked';
+
+import url from '../shared/url.js';
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
 import views from '../como-helpers/views-mobile/index.js';
 
@@ -12,10 +16,16 @@ const conversion = app.imports.helpers.conversion;
 const beatsToSeconds = conversion.beatsToSeconds;
 const positionAddBeats = conversion.positionAddBeats;
 
+const audio = app.imports.helpers.audio;
+
 // for simple debugging in browser...
-const MOCK_SENSORS = window.location.hash === '#mock-sensors';
-console.info('> to mock sensors for debugging purpose, use https://127.0.0.1:8000/designer#mock-sensors');
-console.info('> hash:', window.location.hash, '- mock sensors:', MOCK_SENSORS);
+const MOCK_SENSORS = url.paramGet('mock-sensors');
+console.info('> to mock sensors for debugging purpose, append "?mock-sensors=1" to URL');
+console.info('> mock-sensors', MOCK_SENSORS);
+
+const AUDIO_DEBUG = url.paramGet('audio-debug');
+console.info('> to use audio for debugging purpose, append "?debug-audio=1" to URI');
+console.info('> audio-debug', AUDIO_DEBUG);
 
 const tempoDefault = 80;
 const timeSignatureDefault = {count: 4, division: 4};
@@ -41,8 +51,8 @@ class PlayerExperience extends AbstractExperience {
     this.session = null;
 
     this.voxApplicationState = null;
-
     this.voxPlayerState = null;
+
     this.score = null;
     this.scoreReady = false;
 
@@ -151,6 +161,8 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer = new CoMoPlayer(this.como, player);
     this.coMoPlayer.setSource(source);
 
+    this.audioContext = this.como.audioContext;
+
     // 4. react to gui controls.
     this.listeners = {
       // this one is needed for the enableCreation option
@@ -196,6 +208,10 @@ class PlayerExperience extends AbstractExperience {
         this.updateLookAhead({allowMoreBeats: false});
       });
     });
+
+    if(AUDIO_DEBUG) {
+      this.audioDebugInit();
+    }
 
     window.addEventListener('resize', () => this.render());
 
@@ -398,6 +414,22 @@ class PlayerExperience extends AbstractExperience {
         },
     });
 
+  }
+
+  audioDebugInit() {
+    const noiseBuffer = audio.generateNoiseBuffer({
+      audioContext: this.audioContext,
+      duration: 1, // seconds,
+      gain: -30, // dB
+    });
+
+    const blocked = new Blocked( (duration) => {
+      console.log(`---------- blocked for ${duration} ms ---------`);
+      audio.playBuffer(noiseBuffer, {
+        audioContext: this.audioContext,
+        duration: duration * 1e-3,
+      });
+    }, 50);
   }
 
   render() {

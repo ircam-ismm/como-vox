@@ -1,3 +1,4 @@
+import audio from './helpers/audio.js';
 import conversion from './helpers/conversion.js';
 import math from './helpers/math.js';
 
@@ -12,6 +13,7 @@ if(typeof window !== 'undefined') {
 
 app.imports = {
   helpers: {
+    audio,
     conversion,
     math,
   },

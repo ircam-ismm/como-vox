@@ -7,6 +7,13 @@
       type: 'Input',
     },
     {
+      id: 'timeTag',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'timeTag',
+      },
+    },
+    {
       id: 'motion-descriptors',
       type: 'MotionDescriptors',
     },
@@ -103,6 +110,14 @@
     ],
     [
       'input',
+      'merge-descriptors',
+    ],
+    [
+      'input',
+      'timeTag',
+    ],
+    [
+      'timeTag',
       'merge-descriptors',
     ],
     [

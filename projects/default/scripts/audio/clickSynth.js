@@ -3,11 +3,15 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const conversion = app.imports.helpers.conversion;
 
+  const dBToAmplitude = conversion.dBToAmplitude;
   const midiPichToHertz = conversion.midiPitchToHertz;
   const midiIntensityToAmplitude = conversion.midiIntensityToAmplitude;
   const positionsToSecondsDelta = conversion.positionsToSecondsDelta;
   const performanceToAudioContextTime = conversion.performanceToAudioContextTime;
   const beatsToSeconds = conversion.beatsToSeconds;
+
+  const time = app.imports.helpers.time;
+  const getTime = time.getTime;
 
   const audioContext = graph.como.audioContext;
 
@@ -28,6 +32,9 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       const inputData = inputFrame.data;
 
       const currentPosition = inputData['position'];
+      // use logical time tag from frame
+      const now = inputData['time'];
+
       const timeSignature = inputData['timeSignature'];
       const tempo = inputData['tempo'];
 
@@ -45,11 +52,9 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           continue;
         }
 
-
         const notes = notesContainer[channel];
         notes.forEach( (note) => {
-          const now = performance.now() * 1e-3;
-
+          console.log("note = ", note);
           let noteOffset = 0;
           if(note.position) {
             const notePosition = note.position;
@@ -62,7 +67,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
             noteOffset = note.time - now;
           }
 
-          const currentTime = performanceToAudioContextTime(now * 1e3, {audioContext});
+          const currentTime = performanceToAudioContextTime(performance.now(), {audioContext});
 
           const noteTime = Math.max(audioContext.currentTime,
                                     currentTime + parameters.lookAheadSeconds + noteOffset);
@@ -92,7 +97,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
             range: parameters.intensityRange,
           }),
                                   noteTime);
-          env.gain.exponentialRampToValueAtTime(0.0001, noteTime + noteDuration);
+          env.gain.exponentialRampToValueAtTime(dBToAmplitude(-80), noteTime + noteDuration);
 
           const sine = audioContext.createOscillator();
           sine.connect(env);

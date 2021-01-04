@@ -1,6 +1,7 @@
 import audio from './helpers/audio.js';
 import conversion from './helpers/conversion.js';
 import math from './helpers/math.js';
+import time from './helpers/time.js';
 
 let app;
 if(typeof window !== 'undefined') {
@@ -16,6 +17,7 @@ app.imports = {
     audio,
     conversion,
     math,
+    time,
   },
 };
 

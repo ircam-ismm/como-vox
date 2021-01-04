@@ -13,6 +13,9 @@ function transport(graph, helpers, outputFrame) {
   const median = math.median;
   const mean = math.mean;
 
+  const time = app.imports.helpers.time;
+  const getTime = time.getTime;
+
   const parameters = {
     tempo: 60,
     timeSignature: {
@@ -80,7 +83,8 @@ function transport(graph, helpers, outputFrame) {
     process(inputFrame, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
-      const now = performance.now() * 0.001;
+      // use logical time tag from frame
+      const now = inputData['time'];
 
       let tempo = parameters.tempo;
       const timeSignature = parameters.timeSignature;
@@ -90,7 +94,6 @@ function transport(graph, helpers, outputFrame) {
       const beatGestureWindow = parameters.beatGestureWindow;
 
       outputData['timeSignature'] = timeSignature;
-      outputData['time'] = now;
       outputData['playback'] = parameters.playback;
 
       // start

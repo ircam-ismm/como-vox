@@ -29,12 +29,13 @@ function metronome(graph, helpers, outputFrame) {
     },
 
     process(inputFrame, outputFrame) {
+      const inputData = inputFrame.data;
       const outputData = outputFrame.data;
-      const now = performance.now() * 0.001;
+      // use logical time tag from frame
+      const now = inputData['time'];
 
       outputData['tempo'] = tempo;
       outputData['timeSignature'] = timeSignature;
-      outputData['time'] = now;
 
       // start
       if(positionLastTime === 0) {

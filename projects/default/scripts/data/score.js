@@ -28,7 +28,6 @@ function score(graph, helpers, outputFrame) {
                     ? score.partSet.parts.length
                     : 0);
     seekPosition(undefined);
-    console.log('setScore', score);
   };
 
   return {

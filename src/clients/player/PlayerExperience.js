@@ -10,6 +10,8 @@ import views from '../como-helpers/views-mobile/index.js';
 
 import midi from '../../shared/score/midi.js';
 
+import {SampleManager} from '../shared/SampleManager.js';
+
 // window.app from CoMoPlayer
 const app = window.app;
 const conversion = app.imports.helpers.conversion;
@@ -162,6 +164,11 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer.setSource(source);
 
     this.audioContext = this.como.audioContext;
+    this.pianoSampleManager = new SampleManager({
+      audioContext: this.audioContext,
+      baseUrl: 'soundfonts/bright_acoustic_piano',
+    });
+    app.pianoSampleManager = this.pianoSampleManager;
 
     // 4. react to gui controls.
     this.listeners = {
@@ -232,6 +239,8 @@ class PlayerExperience extends AbstractExperience {
           score: this.score,
         },
       });
+
+      // do not delete notes of previously loaded score
       return Promise.resolve(null);
     }
 
@@ -245,7 +254,7 @@ class PlayerExperience extends AbstractExperience {
                          + `${request.responseText}`) );
       };
 
-      request.onload = () => {
+      request.onload = async () => {
         if (request.status < 200 || request.status >= 300) {
           request.onerror();
           return;
@@ -260,6 +269,20 @@ class PlayerExperience extends AbstractExperience {
             },
           });
 
+          // no duplicates in set
+          const notes = new Set();
+          this.score.partSet.forEach( (part, p) => {
+            part.events.forEach( (event) => {
+              if(event.type === 'noteOn') {
+                notes.add(event.data.pitch);
+              }
+            });
+          });
+
+          await this.pianoSampleManager.update({notes});
+          console.log('samples', this.pianoSampleManager.samples);
+
+          resolve(this.score);
         } catch (error) {
           reject(new Error(`Error while parsing midi file ${scoreURI}: `
                            + error.message) );

@@ -52,12 +52,44 @@ See:
   + [ ] `client/index.js`
   + [ ] `src/ScorePlayer.js`
 
-- [ ] MIDI parser
-  + [ ] metas
-  + [ ] master track
-  + [ ] one track per channel
+- [x] MIDI parser
+  + [x] metas
+  + [x] master track
+  + [x] one track per channel
 
 - [ ] MIDI player
+  - [BAD] MIDI.js: broken on iOS, broken timing, 
+  
+- soundfonts: re-compress from original sf2 (bad compression from MIDI.js)
+  
+```javascript
+MIDI.loadPlugin({
+  soundfontUrl: './soundfonts/',
+  instrument: 'acoustic_grand_piano',
+  // instruments: ['acoustic_grand_piano', 'choir_aahs-mp3'],
+  targetFormat: 'mp3',
+  api: 'webaudio',
+  onsuccess: () => console.log('ok'),
+});
+
+// MIDI.Plugin.js
+
+midi.setVolume
+midi.noteOn(channelId, noteId, velocity, delay)
+midi.noteOff = function(channelId, noteId, delay)
+midi.stopAllNotes = function()
+
+if(typoef window.audioContext === 'undefined') {
+  window.audioContext = webkitAudioContext;
+}
+midi.setContext = function(newCtx, onload, onprogress, onerror)
+midi.connect = function(opts) 
+
+```
+
+Warning: No sleep on iOS < 10 can block network requests.
+
+Warning: after boot: launch Safari, and sound, quit safari (double click and drag out). restart safari. reload page.
 
 
 Sensors:
@@ -66,3 +98,18 @@ Sensors:
 - [ ] prototype with user scripts
 
 - [x] long loading time on iOS (1 minute): pinned certificate? connected once to https://apps.cosima.ircam.fr and update local certificates
+
+
+### Fabrice 
+
+Tout d'abord levée et détente
+
+Maintenant tu vas diriger
+
+2/4 difficile, même endroit pour la levée et le temps.
+
+4/4 ou 3/4
+
+Huawei P8 Lite 2017
+
+

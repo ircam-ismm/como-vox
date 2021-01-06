@@ -54,7 +54,6 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
         const notes = notesContainer[channel];
         notes.forEach( (note) => {
-          console.log("note = ", note);
           let noteOffset = 0;
           if(note.position) {
             const notePosition = note.position;

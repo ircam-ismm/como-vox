@@ -249,6 +249,12 @@ class PlayerExperience extends AbstractExperience {
     this.rafId = window.requestAnimationFrame(updateClock);
   }
 
+  setGraphOptions(node, updates) {
+    if(this.coMoPlayer.graph.modules[node]) {
+      this.coMoPlayer.player.setGraphOptions(node, updates);
+    }
+  }
+
   async setScore(scoreURI) {
     if(!scoreURI) {
       this.score = null;
@@ -320,12 +326,11 @@ class PlayerExperience extends AbstractExperience {
     this.sensorsLatency = sensorsLatency;
 
     if(this.sensorsLatency !== sensorsLatencyLast) {
-      this.coMoPlayer.player.setGraphOptions('beatTriggerFromGesture', {
+      this.setGraphOptions('beatTriggerFromGesture', {
         scriptParams: {
           sensorsLatency: this.sensorsLatency,
         },
       });
-
     }
   }
 
@@ -368,10 +373,10 @@ class PlayerExperience extends AbstractExperience {
 
     if(lookAheadSecondsLast !== this.lookAheadSeconds) {
       ['clickSynth', 'samplePlayer'].forEach( (node) => {
-        this.coMoPlayer.player.setGraphOptions(node, {
-        scriptParams: {
-          lookAheadSeconds: this.lookAheadSeconds,
-        },
+        this.setGraphOptions(node, {
+          scriptParams: {
+            lookAheadSeconds: this.lookAheadSeconds,
+          },
         });
       });
 
@@ -387,10 +392,10 @@ class PlayerExperience extends AbstractExperience {
 
     // @TODO: how to propagate to all relevant scripts that are in graph?
     // (server crashes with non-instantiated scripts)
-    this.coMoPlayer.player.setGraphOptions('transport', {
-        scriptParams: {
-          tempo,
-        },
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        tempo,
+      },
     });
     this.updateLookAhead();
   }
@@ -406,10 +411,10 @@ class PlayerExperience extends AbstractExperience {
     }
 
     this.timeSignature = timeSignature;
-    this.coMoPlayer.player.setGraphOptions('transport', {
-        scriptParams: {
-          timeSignature,
-        },
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        timeSignature,
+      },
     });
     this.updateLookAhead();
   }
@@ -420,7 +425,7 @@ class PlayerExperience extends AbstractExperience {
 
   seekPosition(position) {
     ['transport', 'score'].forEach( (script) => {
-      this.coMoPlayer.player.setGraphOptions(script, {
+      this.setGraphOptions(script, {
         scriptParams: {
           seekPosition: position,
         },
@@ -430,26 +435,26 @@ class PlayerExperience extends AbstractExperience {
 
   setGestureControlsBeat(control) {
     this.gestureControlsBeat = control;
-    this.coMoPlayer.player.setGraphOptions('transport', {
-        scriptParams: {
-          gestureControlsBeat: this.gestureControlsBeat,
-        },
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        gestureControlsBeat: this.gestureControlsBeat,
+      },
     });
   }
 
   setGestureControlsTempo(control) {
     this.gestureControlsTempo = control;
-    this.coMoPlayer.player.setGraphOptions('transport', {
-        scriptParams: {
-          gestureControlsTempo: this.gestureControlsTempo,
-        },
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        gestureControlsTempo: this.gestureControlsTempo,
+      },
     });
   }
 
   setTransportPlayback(playback) {
     this.transportPlayback = playback;
     ['transport', 'score'].forEach( (node) => {
-      this.coMoPlayer.player.setGraphOptions(node, {
+      this.setGraphOptions(node, {
         scriptParams: {
           playback,
         },
@@ -459,20 +464,20 @@ class PlayerExperience extends AbstractExperience {
 
   setMetronomeSound(onOff) {
     this.metronomeSound = onOff;
-    this.coMoPlayer.player.setGraphOptions('clickGenerator', {
-        scriptParams: {
-          onOff,
-        },
+    this.setGraphOptions('clickGenerator', {
+      scriptParams: {
+        onOff,
+      },
     });
 
   }
 
   setBeatingSound(onOff) {
     this.beatingSound = onOff;
-    this.coMoPlayer.player.setGraphOptions('clackFromBeat', {
-        scriptParams: {
-          onOff,
-        },
+    this.setGraphOptions('clackFromBeat', {
+      scriptParams: {
+        onOff,
+      },
     });
 
   }

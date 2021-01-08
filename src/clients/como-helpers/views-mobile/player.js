@@ -135,7 +135,14 @@ export function player(data, listeners, {
              @change="${e => {
                    experience.setTempo(parseFloat(e.srcElement.value) || 60);
                    } }">
-    </ div>
+      from score:
+      <sc-toggle
+        .active="${data.tempoFromScore}"
+        @change="${e => experience.setTempoFromScore(e.detail.value)}"
+      ></sc-toggle>
+
+
+    </div>
 
     <div class="timeSignature">Time signature:
       <input class="count"
@@ -155,7 +162,13 @@ export function player(data, listeners, {
              .value="${data.timeSignature.division}"
              @click="${e => selfSelect(e)}"
              @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
-    </div>
+
+      from score:
+      <sc-toggle
+        .active="${data.timeSignatureFromScore}"
+        @change="${e => experience.setTimeSignatureFromScore(e.detail.value)}"
+      ></sc-toggle>
+    </span>
 
     <div class="controls-container">
 

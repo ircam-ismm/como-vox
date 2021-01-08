@@ -9,12 +9,32 @@ function score(graph, helpers, outputFrame) {
   let positionToSeek = undefined; // undefined to seek to current
 
   const parameters = {
-    onOff: true,
+    playback: true,
+    tempo: undefined,
+    timeSignature: undefined,
   };
 
   let score = null;
 
+  let scoreTempo = 120;
+  let scoreTimeSignature = {count: 4, division: 4};
+
+  let resetParts = undefined;
+
+  const resetPartsRequest = () => {
+    if(resetParts) {
+      // already pending
+      return;
+    }
+    // reset channels of current score
+    resetParts = (score
+                  ? score.partSet.parts
+                  : undefined);
+  };
+
   const seekPosition = (position) => {
+    resetPartsRequest();
+
     positionToSeek = (typeof position === 'undefined'
                       ? undefined
                       : {...position});
@@ -23,22 +43,49 @@ function score(graph, helpers, outputFrame) {
   }
 
   const setScore = (scoreRequest) => {
+    resetPartsRequest();
+
     score = scoreRequest;
+    console.log("score = ", score);
     eventsNext.length = (score
-                    ? score.partSet.parts.length
-                    : 0);
+                         ? score.partSet.parts.length
+                         : 0);
     seekPosition(undefined);
+
+    scoreTempo = undefined;
+    scoreTimeSignature = undefined;
+    if(score && score.masterTrack) {
+      if(score.masterTrack.tempo) {
+        scoreTempo = score.masterTrack.tempo;
+      }
+
+      if(score.masterTrack.timeSignature) {
+        scoreTimeSignature = score.masterTrack.timeSignature;
+      }
+    }
+  };
+
+  const setPlayback = (playback) => {
+    resetPartsRequest();
+
+    parameters.playback = playback;
   };
 
   return {
     updateParams(updates) {
       if(typeof updates.seekPosition !== 'undefined') {
         seekPosition(updates.seekPosition);
-      } else if(typeof updates.score !== 'undefined') {
-        setScore(updates.score);
-      } else {
-        Object.assign(parameters, updates);
       }
+
+      if(typeof updates.score !== 'undefined') {
+        setScore(updates.score);
+      }
+
+      if(typeof updates.playback !== 'undefined') {
+        setPlayback(updates.playback);
+      }
+
+      Object.assign(parameters, updates);
     },
 
     // called on each sensor frame
@@ -49,13 +96,36 @@ function score(graph, helpers, outputFrame) {
       const timeSignature = inputData['timeSignature'];
       const position = inputData['position'];
 
-      if(!parameters.onOff || !score) {
+      let resetEvents = (score
+                         ? score.partSet.parts.map( part => [] )
+                         : []);
+      if(resetParts) {
+        // reset channels may not match parts
+        resetParts.forEach( (part, p) => {
+          resetEvents[p] = [
+            {
+              channel: part.channel,
+              type: 'allNotesOff',
+              position: { bar: 1, beat: 1},
+              data: {},
+            },
+            // reset also volume, instrument, etc.
+          ];
+        });
+        resetParts = undefined;
+      }
+
+      if(!parameters.playback || !score) {
         outputData['notes'] = {};
-        outputData['events'] = [];
+        outputData['events'] = (resetEvents
+                       ? resetEvents
+                                : []);
+
         return outputFrame;
       }
 
       const eventContainer = {}; // key is channel
+
       score.partSet.parts.forEach( (part, p) => {
         const events = part.events;
 
@@ -63,8 +133,7 @@ function score(graph, helpers, outputFrame) {
         const notes = [];
 
         // instrument, volume: output only last of each type
-        const nonNotes = {};
-
+        const nonNotes = new Map();
 
         // no next event, yet: start with first
         let e = (typeof eventsNext[p] !== 'undefined'
@@ -85,7 +154,7 @@ function score(graph, helpers, outputFrame) {
           const event = events[e];
 
           if(event.type !== 'noteOn' && event.type !== 'noteOff') {
-            Object.assign(nonNotes, barBeatToPosition(event) );
+            nonNotes.set(event.type, {...event, ...barBeatToPosition(event)});
           }
         }
 
@@ -99,7 +168,7 @@ function score(graph, helpers, outputFrame) {
           const event = events[e];
 
           if(event.type !== 'noteOn' && event.type !== 'noteOff') {
-            Object.assign(nonNotes, barBeatToPosition(event) );
+            nonNotes.set(event.type, {...event, ...barBeatToPosition(event)});
           } else {
             notes.push(barBeatToPosition(event) );
           }
@@ -108,28 +177,33 @@ function score(graph, helpers, outputFrame) {
 
         eventsNext[p] = e;
 
-        eventContainer[p] = [ ...Object.values(nonNotes), ...notes];
-
+        eventContainer[p] = [ ...resetEvents[p], ...nonNotes.values(), ...notes];
       }); // parts.forEach
+
+      // if the current score contains less parts than the previous one
+      for(let p = score.partSet.parts.length; p < resetEvents.length; ++p) {
+        eventContainer[p] = [ ...resetEvents[p] ];
+      }
+
+      outputData['score'] = {
+        tempo: scoreTempo,
+        timeSignature: scoreTimeSignature,
+      };
 
       outputData['events'] = eventContainer;
 
-      // console.log("eventContainer = ", eventContainer);
-
-      const notes = [...(Object.values(eventContainer).flat(1))] // flatten all channels
-            .filter( (note) => note.type === 'noteOn') // keep only note-ons
-          .map( (note) => {
-            return {
-              position: note.position,
-              pitch: note.data.pitch + 12,
-              intensity: note.data.intensity,
-              duration: 1,
-            };
-          });
-
-      // if(notes.length > 0) {
-      //   console.log("notes = ", notes);
-      // }
+      // flatten all channels
+      const notes = [...(Object.values(eventContainer).flat(1))]
+            // keep only note-ons
+            .filter( (note) => note.type === 'noteOn')
+            .map( (note) => {
+              return {
+                position: note.position,
+                pitch: note.data.pitch + 12,
+                intensity: note.data.intensity,
+                duration: 1,
+              };
+            });
 
       outputData['notes'] = {
         score: notes,

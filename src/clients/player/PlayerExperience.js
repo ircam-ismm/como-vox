@@ -63,7 +63,9 @@ class PlayerExperience extends AbstractExperience {
     this.transportPlayback = transportPlaybackDefault;
 
     this.tempo = tempoDefault;
+    this.tempoFromScore = true;
     this.timeSignature = timeSignatureDefault;
+    this.timeSignatureFromScore = true;
 
     // default values
 
@@ -210,8 +212,20 @@ class PlayerExperience extends AbstractExperience {
 
         this.position = frame['position'];
         this.transportPlayback = frame['playback'];
-        this.tempo = frame['tempo'];
-        this.timeSignature = frame['timeSignature'];
+
+        const score = frame['score'];
+        if(this.tempoFromScore && score && score.tempo) {
+          this.setTempo(score.tempo);
+        } else {
+          this.setTempo(frame['tempo']);
+        }
+
+        if(this.timeSignatureFromScore && score && score.timeSignature) {
+          this.setTimeSignature(score.timeSignature);
+        } else {
+          this.setTimeSignature(frame['timeSignature']);
+        }
+
         this.updateLookAhead({allowMoreBeats: false});
       });
     });
@@ -360,6 +374,9 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setTempo(tempo) {
+    if(tempo === this.tempo) {
+      return;
+    }
     this.tempo = tempo;
 
     // @TODO: how to propagate to all relevant scripts that are in graph?
@@ -372,7 +389,16 @@ class PlayerExperience extends AbstractExperience {
     this.updateLookAhead();
   }
 
+  setTempoFromScore(onOff) {
+    this.tempoFromScore = onOff;
+  }
+
   setTimeSignature(timeSignature) {
+    if(this.timeSignature.count === timeSignature.count
+       && timeSignature.division === timeSignature.division) {
+      return;
+    }
+
     this.timeSignature = timeSignature;
     this.coMoPlayer.player.setGraphOptions('transport', {
         scriptParams: {
@@ -380,6 +406,10 @@ class PlayerExperience extends AbstractExperience {
         },
     });
     this.updateLookAhead();
+  }
+
+  setTimeSignatureFromScore(onOff) {
+    this.timeSignatureFromScore = onOff;
   }
 
   seekPosition(position) {
@@ -474,9 +504,11 @@ class PlayerExperience extends AbstractExperience {
 
       syncTime,
       transportPlayback: this.transportPlayback,
-      position: positionCompensated,
+      position: this.position, // this.positionCompensated,
       tempo: this.tempo,
+      tempoFromScore: this.tempoFromScore,
       timeSignature: this.timeSignature,
+      timeSignatureFromScore: this.timeSignatureFromScore,
       sensorsLatency: this.sensorsLatency,
       audioLatency: this.audioLatency,
       lookAheadBeats: this.lookAheadBeats,

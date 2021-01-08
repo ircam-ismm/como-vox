@@ -72,12 +72,13 @@ function transport(graph, helpers, outputFrame) {
     updateParams(updates) {
       if(typeof updates.seekPosition !== 'undefined') {
         seekPosition(updates.seekPosition);
-      } else if(typeof updates.timeSignature !== 'undefined') {
-        setTimeSignature(updates.timeSignature);
-      } else {
-        Object.assign(parameters, updates);
       }
 
+      if(typeof updates.timeSignature !== 'undefined') {
+        setTimeSignature(updates.timeSignature);
+      }
+
+      Object.assign(parameters, updates);
     },
 
     process(inputFrame, outputFrame) {

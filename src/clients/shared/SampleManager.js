@@ -22,18 +22,15 @@ export class SampleManager {
     notes = notesDefault,
   } = {}) {
     const notesRequest = new Set([...notes]); // array or set
-    console.log("notes = ", notes);
 
     this.samplesLoading.forEach( (loading, pitch) => {
       if(!notesRequest.has(pitch) ) {
-        console.log('cancel sample loading', loading);
         loading.cancel();
       }
     });
 
     this.samples.forEach( (sample, pitch) => {
       if(!notesRequest.has(pitch) ) {
-        console.log('delete sample', pitch, sample);
         this.samples.delete(pitch);
       }
     });
@@ -42,9 +39,6 @@ export class SampleManager {
       return !this.samplesLoading.get(pitch)
         && !this.samples.get(pitch);
     });
-
-
-    console.log('new samples', notesNew);
 
     const promises = [];
     notesNew.forEach( (pitch) => {

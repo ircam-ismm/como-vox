@@ -10,17 +10,12 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const performanceToAudioContextTime = conversion.performanceToAudioContextTime;
   const beatsToSeconds = conversion.beatsToSeconds;
 
-  const time = app.imports.helpers.time;
-  const getTime = time.getTime;
-
   const audioContext = graph.como.audioContext;
 
   const parameters = {
     lookAheadSeconds: 0,
     intensityRange: 30, // in dB
   };
-
-  let noteTimeLast = 0;
 
   return {
     updateParams(updates) {
@@ -43,12 +38,8 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
         return;
       }
 
-      // if(notesContainer['score'] && notesContainer['score'].length > 0) {
-      //   console.log("notesContainer['score'] = ", notesContainer['score']);
-      // }
-
       for(const channel in notesContainer) {
-        if(channel !== 'click' && channel !== 'clack' && channel !== 'score') {
+        if(channel !== 'click' && channel !== 'clack') {
           continue;
         }
 
@@ -70,21 +61,6 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
           const noteTime = Math.max(audioContext.currentTime,
                                     currentTime + parameters.lookAheadSeconds + noteOffset);
-
-          // console.log('time', audioContext.currentTime,
-          //             'compensated time', currentTime + parameters.lookAheadSeconds - noteDelay);
-
-          // console.log('note', 'time', noteTime, 'delay', noteDelay,
-          //             'pitch', note.pitch, 'intensity', note.intensity,
-          //             'duration', note.duration);
-
-          // console.log('currentTime', currentTime,
-          //             'lookAheadSeconds', parameters.lookAheadSeconds,
-          //             'noteOffset', noteOffset);
-          // console.log('noteTime', noteTime,
-          //             'delta', noteTime - noteTimeLast);
-
-          noteTimeLast = noteTime;
 
           const noteDuration = beatsToSeconds(note.duration, {tempo, timeSignature});
 

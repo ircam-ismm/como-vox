@@ -20,6 +20,10 @@ const positionAddBeats = conversion.positionAddBeats;
 
 const audio = app.imports.helpers.audio;
 
+if(typeof app.instruments === 'undefined') {
+  app.instruments = {};
+}
+
 // for simple debugging in browser...
 const MOCK_SENSORS = url.paramGet('mock-sensors');
 console.info('> to mock sensors for debugging purpose, append "?mock-sensors=1" to URL');
@@ -168,9 +172,10 @@ class PlayerExperience extends AbstractExperience {
     this.audioContext = this.como.audioContext;
     this.pianoSampleManager = new SampleManager({
       audioContext: this.audioContext,
-      baseUrl: 'soundfonts/bright_acoustic_piano',
+      // baseUrl: 'soundfonts/bright_acoustic_piano',
+      baseUrl: 'soundfonts/acoustic_grand_piano',
     });
-    app.pianoSampleManager = this.pianoSampleManager;
+    app.instruments.pianoSampleManager = this.pianoSampleManager;
 
     // 4. react to gui controls.
     this.listeners = {
@@ -294,11 +299,10 @@ class PlayerExperience extends AbstractExperience {
           });
 
           await this.pianoSampleManager.update({notes});
-          console.log('samples', this.pianoSampleManager.samples);
 
           resolve(this.score);
         } catch (error) {
-          reject(new Error(`Error while parsing midi file ${scoreURI}: `
+          reject(new Error(`Error with midi file ${scoreURI}: `
                            + error.message) );
         }
       };
@@ -363,10 +367,12 @@ class PlayerExperience extends AbstractExperience {
     }
 
     if(lookAheadSecondsLast !== this.lookAheadSeconds) {
-      this.coMoPlayer.player.setGraphOptions('clickSynth', {
+      ['clickSynth', 'samplePlayer'].forEach( (node) => {
+        this.coMoPlayer.player.setGraphOptions(node, {
         scriptParams: {
           lookAheadSeconds: this.lookAheadSeconds,
         },
+        });
       });
 
     }
@@ -442,10 +448,12 @@ class PlayerExperience extends AbstractExperience {
 
   setTransportPlayback(playback) {
     this.transportPlayback = playback;
-    this.coMoPlayer.player.setGraphOptions('transport', {
+    ['transport', 'score'].forEach( (node) => {
+      this.coMoPlayer.player.setGraphOptions(node, {
         scriptParams: {
           playback,
         },
+      });
     });
   }
 

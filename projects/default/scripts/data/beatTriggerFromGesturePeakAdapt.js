@@ -12,7 +12,6 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
   const meanThresholdAdapt =  1; // factor to multiply standar deviation
   const meanThresholdMin =  50; // min threshold
   const timeIntervalThreshold = 0.2; //  0.2 in seconds
-  //const movingAverage = new helpers.algo.MovingAverage(meanOrder);
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
 
@@ -47,6 +46,8 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
       //const intensity = inputData['rotationRate'].alpha ** 2 +  inputData['rotationRate'].beta ** 2 +  inputData['rotationRate'].gamma ** 2;
       //const intensity = inputData['accelerationIncludingGravity'].x ** 2 +  inputData['accelerationIncludingGravity'].y ** 2 +  inputData['accelerationIncludingGravity'].z ** 2;
 
+
+      // computing intensity using only one axis
       let intensity = inputData['accelerationIncludingGravity'].x;
       let value = Math.abs(movingDelta.process(intensity, inputData.metas.period));
       value = value + feedbackIntensity * memory; // store value for next pass
@@ -90,9 +91,8 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
         lastBeatTime = null;
       }
 
-      //lastMean = movingAverage.process(intensity);
       [lastMean, lastStd] = movingMeanStd.process(intensity);
-      console.log(lastMean, lastStd)
+
       outputData['beat'] = beat;
       return outputFrame;
     },

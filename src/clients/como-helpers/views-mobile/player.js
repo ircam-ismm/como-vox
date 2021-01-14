@@ -162,16 +162,9 @@ export function player(data, listeners, {
              value="${data.timeSignature.division}"
              @click="${e => selfSelect(e)}"
              @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
-
-      from score:
-      <sc-toggle
-        .active="${data.timeSignatureFromScore}"
-        @change="${e => experience.setTimeSignatureFromScore(e.detail.value)}"
-      ></sc-toggle>
     </span>
 
     <div class="controls-container">
-
       <div class="onoff transport">Playback:
         <sc-toggle
           .active="${data.transportPlayback}"

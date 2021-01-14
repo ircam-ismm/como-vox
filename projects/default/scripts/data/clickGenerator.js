@@ -11,7 +11,7 @@ function clickGenerator(graph, helpers, outputFrame) {
   const duration = 0.5; // in beats
 
   const parameters = {
-    onOff: true,
+    onOff: false,
   };
 
   return {

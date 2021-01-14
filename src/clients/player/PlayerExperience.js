@@ -39,6 +39,9 @@ const positionDefault = {bar: 1, beat: 1};
 
 const transportPlaybackDefault = true;
 
+const metronomeSoundDefault = false;
+const beatingSoundDefault = false;
+
 const lookAheadBeatsDefault = 0;
 const sensorsLatencyDefault = 1 / 60; // 60 Hz?
 
@@ -87,8 +90,8 @@ class PlayerExperience extends AbstractExperience {
     this.gestureControlsBeat = false;
     this.gestureControlsTempo = false;
 
-    this.metronomeSound = true;
-    this.beatingSound = true;
+    this.metronomeSound = undefined;
+    this.beatingSound = undefined;
 
     // configure como w/ the given experience
     this.como.configureExperience(this);
@@ -207,6 +210,10 @@ class PlayerExperience extends AbstractExperience {
       this.setTransportPlayback(transportPlaybackDefault);
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);
+
+      this.setMetronomeSound(metronomeSoundDefault);
+      this.setBeatingSound(beatingSoundDefault);
+
       this.setLookAheadBeats(lookAheadBeatsDefault);
       this.seekPosition(positionDefault);
 
@@ -219,14 +226,18 @@ class PlayerExperience extends AbstractExperience {
         this.transportPlayback = frame['playback'];
 
         const score = frame['score'];
-        if(this.tempoFromScore && score && score.tempo) {
-          this.setTempo(score.tempo);
+        if(this.tempoFromScore) {
+          if(score && score.tempo) {
+            this.setTempo(score.tempo);
+          }
         } else {
           this.setTempo(frame['tempo']);
         }
 
-        if(this.timeSignatureFromScore && score && score.timeSignature) {
-          this.setTimeSignature(score.timeSignature);
+        if(this.timeSignatureFromScore) {
+          if(score && score.timeSignature) {
+            this.setTimeSignature(score.timeSignature);
+          }
         } else {
           this.setTimeSignature(frame['timeSignature']);
         }
@@ -250,7 +261,8 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setGraphOptions(node, updates) {
-    if(this.coMoPlayer.graph.modules[node]) {
+    if(this.coMoPlayer && this.coMoPlayer.graph
+       && this.coMoPlayer.graph.modules[node]) {
       this.coMoPlayer.player.setGraphOptions(node, updates);
     }
   }
@@ -385,7 +397,7 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setTempo(tempo) {
-    if(tempo === this.tempo) {
+    if(!tempo || tempo === this.tempo) {
       return;
     }
     this.tempo = tempo;
@@ -405,8 +417,10 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setTimeSignature(timeSignature) {
-    if(this.timeSignature.count === timeSignature.count
-       && timeSignature.division === timeSignature.division) {
+    // object equal
+    if(!timeSignature
+       || (JSON.stringify(this.timeSignature.count)
+           === JSON.stringify(timeSignature.count) ) ) {
       return;
     }
 

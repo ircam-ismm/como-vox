@@ -28,11 +28,13 @@ User data
 folder_path = '/mypath'
 filename = 'xxx-*'
 
-# #folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/mesures-morgan-2020-12-21'
+# folder_path = \
+#   '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/data-test'
+# filename = '2021*'
 
 # #fabrice
 # folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2020-12-22-mesures-fabrice'
-# filename = '20201222-*'#'20201221-*'
+# filename = '20201222-*'
 
 # morgan
 # folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2020-12-21-mesures-morgan'
@@ -62,17 +64,21 @@ plot figures
 
 """
 
-y_limits = {'acceleration':(-5,20),'rotation':(-150,150),'intensity_lin':(0,0.02),'intensity_comp':(0,0.05)}  # 0 = auto
+y_limits = {'acceleration':(-5,20),'rotation':(-150,150),
+            'intensity_lin':(0,0.02),'intensity_comp':(0,0.05)}  # 0 = auto
 y_limits = 0
 
 #acceleeration
-axis_weights_accel = [1,1,1]
+axis_weights_accel = [1,0,0]
 integration_parameter = -0.8
-rolling_window_accel = 10
+rolling_window_accel = 2
 compression = 1
-scaling = 0.2
-threshold = 0.1
-median_window = 15
+scaling = 1 
+delta_order= 5
+
+threshold = 1
+threshold_min = 5
+threshold_window = 10
 norepeat_interval = 20
 detect = 1
 
@@ -81,7 +87,7 @@ axis_weights_rotation = [1,1,1]
 rolling_window_rotation = 20
 
 save_figure = True
-text ='1'
+text ='adapt4_phoneParam'
 
 
 def make_figure(data_string, figure_no):
@@ -92,10 +98,13 @@ def make_figure(data_string, figure_no):
                                        rolling_window_accel, 
                                        compression, 
                                        scaling, 
-                                       threshold, 
-                                       median_window,
+                                       delta_order,
+                                       threshold, threshold_min,
+                                       threshold_window,
                                        norepeat_interval, detect)
-    comovox.rotation_analysis(data[data_string],axis_weights_rotation, rolling_window_rotation, 1)
+    comovox.rotation_analysis(data[data_string],
+                                  axis_weights_rotation, 
+                                  rolling_window_rotation, 1)
     comovox.sensors_plot(data[data_string], data_string, y_limits, figure_no) 
     plt.figtext(0.15 ,0.93, 
                 'ACC - ' + 
@@ -105,7 +114,8 @@ def make_figure(data_string, figure_no):
                 ' | compression: ' + str(compression) +
                 ' | scaling: ' + str(scaling) +
                 ' | threshold: ' + str(threshold) +
-                ' | median_window: ' + str(median_window) +
+                ' | threshold_min: ' + str(threshold_min) +
+                ' | threshold_window: ' + str(threshold_window) +
                 ' | norepeat_interval: ' + str(norepeat_interval) + 
                 ' | detect: ' + str(detect),
                 fontsize = 10)
@@ -119,12 +129,37 @@ def make_figure(data_string, figure_no):
                     + data_string + '-' + text + '.png')
 
 #single plot
-make_figure(data_list[0], 1)
+# data = {}
 
-# looping over data list
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2020-12-22-mesures-fabrice'
+# filename = '20201222-162915-player-15-metro-80-4_4-nuances'
+# data[filename] = comovox.sensors_read(folder_path + '/' + filename)
+# # data = comovox.multiple_sensors_read(folder_path + '/' + filename)
+# make_figure(filename, 1)
+
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2020-12-21-mesures-morgan'
+# filename = '20201221-131759-player-27-metro-80-4_4-nuances'
+# data[filename] = comovox.sensors_read(folder_path + '/' + filename)
+# make_figure(filename, 2)
+
+# data_list = [*data]
+# make_figure(data_list[0], 1)
+# make_figure(data_list[1], 2)
+
+
+
+# make_figure('20201221-123746-player-22-coule-60-2_4', 1)
+# make_figure('20201221-123333-player-22-coule-60', 2)
+# make_figure('20201221-131759-player-27-metro-80-4_4-nuances', 3)
+# make_figure('20201222-162915-player-15-metro-80-4_4-nuances', 4)
+
+
+#looping over data_list
 for i in data_list:   
     make_figure(i, None)
     print(i)
+
+ 
 
 
 

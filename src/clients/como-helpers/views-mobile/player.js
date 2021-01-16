@@ -67,7 +67,7 @@ export function player(data, listeners, {
              min="0"
              max="100"
              step="5"
-             .value="${data.sensorsLatency * 1e3}"
+             value="${data.sensorsLatency * 1e3}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
                    experience.setSensorsLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
@@ -80,7 +80,7 @@ export function player(data, listeners, {
              min="0"
              max="500"
              step="10"
-             .value="${data.audioLatency * 1e3}"
+             value="${data.audioLatency * 1e3}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
                    experience.setAudioLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
@@ -93,7 +93,7 @@ export function player(data, listeners, {
              min="0"
              max="32"
              step="1"
-             .value="${data.lookAheadBeats}"
+             value="${data.lookAheadBeats}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
                    experience.setLookAheadBeats(parseFloat(e.srcElement.value) || 0);
@@ -130,7 +130,7 @@ export function player(data, listeners, {
              min="10"
              max="300"
              step="10"
-             .value="${Math.round(data.tempo)}"
+             value="${Math.round(data.tempo)}"
              @click="${e => selfSelect(e)}"
              @change="${e => {
                    experience.setTempo(parseFloat(e.srcElement.value) || 60);
@@ -150,7 +150,7 @@ export function player(data, listeners, {
              min="1"
              max="32"
              step="1"
-             .value="${data.timeSignature.count}"
+             value="${data.timeSignature.count}"
              @click="${e => selfSelect(e)}"
              @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
       /
@@ -159,19 +159,12 @@ export function player(data, listeners, {
              min="1"
              max="32"
              step="1"
-             .value="${data.timeSignature.division}"
+             value="${data.timeSignature.division}"
              @click="${e => selfSelect(e)}"
              @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
-
-      from score:
-      <sc-toggle
-        .active="${data.timeSignatureFromScore}"
-        @change="${e => experience.setTimeSignatureFromScore(e.detail.value)}"
-      ></sc-toggle>
     </span>
 
     <div class="controls-container">
-
       <div class="onoff transport">Playback:
         <sc-toggle
           .active="${data.transportPlayback}"
@@ -198,7 +191,7 @@ export function player(data, listeners, {
       <input class="time bar"
              type="number"
              step="1"
-             .value="${!data.position
+             value="${!data.position
                        ? 0
                        : (data.position.bar > 0
                           ? data.position.bar
@@ -209,9 +202,9 @@ export function player(data, listeners, {
                type="number"
                step="1"
                min"1"
-               .value="${!data.position
+               value="${!data.position
                          ? 0
-                         : (Math.floor(beat * 100) / 100).toFixed(2)}"
+                         : Math.floor(beat)}"
                @click="${e => selfSelect(e)}"
                @change="${e => experience.seekPosition(getPosition(e) )}"
         >

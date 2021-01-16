@@ -1,6 +1,7 @@
 import audio from './helpers/audio.js';
 import conversion from './helpers/conversion.js';
 import math from './helpers/math.js';
+import Scaler from './helpers/Scaler.js'
 import time from './helpers/time.js';
 
 let app;
@@ -17,6 +18,7 @@ app.imports = {
     audio,
     conversion,
     math,
+    Scaler,
     time,
   },
 };

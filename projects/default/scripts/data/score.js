@@ -16,8 +16,11 @@ function score(graph, helpers, outputFrame) {
 
   let score = null;
 
-  let scoreTempo = 120;
+  let scoreTempo = undefined;
+  let scoreTempoChanged = false;
+
   let scoreTimeSignature = {count: 4, division: 4};
+  let scoreTimeSignatureChanged = false;
 
   let resetParts = undefined;
 
@@ -57,10 +60,12 @@ function score(graph, helpers, outputFrame) {
     if(score && score.masterTrack) {
       if(score.masterTrack.tempo) {
         scoreTempo = score.masterTrack.tempo;
+        scoreTempoChanged = true;
       }
 
       if(score.masterTrack.timeSignature) {
         scoreTimeSignature = score.masterTrack.timeSignature;
+        scoreTimeSignatureChanged = true;
       }
     }
   };
@@ -185,9 +190,21 @@ function score(graph, helpers, outputFrame) {
         eventContainer[p] = [ ...resetEvents[p] ];
       }
 
+      let outputTempo;
+      if(scoreTempoChanged) {
+        outputTempo = scoreTempo;
+        scoreTempoChanged = false;
+      }
+
+      let outputTimeSignature;
+      if(scoreTimeSignatureChanged) {
+        outputTimeSignature = scoreTimeSignature;
+        scoreTimeSignatureChanged = false;
+      }
+
       outputData['score'] = {
-        tempo: scoreTempo,
-        timeSignature: scoreTimeSignature,
+        tempo: outputTempo,
+        timeSignature: outputTimeSignature,
       };
 
       outputData['events'] = eventContainer;

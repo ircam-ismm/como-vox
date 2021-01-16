@@ -83,8 +83,15 @@ body.loading {
 #__soundworks-container .position>.bar,
 #__soundworks-container .position>.beat {
   font-size: 48px;
-  width: 2.5em;
   padding: 0;
+}
+
+#__soundworks-container .position>.bar {
+  width: 2.5em;
+}
+
+#__soundworks-container .position>.beat {
+  width: 1.5em;
 }
 
 #__soundworks-container .sensorsLatency {

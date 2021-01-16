@@ -39,6 +39,9 @@ const positionDefault = {bar: 1, beat: 1};
 
 const transportPlaybackDefault = true;
 
+const metronomeSoundDefault = false;
+const beatingSoundDefault = false;
+
 const lookAheadBeatsDefault = 0;
 const sensorsLatencyDefault = 1 / 60; // 60 Hz?
 
@@ -87,8 +90,8 @@ class PlayerExperience extends AbstractExperience {
     this.gestureControlsBeat = false;
     this.gestureControlsTempo = false;
 
-    this.metronomeSound = true;
-    this.beatingSound = true;
+    this.metronomeSound = undefined;
+    this.beatingSound = undefined;
 
     // configure como w/ the given experience
     this.como.configureExperience(this);
@@ -207,6 +210,10 @@ class PlayerExperience extends AbstractExperience {
       this.setTransportPlayback(transportPlaybackDefault);
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);
+
+      this.setMetronomeSound(metronomeSoundDefault);
+      this.setBeatingSound(beatingSoundDefault);
+
       this.setLookAheadBeats(lookAheadBeatsDefault);
       this.seekPosition(positionDefault);
 
@@ -219,14 +226,18 @@ class PlayerExperience extends AbstractExperience {
         this.transportPlayback = frame['playback'];
 
         const score = frame['score'];
-        if(this.tempoFromScore && score && score.tempo) {
-          this.setTempo(score.tempo);
+        if(this.tempoFromScore) {
+          if(score && score.tempo) {
+            this.setTempo(score.tempo);
+          }
         } else {
           this.setTempo(frame['tempo']);
         }
 
-        if(this.timeSignatureFromScore && score && score.timeSignature) {
-          this.setTimeSignature(score.timeSignature);
+        if(this.timeSignatureFromScore) {
+          if(score && score.timeSignature) {
+            this.setTimeSignature(score.timeSignature);
+          }
         } else {
           this.setTimeSignature(frame['timeSignature']);
         }
@@ -247,6 +258,13 @@ class PlayerExperience extends AbstractExperience {
     };
 
     this.rafId = window.requestAnimationFrame(updateClock);
+  }
+
+  setGraphOptions(node, updates) {
+    if(this.coMoPlayer && this.coMoPlayer.graph
+       && this.coMoPlayer.graph.modules[node]) {
+      this.coMoPlayer.player.setGraphOptions(node, updates);
+    }
   }
 
   async setScore(scoreURI) {
@@ -320,12 +338,11 @@ class PlayerExperience extends AbstractExperience {
     this.sensorsLatency = sensorsLatency;
 
     if(this.sensorsLatency !== sensorsLatencyLast) {
-      this.coMoPlayer.player.setGraphOptions('beatTriggerFromGesture', {
+      this.setGraphOptions('beatTriggerFromGesture', {
         scriptParams: {
           sensorsLatency: this.sensorsLatency,
         },
       });
-
     }
   }
 
@@ -368,10 +385,10 @@ class PlayerExperience extends AbstractExperience {
 
     if(lookAheadSecondsLast !== this.lookAheadSeconds) {
       ['clickSynth', 'samplePlayer'].forEach( (node) => {
-        this.coMoPlayer.player.setGraphOptions(node, {
-        scriptParams: {
-          lookAheadSeconds: this.lookAheadSeconds,
-        },
+        this.setGraphOptions(node, {
+          scriptParams: {
+            lookAheadSeconds: this.lookAheadSeconds,
+          },
         });
       });
 
@@ -380,17 +397,17 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setTempo(tempo) {
-    if(tempo === this.tempo) {
+    if(!tempo || tempo === this.tempo) {
       return;
     }
     this.tempo = tempo;
 
     // @TODO: how to propagate to all relevant scripts that are in graph?
     // (server crashes with non-instantiated scripts)
-    this.coMoPlayer.player.setGraphOptions('transport', {
-        scriptParams: {
-          tempo,
-        },
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        tempo,
+      },
     });
     this.updateLookAhead();
   }
@@ -400,16 +417,18 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setTimeSignature(timeSignature) {
-    if(this.timeSignature.count === timeSignature.count
-       && timeSignature.division === timeSignature.division) {
+    // object equal
+    if(!timeSignature
+       || (JSON.stringify(this.timeSignature.count)
+           === JSON.stringify(timeSignature.count) ) ) {
       return;
     }
 
     this.timeSignature = timeSignature;
-    this.coMoPlayer.player.setGraphOptions('transport', {
-        scriptParams: {
-          timeSignature,
-        },
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        timeSignature,
+      },
     });
     this.updateLookAhead();
   }
@@ -420,7 +439,7 @@ class PlayerExperience extends AbstractExperience {
 
   seekPosition(position) {
     ['transport', 'score'].forEach( (script) => {
-      this.coMoPlayer.player.setGraphOptions(script, {
+      this.setGraphOptions(script, {
         scriptParams: {
           seekPosition: position,
         },
@@ -430,26 +449,26 @@ class PlayerExperience extends AbstractExperience {
 
   setGestureControlsBeat(control) {
     this.gestureControlsBeat = control;
-    this.coMoPlayer.player.setGraphOptions('transport', {
-        scriptParams: {
-          gestureControlsBeat: this.gestureControlsBeat,
-        },
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        gestureControlsBeat: this.gestureControlsBeat,
+      },
     });
   }
 
   setGestureControlsTempo(control) {
     this.gestureControlsTempo = control;
-    this.coMoPlayer.player.setGraphOptions('transport', {
-        scriptParams: {
-          gestureControlsTempo: this.gestureControlsTempo,
-        },
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        gestureControlsTempo: this.gestureControlsTempo,
+      },
     });
   }
 
   setTransportPlayback(playback) {
     this.transportPlayback = playback;
     ['transport', 'score'].forEach( (node) => {
-      this.coMoPlayer.player.setGraphOptions(node, {
+      this.setGraphOptions(node, {
         scriptParams: {
           playback,
         },
@@ -459,20 +478,20 @@ class PlayerExperience extends AbstractExperience {
 
   setMetronomeSound(onOff) {
     this.metronomeSound = onOff;
-    this.coMoPlayer.player.setGraphOptions('clickGenerator', {
-        scriptParams: {
-          onOff,
-        },
+    this.setGraphOptions('clickGenerator', {
+      scriptParams: {
+        onOff,
+      },
     });
 
   }
 
   setBeatingSound(onOff) {
     this.beatingSound = onOff;
-    this.coMoPlayer.player.setGraphOptions('clackFromBeat', {
-        scriptParams: {
-          onOff,
-        },
+    this.setGraphOptions('clackFromBeat', {
+      scriptParams: {
+        onOff,
+      },
     });
 
   }

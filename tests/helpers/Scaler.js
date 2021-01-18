@@ -13,10 +13,10 @@ describe(`Check Scaler object`, () => {
     // linear
     [
       {
-        inputMin: 5,
-        inputMax: 47,
-        outputMin: -12,
-        outputMax: 3,
+        inputStart: 5,
+        inputEnd: 47,
+        outputStart: -12,
+        outputEnd: 3,
         base: 1,
         clip: true,
       },
@@ -26,17 +26,36 @@ describe(`Check Scaler object`, () => {
         [33, -2, 33],
         // clip, then inverse
         [-12, -12, 5],
-        [55, 3, 47]
+        [55, 3, 47],
+      ],
+    ],
+    // start > end
+    [
+      {
+        inputStart: 47,
+        inputEnd: 5,
+        outputStart: 3,
+        outputEnd: -12,
+        base: 1,
+        clip: true,
+      },
+      [ // input, scaled, inverse
+        [5, -12, 5],
+        [47, 3, 47],
+        [33, -2, 33],
+        // clip, then inverse
+        [-12, -12, 5],
+        [55, 3, 47],
       ],
     ],
     // no input or output range
     [
       // linear
       {
-        inputMin: 5,
-        inputMax: 5,
-        outputMin: -5,
-        outputMax: -5,
+        inputStart: 5,
+        inputEnd: 5,
+        outputStart: -5,
+        outputEnd: -5,
         base: 1,
         clip: false,
       },
@@ -49,10 +68,10 @@ describe(`Check Scaler object`, () => {
     [
       // logarithmic
       {
-        inputMin: 5,
-        inputMax: 5,
-        outputMin: -5,
-        outputMax: -5,
+        inputStart: 5,
+        inputEnd: 5,
+        outputStart: -5,
+        outputEnd: -5,
         base: 2,
         type: 'logarithmic',
         clip: false,
@@ -66,10 +85,10 @@ describe(`Check Scaler object`, () => {
     [
       // exponential
       {
-        inputMin: 5,
-        inputMax: 5,
-        outputMin: -5,
-        outputMax: -5,
+        inputStart: 5,
+        inputEnd: 5,
+        outputStart: -5,
+        outputEnd: -5,
         base: 2,
         type: 'exponential',
         clip: false,
@@ -84,12 +103,32 @@ describe(`Check Scaler object`, () => {
     [
       // forward
       {
-        inputMin:69,
-        inputMax: 81,
-        outputMin: 440,
-        outputMax: 880,
+        inputStart: 69,
+        inputEnd: 81,
+        outputStart: 440,
+        outputEnd: 880,
         type: 'exponential',
         base: 2,
+        clip: false,
+      },
+      [
+        [69, 440, 69],
+        [72, 523.251131, 72],
+        [81, 880, 81],
+        // no clip
+        [57, 220, 57],
+        [93, 1760, 93],
+      ],
+    ],
+    [
+      // start > end
+      {
+        inputStart: 81,
+        inputEnd: 69,
+        outputStart: 880,
+        outputEnd: 440,
+        type: 'exponential',
+        base: 0.5,
         clip: false,
       },
       [
@@ -105,10 +144,10 @@ describe(`Check Scaler object`, () => {
     [
       // forward
       {
-        inputMin: 0,
-        inputMax: 20,
-        outputMin: 1,
-        outputMax: 10,
+        inputStart: 0,
+        inputEnd: 20,
+        outputStart: 1,
+        outputEnd: 10,
         type: 'exponential',
         base: 10,
         clip: false,
@@ -136,10 +175,10 @@ describe(`Check Scaler object`, () => {
       scalerReused.set(scalerSetup);
 
       const scalerInverseSetup = {
-        inputMin: setup[0].outputMin,
-        inputMax: setup[0].outputMax,
-        outputMin: setup[0].inputMin,
-        outputMax: setup[0].inputMax,
+        inputStart: setup[0].outputStart,
+        inputEnd: setup[0].outputEnd,
+        outputStart: setup[0].inputStart,
+        outputEnd: setup[0].inputEnd,
         type: (setup[0].type === 'logarithmic'
                ? 'exponential'
                : 'logarithmic'),

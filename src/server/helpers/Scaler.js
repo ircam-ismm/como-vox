@@ -3,18 +3,18 @@ const e = {};
 export class Scaler {
 
   constructor({
-    inputMin = 0,
-    inputMax = 0,
-    outputMin = 0,
-    outputMax = 1,
+    inputStart = 0,
+    inputEnd = 0,
+    outputStart = 0,
+    outputEnd = 1,
     clip = false,
     type = 'linear',
     base = 1,
   } = {}) {
-    this.inputMin = inputMin;
-    this.inputMax = inputMax;
-    this.outputMin = outputMin;
-    this.outputMax = outputMax;
+    this.inputStart = inputStart;
+    this.inputEnd = inputEnd;
+    this.outputStart = outputStart;
+    this.outputEnd = outputEnd;
     this.clip = clip;
     this.type = type;
     this.base = base;
@@ -38,15 +38,18 @@ export class Scaler {
 
     this.base = Math.max(0, this.base);
 
-    this.inputRange = this.inputMax - this.inputMin;
-    this.outputRange = this.outputMax - this.outputMin;
+    this.inputRange = this.inputEnd - this.inputStart;
+    this.outputRange = this.outputEnd - this.outputStart;
+
+    this.inputMin = Math.min(this.inputStart, this.inputEnd);
+    this.inputMax = Math.max(this.inputStart, this.inputEnd);
 
     this.logBase = Math.log(this.base);
   }
 
   process(inputValue) {
     if(this.inputRange === 0 || this.outputRange === 0) {
-      return this.outputMin;
+      return this.outputStart;
     }
 
     const input = (this.clip
@@ -56,16 +59,16 @@ export class Scaler {
                    : inputValue);
 
     if(this.base === 1 || this.type === 'linear') {
-      return this.outputMin + this.outputRange
-        * (input - this.inputMin) / this.inputRange;
+      return this.outputStart + this.outputRange
+        * (input - this.inputStart) / this.inputRange;
     }
     else if(this.type === 'logarithmic') {
-      return this.outputMin + this.outputRange
-        * Math.log((this.base - 1) * (input - this.inputMin) / this.inputRange + 1)
+      return this.outputStart + this.outputRange
+        * Math.log((this.base - 1) * (input - this.inputStart) / this.inputRange + 1)
         / this.logBase;
     } else {
-      return this.outputMin + this.outputRange
-        * (Math.exp(this.logBase * (input - this.inputMin) / this.inputRange) - 1)
+      return this.outputStart + this.outputRange
+        * (Math.exp(this.logBase * (input - this.inputStart) / this.inputRange) - 1)
         / (this.base - 1);
     }
 

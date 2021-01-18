@@ -1,5 +1,3 @@
-const e = {};
-
 export class Scaler {
 
   constructor({
@@ -76,7 +74,5 @@ export class Scaler {
 
 
 }
-Object.assign(e, {Scaler});
-
-export default e;
+export default Scaler;
 

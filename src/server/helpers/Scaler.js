@@ -8,7 +8,7 @@ export class Scaler {
     outputMin = 0,
     outputMax = 1,
     clip = false,
-    type = 'logarithmic',
+    type = 'linear',
     base = 1,
   } = {}) {
     this.inputMin = inputMin;
@@ -28,7 +28,9 @@ export class Scaler {
   }
 
   init() {
-    if(this.type === 'log') {
+    if(this.type === 'lin') {
+      this.type = 'linear';
+    } else if(this.type === 'log') {
       this.type = 'logarithmic';
     } else if (this.type === 'exp') {
       this.type = 'exponential';
@@ -38,16 +40,22 @@ export class Scaler {
 
     this.inputRange = this.inputMax - this.inputMin;
     this.outputRange = this.outputMax - this.outputMin;
+
     this.logBase = Math.log(this.base);
   }
 
   process(inputValue) {
+    if(this.inputRange === 0 || this.outputRange === 0) {
+      return this.outputMin;
+    }
+
     const input = (this.clip
-                   ? Math.max(Math.min(this.inputMax, inputValue),
-                              this.inputMin)
+                   ? Math.max(this.inputMin,
+                              Math.min(this.inputMax,
+                                       inputValue) )
                    : inputValue);
 
-    if(this.base === 1) {
+    if(this.base === 1 || this.type === 'linear') {
       return this.outputMin + this.outputRange
         * (input - this.inputMin) / this.inputRange;
     }

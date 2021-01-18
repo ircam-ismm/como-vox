@@ -30,6 +30,57 @@ describe(`Check Scaler object`, () => {
         [55, 3, 47]
       ],
     ],
+    // no input or output range
+    [
+      // linear
+      {
+        inputMin: 5,
+        inputMax: 5,
+        outputMin: -5,
+        outputMax: -5,
+        base: 1,
+        clip: false,
+      },
+      [
+        [5, -5, 5],
+        [2, -5, 5],
+        [12, -5, 5],
+      ],
+    ],
+    [
+      // logarithmic
+      {
+        inputMin: 5,
+        inputMax: 5,
+        outputMin: -5,
+        outputMax: -5,
+        base: 2,
+        type: 'logarithmic',
+        clip: false,
+      },
+      [
+        [5, -5, 5],
+        [2, -5, 5],
+        [12, -5, 5],
+      ],
+    ],
+    [
+      // exponential
+      {
+        inputMin: 5,
+        inputMax: 5,
+        outputMin: -5,
+        outputMax: -5,
+        base: 2,
+        type: 'exponential',
+        clip: false,
+      },
+      [
+        [5, -5, 5],
+        [2, -5, 5],
+        [12, -5, 5],
+      ],
+    ],
     // MIDI pitch to Hertz
     [
       // forward

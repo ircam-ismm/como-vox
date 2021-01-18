@@ -12,7 +12,6 @@ describe(`Check Scaler object`, () => {
   const testSetups = [
     // linear
     [
-      // forward
       {
         inputMin: 5,
         inputMax: 47,
@@ -21,7 +20,7 @@ describe(`Check Scaler object`, () => {
         base: 1,
         clip: true,
       },
-      [ // input, scaled, inversed
+      [ // input, scaled, inverse
         [5, -12, 5],
         [47, 3, 47],
         [33, -2, 33],
@@ -124,9 +123,17 @@ describe(`Check Scaler object`, () => {
   ];
 
   it(`should validate values`, () => {
+    // test for set method
+    const scalerReused = new Scaler();
+
     testSetups.forEach( (setup) => {
       const scalerSetup = setup[0];
+
+      // test for constructor
       const scaler = new Scaler(scalerSetup);
+
+      // test for set method
+      scalerReused.set(scalerSetup);
 
       const scalerInverseSetup = {
         inputMin: setup[0].outputMin,
@@ -143,6 +150,12 @@ describe(`Check Scaler object`, () => {
       setup[1].forEach( (testValues) => {
         const transform = scaler.process(testValues[0]);
         assertWithRelativeError(transform, testValues[1], epsilon,
+                                `scaler ${
+JSON.stringify({setup: setup[0], value: testValues[0], expected: testValues[1]})
+      }`);
+
+        const transformReused = scalerReused.process(testValues[0]);
+        assertWithRelativeError(transformReused, testValues[1], epsilon,
                                 `scaler ${
 JSON.stringify({setup: setup[0], value: testValues[0], expected: testValues[1]})
       }`);

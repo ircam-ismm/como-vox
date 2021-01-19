@@ -4,6 +4,7 @@ function transport(graph, helpers, outputFrame) {
   const conversion = app.imports.helpers.conversion;
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;
+  const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
   const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
   const positionRoundBeats = conversion.positionRoundBeats;
   const timeDeltaToTempo = conversion.timeDeltaToTempo;
@@ -16,12 +17,16 @@ function transport(graph, helpers, outputFrame) {
   const time = app.imports.helpers.time;
   const getTime = time.getTime;
 
+  const Scaler = app.imports.helpers.Scaler;
+
+  const tempoDefault = 80;
+  const timeSignatureDefault = {
+    count: 4,
+    division: 4,
+  };
+
   const parameters = {
-    tempo: 60,
-    timeSignature: {
-      count: 4,
-      division: 4,
-    },
+    timeSignature: timeSignatureDefault,
 
     playback: true,
 
@@ -56,6 +61,18 @@ function transport(graph, helpers, outputFrame) {
 
   let tempoGestures = [];
 
+  const tempoSmoothDuration = {bar: 0, beat: 1};
+
+  // initialisation with fixed value
+  const tempoSmoother = new Scaler({
+    inputStart: 0,
+    inputEnd: 0,
+    outputStart: tempoDefault,
+    outputEnd: tempoDefault,
+    type: 'linear',
+    clip: true,
+  });
+
   const seekPosition = (position) => {
     positionLast = position;
     positionRequest = position;
@@ -78,7 +95,23 @@ function transport(graph, helpers, outputFrame) {
         setTimeSignature(updates.timeSignature);
       }
 
-      Object.assign(parameters, updates);
+      if(typeof updates.tempo !== 'undefined') {
+        // immediately set fixed value
+        tempoSmoother.set({
+          inputStart: 0,
+          inputEnd: 0,
+          outputStart: updates.tempo,
+          outputEnd: updates.tempo,
+        });
+
+      }
+
+      for(const p of Object.keys(updates) ) {
+        if(parameters.hasOwnProperty(p) ) {
+          parameters[p] = updates[p];
+        }
+      }
+
     },
 
     process(inputFrame, outputFrame) {
@@ -87,7 +120,8 @@ function transport(graph, helpers, outputFrame) {
       // use logical time tag from frame
       const now = inputData['time'];
 
-      let tempo = parameters.tempo;
+      let tempo = tempoSmoother.process(now);
+
       const timeSignature = parameters.timeSignature;
 
       // do not alias playback as it may change
@@ -99,7 +133,7 @@ function transport(graph, helpers, outputFrame) {
 
       // start
       if(!parameters.playback || positionLastTime === 0) {
-        outputData['tempo'] = parameters.tempo;
+        outputData['tempo'] = tempo;
         outputData['position'] = positionLast;
         positionLastTime = now;
         return outputFrame;
@@ -118,7 +152,7 @@ function transport(graph, helpers, outputFrame) {
       const beatGesturePosition = positionAddBeats(position, beatGestureDeltaFromNow,
                                                    {timeSignature});
 
-      // tempo
+      ////////////////// tempo
       if(parameters.gestureControlsTempo && beatGesture && beatGesture.trigger) {
         tempoGestures.push({
           time: beatGesture.time,
@@ -163,12 +197,23 @@ function transport(graph, helpers, outputFrame) {
         if(tempos.length > 0) {
           // use median(tempos) to smooth variations
           // use median(beatDeltas) for integer result to halve tempo
-          tempo = median(tempos) / median(beatDeltas);
+          const tempoNew = median(tempos) / median(beatDeltas);
+
+          tempoSmoother.set({
+            inputStart: now,
+            inputEnd: now + positionDeltaToSeconds(tempoSmoothDuration, {
+              tempo: tempoNew,
+              timeSignature,
+            }),
+            outputStart: tempo,
+            outputEnd: tempoNew,
+          });
+          // now, tempo is still old tempo
         }
 
       }
 
-      // beat position
+      ///////////////////// beat position
       if(parameters.gestureControlsBeat
          && beatGesture && beatGesture.trigger) {
         // first, get position with look-behind
@@ -209,7 +254,6 @@ function transport(graph, helpers, outputFrame) {
       }
 
       outputData['tempo'] = tempo;
-      parameters.tempo = tempo;
 
       positionLast = position;
       positionLastTime = now;

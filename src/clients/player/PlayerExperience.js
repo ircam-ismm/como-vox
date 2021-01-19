@@ -226,12 +226,10 @@ class PlayerExperience extends AbstractExperience {
         this.transportPlayback = frame['playback'];
 
         const score = frame['score'];
-        if(this.tempoFromScore) {
-          if(score && score.tempo) {
-            this.setTempo(score.tempo);
-          }
+        if(this.tempoFromScore && score && score.tempo) {
+          this.setTempo(score.tempo, {transportUpdate: true});
         } else {
-          this.setTempo(frame['tempo']);
+          this.setTempo(frame['tempo'], {transportUpdate: false});
         }
 
         if(this.timeSignatureFromScore) {
@@ -396,19 +394,24 @@ class PlayerExperience extends AbstractExperience {
 
   }
 
-  setTempo(tempo) {
+  setTempo(tempo, {
+    transportUpdate = true,
+  } = {}) {
+    console.log('setTempo', tempo, transportUpdate);
+
     if(!tempo || tempo === this.tempo) {
       return;
     }
     this.tempo = tempo;
 
-    // @TODO: how to propagate to all relevant scripts that are in graph?
-    // (server crashes with non-instantiated scripts)
-    this.setGraphOptions('transport', {
-      scriptParams: {
-        tempo,
-      },
-    });
+    if(transportUpdate) {
+      this.setGraphOptions('transport', {
+        scriptParams: {
+          tempo,
+        },
+      });
+    }
+
     this.updateLookAhead();
   }
 
@@ -504,7 +507,7 @@ class PlayerExperience extends AbstractExperience {
     });
 
     const blocked = new Blocked( (duration) => {
-      console.log(`---------- blocked for ${duration} ms ---------`);
+      console.warn(`---------- blocked for ${duration} ms ---------`);
       audio.playBuffer(noiseBuffer, {
         audioContext: this.audioContext,
         duration: duration * 1e-3,

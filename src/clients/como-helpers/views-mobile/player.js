@@ -99,7 +99,7 @@ export function player(data, listeners, {
                    experience.setLookAheadBeats(parseFloat(e.srcElement.value) || 0);
                    } }">
       beat${data.lookAheadBeats > 1 ? 's' : ''}
-      (${data.lookAheadSeconds * 1e3} ms)
+      (${Math.round(data.lookAheadSeconds * 1e3)} ms)
     </div>
 
     <div class="time">

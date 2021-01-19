@@ -47,7 +47,9 @@ export class Scaler {
 
   process(inputValue) {
     if(this.inputRange === 0 || this.outputRange === 0) {
-      return this.outputStart;
+      return (inputValue <= this.inputMin
+              ? this.outputStart
+              : this.outputEnd);
     }
 
     const input = (this.clip

@@ -55,14 +55,14 @@ describe(`Check Scaler object`, () => {
         inputStart: 5,
         inputEnd: 5,
         outputStart: -5,
-        outputEnd: -5,
+        outputEnd: 0,
         base: 1,
         clip: false,
       },
       [
         [5, -5, 5],
         [2, -5, 5],
-        [12, -5, 5],
+        [12, 0, 5],
       ],
     ],
     [

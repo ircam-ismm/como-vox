@@ -38,4 +38,39 @@ export function mean(values) {
 }
 Object.assign(e, {mean});
 
+
+
+/**
+ * Compute the weighted mean of an array of values, with an other array of
+ * weights.
+ *
+ * @param {Array<Number} values
+ * @param {Array<Number>} weights
+ * @param {Object} options
+ * @param {Any} options.defaultValue any value, except undefined
+ *
+ * @returns weight mean or defaultValue if undefined (no values, no weights, or
+ * sum of weights is zero)
+ */
+export function weightedMean(values, weights, {
+  defaultValue = 0,
+} = {}) {
+  if(values.length === 0) {
+    return defaultValue;
+  }
+
+  let valuesSum = 0;
+  let weightsSum = 0;
+  for(let i = 0; i < values.length && i < weights.length; ++i) {
+    valuesSum += values[i] * weights[i];
+    weightsSum += weights[i];
+  }
+
+  return (weightsSum !== 0
+          ? valuesSum / weightsSum
+          : defaultValue);
+
+}
+Object.assign(e, {weightedMean});
+
 export default e;

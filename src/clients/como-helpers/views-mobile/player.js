@@ -214,8 +214,8 @@ export function player(data, listeners, {
 
       <div class="onoff beating audio">Gesture controls beat:
         <sc-toggle
-          .active="${data.gesture.controlsBeat}"
-          @change="${e => experience.setGestureControlsBeat(e.detail.value)}"
+          .active="${data.gesture.controlsBeatOffset}"
+          @change="${e => experience.setGestureControlsBeatOffset(e.detail.value)}"
         ></sc-toggle>
       </div>
 

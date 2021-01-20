@@ -42,7 +42,7 @@ const transportPlaybackDefault = true;
 const metronomeSoundDefault = false;
 const beatingSoundDefault = false;
 
-const lookAheadBeatsDefault = 0;
+const lookAheadBeatsDefault = 1;
 const sensorsLatencyDefault = 1 / 60; // 60 Hz?
 
 class PlayerExperience extends AbstractExperience {
@@ -87,7 +87,7 @@ class PlayerExperience extends AbstractExperience {
     // @TODO discover and store in localStorage
     this.audioLatency = 0;
 
-    this.gestureControlsBeat = false;
+    this.gestureControlsBeatOffset = false;
     this.gestureControlsTempo = false;
 
     this.metronomeSound = undefined;
@@ -227,8 +227,9 @@ class PlayerExperience extends AbstractExperience {
 
         const score = frame['score'];
         if(this.tempoFromScore && score && score.tempo) {
-          this.setTempo(score.tempo, {transportUpdate: true});
+          this.setTempo(score.tempo);
         } else {
+          // avoid loop-back
           this.setTempo(frame['tempo'], {transportUpdate: false});
         }
 
@@ -397,8 +398,6 @@ class PlayerExperience extends AbstractExperience {
   setTempo(tempo, {
     transportUpdate = true,
   } = {}) {
-    console.log('setTempo', tempo, transportUpdate);
-
     if(!tempo || tempo === this.tempo) {
       return;
     }
@@ -450,11 +449,11 @@ class PlayerExperience extends AbstractExperience {
     });
   }
 
-  setGestureControlsBeat(control) {
-    this.gestureControlsBeat = control;
+  setGestureControlsBeatOffset(control) {
+    this.gestureControlsBeatOffset = control;
     this.setGraphOptions('transport', {
       scriptParams: {
-        gestureControlsBeat: this.gestureControlsBeat,
+        gestureControlsBeatOffset: this.gestureControlsBeatOffset,
       },
     });
   }
@@ -545,7 +544,7 @@ class PlayerExperience extends AbstractExperience {
       lookAheadSeconds: this.lookAheadSeconds,
 
       gesture: {
-        controlsBeat: this.gestureControlsBeat,
+        controlsBeatOffset: this.gestureControlsBeatOffset,
         controlsTempo: this.gestureControlsTempo,
       },
 

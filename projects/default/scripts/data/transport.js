@@ -31,10 +31,18 @@ function transport(graph, helpers, outputFrame) {
     playback: true,
     gestureControlsBeatOffset: false,
     gestureControlsTempo: false,
+    // 1 bar + 1 beat to get 4 periods for tempo
+    // + 1 bar for the gestures fluctuations
     gestureWindow: {
       bar: 1,
-      beat: 0,
+      beat: 1,
     },
+    tempoLimits: {
+      absoluteMin: 40,
+      absoluteMax: 200,
+      relativeMin: 0.5,
+      relativeMax: 2,
+    }
   };
 
   let positionLast = {
@@ -47,7 +55,8 @@ function transport(graph, helpers, outputFrame) {
   // for tempo and beat offset
   let beatGestures = [];
 
-  const tempoSmoothDuration = {bar: 0, beat: 1};
+  // do we need tempo smoother?
+  const tempoSmoothDuration = {bar: 0, beat: 0};
   // initialisation with fixed value
   const tempoSmoother = new Scaler({
     inputStart: 0,
@@ -58,7 +67,7 @@ function transport(graph, helpers, outputFrame) {
     clip: true,
   });
 
-  const beatOffsetSmoothDuration = {bar: 0, beat: 1};
+  const beatOffsetSmoothDuration = {bar: 0, beat: 2};
   // initialisation with fixed value
   const beatOffsetSmoother = new Scaler({
     inputStart: 0,
@@ -208,17 +217,13 @@ function transport(graph, helpers, outputFrame) {
         const deltaMax = parameters.gestureWindow.bar * timeSignature.count
               + parameters.gestureWindow.beat;
 
-        // remove old gestures but keep the same number as deltaMax
-        // in order to be able to halve tempo
-        for(let g = 0, gesturesKept = beatGestures.length;
-            g < beatGestures.length && gesturesKept > deltaMax;
-            ++g) {
+        // remove old gestures
+        for(let g = 0; g < beatGestures.length; ++g) {
           const gesture = beatGestures[g];
           if(deltaMax < positionsToBeatsDelta(positionWithOffset,
                                               gesture.position,
                                               {timeSignature}) ) {
             beatGestures[g] = undefined;
-            --gesturesKept;
           }
         }
         beatGestures = beatGestures.filter( (gesture) => {
@@ -229,34 +234,43 @@ function transport(graph, helpers, outputFrame) {
       ////////////////// tempo
       if(parameters.gestureControlsTempo
          && beatGesture && beatGesture.trigger) {
+        const {
+          absoluteMin,
+          absoluteMax,
+          relativeMin,
+          relativeMax,
+        } = parameters.tempoLimits;
         let tempos = [];
-        let beatDeltas = [];
-        for(let g = 1; g < beatGestures.length; ++g) {
+        for(let g = beatGestures.length - 1; g > 0; --g) {
           const timeDelta = beatGestures[g].time - beatGestures[g - 1].time;
-          const beatDelta = Math.round(
-            positionsToBeatsDelta(beatGestures[g].position,
-                                  beatGestures[g - 1].position,
-                                  {timeSignature}));
-          if(beatDelta === 1 || beatDelta === 2) {
-            const tempoCurrent = timeDeltaToTempo(timeDelta, beatDelta, {timeSignature});
-            tempos.push(tempoCurrent);
-            beatDeltas.push(beatDelta);
+          const beatDelta
+                = positionsToBeatsDelta(beatGestures[g].position,
+                                        beatGestures[g - 1].position,
+                                        {timeSignature});
+          if(beatDelta > 0.5 && beatDelta < 2.5) {
+            const tempoFromGesture = timeDeltaToTempo(timeDelta,
+                                                  Math.round(beatDelta),
+                                                  {timeSignature});
+            if(tempoFromGesture > absoluteMin
+               && tempoFromGesture < absoluteMax
+               && tempoFromGesture > relativeMin * tempo
+               && tempoFromGesture < relativeMax * tempo) {
+              tempos.push(tempoFromGesture);
+            }
           }
         }
 
         if(tempos.length > 0) {
           // use median(tempos) to avoid outliers, instead of mean
-          // use median(beatDeltas) for integer result to halve tempo
-          const tempoNew = median(tempos) / median(beatDeltas);
-
+          const tempoNew = median(tempos);
           tempoSmoother.set({
             inputStart: now,
             inputEnd: now + positionDeltaToSeconds(tempoSmoothDuration, {
               tempo: tempoNew,
-              timeSignature,
+              timeSignature
             }),
             outputStart: tempo,
-            outputEnd: tempoNew,
+            outputEnd: tempoNew
           });
           // now, tempo is still old tempo
         }
@@ -270,8 +284,17 @@ function transport(graph, helpers, outputFrame) {
         let offsets = [];
         let offsetWeights = [];
 
-        for(let g = 0; g < beatGestures.length; ++g) {
+        for(let g = beatGestures.length - 1; g >= 0; --g) {
           const beatGesturePosition = beatGestures[g].position;
+          const beatDelta = positionsToBeatsDelta(positionWithOffset,
+                                                  beatGestures[g].position,
+                                                  {timeSignature});
+          // consider only one bar from now,
+          // plus and one beat for the fluctuations
+          if(beatDelta > timeSignature.count + 1) {
+            break;
+          }
+
           const beatGesturePositionRounded
                 = positionRoundBeats(beatGesturePosition, {timeSignature});
           const offset = positionsToBeatsDelta(beatGesturePosition,

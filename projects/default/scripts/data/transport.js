@@ -241,6 +241,7 @@ function transport(graph, helpers, outputFrame) {
           relativeMax,
         } = parameters.tempoLimits;
         let tempos = [];
+        let beatDeltas = [];
         for(let g = beatGestures.length - 1; g > 0; --g) {
           const timeDelta = beatGestures[g].time - beatGestures[g - 1].time;
           const beatDelta
@@ -248,23 +249,30 @@ function transport(graph, helpers, outputFrame) {
                                         beatGestures[g - 1].position,
                                         {timeSignature});
           if(beatDelta > 0.5 && beatDelta < 2.5) {
+            const beatDeltaRounded = Math.round(beatDelta);
             const tempoFromGesture = timeDeltaToTempo(timeDelta,
-                                                  Math.round(beatDelta),
+                                                  beatDeltaRounded,
                                                   {timeSignature});
             if(tempoFromGesture > absoluteMin
                && tempoFromGesture < absoluteMax
                && tempoFromGesture > relativeMin * tempo
                && tempoFromGesture < relativeMax * tempo) {
               tempos.push(tempoFromGesture);
+              beatDeltas.push(beatDeltaRounded);
             }
           }
         }
 
         // first period may be wrong, specially when starting the last beat of a bar
-        // use at least 3 samples to remove outliers
-        if(tempos.length >= 3) {
-          // use median(tempos) to avoid outliers, instead of mean
-          const tempoNew = median(tempos);
+        // use at least 2 samples to smooth variations
+        // warning: with 2 samples, mean of 2 intermediate values is used
+        if(tempos.length >= 2) {
+          // - use median(tempos) to avoid outliers, instead of mean
+          // - use median(beatDeltas) to halve tempo
+          //   (with transition with mean on middle values)
+
+          const tempoNew = median(tempos) / median(beatDeltas);
+
           tempoSmoother.set({
             inputStart: now,
             inputEnd: now + positionDeltaToSeconds(tempoSmoothDuration, {

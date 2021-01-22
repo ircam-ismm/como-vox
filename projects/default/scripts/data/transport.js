@@ -40,8 +40,8 @@ function transport(graph, helpers, outputFrame) {
     tempoLimits: {
       absoluteMin: 40,
       absoluteMax: 200,
-      relativeMin: 0.5,
-      relativeMax: 2,
+      relativeMin: 0,
+      relativeMax: 10,
     }
   };
 

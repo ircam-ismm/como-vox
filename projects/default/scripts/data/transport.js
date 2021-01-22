@@ -40,8 +40,8 @@ function transport(graph, helpers, outputFrame) {
     tempoLimits: {
       absoluteMin: 40,
       absoluteMax: 200,
-      relativeMin: 0,
-      relativeMax: 10,
+      relativeMin: 0, // no relative min
+      relativeMax: 10, //  no relative max
     }
   };
 
@@ -260,7 +260,9 @@ function transport(graph, helpers, outputFrame) {
           }
         }
 
-        if(tempos.length > 0) {
+        // first period may be wrong, specially when starting the last beat of a bar
+        // use at least 3 samples to remove outliers
+        if(tempos.length >= 3) {
           // use median(tempos) to avoid outliers, instead of mean
           const tempoNew = median(tempos);
           tempoSmoother.set({

@@ -27,6 +27,8 @@
 # 2) Edit BUILD_DIR, SOUNDFONT, and INSTRUMENTS as required.
 # 3) Run without any argument.
 
+raise "Needs ruby version 2.4 or above" unless RUBY_VERSION.to_f >= 2.4
+
 require 'base64'
 require 'fileutils'
 require 'midilib'

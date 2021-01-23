@@ -8,6 +8,7 @@ const epsilon = 1e-3;
 import {
   beatsToSeconds,
   secondsToBeats,
+  positionDeltaToSeconds,
   positionsToBeatsDelta,
   positionsToSecondsDelta,
   positionAddBeats,
@@ -91,6 +92,14 @@ describe(`Check positionsToBeatsDelta conversion helper`, () => {
      {bar:1, beat: 1},
      1],
     [{timeSignature: {count: 4} },
+     {bar:0, beat: 1},
+     {bar:0, beat: 0},
+     1],
+    [{timeSignature: {count: 4} },
+     {bar:1, beat: 0},
+     {bar:0, beat: 0},
+     4],
+    [{timeSignature: {count: 4} },
      {bar:1, beat: 1},
      {bar:1, beat: 2},
      -1],
@@ -162,6 +171,14 @@ describe(`Check positionsToSecondsDelta conversion helper`, () => {
      {bar:1, beat: 2},
      {bar:1, beat: 1},
      1],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60 },
+     {bar:0, beat: 1},
+     {bar:0, beat: 0},
+     1],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60 },
+     {bar:1, beat: 0},
+     {bar:0, beat: 0},
+     4],
     [{timeSignature: {count: 4, division: 4}, tempo: 120 },
      {bar:1, beat: 2},
      {bar:1, beat: 1},
@@ -198,6 +215,43 @@ describe(`Check positionsToSecondsDelta conversion helper`, () => {
                    values[3],
                    `values ${
 JSON.stringify({...values[0], position: values[1], reference: values[2]})
+    }`);
+    });
+
+  });
+
+});
+
+
+describe(`Check positionDeltaToSeconds conversion helper`, () => {
+
+  const testValues = [
+    [{timeSignature: {count: 4, division: 4}, tempo: 60 },
+     {bar:0, beat: 0},
+     0],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60 },
+     {bar:1, beat: 2},
+     6],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60 },
+     {bar:0, beat: 1},
+     1],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60 },
+     {bar:1, beat: 0},
+     4],
+    [{timeSignature: {count: 4, division: 4}, tempo: 120 },
+     {bar:1, beat: 2},
+     3],
+    [{timeSignature: {count: 4, division: 4}, tempo: 120 },
+     {bar:-1, beat: 0},
+     -2],
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      assert.equal(positionDeltaToSeconds(values[1], values[0]),
+                   values[2],
+                   `values ${
+JSON.stringify({...values[0], positionDelta: values[1]})
     }`);
     });
 

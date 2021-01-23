@@ -88,6 +88,17 @@ export function secondsToBeats(seconds = 1, {
 }
 Object.assign(e, {secondsToBeats});
 
+export function positionDeltaToSeconds(position, {
+  timeSignature = timeSignatureDefault,
+  tempo = tempoDefault,
+} = {}) {
+  return positionsToSecondsDelta(position, {bar: 0, beat: 0}, {
+    timeSignature,
+    tempo,
+  });
+}
+Object.assign(e, {positionDeltaToSeconds});
+
 export function positionsToBeatsDelta(position, reference = positionDefault, {
   timeSignature = timeSignatureDefault,
 } = {}) {

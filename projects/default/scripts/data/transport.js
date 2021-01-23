@@ -4,6 +4,7 @@ function transport(graph, helpers, outputFrame) {
   const conversion = app.imports.helpers.conversion;
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;
+  const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
   const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
   const positionRoundBeats = conversion.positionRoundBeats;
   const timeDeltaToTempo = conversion.timeDeltaToTempo;
@@ -12,60 +13,120 @@ function transport(graph, helpers, outputFrame) {
   const modulo = math.modulo;
   const median = math.median;
   const mean = math.mean;
+  const weightedMean = math.weightedMean;
 
   const time = app.imports.helpers.time;
   const getTime = time.getTime;
 
+  const Scaler = app.imports.helpers.Scaler;
+
+  const tempoDefault = 80;
+  const timeSignatureDefault = {
+    count: 4,
+    division: 4,
+  };
+
   const parameters = {
-    tempo: 60,
-    timeSignature: {
-      count: 4,
-      division: 4,
-    },
-
+    timeSignature: timeSignatureDefault,
     playback: true,
-
-    gestureControlsBeat: false,
-
-    // in beats, around current beat
-    // @TODO: for tempo also?
-    beatGestureWindow: {
-      min: -0.5,
-      max: 0.5,
-    },
-
+    gestureControlsBeatOffset: false,
     gestureControlsTempo: false,
-
-    tempoGestureWindow: {
+    // 1 bar + 1 beat to get 4 periods for tempo
+    // + 1 bar for the gestures fluctuations
+    gestureWindow: {
       bar: 1,
-      beat: 0,
+      beat: 1,
     },
+    tempoLimits: {
+      absoluteMin: 40,
+      absoluteMax: 200,
+      relativeMin: 0, // no relative min
+      relativeMax: 10, //  no relative max
+    }
   };
 
   let positionLast = {
     bar: 1,
     beat: 1,
   };
+  let positionWithOffsetLast = positionLast;
   let positionLastTime = 0; // in seconds
 
-  let positionRequest = {
-    bar: 1,
-    beat: 1,
-  };
-  let positionRequestTime = 0;
+  // for tempo and beat offset
+  let beatGestures = [];
 
-  let tempoGestures = [];
+  // do we need tempo smoother?
+  const tempoSmoothDuration = {bar: 0, beat: 0};
+  // initialisation with fixed value
+  const tempoSmoother = new Scaler({
+    inputStart: 0,
+    inputEnd: 0,
+    outputStart: tempoDefault,
+    outputEnd: tempoDefault,
+    type: 'linear',
+    clip: true,
+  });
+
+  const beatOffsetSmoothDuration = {bar: 0, beat: 2};
+  // initialisation with fixed value
+  const beatOffsetSmoother = new Scaler({
+    inputStart: 0,
+    inputEnd: 0,
+    outputStart: 0,
+    outputEnd: 0,
+    type: 'linear',
+    clip: true,
+  });
+
+  // half a beat before and half a beat after
+  const beatOffsetRange = 1;
+  const beatOffsetRangeInverse = 1 / beatOffsetRange;
+
+  // triangle window    :
+  //                    X  1
+  //                   /:\
+  //                  / : \
+  //                 /  :  \
+  //                /   :   \
+  //               /    :    \
+  //   -----------X···········X------------>
+  //         -range/2   :   range/2
+  //
+  const beatOffsetGestureWeigthGet = (offset) => {
+    // // too few correction with this window
+    // return 1;
+
+    const offsetBounded = Math.max(Math.min(offset,
+                                           beatOffsetRange * 0.5),
+                                   -beatOffsetRange * 0.5);
+    return 1 - Math.abs(offsetBounded) * 2 * beatOffsetRangeInverse;
+  }
 
   const seekPosition = (position) => {
     positionLast = position;
-    positionRequest = position;
+    positionWithOffsetLast = position;
     positionLastTime = 0;
-    tempoGestures.length = 0;
-  };
+
+    beatGestures.length = 0;
+    tempoSmoother.set({
+      inputStart: 0,
+      inputEnd: 0,
+      // end now
+      outputStart: tempoSmoother.outputEnd,
+    });
+
+    beatOffsetSmoother.set({
+      inputStart: 0,
+      inputEnd: 0,
+      outputStart: 0,
+      outputEnd: 0,
+    });
+
+  }
 
   const setTimeSignature = (timeSignature) => {
     parameters.timeSignature = timeSignature;
-    tempoGestures.length = 0;
+    beatGestures.length = 0;
   }
 
   return {
@@ -78,7 +139,23 @@ function transport(graph, helpers, outputFrame) {
         setTimeSignature(updates.timeSignature);
       }
 
-      Object.assign(parameters, updates);
+      if(typeof updates.tempo !== 'undefined') {
+        // immediately set fixed value
+        tempoSmoother.set({
+          inputStart: 0,
+          inputEnd: 0,
+          outputStart: updates.tempo,
+          outputEnd: updates.tempo,
+        });
+
+      }
+
+      for(const p of Object.keys(updates) ) {
+        if(parameters.hasOwnProperty(p) ) {
+          parameters[p] = updates[p];
+        }
+      }
+
     },
 
     process(inputFrame, outputFrame) {
@@ -87,20 +164,21 @@ function transport(graph, helpers, outputFrame) {
       // use logical time tag from frame
       const now = inputData['time'];
 
-      let tempo = parameters.tempo;
+      const tempo = tempoSmoother.process(now);
+      const beatOffset = beatOffsetSmoother.process(now);
+
       const timeSignature = parameters.timeSignature;
 
       // do not alias playback as it may change
-
-      const beatGestureWindow = parameters.beatGestureWindow;
 
       outputData['timeSignature'] = timeSignature;
       outputData['playback'] = parameters.playback;
 
       // start
       if(!parameters.playback || positionLastTime === 0) {
-        outputData['tempo'] = parameters.tempo;
+        outputData['tempo'] = tempo;
         outputData['position'] = positionLast;
+
         positionLastTime = now;
         return outputFrame;
       }
@@ -109,109 +187,154 @@ function transport(graph, helpers, outputFrame) {
       const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
 
       let position = positionAddBeats(positionLast, beatDelta, {timeSignature});
+      let positionWithOffset = positionAddBeats(position, beatOffset, {timeSignature});
+
+      if(positionsToBeatsDelta(positionWithOffset,
+                               positionWithOffsetLast,
+                               {timeSignature}) < 0) {
+        // do not go back in time, to ensure monotonic output
+        positionWithOffset = positionWithOffsetLast;
+      }
 
       const beatGesture = inputData['beat'];
-      const beatGestureDeltaFromNow = secondsToBeats(beatGesture.time - now, {
-        timeSignature,
-        tempo,
-      });
-      const beatGesturePosition = positionAddBeats(position, beatGestureDeltaFromNow,
-                                                   {timeSignature});
-
-      // tempo
-      if(parameters.gestureControlsTempo && beatGesture && beatGesture.trigger) {
-        tempoGestures.push({
+      ////////////// beat gestures for tempo and beat offset
+      if( (parameters.gestureControlsTempo || parameters.gestureControlsBeatOffset)
+          && beatGesture && beatGesture.trigger) {
+        const beatGestureDeltaFromNow = secondsToBeats(beatGesture.time - now, {
+          timeSignature,
+          tempo,
+        });
+        const beatGesturePosition = positionAddBeats(positionWithOffset,
+                                                     beatGestureDeltaFromNow,
+                                                     {timeSignature});
+        beatGestures.push({
           time: beatGesture.time,
           position: beatGesturePosition
         });
 
         // maximum number of beats from now
         // and minimum number of tempo gestures
-        const deltaMax = parameters.tempoGestureWindow.bar * timeSignature.count
-              + parameters.tempoGestureWindow.beat;
+        const deltaMax = parameters.gestureWindow.bar * timeSignature.count
+              + parameters.gestureWindow.beat;
 
-        // remove old gestures but keep the same number as deltaMax
-        // in order to be able to halve tempo
-        for(let g = 0, gesturesKept = tempoGestures.length;
-            g < tempoGestures.length && gesturesKept > deltaMax;
-            ++g) {
-          const gesture = tempoGestures[g];
-          if(deltaMax < positionsToBeatsDelta(position, gesture.position, {timeSignature}) ) {
-            tempoGestures[g] = undefined;
-            --gesturesKept;
+        // remove old gestures
+        for(let g = 0; g < beatGestures.length; ++g) {
+          const gesture = beatGestures[g];
+          if(deltaMax < positionsToBeatsDelta(positionWithOffset,
+                                              gesture.position,
+                                              {timeSignature}) ) {
+            beatGestures[g] = undefined;
           }
         }
-        tempoGestures = tempoGestures.filter( (gesture) => {
+        beatGestures = beatGestures.filter( (gesture) => {
           return typeof gesture !== 'undefined';
         });
+      }
 
+      ////////////////// tempo
+      if(parameters.gestureControlsTempo
+         && beatGesture && beatGesture.trigger) {
+        const {
+          absoluteMin,
+          absoluteMax,
+          relativeMin,
+          relativeMax,
+        } = parameters.tempoLimits;
         let tempos = [];
         let beatDeltas = [];
-        for(let g = 1; g < tempoGestures.length; ++g) {
-          const timeDelta = tempoGestures[g].time - tempoGestures[g - 1].time;
-          const beatDelta = Math.round(
-            positionsToBeatsDelta(tempoGestures[g].position,
-                                  tempoGestures[g - 1].position,
-                                  {timeSignature}));
-          if(beatDelta === 1 || beatDelta === 2) {
-            const tempoCurrent = timeDeltaToTempo(timeDelta, beatDelta, {timeSignature});
-            tempos.push(tempoCurrent);
-            beatDeltas.push(beatDelta);
+        for(let g = beatGestures.length - 1; g > 0; --g) {
+          const timeDelta = beatGestures[g].time - beatGestures[g - 1].time;
+          const beatDelta
+                = positionsToBeatsDelta(beatGestures[g].position,
+                                        beatGestures[g - 1].position,
+                                        {timeSignature});
+          if(beatDelta > 0.5 && beatDelta < 2.5) {
+            const beatDeltaRounded = Math.round(beatDelta);
+            const tempoFromGesture = timeDeltaToTempo(timeDelta,
+                                                  beatDeltaRounded,
+                                                  {timeSignature});
+            if(tempoFromGesture > absoluteMin
+               && tempoFromGesture < absoluteMax
+               && tempoFromGesture > relativeMin * tempo
+               && tempoFromGesture < relativeMax * tempo) {
+              tempos.push(tempoFromGesture);
+              beatDeltas.push(beatDeltaRounded);
+            }
           }
         }
 
-        if(tempos.length > 0) {
-          // use median(tempos) to smooth variations
-          // use median(beatDeltas) for integer result to halve tempo
-          tempo = median(tempos) / median(beatDeltas);
+        // first period may be wrong, specially when starting the last beat of a bar
+        // use at least 2 samples to smooth variations
+        // warning: with 2 samples, mean of 2 intermediate values is used
+        if(tempos.length >= 2) {
+          // - use median(tempos) to avoid outliers, instead of mean
+          // - use median(beatDeltas) to halve tempo
+          //   (with transition with mean on middle values)
+
+          const tempoNew = median(tempos) / median(beatDeltas);
+
+          tempoSmoother.set({
+            inputStart: now,
+            inputEnd: now + positionDeltaToSeconds(tempoSmoothDuration, {
+              tempo: tempoNew,
+              timeSignature
+            }),
+            outputStart: tempo,
+            outputEnd: tempoNew
+          });
+          // now, tempo is still old tempo
         }
 
       }
 
-      // beat position
-      if(parameters.gestureControlsBeat
+      ///////////////////// beat offset
+      if(parameters.gestureControlsBeatOffset
          && beatGesture && beatGesture.trigger) {
-        // first, get position with look-behind
-        const beatGesturePositionRounded = positionRoundBeats(beatGesturePosition,
-                                                              {timeSignature});
-        const beatGestureDeltaFromRounded = positionsToBeatsDelta(beatGesturePosition,
-                                                                  beatGesturePositionRounded,
-                                                                  {timeSignature});
-        if(beatGestureDeltaFromRounded >= beatGestureWindow.min
-           && beatGestureDeltaFromRounded <= beatGestureWindow.max) {
-          positionRequest = beatGesturePositionRounded;
-          const positionRequestDelta = positionsToBeatsDelta(positionRequest,
-                                                             position, {timeSignature});
-          if(positionRequestDelta < 0) {
-            // backward
-            // use positionRequest for monotonic output until current position is
-            // reached again
-            // @TODO: smooth
-            [position, positionRequest] = [positionRequest, position];
-          } else {
-            // forward
-            // @TODO: smooth
-            position = positionRequest;
+
+        let offsets = [];
+        let offsetWeights = [];
+
+        for(let g = beatGestures.length - 1; g >= 0; --g) {
+          const beatGesturePosition = beatGestures[g].position;
+          const beatDelta = positionsToBeatsDelta(positionWithOffset,
+                                                  beatGestures[g].position,
+                                                  {timeSignature});
+          // consider only one bar from now,
+          // plus and one beat for the fluctuations
+          if(beatDelta > timeSignature.count + 1) {
+            break;
           }
 
-          positionRequestTime = now;
-        } // beat in window
-      } // beatGesture
+          const beatGesturePositionRounded
+                = positionRoundBeats(beatGesturePosition, {timeSignature});
+          const offset = positionsToBeatsDelta(beatGesturePosition,
+                                               beatGesturePositionRounded,
+                                               {timeSignature});
 
-      // max(positionRequest, position) to ensure monotonic output
-      const positionRequestDelta = positionsToBeatsDelta(positionRequest,
-                                                         position, {timeSignature});
-      if(positionRequestDelta > 0) {
-        // wait
-        outputData['position'] = positionRequest;
-      } else {
-        outputData['position'] = position;
+          offsets.push(offset);
+          const offsetWeight = beatOffsetGestureWeigthGet(offset);
+          offsetWeights.push(offsetWeight);
+        }
+
+        if(offsets.length > 0) {
+          const beatOffsetNew = weightedMean(offsets, offsetWeights);
+          beatOffsetSmoother.set({
+            inputStart: now,
+            inputEnd: now + positionDeltaToSeconds(beatOffsetSmoothDuration, {
+              tempo,
+              timeSignature,
+            }),
+            outputStart: beatOffset,
+            outputEnd: beatOffsetNew,
+          });
+        }
       }
 
       outputData['tempo'] = tempo;
-      parameters.tempo = tempo;
 
+      outputData['position'] = positionWithOffset;
       positionLast = position;
+      positionWithOffsetLast = positionWithOffset;
       positionLastTime = now;
 
       return outputFrame;

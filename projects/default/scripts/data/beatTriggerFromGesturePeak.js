@@ -5,7 +5,7 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
   const positionAddBeats = conversion.positionAddBeats;
 
   const medianOrder = 5; //5
-  const medianThreshold =  0.003; //0.003
+  const medianThreshold =  0.002; //0.003
   const timeIntervalThreshold = 0.2; //  0.2 in seconds
   const movingMedian = new helpers.algo.MovingMedian(medianOrder);
 

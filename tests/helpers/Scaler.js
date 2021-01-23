@@ -12,34 +12,123 @@ describe(`Check Scaler object`, () => {
   const testSetups = [
     // linear
     [
-      // forward
       {
-        inputMin: 5,
-        inputMax: 47,
-        outputMin: -12,
-        outputMax: 3,
+        inputStart: 5,
+        inputEnd: 47,
+        outputStart: -12,
+        outputEnd: 3,
         base: 1,
         clip: true,
       },
-      [ // input, scaled, inversed
+      [ // input, scaled, inverse
         [5, -12, 5],
         [47, 3, 47],
         [33, -2, 33],
         // clip, then inverse
         [-12, -12, 5],
-        [55, 3, 47]
+        [55, 3, 47],
+      ],
+    ],
+    // start > end
+    [
+      {
+        inputStart: 47,
+        inputEnd: 5,
+        outputStart: 3,
+        outputEnd: -12,
+        base: 1,
+        clip: true,
+      },
+      [ // input, scaled, inverse
+        [5, -12, 5],
+        [47, 3, 47],
+        [33, -2, 33],
+        // clip, then inverse
+        [-12, -12, 5],
+        [55, 3, 47],
+      ],
+    ],
+    // no input or output range
+    [
+      // linear
+      {
+        inputStart: 5,
+        inputEnd: 5,
+        outputStart: -5,
+        outputEnd: 0,
+        base: 1,
+        clip: false,
+      },
+      [
+        [5, -5, 5],
+        [2, -5, 5],
+        [12, 0, 5],
+      ],
+    ],
+    [
+      // logarithmic
+      {
+        inputStart: 5,
+        inputEnd: 5,
+        outputStart: -5,
+        outputEnd: -5,
+        base: 2,
+        type: 'logarithmic',
+        clip: false,
+      },
+      [
+        [5, -5, 5],
+        [2, -5, 5],
+        [12, -5, 5],
+      ],
+    ],
+    [
+      // exponential
+      {
+        inputStart: 5,
+        inputEnd: 5,
+        outputStart: -5,
+        outputEnd: -5,
+        base: 2,
+        type: 'exponential',
+        clip: false,
+      },
+      [
+        [5, -5, 5],
+        [2, -5, 5],
+        [12, -5, 5],
       ],
     ],
     // MIDI pitch to Hertz
     [
       // forward
       {
-        inputMin:69,
-        inputMax: 81,
-        outputMin: 440,
-        outputMax: 880,
+        inputStart: 69,
+        inputEnd: 81,
+        outputStart: 440,
+        outputEnd: 880,
         type: 'exponential',
         base: 2,
+        clip: false,
+      },
+      [
+        [69, 440, 69],
+        [72, 523.251131, 72],
+        [81, 880, 81],
+        // no clip
+        [57, 220, 57],
+        [93, 1760, 93],
+      ],
+    ],
+    [
+      // start > end
+      {
+        inputStart: 81,
+        inputEnd: 69,
+        outputStart: 880,
+        outputEnd: 440,
+        type: 'exponential',
+        base: 0.5,
         clip: false,
       },
       [
@@ -55,10 +144,10 @@ describe(`Check Scaler object`, () => {
     [
       // forward
       {
-        inputMin: 0,
-        inputMax: 20,
-        outputMin: 1,
-        outputMax: 10,
+        inputStart: 0,
+        inputEnd: 20,
+        outputStart: 1,
+        outputEnd: 10,
         type: 'exponential',
         base: 10,
         clip: false,
@@ -73,15 +162,23 @@ describe(`Check Scaler object`, () => {
   ];
 
   it(`should validate values`, () => {
+    // test for set method
+    const scalerReused = new Scaler();
+
     testSetups.forEach( (setup) => {
       const scalerSetup = setup[0];
+
+      // test for constructor
       const scaler = new Scaler(scalerSetup);
 
+      // test for set method
+      scalerReused.set(scalerSetup);
+
       const scalerInverseSetup = {
-        inputMin: setup[0].outputMin,
-        inputMax: setup[0].outputMax,
-        outputMin: setup[0].inputMin,
-        outputMax: setup[0].inputMax,
+        inputStart: setup[0].outputStart,
+        inputEnd: setup[0].outputEnd,
+        outputStart: setup[0].inputStart,
+        outputEnd: setup[0].inputEnd,
         type: (setup[0].type === 'logarithmic'
                ? 'exponential'
                : 'logarithmic'),
@@ -92,6 +189,12 @@ describe(`Check Scaler object`, () => {
       setup[1].forEach( (testValues) => {
         const transform = scaler.process(testValues[0]);
         assertWithRelativeError(transform, testValues[1], epsilon,
+                                `scaler ${
+JSON.stringify({setup: setup[0], value: testValues[0], expected: testValues[1]})
+      }`);
+
+        const transformReused = scalerReused.process(testValues[0]);
+        assertWithRelativeError(transformReused, testValues[1], epsilon,
                                 `scaler ${
 JSON.stringify({setup: setup[0], value: testValues[0], expected: testValues[1]})
       }`);

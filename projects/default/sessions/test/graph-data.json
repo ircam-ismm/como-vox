@@ -41,9 +41,6 @@
       type: 'ScriptData',
       options: {
         scriptName: 'transport',
-        scriptParams: {
-          gestureControlsBeat: false,
-        },
       },
     },
     {

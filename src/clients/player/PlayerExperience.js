@@ -42,7 +42,7 @@ const transportPlaybackDefault = true;
 const metronomeSoundDefault = false;
 const beatingSoundDefault = false;
 
-const lookAheadBeatsDefault = 0;
+const lookAheadBeatsDefault = 1;
 const sensorsLatencyDefault = 1 / 60; // 60 Hz?
 
 class PlayerExperience extends AbstractExperience {
@@ -87,7 +87,7 @@ class PlayerExperience extends AbstractExperience {
     // @TODO discover and store in localStorage
     this.audioLatency = 0;
 
-    this.gestureControlsBeat = false;
+    this.gestureControlsBeatOffset = false;
     this.gestureControlsTempo = false;
 
     this.metronomeSound = undefined;
@@ -226,12 +226,11 @@ class PlayerExperience extends AbstractExperience {
         this.transportPlayback = frame['playback'];
 
         const score = frame['score'];
-        if(this.tempoFromScore) {
-          if(score && score.tempo) {
-            this.setTempo(score.tempo);
-          }
+        if(this.tempoFromScore && score && score.tempo) {
+          this.setTempo(score.tempo);
         } else {
-          this.setTempo(frame['tempo']);
+          // avoid loop-back
+          this.setTempo(frame['tempo'], {transportUpdate: false});
         }
 
         if(this.timeSignatureFromScore) {
@@ -396,19 +395,22 @@ class PlayerExperience extends AbstractExperience {
 
   }
 
-  setTempo(tempo) {
+  setTempo(tempo, {
+    transportUpdate = true,
+  } = {}) {
     if(!tempo || tempo === this.tempo) {
       return;
     }
     this.tempo = tempo;
 
-    // @TODO: how to propagate to all relevant scripts that are in graph?
-    // (server crashes with non-instantiated scripts)
-    this.setGraphOptions('transport', {
-      scriptParams: {
-        tempo,
-      },
-    });
+    if(transportUpdate) {
+      this.setGraphOptions('transport', {
+        scriptParams: {
+          tempo,
+        },
+      });
+    }
+
     this.updateLookAhead();
   }
 
@@ -447,11 +449,11 @@ class PlayerExperience extends AbstractExperience {
     });
   }
 
-  setGestureControlsBeat(control) {
-    this.gestureControlsBeat = control;
+  setGestureControlsBeatOffset(control) {
+    this.gestureControlsBeatOffset = control;
     this.setGraphOptions('transport', {
       scriptParams: {
-        gestureControlsBeat: this.gestureControlsBeat,
+        gestureControlsBeatOffset: this.gestureControlsBeatOffset,
       },
     });
   }
@@ -504,7 +506,7 @@ class PlayerExperience extends AbstractExperience {
     });
 
     const blocked = new Blocked( (duration) => {
-      console.log(`---------- blocked for ${duration} ms ---------`);
+      console.warn(`---------- blocked for ${duration} ms ---------`);
       audio.playBuffer(noiseBuffer, {
         audioContext: this.audioContext,
         duration: duration * 1e-3,
@@ -542,7 +544,7 @@ class PlayerExperience extends AbstractExperience {
       lookAheadSeconds: this.lookAheadSeconds,
 
       gesture: {
-        controlsBeat: this.gestureControlsBeat,
+        controlsBeatOffset: this.gestureControlsBeatOffset,
         controlsTempo: this.gestureControlsTempo,
       },
 

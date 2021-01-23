@@ -8,7 +8,7 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
   const gain = 1.; // original gain  = 0.07 with acdeleramoeter / 9.81
   const deltaOrder = 5;
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
-  const averageOrder = 2;
+  const averageOrder = 1;
   const movingAverage = new helpers.algo.MovingAverage(averageOrder);
   
   const meanThresholdAdapt =  1 // factor to multiply standar deviation
@@ -16,6 +16,7 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
   const timeIntervalThreshold = 0.2; //  0.2 in seconds
   const meanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
+  const windowMax = 0.3; // in seconds
   const thresoldRotation = 50;
 
   // initatilistion
@@ -29,6 +30,7 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
   let memory = 0; // intensity[time-1] 
   let lastDelta = -1;
   let detection = 0;
+  let onsetTime = 0;
 
   const parameters = {
     sensorsLatency: 1 / 60, // 60 Hz?
@@ -66,7 +68,8 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
       delta = intensityFiltered - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin
 
       // @TODO should compensate latency depending on algorithm
-      const time = now - parameters.sensorsLatency;
+      //const time = now - parameters.sensorsLatency;
+      const time = now - inputData.metas.period * (1 + (deltaOrder + averageOrder)/2)  
 
       const beat = {
         time,
@@ -103,23 +106,27 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
       // }
       //positiveDelta = 0;
       if (now - lastBeatTime > timeIntervalThreshold && intensityRotation > thresoldRotation) {
+        
         if (positiveDelta === 0) {
          if (delta > 0 && lastDelta < 0) {
             positiveDelta = 1;
-
+            onsetTime = time;
             previousIntensity = intensityFiltered; 
             } 
+
         } else {
-          if (intensityFiltered > (previousIntensity)) {
-            previousIntensity = intensityFiltered;
+          if (time - onsetTime < windowMax) {
+            if (intensityFiltered > previousIntensity) {
+              tempMax = intensityFiltered;
+            }
           } else {
-            lastBeatTime = now;
+            lastBeatTime = tempMax;
             beat.trigger = 1;  
-            beat.intensity = intensityFiltered;
+            beat.intensity = tempMax;
             previousIntensity = 0;
             positiveDelta = 0;
-
           }
+
         }
       } 
 

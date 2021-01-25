@@ -4,14 +4,18 @@ function score(graph, helpers, outputFrame) {
   const conversion = app.imports.helpers.conversion;
   const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
   const barBeatToPosition = conversion.barBeatToPosition;
+  const positionAddSeconds = conversion.positionAddSeconds;
 
   let eventsNext = [];
   let positionToSeek = undefined; // undefined to seek to current
+
+  const humaniseJitter = 10e-3; // in seconds
 
   const parameters = {
     playback: true,
     tempo: undefined,
     timeSignature: undefined,
+    humanise: true,
   };
 
   let score = null;
@@ -99,6 +103,7 @@ function score(graph, helpers, outputFrame) {
       const outputData = outputFrame.data;
 
       const timeSignature = inputData['timeSignature'];
+      const tempo = inputData['tempo'];
       const position = inputData['position'];
 
       let resetEvents = (score
@@ -175,7 +180,17 @@ function score(graph, helpers, outputFrame) {
           if(event.type !== 'noteOn' && event.type !== 'noteOff') {
             nonNotes.set(event.type, {...event, ...barBeatToPosition(event)});
           } else {
-            notes.push(barBeatToPosition(event) );
+            const noteEvent = barBeatToPosition(event);
+            if(parameters.humanise) {
+              const positionHumanised
+                    = positionAddSeconds(noteEvent.position,
+                                         Math.random() * humaniseJitter,
+                                         {timeSignature, tempo});
+              noteEvent.position = positionHumanised;
+              noteEvent.bar = positionHumanised.bar;
+              noteEvent.beat = positionHumanised.beat;
+            }
+            notes.push(noteEvent);
           }
 
         }

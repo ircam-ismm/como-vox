@@ -12,6 +12,7 @@ import {
   positionsToBeatsDelta,
   positionsToSecondsDelta,
   positionAddBeats,
+  positionAddSeconds,
   positionRoundBeats,
   timeDeltaToTempo,
 } from '../../../src/server/helpers/conversion.js';
@@ -353,6 +354,113 @@ JSON.stringify({...values[0], position: values[1], beats: values[2]})
                               epsilon,
                               `beat ${
 JSON.stringify({...values[0], position: values[1], beats: values[2]})
+    }`);
+    });
+
+  });
+});
+
+describe(`Check positionsAddSeconds conversion helper`, () => {
+
+  const testValues = [
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:1, beat: 1},
+     1,
+     {bar: 1, beat: 2}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 120},
+     {bar:1, beat: 1},
+     1,
+     {bar: 1, beat: 3}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:1, beat: 4.99},
+     0.01,
+     {bar: 2, beat: 1}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:1, beat: 4},
+     1,
+     {bar: 2, beat: 1}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:1, beat: 4},
+     1.2,
+     {bar: 2, beat: 1.2}],
+    [{timeSignature: {count: 3, division: 4}, tempo: 60},
+     {bar:5, beat: 2},
+     3,
+     {bar: 6, beat: 2}],
+    [{timeSignature: {count: 3, division: 4}, tempo: 30},
+     {bar:5, beat: 2},
+     3,
+     {bar: 5, beat: 3.5}],
+    [{timeSignature: {count: 3, division: 4} },
+     {bar:5, beat: 2},
+     0,
+     {bar: 5, beat: 2}],
+    // negative values
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:5, beat: 2},
+     -3,
+     {bar: 4, beat: 3}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:-5, beat: 2},
+     -3,
+     {bar: -6, beat: 3}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:-1, beat: 2},
+     8,
+     {bar: 1, beat: 2}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:5, beat: 2},
+     -3.5,
+     {bar: 4, beat: 2.5}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:2, beat: 1},
+     -8,
+     {bar: 0, beat: 1}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:2, beat: 1},
+     -16,
+     {bar: -2, beat: 1}],
+    // keep bar 0 for computation (and may offset display by -1)
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:-1, beat: 4},
+     1,
+     {bar: 0, beat: 1}],
+    [{timeSignature: {count: 4, division: 4}, tempo: 60},
+     {bar:1, beat: 1},
+     -1,
+     {bar: 0, beat: 4}],
+     // conform bar and beat
+     [{timeSignature: {count: 4, division: 4}, tempo: 60},
+      {bar:2, beat: 0},
+      0,
+      {bar: 1, beat: 4}],
+     [{timeSignature: {count: 4, division: 4}, tempo: 80},
+      {bar:2, beat: 5},
+      0,
+      {bar: 3, beat: 1}],
+     [{timeSignature: {count: 4, division: 4}, tempo: 100},
+      {bar:1, beat: 0},
+      0,
+      {bar: 0, beat: 4}],
+     [{timeSignature: {count: 4, division: 4}, tempo: 50},
+      {bar:0, beat: 0},
+      0,
+      {bar: -1, beat: 4}],
+    ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const position = positionAddSeconds(values[1], values[2], values[0]);
+      assert.equal(position.bar,
+                   values[3].bar,
+                   `bar ${
+JSON.stringify({...values[0], position: values[1], seconds: values[2]})
+    }`);
+      assertWithRelativeError(position.beat,
+                              values[3].beat,
+                              epsilon,
+                              `beat ${
+JSON.stringify({...values[0], position: values[1], seconds: values[2]})
     }`);
     });
 

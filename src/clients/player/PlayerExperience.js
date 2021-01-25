@@ -112,7 +112,7 @@ class PlayerExperience extends AbstractExperience {
     const player = await this.como.project.createPlayer(this.como.client.id);
     this.voxPlayerState = await this.client.stateManager.create('vox-player');
 
-    this.voxPlayerState.subscribe(updates => {
+    this.voxPlayerState.subscribe(async (updates) => {
       for (let [key, value] of Object.entries(updates)) {
         switch (key) {
           case 'record': {
@@ -137,9 +137,9 @@ class PlayerExperience extends AbstractExperience {
                 + scoreURIbase;
             }
             try {
-              this.setScore(scoreURI)
+              await this.setScore(scoreURI)
             } catch (error) {
-              console.error(error.message);
+              console.error('Error while loading score: ' + error.message);
             }
             break;
           }
@@ -281,6 +281,14 @@ class PlayerExperience extends AbstractExperience {
     }
 
     const promise = new Promise( (resolve, reject) => {
+      this.score = null;
+      this.scoreReady = false;
+      this.coMoPlayer.player.setGraphOptions('score', {
+        scriptParams: {
+          score: this.score,
+        },
+      });
+
       const request = new window.XMLHttpRequest();
       request.open('GET', scoreURI, true);
       request.responseType = 'arraybuffer'; // binary data
@@ -297,17 +305,10 @@ class PlayerExperience extends AbstractExperience {
         }
 
         try {
-          this.score = midi.parse(request.response);
-          this.scoreReady = true;
-          this.coMoPlayer.player.setGraphOptions('score', {
-            scriptParams: {
-              score: this.score,
-            },
-          });
-
+          const score = midi.parse(request.response);
           // no duplicates in set
           const notes = new Set();
-          this.score.partSet.forEach( (part, p) => {
+          score.partSet.forEach( (part, p) => {
             part.events.forEach( (event) => {
               if(event.type === 'noteOn') {
                 notes.add(event.data.pitch);
@@ -316,7 +317,13 @@ class PlayerExperience extends AbstractExperience {
           });
 
           await this.pianoSampleManager.update({notes});
-
+          this.score = score;
+          this.scoreReady = true;
+          this.coMoPlayer.player.setGraphOptions('score', {
+            scriptParams: {
+              score: this.score,
+            },
+          });
           resolve(this.score);
         } catch (error) {
           reject(new Error(`Error with midi file ${scoreURI}: `

@@ -62,9 +62,9 @@ export class SampleManager {
           try {
             this.audioContext.decodeAudioData(request.response, (buffer) => {
               this.samples.set(pitch, buffer);
+              this.samplesLoading.delete(pitch);
+              resolve();
             });
-            this.samplesLoading.delete(pitch);
-            resolve();
           } catch (error) {
             this.samplesLoading.delete(pitch);
             reject(new Error(`Error while decoding audio file ${sourceURI}: `

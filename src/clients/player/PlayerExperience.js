@@ -79,7 +79,7 @@ class PlayerExperience extends AbstractExperience {
     // in beats, not taking account of audioLatency
     this.lookAheadBeats = lookAheadBeatsDefault;
     // in seconds, taking audioLatency into account
-    this.lookAheadSeconds = 0;
+    this.lookAheadSeconds = undefined;
 
     this.sensorsLatency = sensorsLatencyDefault;
 

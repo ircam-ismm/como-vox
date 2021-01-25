@@ -30,7 +30,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let memory = 0; // intensity[time-1] 
   let lastDelta = -1;
   let detection = 0;
-  let onsetTime = 0;
+  let timeOnset = 0;
   let timeMax = 0;
   let tempMax = 0;
 
@@ -46,7 +46,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
     process(inputFrame, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
-   
+
       // use logical time tag from frame
       const now = inputData['time'];
 
@@ -64,15 +64,15 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       memory = value;
       let intensity = value * gain;
       let intensityFiltered = movingAverage.process(intensity);
-      
-     
+
+
 
       delta = intensityFiltered - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin
 
       // @TODO should compensate latency depending on algorithm
       //const time = now - parameters.sensorsLatency;
-      const time = now - inputData.metas.period * (1 + (deltaOrder + averageOrder)/2)  
-      
+      const time = now - inputData.metas.period * (1 + (deltaOrder + averageOrder)/2);
+
       const beat = {
         time,
         trigger: 0,
@@ -97,7 +97,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       //     detection = 1;
       //     previousIntensity = intensityFiltered;
       //     //beat.trigger = 1;
-      //   }  
+      //   }
       // } else {
       //   if (intensityFiltered > previousIntensity) {
       //     previousIntensity = intensityFiltered;
@@ -113,17 +113,17 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       // }
       //positiveDelta = 0;
       if (time - lastBeatTime > timeIntervalThreshold && intensityRotation > thresholdRotation) {
-        
+
         if (positiveDelta === 0) {
          if (delta > 0 && lastDelta < 0) {
             positiveDelta = 1;
             timeOnset = time;
             beat.timeOnset = timeOnset;
             tempMax = previousIntensity;
-            } 
+            }
 
         } else {
-          if (time - onsetTime < windowMax) {
+          if (time - timeOnset < windowMax) {
             if (intensityFiltered > tempMax) {
               tempMax = intensityFiltered;
               timeMax = time;
@@ -138,6 +138,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
             lastBeatTime = timeMax;
             tempMax = 0;
             timeMax = 0;
+
+            // console.log('beat', beat, 'offset from now', beat.time - now);
           }
 
         }
@@ -147,7 +149,6 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       //     && now - lastBeatTime > timeIntervalThreshold) {
       //   lastBeatTime = null;
       // }
-      console.log(timeMax);
       [lastMean, lastStd] = movingMeanStd.process(intensityFiltered);
       lastDelta = delta;
       outputData['beat'] = beat;

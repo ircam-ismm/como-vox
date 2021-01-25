@@ -133,6 +133,16 @@ export function positionAddBeats(position, beats, {
 }
 Object.assign(e, {positionAddBeats});
 
+export function positionAddSeconds(position, seconds, {
+  timeSignature = timeSignatureDefault,
+  tempo = tempoDefault,
+} = {}) {
+  const beats = secondsToBeats(seconds, {timeSignature, tempo});
+
+  return  positionAddBeats(position, beats, {timeSignature});
+}
+Object.assign(e, {positionAddSeconds});
+
 export function positionRoundBeats(position, {timeSignature = timeSignatureDefault}) {
   return positionAddBeats(
     {

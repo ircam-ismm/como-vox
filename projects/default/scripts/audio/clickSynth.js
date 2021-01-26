@@ -61,6 +61,15 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
           const noteTime = Math.max(audioContext.currentTime,
                                     currentTime + parameters.lookAheadSeconds + noteOffset);
+          // console.log('note', note,
+          //             'offset', noteOffset,
+          //             'from currentTime', (currentTime
+          //                                  + parameters.lookAheadSeconds
+          //                                  + noteOffset)
+          //             - audioContext.currentTime,
+          //             'noteTime', noteTime,
+          //             'ac.currentTime', audioContext.currentTime);
+          // console.log("parameters.lookAheadSeconds = ", parameters.lookAheadSeconds);
 
           const noteDuration = beatsToSeconds(note.duration, {tempo, timeSignature});
 

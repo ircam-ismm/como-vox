@@ -23,7 +23,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const parameters = {
     lookAheadSeconds: 0,
-    intensityRange: 20, // in dB
+    intensityRange: 30, // in dB
   };
 
   const noteOn = ({

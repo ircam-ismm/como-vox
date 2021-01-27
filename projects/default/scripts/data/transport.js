@@ -67,7 +67,7 @@ function transport(graph, helpers, outputFrame) {
     clip: true,
   });
 
-  const beatOffsetSmoothDuration = {bar: 0, beat: 2};
+  const beatOffsetSmoothDuration = {bar: 1, beat: 0};
   // initialisation with fixed value
   const beatOffsetSmoother = new Scaler({
     inputStart: 0,

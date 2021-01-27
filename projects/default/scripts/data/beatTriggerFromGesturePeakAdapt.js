@@ -6,18 +6,18 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
   const feedbackFactor = 0.8; //for the intensity factor initllay set to 0.7
   const gain = 1.; // original gain  = 0.07 with acdeleramoeter / 9.81
-  const deltaOrder = 10;
+  const deltaOrder = 20;
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
   const averageOrder = 2;
   const movingAverage = new helpers.algo.MovingAverage(averageOrder);
   
-  const meanThresholdAdapt =  1 // factor to multiply standar deviation
-  const meanThresholdMin = 5 // min threshold
+  const meanThresholdAdapt =  1; // factor to multiply standar deviation
+  const meanThresholdMin = 5; // min threshold
   const timeIntervalThreshold = 0.2; //  0.2 in seconds
-  const meanStdOrder = 20;
+  const meanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
-  const windowMax = 0.3; // in seconds
-  const thresholdRotation = 0;
+  const windowMax = 0.2; // in seconds
+  const thresholdRotation = 50;
 
   // initatilistion
   let lastBeatTime = null;
@@ -26,7 +26,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let previousIntensity = 0; //intensity at previous frame
   let positiveDelta = 0; // 1 if intensity > delta
   let delta = 0;
-  let value = 0
+  let value = 0;
   let memory = 0; // intensity[time-1] 
   let lastDelta = -1;
   let detection = 0;
@@ -71,7 +71,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
       // @TODO should compensate latency depending on algorithm
       //const time = now - parameters.sensorsLatency;
-      const time = now - inputData.metas.period * (1 + (deltaOrder + averageOrder)/2);
+      const time = now - inputData.metas.period* (1 + (deltaOrder + averageOrder)/3);
 
       const beat = {
         time,

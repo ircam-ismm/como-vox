@@ -69,9 +69,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
       delta = intensityFiltered - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin
 
-      // @TODO should compensate latency depending on algorithm
-      //const time = now - parameters.sensorsLatency;
-      const time = now - inputData.metas.period* (1 + (deltaOrder + averageOrder)/3);
+      // 1 for the sensors latency
+      const time = now - inputData.metas.period * (1 + (deltaOrder + averageOrder)/3);
 
       const beat = {
         time,

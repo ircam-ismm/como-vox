@@ -56,7 +56,7 @@ function transport(graph, helpers, outputFrame) {
   let beatGestures = [];
 
   // do we need tempo smoother?
-  const tempoSmoothDuration = {bar: 0, beat: 2};
+  const tempoSmoothDuration = {bar: 0, beat: 1};
   // initialisation with fixed value
   const tempoSmoother = new Scaler({
     inputStart: 0,
@@ -67,7 +67,7 @@ function transport(graph, helpers, outputFrame) {
     clip: true,
   });
 
-  const beatOffsetSmoothDuration = {bar: 1, beat: 0};
+  const beatOffsetSmoothDuration = {bar: 0, beat: 2};
   // initialisation with fixed value
   const beatOffsetSmoother = new Scaler({
     inputStart: 0,
@@ -301,6 +301,7 @@ function transport(graph, helpers, outputFrame) {
             break;
           }
 
+          // use position without beat offset to compute new offset
           const beatGesturePosition = positionAddBeats(position,
                                                        beatDeltaFromNow,
                                                        {timeSignature});
@@ -318,9 +319,6 @@ function transport(graph, helpers, outputFrame) {
 
         // First period may be wrong, specially when starting the last beat of
         // a bar: use at least 2 samples to smooth variations.
-        //
-        // Warning: with an even number of samples (2 or 4), median is the mean
-        // of 2 middle values: use the floor to be conservative.
         if(offsets.length >= 2) {
           const beatOffsetNew = weightedMean(offsets, offsetWeights);
           beatOffsetSmoother.set({
@@ -330,8 +328,7 @@ function transport(graph, helpers, outputFrame) {
               timeSignature,
             }),
             outputStart: beatOffset,
-            // new offset is relative to current offset
-            outputEnd: beatOffset + beatOffsetNew,
+            outputEnd: beatOffsetNew,
           });
         }
       }

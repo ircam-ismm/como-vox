@@ -34,13 +34,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let timeMax = 0;
   let tempMax = 0;
 
-  const parameters = {
-    sensorsLatency: 1 / 60, // 60 Hz?
-  };
-
   return {
     updateParams(updates) {
-      Object.assign(parameters, updates);
     },
 
     process(inputFrame, outputFrame) {

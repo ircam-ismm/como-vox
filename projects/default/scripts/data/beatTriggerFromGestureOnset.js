@@ -12,17 +12,22 @@ function beatTriggerFromGestureOnset(graph, helpers, outputFrame) {
   let lastMedian = +Infinity; // prevent kick on first frame
 
   const parameters = {
-    sensorsLatency: 1 / 60, // 60 Hz?
   };
 
   return {
     updateParams(updates) {
-      Object.assign(parameters, updates);
+      for(const p of Object.keys(updates) ) {
+        if(parameters.hasOwnProperty(p) ) {
+          parameters[p] = updates[p];
+        }
+      }
     },
 
     process(inputFrame, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
+
+      const sensorsLatency = inputData.metas.period;
 
       // use logical time tag from frame
       const now = inputData['time'];
@@ -33,7 +38,7 @@ function beatTriggerFromGestureOnset(graph, helpers, outputFrame) {
       const delta = intensity - lastMedian;
 
       // @TODO should compensate latency depending on algorithm
-      const time = now - parameters.sensorsLatency;
+      const time = now - sensorsLatency;
 
       const beat = {
         time,

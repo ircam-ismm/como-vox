@@ -94,7 +94,12 @@ function score(graph, helpers, outputFrame) {
         setPlayback(updates.playback);
       }
 
-      Object.assign(parameters, updates);
+      for(const p of Object.keys(updates) ) {
+        if(parameters.hasOwnProperty(p) ) {
+          parameters[p] = updates[p];
+        }
+      }
+
     },
 
     // called on each sensor frame

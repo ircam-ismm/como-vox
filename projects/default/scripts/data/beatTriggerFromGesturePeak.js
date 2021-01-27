@@ -15,19 +15,15 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
   let previousIntensity = 0; //intensity at previous frame
   let overMedian = 0; // 1 if intensity > delta
 
-
-  const parameters = {
-    sensorsLatency: 1 / 60, // 60 Hz?
-  };
-
   return {
     updateParams(updates) {
-      Object.assign(parameters, updates);
     },
 
     process(inputFrame, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
+
+      const sensorsLatency = inputData.metas.period;
 
       // use logical time tag from frame
       const now = inputData['time'];
@@ -41,7 +37,7 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
       //const delta = intensity;
 
       // @TODO should compensate latency depending on algorithm
-      const time = now - parameters.sensorsLatency;
+      const time = now - sensorsLatency;
 
       const beat = {
         time,

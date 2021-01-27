@@ -13,7 +13,6 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const audioContext = graph.como.audioContext;
 
   const parameters = {
-    lookAheadSeconds: 0,
     intensityRange: 30, // in dB
   };
 
@@ -24,6 +23,8 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
+      const lookAheadSeconds = app.data.lookAheadSeconds;
+
       const inputData = inputFrame.data;
 
       const currentPosition = inputData['position'];
@@ -60,16 +61,16 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           const currentTime = performanceToAudioContextTime(performance.now(), {audioContext});
 
           const noteTime = Math.max(audioContext.currentTime,
-                                    currentTime + parameters.lookAheadSeconds + noteOffset);
+                                    currentTime + lookAheadSeconds + noteOffset);
           // console.log('note', note,
           //             'offset', noteOffset,
           //             'from currentTime', (currentTime
-          //                                  + parameters.lookAheadSeconds
+          //                                  + lookAheadSeconds
           //                                  + noteOffset)
           //             - audioContext.currentTime,
           //             'noteTime', noteTime,
           //             'ac.currentTime', audioContext.currentTime);
-          // console.log("parameters.lookAheadSeconds = ", parameters.lookAheadSeconds);
+          // console.log("lookAheadSeconds = ", lookAheadSeconds);
 
           const noteDuration = beatsToSeconds(note.duration, {tempo, timeSignature});
 

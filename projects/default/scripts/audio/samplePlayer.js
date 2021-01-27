@@ -22,7 +22,6 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const fadeOutDuration = 0.1; // in seconds
 
   const parameters = {
-    lookAheadSeconds: 0,
     intensityRange: 30, // in dB
   };
 
@@ -97,6 +96,8 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     },
 
     process(inputFrame) {
+      const lookAheadSeconds = app.data.lookAheadSeconds;
+
       const inputData = inputFrame.data;
 
       const currentPosition = inputData['position'];
@@ -137,7 +138,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           const currentTime = performanceToAudioContextTime(performance.now(), {audioContext});
 
           const eventTime = Math.max(audioContext.currentTime,
-                                     currentTime + parameters.lookAheadSeconds + eventOffset);
+                                     currentTime + lookAheadSeconds + eventOffset);
 
           switch(event.type) {
             case 'noteOn': {

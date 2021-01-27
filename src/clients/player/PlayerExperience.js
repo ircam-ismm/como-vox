@@ -24,6 +24,12 @@ if(typeof app.instruments === 'undefined') {
   app.instruments = {};
 }
 
+if(typeof app.data === 'undefined') {
+  app.data = {
+    lookAheadSeconds: 0,
+  };
+}
+
 // for simple debugging in browser...
 const MOCK_SENSORS = url.paramGet('mock-sensors');
 console.info('> to mock sensors for debugging purpose, append "?mock-sensors=1" to URL');
@@ -390,14 +396,17 @@ class PlayerExperience extends AbstractExperience {
     }
 
     if(lookAheadSecondsLast !== this.lookAheadSeconds) {
-      ['clickSynth', 'samplePlayer'].forEach( (node) => {
-        this.setGraphOptions(node, {
-          scriptParams: {
-            lookAheadSeconds: this.lookAheadSeconds,
-          },
-        });
-      });
+      // bypass graph option
 
+      // ['clickSynth', 'samplePlayer'].forEach( (node) => {
+      //   this.setGraphOptions(node, {
+      //     scriptParams: {
+      //       lookAheadSeconds: this.lookAheadSeconds,
+      //     },
+      //   });
+      // });
+
+      app.data.lookAheadSeconds = this.lookAheadSeconds;
     }
 
   }

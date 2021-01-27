@@ -8,6 +8,7 @@ import {
   median,
   mean,
   weightedMean,
+  unwrap,
 } from '../../src/server/helpers/math.js';
 
 const epsilon = 1e-7;
@@ -164,6 +165,38 @@ JSON.stringify({values: values[0], weights: values[1], options: values[2]})
       } else {
         assert.equal(result, values[3], message);
       }
+    });
+  });
+
+});
+
+describe(`Check unwrap`, () => {
+
+  const testValues = [
+    [0, 0, {}, 0],
+    [-1, 0, {range: 1}, 0],
+    [-1, 0, {range: 2}, -1],
+    [-1, 1, {range: 1}, 1],
+    [-1, 2, {range: 1}, 2],
+    [-0.9, 0, {range: 1}, 0.1],
+    [0.9, 0, {range: 1}, -0.1],
+    [0.9, 0.5, {range: 1}, 0.9],
+    [-0.49, 0.5, {range: 1}, 0.51],
+    [-0.49, -0.5, {range: 1}, -0.49],
+    [0.49, 0.5, {range: 1}, 0.49],
+    [0.49, -0.5, {range: 1}, -0.51],
+    [0.49, 12, {range: 1}, 12.49],
+    [0.49, -12, {range: 1}, -11.51],
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const result = unwrap(values[0], values[1], values[2]);
+      const message = `unwrap ${
+JSON.stringify({value: values[0], reference: values[1], options: values[2]})
+    }`;
+
+      assertWithRelativeError(result, values[3], epsilon, message);
     });
   });
 

@@ -437,8 +437,8 @@ class PlayerExperience extends AbstractExperience {
   setTimeSignature(timeSignature) {
     // object equal
     if(!timeSignature
-       || (JSON.stringify(this.timeSignature.count)
-           === JSON.stringify(timeSignature.count) ) ) {
+       || (JSON.stringify(this.timeSignature)
+           === JSON.stringify(timeSignature) ) ) {
       return;
     }
 

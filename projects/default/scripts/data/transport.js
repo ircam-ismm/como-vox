@@ -83,19 +83,18 @@ function transport(graph, helpers, outputFrame) {
   const beatOffsetRangeInverse = 1 / beatOffsetRange;
 
   // triangle window    :
-  //                    X  1
+  //                    X 1
   //                   /:\
   //                  / : \
   //                 /  :  \
   //                /   :   \
-  //               /    :    \
+  //               /    : 0  \
   //   -----------X···········X------------>
   //         -range/2   :   range/2
   //
+  // allows to minimise the contribution of out of phase samples,
+  // and to stabilise around 0
   const beatOffsetGestureWeigthGet = (offset) => {
-    // // too few correction of offset with this window
-    // return 1;
-
     const offsetBounded = Math.max(Math.min(offset,
                                            beatOffsetRange * 0.5),
                                    -beatOffsetRange * 0.5);
@@ -301,8 +300,13 @@ function transport(graph, helpers, outputFrame) {
             break;
           }
 
-          // use position without beat offset to compute new offset
-          const beatGesturePosition = positionAddBeats(position,
+          // Compute new beat offset as a relative phase:
+          // - Use position with beat offset, as it is the current reference,
+          //   which is heard.
+          // - It allows to apply a window centred around zero.
+          // The new offset as a relative offset, and must be added to the
+          // current one.
+          const beatGesturePosition = positionAddBeats(positionWithOffset,
                                                        beatDeltaFromNow,
                                                        {timeSignature});
 
@@ -328,7 +332,8 @@ function transport(graph, helpers, outputFrame) {
               timeSignature,
             }),
             outputStart: beatOffset,
-            outputEnd: beatOffsetNew,
+            // new offset is relative
+            outputEnd: beatOffset + beatOffsetNew,
           });
         }
       }

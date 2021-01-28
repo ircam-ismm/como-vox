@@ -276,7 +276,7 @@ class PlayerExperience extends AbstractExperience {
     if(!scoreURI) {
       this.score = null;
       this.scoreReady = true;
-      this.coMoPlayer.player.setGraphOptions('score', {
+      this.setGraphOptions('score', {
         scriptParams: {
           score: this.score,
         },
@@ -289,7 +289,7 @@ class PlayerExperience extends AbstractExperience {
     const promise = new Promise( (resolve, reject) => {
       this.score = null;
       this.scoreReady = false;
-      this.coMoPlayer.player.setGraphOptions('score', {
+      this.setGraphOptions('score', {
         scriptParams: {
           score: this.score,
         },
@@ -325,7 +325,7 @@ class PlayerExperience extends AbstractExperience {
           await this.pianoSampleManager.update({notes});
           this.score = score;
           this.scoreReady = true;
-          this.coMoPlayer.player.setGraphOptions('score', {
+          this.setGraphOptions('score', {
             scriptParams: {
               score: this.score,
             },

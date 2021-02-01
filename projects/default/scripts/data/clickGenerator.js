@@ -55,7 +55,7 @@ function clickGenerator(graph, helpers, outputFrame) {
       }
 
       if(!trigger) {
-        outputData['notes'] = [];
+        outputData['notes'] = notesContainer;
         return outputFrame;
       }
 

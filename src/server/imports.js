@@ -1,4 +1,5 @@
 import audio from './helpers/audio.js';
+import {Clipper} from './helpers/Clipper.js'
 import conversion from './helpers/conversion.js';
 import math from './helpers/math.js';
 import {Scaler} from './helpers/Scaler.js'
@@ -16,6 +17,7 @@ if(typeof window !== 'undefined') {
 app.imports = {
   helpers: {
     audio,
+    Clipper,
     conversion,
     math,
     Scaler,

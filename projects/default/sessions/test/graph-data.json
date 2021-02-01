@@ -78,6 +78,17 @@
       },
     },
     {
+      id: 'to-intensityFromGesture',
+      type: 'Merge',
+    },
+    {
+      id: 'intensityFromGesture',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'intensityFromGesture',
+      },
+    },
+    {
       id: 'clackFromBeat',
       type: 'ScriptData',
       options: {
@@ -174,15 +185,11 @@
     ],
     [
       'clickGenerator',
-      'output',
+      'to-intensityFromGesture',
     ],
     [
       'merge-descriptors-position',
       'score',
-    ],
-    [
-      'score',
-      'output',
     ],
     [
       'beatTriggerFromGesture',
@@ -197,8 +204,30 @@
       'output',
     ],
     [
-      'clackFromBeat',
+      'merge-descriptors-position',
+      'to-intensityFromGesture',
+    ],
+    [
+      'score',
+      'to-intensityFromGesture',
+    ],
+    // do not connect score to output,
+    // as it is filtered by intensity
+    [
+      'beatTriggerFromGesture',
+      'to-intensityFromGesture',
+    ],
+    [
+      'to-intensityFromGesture',
+      'intensityFromGesture',
+    ],
+    [
+      'intensityFromGesture',
       'output',
+    ],
+    [
+      'clackFromBeat',
+      'to-intensityFromGesture',
     ],
     [
       'ml-decoder',

@@ -226,6 +226,13 @@ export function player(data, listeners, {
         ></sc-toggle>
       </div>
 
+      <div class="onoff beating audio">Gesture controls intensity:
+        <sc-toggle
+          .active="${data.gesture.controlsIntensity}"
+          @change="${e => experience.setGestureControlsIntensity(e.detail.value)}"
+        ></sc-toggle>
+      </div>
+
       <div class="onoff metronome audio">Metronome sound:
         <sc-toggle
           .active="${data.metronomeSound.onOff}"

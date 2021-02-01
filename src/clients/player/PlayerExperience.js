@@ -95,6 +95,7 @@ class PlayerExperience extends AbstractExperience {
 
     this.gestureControlsBeatOffset = false;
     this.gestureControlsTempo = false;
+    this.gestureControlsTempintensity = false;
 
     this.metronomeSound = undefined;
     this.beatingSound = undefined;
@@ -483,6 +484,15 @@ class PlayerExperience extends AbstractExperience {
     });
   }
 
+  setGestureControlsIntensity(control) {
+    this.gestureControlsIntensity = control;
+    this.setGraphOptions('intensityFromGesture', {
+      scriptParams: {
+        gestureControlsIntensity: this.gestureControlsIntensity,
+      },
+    });
+  }
+
   setTransportPlayback(playback) {
     this.transportPlayback = playback;
     ['transport', 'score'].forEach( (node) => {
@@ -562,6 +572,7 @@ class PlayerExperience extends AbstractExperience {
       gesture: {
         controlsBeatOffset: this.gestureControlsBeatOffset,
         controlsTempo: this.gestureControlsTempo,
+        controlsIntensity: this.gestureControlsIntensity,
       },
 
       metronomeSound: {onOff: this.metronomeSound},

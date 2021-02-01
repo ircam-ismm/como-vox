@@ -229,22 +229,23 @@ function score(graph, helpers, outputFrame) {
 
       outputData['events'] = eventContainer;
 
-      // flatten all channels
-      const notes = [...(Object.values(eventContainer).flat(1))]
-            // keep only note-ons
-            .filter( (note) => note.type === 'noteOn')
-            .map( (note) => {
-              return {
-                position: note.position,
-                pitch: note.data.pitch + 12,
-                intensity: note.data.intensity,
-                duration: 1,
-              };
-            });
+      // // 'notes' output for debug with clickSynth
+      // // flatten all channels
+      // const notes = [...(Object.values(eventContainer).flat(1))]
+      //       // keep only note-ons
+      //       .filter( (note) => note.type === 'noteOn')
+      //       .map( (note) => {
+      //         return {
+      //           position: note.position,
+      //           pitch: note.data.pitch + 12,
+      //           intensity: note.data.intensity,
+      //           duration: 1,
+      //         };
+      //       });
 
-      outputData['notes'] = {
-        score: notes,
-      };
+      // outputData['notes'] = {
+      //   score: notes,
+      // };
 
       return outputFrame;
     },

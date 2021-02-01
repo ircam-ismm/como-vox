@@ -340,7 +340,35 @@ function transport(graph, helpers, outputFrame) {
 
       outputData['tempo'] = tempo;
 
-      outputData['position'] = positionWithOffset;
+      let barChanged = false;
+      let beatChanged = false;
+
+      const barLast = positionWithOffsetLast.bar;
+      const beatLast = positionWithOffsetLast.beat;
+
+      const bar = positionWithOffset.bar;
+      const beat = positionWithOffset.beat;
+      // always on a beat, to avoid late beats
+      if(beat % 1 > 0.95 || beat % 1 < 0.05) {
+        if(this.positionLastTime === 0) {
+          // start
+          barChanged = true;
+          beatChanged = true;
+        } else {
+          barChanged = bar !== barLast;
+          // on beat change
+          beatChanged = (Math.floor(beat) !== Math.floor(beatLast)
+                         || barChanged); // count to 1
+        }
+      }
+
+      outputData['position'] = {
+        bar: positionWithOffset.bar,
+        beat: positionWithOffset.beat,
+        barChanged,
+        beatChanged,
+      };
+
       positionLast = position;
       positionWithOffsetLast = positionWithOffset;
       positionLastTime = now;

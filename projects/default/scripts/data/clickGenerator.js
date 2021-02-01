@@ -1,7 +1,4 @@
 function clickGenerator(graph, helpers, outputFrame) {
-  let barLast = 0;
-  let beatLast = 0;
-
   const pitchHigh = 91; // G6
   const pitchLow = 86; // D6
 
@@ -36,23 +33,7 @@ function clickGenerator(graph, helpers, outputFrame) {
       const bar = position.bar;
       const beat = position.beat;
 
-      let trigger = false;
-
-      if(parameters.onOff) {
-        // always on a beat, to avoid late beats
-        if(beat % 1 > 0.95 || beat % 1 < 0.05) {
-          if(barLast === 0) {
-            // start
-            barLast = bar;
-            beatLast = beat;
-            trigger = true;
-          } else {
-            // on beat change
-            trigger = (Math.floor(beat) !== Math.floor(beatLast)
-                       || bar !== barLast); // count to 1
-          }
-        }
-      }
+      const trigger = parameters.onOff && position.beatChanged;
 
       if(!trigger) {
         outputData['notes'] = notesContainer;
@@ -77,8 +58,6 @@ function clickGenerator(graph, helpers, outputFrame) {
       });
 
       outputData['notes'] = notesContainer;
-      barLast = bar;
-      beatLast = beat;
       return outputFrame;
     },
 

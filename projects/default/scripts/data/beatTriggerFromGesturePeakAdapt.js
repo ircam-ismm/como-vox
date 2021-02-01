@@ -16,7 +16,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const timeIntervalThreshold = 0.2; //  0.2 in seconds
   const meanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
-  const windowMax = 0.2; // in seconds
+  const windowMax = 0.3; // in seconds
   const thresholdRotation = 50;
 
   // initatilistion
@@ -71,7 +71,6 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         time,
         trigger: 0,
         type: 'peak',
-        intensity: 0,
         // for off-line analysis
 
         timePlot: time,
@@ -83,6 +82,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         intensityFiltered,
         delta,
         mean: lastMean,
+        std: lastStd,
       };
 
       // not working

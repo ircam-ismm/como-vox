@@ -15,9 +15,6 @@ function transport(graph, helpers, outputFrame) {
   const mean = math.mean;
   const weightedMean = math.weightedMean;
 
-  const time = app.imports.helpers.time;
-  const getTime = time.getTime;
-
   const Scaler = app.imports.helpers.Scaler;
 
   const tempoDefault = 80;

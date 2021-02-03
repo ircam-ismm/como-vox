@@ -6,6 +6,8 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
+  const getTime = app.imports.helpers.time.getTime;
+
   const conversion = app.imports.helpers.conversion;
 
   const dBToAmplitude = conversion.dBToAmplitude;
@@ -124,6 +126,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
         const volume = parts[part].volume;
 
         events.forEach( (event) => {
+          // difference from logical now
           let eventOffset = 0;
           if(event.position) {
             const eventPosition = event.position;
@@ -135,10 +138,18 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
             eventOffset = event.time - now;
           }
 
-          const currentTime = performanceToAudioContextTime(performance.now(), {audioContext});
+          // difference from logical time
+          const timeOffset = getTime() - now;
 
-          const eventTime = Math.max(audioContext.currentTime,
-                                     currentTime + lookAheadSeconds + eventOffset);
+          // remove timeOffset from logical time to compensate,
+          // add event offset and lookahead
+          const currentTime = performanceToAudioContextTime(
+            performance.now()
+              + 1e3 * (lookAheadSeconds + eventOffset
+                       - timeOffset),
+            {audioContext});
+
+          const eventTime = Math.max(audioContext.currentTime, currentTime);
 
           switch(event.type) {
             case 'noteOn': {

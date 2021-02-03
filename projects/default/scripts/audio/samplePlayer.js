@@ -8,11 +8,18 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const getTime = app.imports.helpers.time.getTime;
 
+  let nowLast = 0;
+  let currentTimeLast = 0;
+  let timeLast = 0;
+  let eventPositionTimeLast = 0;
+  let eventTimeLast = 0;
+
   const conversion = app.imports.helpers.conversion;
 
   const dBToAmplitude = conversion.dBToAmplitude;
   const midiPichToHertz = conversion.midiPitchToHertz;
   const midiIntensityToAmplitude = conversion.midiIntensityToAmplitude;
+  const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
   const positionsToSecondsDelta = conversion.positionsToSecondsDelta;
   const performanceToAudioContextTime = conversion.performanceToAudioContextTime;
   const beatsToSeconds = conversion.beatsToSeconds;
@@ -162,6 +169,25 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
                 intensity,
                 samplesPlaying,
               });
+
+              const eventPositionTime = positionDeltaToSeconds(event.position, {
+                timeSignature,
+                tempo,
+              });
+
+              // console.log("currentTime = ", currentTime, audioContext.currentTime,
+              //             currentTime - currentTimeLast);
+              // currentTimeLast = currentTime;
+
+              // console.log("timeOffset = ", timeOffset);
+              // console.log("eventOffset = ", eventOffset);
+
+              // console.log('samplePlayer: event.position2time delta = ', eventPositionTime - eventPositionTimeLast);
+              // eventPositionTimeLast = eventPositionTime;
+
+              // console.log('samplePlayer: event.time delta = ', eventTime - eventTimeLast);
+              // eventTimeLast = eventTime;
+
               break;
             }
 

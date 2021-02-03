@@ -19,6 +19,14 @@
       },
     },
     {
+      id: 'compressor',
+      type: 'ScriptAudio',
+      options: {
+        scriptName: 'compressor',
+        bypass: false,
+      },
+    },
+    {
       id: 'audio-destination',
       type: 'AudioDestination',
       options: {
@@ -30,10 +38,14 @@
   connections: [
     [
       'clickSynth',
-      'audio-destination',
+      'compressor',
     ],
     [
       'samplePlayer',
+      'compressor',
+    ],
+    [
+      'compressor',
       'audio-destination',
     ],
   ],

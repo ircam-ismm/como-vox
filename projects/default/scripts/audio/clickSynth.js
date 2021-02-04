@@ -29,7 +29,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
       const currentPosition = inputData['position'];
       // use logical time tag from frame
-      const now = inputData['time'];
+      const now = inputData['time'].audio;
 
       const timeSignature = inputData['timeSignature'];
       const tempo = inputData['tempo'];
@@ -58,10 +58,17 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
             noteOffset = note.time - now;
           }
 
-          const currentTime = performanceToAudioContextTime(performance.now(), {audioContext});
+          // difference from logical time
+          const timeOffset = audioContext.currentTime - now;
 
-          const noteTime = Math.max(audioContext.currentTime,
-                                    currentTime + lookAheadSeconds + noteOffset);
+          // remove timeOffset from logical time to compensate,
+          // add event offset and look-ahead
+          const currentTime = audioContext.currentTime
+                + lookAheadSeconds + noteOffset
+                - timeOffset;
+
+          const noteTime = Math.max(audioContext.currentTime, currentTime);
+
           // console.log('note', note,
           //             'offset', noteOffset,
           //             'from currentTime', (currentTime

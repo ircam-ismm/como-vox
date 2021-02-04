@@ -1,4 +1,6 @@
 function timeTag(graph, helpers, outputFrame) {
+  const audioContext = graph.como.audioContext;
+
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const time = app.imports.helpers.time;
@@ -12,9 +14,13 @@ function timeTag(graph, helpers, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
 
-      const now = getTime();
+      const audio = audioContext.currentTime;
+      const performance = getTime();
 
-      outputData['time'] = now;
+      outputData['time'] = {
+        audio,
+        performance,
+      };
       return outputFrame;
     },
 

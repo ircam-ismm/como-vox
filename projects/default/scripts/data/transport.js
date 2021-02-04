@@ -158,10 +158,12 @@ function transport(graph, helpers, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
       // use logical time tag from frame
+      // - now.audio for eveything related to position
+      // - now.performance for beat from gestures
       const now = inputData['time'];
 
-      const tempo = tempoSmoother.process(now);
-      const beatOffset = beatOffsetSmoother.process(now);
+      const tempo = tempoSmoother.process(now.audio);
+      const beatOffset = beatOffsetSmoother.process(now.audio);
 
       const timeSignature = parameters.timeSignature;
 
@@ -170,16 +172,27 @@ function transport(graph, helpers, outputFrame) {
       outputData['timeSignature'] = timeSignature;
       outputData['playback'] = parameters.playback;
 
-      // start
-      if(!parameters.playback || positionLastTime === 0) {
+      // stop
+      if(!parameters.playback) {
         outputData['tempo'] = tempo;
-        outputData['position'] = positionLast;
+        outputData['position'] = {
+          bar: positionLast.bar,
+          beat: positionLast.beat,
+          barChanged: false,
+          beatChanged: false
+        };
 
-        positionLastTime = now;
+        // pause
+        if(positionLastTime !== 0) {
+          positionLastTime = now.audio;
+        }
+
         return outputFrame;
       }
 
-      const timeDelta = now - positionLastTime;
+      const timeDelta = (positionLastTime !== 0
+                         ? now.audio - positionLastTime
+                         : 0);
       const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
 
       let position = positionAddBeats(positionLast, beatDelta, {timeSignature});
@@ -201,7 +214,7 @@ function transport(graph, helpers, outputFrame) {
           time: beatGesture.time,
         });
 
-        // maximum number of beats from now
+        // maximum number of beats from now (performance time)
         // and minimum number of tempo gestures
         const beatDeltaMax = parameters.gestureWindow.bar * timeSignature.count
               + parameters.gestureWindow.beat;
@@ -209,7 +222,7 @@ function transport(graph, helpers, outputFrame) {
         // remove old gestures
         for(let g = 0; g < beatGestures.length; ++g) {
           const beatGesture = beatGestures[g];
-          const beatDeltaFromNow = secondsToBeats(now - beatGesture.time, {
+          const beatDeltaFromNow = secondsToBeats(now.performance - beatGesture.time, {
             timeSignature,
             tempo,
           });
@@ -263,8 +276,8 @@ function transport(graph, helpers, outputFrame) {
 
           const tempoNew = median(tempos) / Math.floor(median(beatDeltas) );
           tempoSmoother.set({
-            inputStart: now,
-            inputEnd: now + positionDeltaToSeconds(tempoSmoothDuration, {
+            inputStart: now.audio,
+            inputEnd: now.audio + positionDeltaToSeconds(tempoSmoothDuration, {
               tempo: tempoNew,
               timeSignature
             }),
@@ -286,7 +299,7 @@ function transport(graph, helpers, outputFrame) {
         for(let g = beatGestures.length - 1; g >= 0; --g) {
           const beatGesture = beatGestures[g];
 
-          const beatDeltaFromNow = secondsToBeats(now - beatGesture.time, {
+          const beatDeltaFromNow = secondsToBeats(now.performance - beatGesture.time, {
             timeSignature,
             tempo,
           });
@@ -323,8 +336,8 @@ function transport(graph, helpers, outputFrame) {
         if(offsets.length >= 2) {
           const beatOffsetNew = weightedMean(offsets, offsetWeights);
           beatOffsetSmoother.set({
-            inputStart: now,
-            inputEnd: now + positionDeltaToSeconds(beatOffsetSmoothDuration, {
+            inputStart: now.audio,
+            inputEnd: now.audio + positionDeltaToSeconds(beatOffsetSmoothDuration, {
               tempo,
               timeSignature,
             }),
@@ -345,18 +358,15 @@ function transport(graph, helpers, outputFrame) {
 
       const bar = positionWithOffset.bar;
       const beat = positionWithOffset.beat;
-      // always on a beat, to avoid late beats
-      if(beat % 1 > 0.95 || beat % 1 < 0.05) {
-        if(this.positionLastTime === 0) {
-          // start
-          barChanged = true;
-          beatChanged = true;
-        } else {
-          barChanged = bar !== barLast;
-          // on beat change
-          beatChanged = (Math.floor(beat) !== Math.floor(beatLast)
-                         || barChanged); // count to 1
-        }
+      if(positionLastTime === 0) {
+        // start
+        barChanged = true;
+        beatChanged = true;
+      } else {
+        barChanged = bar !== barLast;
+        // on beat change
+        beatChanged = (Math.floor(beat) !== Math.floor(beatLast)
+                       || barChanged); // count to 1
       }
 
       outputData['position'] = {
@@ -368,7 +378,7 @@ function transport(graph, helpers, outputFrame) {
 
       positionLast = position;
       positionWithOffsetLast = positionWithOffset;
-      positionLastTime = now;
+      positionLastTime = now.audio;
 
       return outputFrame;
     },

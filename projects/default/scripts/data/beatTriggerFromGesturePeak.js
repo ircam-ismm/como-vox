@@ -26,7 +26,7 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
       const sensorsLatency = inputData.metas.period;
 
       // use logical time tag from frame
-      const now = inputData['time'];
+      const now = inputData['time'].performance;
 
       const timeSignature = inputData['timeSignature'];
 

@@ -105,6 +105,34 @@ export function secondsToBeats(seconds = 1, {
 }
 Object.assign(e, {secondsToBeats});
 
+export function notesToSeconds(notes = 1, {
+  tempo = tempoDefault,
+} = {}) {
+  return (60 / tempo) * notes * 4;
+}
+Object.assign(e, {notesToSeconds});
+
+export function secondsToNotes(seconds = 1, {
+  tempo = tempoDefault,
+} = {}) {
+  return seconds / (4 * 60 / tempo);
+}
+Object.assign(e, {secondsToNotes});
+
+export function notesToBeats(notes = 1, {
+  timeSignature = timeSignatureDefault,
+} = {}) {
+  return notes * timeSignature.division;
+}
+Object.assign(e, {notesToBeats});
+
+export function beatsToNotes(beats = 1, {
+  timeSignature = timeSignatureDefault,
+} = {}) {
+  return beats / timeSignature.division;
+}
+Object.assign(e, {beatsToNotes});
+
 export function positionDeltaToSeconds(position, {
   timeSignature = timeSignatureDefault,
   tempo = tempoDefault,

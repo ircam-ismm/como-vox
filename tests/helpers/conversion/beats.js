@@ -8,6 +8,10 @@ const epsilon = 1e-3;
 import {
   beatsToSeconds,
   secondsToBeats,
+  notesToSeconds,
+  secondsToNotes,
+  notesToBeats,
+  beatsToNotes,
   positionDeltaToSeconds,
   positionsToBeatsDelta,
   positionsToSecondsDelta,
@@ -76,6 +80,106 @@ describe(`Check beats conversion helpers`, () => {
         secondsToBeats(values[2], values[0]),
         values[1],
         `secondsToBeats values ${JSON.stringify(values[0])}, ${values[2]}`);
+    });
+  });
+
+});
+
+describe(`Check note conversion helpers`, () => {
+
+  // tempo of quarter note
+  const testValues = [
+    [
+      {tempo: 60, timeSignature: {count: 4, division: 4} },
+      1, // whole notes
+      4, // beats
+      4, // seconds
+    ],
+    [
+      {tempo: 120, timeSignature: {count: 4, division: 4} },
+      1, // whole notes
+      4, // beats
+      2, // seconds
+    ],
+    [
+      {tempo: 120, timeSignature: {count: 3, division: 4} },
+      1, // whole notes
+      4, // beats
+      2, // seconds
+    ],
+    [
+      {tempo: 120, timeSignature: {count: 3, division: 8} },
+      1, // whole notes
+      8, // beats
+      2, // seconds
+    ],
+    [
+      {tempo: 120, timeSignature: {count: 3, division: 8} },
+      0, // whole notes
+      0, // beats
+      0, // seconds
+    ],
+    [
+      {tempo: 60, timeSignature: {count: 7, division: 16} },
+      0.5, // whole notes
+      8, // beats
+      2, // seconds
+    ],
+  ];
+
+  it(`should convert to beats and back`, () => {
+    testValues.forEach( (values) => {
+      assert.equal(
+        beatsToNotes(notesToBeats(values[1], values[0]),
+                     values[0]),
+        values[1],
+        `notesToBeats and beatsToNote values: ${JSON.stringify(values[0])}, ${values[1]}` );
+    });
+  });
+
+  it(`should convert from notes to beats`, () => {
+    testValues.forEach( (values) => {
+      assert.equal(
+        notesToBeats(values[1], values[0]),
+        values[2],
+        `notesToBeats values: ${JSON.stringify(values[0])}, ${values[1]}`);
+    });
+  });
+
+  it(`should convert from beats to notes`, () => {
+    testValues.forEach( (values) => {
+      assert.equal(
+        beatsToNotes(values[2], values[0]),
+        values[1],
+        `beatsToNotes values: ${JSON.stringify(values[0])}, ${values[2]}`);
+    });
+  });
+
+  it(`should convert to seconds and back`, () => {
+    testValues.forEach( (values) => {
+      assert.equal(
+        secondsToNotes(notesToSeconds(values[1], values[0]),
+                          values[0]),
+        values[1],
+        `notesToSeconds and secondsToNote values: ${JSON.stringify(values[0])}, ${values[1]}` );
+    });
+  });
+
+  it(`should convert from notes to seconds`, () => {
+    testValues.forEach( (values) => {
+      assert.equal(
+        notesToSeconds(values[1], values[0]),
+        values[3],
+        `notesToSeconds values: ${JSON.stringify(values[0])}, ${values[1]}`);
+    });
+  });
+
+  it(`should convert from seconds to notes`, () => {
+    testValues.forEach( (values) => {
+      assert.equal(
+        secondsToNotes(values[3], values[0]),
+        values[1],
+        `secondsToNotes values: ${JSON.stringify(values[0])}, ${values[3]}`);
     });
   });
 

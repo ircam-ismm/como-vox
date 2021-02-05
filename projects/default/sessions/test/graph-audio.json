@@ -19,6 +19,14 @@
       },
     },
     {
+      id: 'reverberator',
+      type: 'ScriptAudio',
+      options: {
+        scriptName: 'reverberator',
+        bypass: false,
+      },
+    },
+    {
       id: 'compressor',
       type: 'ScriptAudio',
       options: {
@@ -46,6 +54,10 @@
     ],
     [
       'compressor',
+      'reverberator',
+    ],
+    [
+      'reverberator',
       'audio-destination',
     ],
   ],

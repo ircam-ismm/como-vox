@@ -177,6 +177,8 @@ class PlayerExperience extends AbstractExperience {
     // for binding player, sessions, and graph, triggering subscriptions when
     // anything change.
     this.coMoPlayer = new CoMoPlayer(this.como, player);
+    app.player = this.coMoPlayer;
+
     this.coMoPlayer.setSource(source);
 
     this.audioContext = this.como.audioContext;
@@ -214,6 +216,8 @@ class PlayerExperience extends AbstractExperience {
 
     // quick and drity fix...
     this.coMoPlayer.onGraphCreated(async () => {
+      app.graph = this.coMoPlayer.graph;
+
       this.setTransportPlayback(transportPlaybackDefault);
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);

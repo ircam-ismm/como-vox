@@ -117,7 +117,6 @@ function transport(graph, helpers, outputFrame) {
       outputStart: 0,
       outputEnd: 0,
     });
-
   }
 
   const setTimeSignature = (timeSignature) => {
@@ -175,12 +174,15 @@ function transport(graph, helpers, outputFrame) {
       // stop
       if(!parameters.playback) {
         outputData['tempo'] = tempo;
+        app.data.tempo = tempo;
+
         outputData['position'] = {
           bar: positionLast.bar,
           beat: positionLast.beat,
           barChanged: false,
           beatChanged: false
         };
+        app.data.position = position;
 
         // pause
         if(positionLastTime !== 0) {
@@ -349,6 +351,7 @@ function transport(graph, helpers, outputFrame) {
       }
 
       outputData['tempo'] = tempo;
+      app.data.tempo = tempo;
 
       let barChanged = false;
       let beatChanged = false;
@@ -375,6 +378,7 @@ function transport(graph, helpers, outputFrame) {
         barChanged,
         beatChanged,
       };
+      app.data.position = position;
 
       positionLast = position;
       positionWithOffsetLast = positionWithOffset;

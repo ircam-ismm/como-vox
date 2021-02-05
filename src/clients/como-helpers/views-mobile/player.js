@@ -62,19 +62,6 @@ export function player(data, listeners, {
       }
     </div>
 
-    <div class="sensorsLatency">Sensors Latency:
-      <input type="number"
-             min="0"
-             max="100"
-             step="5"
-             .value=${data.sensorsLatency * 1e3}
-             @click="${e => selfSelect(e)}"
-             @change="${e => {
-                   experience.setSensorsLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
-                   } }">
-      ms
-    </div>
-
     <div class="audioLatency">Audio Latency:
       <input type="number"
              min="0"

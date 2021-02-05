@@ -21,6 +21,8 @@ function timeTag(graph, helpers, outputFrame) {
         audio,
         performance,
       };
+      app.data.time = time;
+
       return outputFrame;
     },
 

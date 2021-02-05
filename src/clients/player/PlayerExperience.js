@@ -24,9 +24,26 @@ if(typeof app.instruments === 'undefined') {
   app.instruments = {};
 }
 
+const beatingSoundDefault = false;
+const lookAheadBeatsDefault = 1;
+const metronomeSoundDefault = false;
+const positionDefault = {bar: 1, beat: 1};
+const tempoDefault = 80;
+const timeSignatureDefault = {count: 4, division: 4};
+const transportPlaybackDefault = true;
+
 if(typeof app.data === 'undefined') {
   app.data = {
+    lookAheadBeats: lookAheadBeatsDefault,
     lookAheadSeconds: 0,
+    position: positionDefault,
+    playback: transportPlaybackDefault,
+    tempo: tempoDefault,
+    time: {
+      audio: 0,
+      performance: 0,
+    },
+    timeSignature: timeSignatureDefault,
   };
 }
 
@@ -38,18 +55,6 @@ console.info('> mock-sensors', MOCK_SENSORS);
 const AUDIO_DEBUG = url.paramGet('audio-debug');
 console.info('> to use audio for debugging purpose, append "?debug-audio=1" to URI');
 console.info('> audio-debug', AUDIO_DEBUG);
-
-const tempoDefault = 80;
-const timeSignatureDefault = {count: 4, division: 4};
-const positionDefault = {bar: 1, beat: 1};
-
-const transportPlaybackDefault = true;
-
-const metronomeSoundDefault = false;
-const beatingSoundDefault = false;
-
-const lookAheadBeatsDefault = 1;
-const sensorsLatencyDefault = 1 / 60; // 60 Hz?
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -86,8 +91,6 @@ class PlayerExperience extends AbstractExperience {
     this.lookAheadBeats = lookAheadBeatsDefault;
     // in seconds, taking audioLatency into account
     this.lookAheadSeconds = undefined;
-
-    this.sensorsLatency = sensorsLatencyDefault;
 
     // in seconds
     // @TODO discover and store in localStorage
@@ -228,8 +231,6 @@ class PlayerExperience extends AbstractExperience {
       this.setLookAheadBeats(lookAheadBeatsDefault);
       this.seekPosition(positionDefault);
 
-      this.setSensorsLatency(sensorsLatencyDefault);
-
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
         // console.log('frame', JSON.parse(JSON.stringify(frame)));
 
@@ -350,19 +351,6 @@ class PlayerExperience extends AbstractExperience {
     return promise;
   }
 
-  setSensorsLatency(sensorsLatency) {
-    const sensorsLatencyLast = this.sensorsLatency
-    this.sensorsLatency = sensorsLatency;
-
-    if(this.sensorsLatency !== sensorsLatencyLast) {
-      this.setGraphOptions('beatTriggerFromGesture', {
-        scriptParams: {
-          sensorsLatency: this.sensorsLatency,
-        },
-      });
-    }
-  }
-
   setAudioLatency(audioLatency) {
     this.audioLatency = audioLatency;
     this.updateLookAhead();
@@ -370,6 +358,7 @@ class PlayerExperience extends AbstractExperience {
 
   setLookAheadBeats(lookAheadBeats) {
     this.lookAheadBeats = lookAheadBeats;
+    app.lookAheadBeats = lookAheadBeats;
     this.updateLookAhead();
   }
 
@@ -432,6 +421,7 @@ class PlayerExperience extends AbstractExperience {
       });
     }
 
+    app.data.tempo = tempo;
     this.updateLookAhead();
   }
 
@@ -453,6 +443,8 @@ class PlayerExperience extends AbstractExperience {
         timeSignature,
       },
     });
+
+    app.data.timeSignature = timeSignature;
     this.updateLookAhead();
   }
 
@@ -506,6 +498,8 @@ class PlayerExperience extends AbstractExperience {
         },
       });
     });
+
+    app.data.playback = playback;
   }
 
   setMetronomeSound(onOff) {
@@ -568,7 +562,6 @@ class PlayerExperience extends AbstractExperience {
       tempoFromScore: this.tempoFromScore,
       timeSignature: this.timeSignature,
       timeSignatureFromScore: this.timeSignatureFromScore,
-      sensorsLatency: this.sensorsLatency,
       audioLatency: this.audioLatency,
       lookAheadBeats: this.lookAheadBeats,
       lookAheadSeconds: this.lookAheadSeconds,

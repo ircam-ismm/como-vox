@@ -5,7 +5,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const positionAddBeats = conversion.positionAddBeats;
 
   const feedbackFactor = 0.8; //for the intensity factor initllay set to 0.7
-  const gain = 1.; // original gain  = 0.07 with acdeleramoeter / 9.81
+  const gain = 1.; // original gain  = 0.07 with accelerometer / 9.81
   const deltaOrder = 20;
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
   const averageOrder = 2;
@@ -19,7 +19,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const windowMax = 0.3; // in seconds
   const thresholdRotation = 50;
 
-  // initatilistion
+  // initialisation
   let lastBeatTime = null;
   let lastMean = +Infinity; // prevent kick on first frame
   let lastStd = 0; // prevent kick on first frame
@@ -45,7 +45,10 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       // use logical time tag from frame
       const now = inputData['time'].performance;
 
-      const timeSignature = inputData['timeSignature'];
+      // @TODO: adapt inhibition to current playing
+      const tempo = app.data.tempo;
+      const timeSignature = app.data.timeSignature;
+      const lookAheadSeconds = app.data.lookAheadSeconds;
 
       //const intensity = inputData['intensity'].linear;
       const intensityRotation = Math.pow(inputData['rotationRate'].alpha ** 2 +  inputData['rotationRate'].beta ** 2 +  inputData['rotationRate'].gamma ** 2, 0.5);

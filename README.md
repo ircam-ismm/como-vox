@@ -5,6 +5,10 @@
 - [ ] avoid navigation gestures (swipe from left, swipe from top, etc.)
 - [ ] calibrate latency
 - [ ] beatTriggerFromGesturePeakAdapt: adapt inhibition to tempo & time-signature ++++++
+- [ ] data: bypass graph
+  - [x] injection
+  - [ ] no mode shared states via setGraphOptions
+  - [ ] graph simplification and optimisation
 - [ ] score
   - [ ] normalise
   - [ ] apply time-signature changes
@@ -18,6 +22,9 @@
 - [ ] start
 - [ ] end
 - [ ] UI
+  - [ ] CSS
+    - [ ] no more in templates
+    - [ ] SCSS
   - [ ] users
   - [ ] debug
   - [ ] controller
@@ -67,16 +74,16 @@ Should we change to 10.0.*.* or even 10.149.*.* to avoid collision?
 # Todo
 
 See:
-- [ ] projet radio france
-  + [ ] `client/index.js`
-  + [ ] `src/ScorePlayer.js`
+- [x] projet radio france
+  + [x] `client/index.js`
+  + [x] `src/ScorePlayer.js`
 
 - [x] MIDI parser
   + [x] metas
   + [x] master track
   + [x] one track per channel
 
-- [ ] MIDI player
+- [x] MIDI player
   - [BAD] MIDI.js: broken on iOS, broken timing, 
   
 - soundfonts: re-compress from original sf2 (bad compression from MIDI.js)
@@ -117,6 +124,7 @@ Sensors:
 - [ ] prototype with user scripts
 
 - [x] long loading time on iOS (1 minute): pinned certificate? connected once to https://apps.cosima.ircam.fr and update local certificates
+  - [ ] DNS problem, should have a local one without catch-all and a remote with catch-all to avoid iOS time-outs
 
 
 ### Fabrice 

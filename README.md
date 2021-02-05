@@ -1,8 +1,27 @@
 # CoMo - Vox
 
-?? what to do with ??
-- Intensity
-- Kick
+## Todo
+
+- [ ] avoid navigation gestures (swipe from left, swipe from top, etc.)
+- [ ] calibrate latency
+- [ ] beatTriggerFromGesturePeakAdapt: adapt inhibition to tempo & time-signature ++++++
+- [ ] score
+  - [ ] normalise
+  - [ ] apply time-signature changes
+- [ ] intensity
+  - [ ] lookahead: float 1/2 beat NO: better 1 quarter note ++++++++
+  - [ ] relative intensity
+  - [ ] normalise score
+- [ ] global volume
+  - [x] compressor
+  - [x] reverb
+- [ ] start
+- [ ] end
+- [ ] UI
+  - [ ] users
+  - [ ] debug
+  - [ ] controller
+
 
 **Projects are dedicated to exercices types:**
 
@@ -43,7 +62,7 @@ Should we change to 10.0.*.* or even 10.149.*.* to avoid collision?
 
 ## Sensors
 
-- [ ] Check that there is no interruption on orientation, when web page refreshes.
+- [x] Check that there is no interruption on orientation, when web page refreshes.
 
 # Todo
 

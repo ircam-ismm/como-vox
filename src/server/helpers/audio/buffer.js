@@ -1,4 +1,4 @@
-import {dBToAmplitude} from './conversion.js';
+import {dBToAmplitude} from '../conversion.js';
 
 const e = {};
 

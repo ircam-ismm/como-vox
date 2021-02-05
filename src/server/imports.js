@@ -1,4 +1,4 @@
-import audio from './helpers/audio.js';
+import audio from './helpers/audio/index.js';
 import {Clipper} from './helpers/Clipper.js'
 import conversion from './helpers/conversion.js';
 import math from './helpers/math.js';

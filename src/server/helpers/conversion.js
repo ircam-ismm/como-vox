@@ -17,6 +17,23 @@ export function dBToAmplitude (dB) {
 }
 Object.assign(e, {dBToAmplitude});
 
+const c10OverLn10 = 10 / Math.log(10);
+
+export function powerToDB (power) {
+  return c10OverLn10 * Math.log(Math.max(Number.EPSILON, power) );
+}
+Object.assign(e, {powerToDB});
+
+const ln10Over10 = Math.log(10) / 10;
+
+export function dBToPower (dB) {
+  const result = Math.exp(ln10Over10 * dB);
+  return (result > Number.EPSILON
+          ? result
+          : 0);
+}
+Object.assign(e, {dBToPower});
+
 const c12OverLn2 = 12 / Math.log(2);
 
 export function hertzToMidiPitch(

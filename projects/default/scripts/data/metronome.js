@@ -32,7 +32,7 @@ function metronome(graph, helpers, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
       // use logical time tag from frame
-      const now = inputData['time'];
+      const now = inputData['time'].audio;
 
       outputData['tempo'] = tempo;
       outputData['timeSignature'] = timeSignature;

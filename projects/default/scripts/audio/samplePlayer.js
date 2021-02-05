@@ -111,7 +111,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
       const currentPosition = inputData['position'];
       // use logical time tag from frame
-      const now = inputData['time'];
+      const now = inputData['time'].audio;
 
       const timeSignature = inputData['timeSignature'];
       const tempo = inputData['tempo'];
@@ -146,15 +146,13 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           }
 
           // difference from logical time
-          const timeOffset = getTime() - now;
+          const timeOffset = audioContext.currentTime - now;
 
           // remove timeOffset from logical time to compensate,
-          // add event offset and lookahead
-          const currentTime = performanceToAudioContextTime(
-            performance.now()
-              + 1e3 * (lookAheadSeconds + eventOffset
-                       - timeOffset),
-            {audioContext});
+          // add event offset and look-ahead
+          const currentTime = audioContext.currentTime
+                + lookAheadSeconds + eventOffset
+                - timeOffset;
 
           const eventTime = Math.max(audioContext.currentTime, currentTime);
 
@@ -175,18 +173,18 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
                 tempo,
               });
 
-              console.log("currentTime = ", currentTime, audioContext.currentTime,
-                          currentTime - currentTimeLast);
-              currentTimeLast = currentTime;
+              // console.log("currentTime = ", currentTime, audioContext.currentTime,
+              //             currentTime - currentTimeLast);
+              // currentTimeLast = currentTime;
 
-              console.log("timeOffset = ", timeOffset);
-              console.log("eventOffset = ", eventOffset);
+              // console.log("timeOffset = ", timeOffset);
+              // console.log("eventOffset = ", eventOffset);
 
-              console.log('samplePlayer: event.position2time delta = ', eventPositionTime - eventPositionTimeLast);
-              eventPositionTimeLast = eventPositionTime;
+              // console.log('samplePlayer: event.position2time delta = ', eventPositionTime - eventPositionTimeLast);
+              // eventPositionTimeLast = eventPositionTime;
 
-              console.log('samplePlayer: event.time delta = ', eventTime - eventTimeLast);
-              eventTimeLast = eventTime;
+              // console.log('samplePlayer: event.time delta = ', eventTime - eventTimeLast);
+              // eventTimeLast = eventTime;
 
               break;
             }

@@ -79,14 +79,15 @@ export function player(data, listeners, {
       <input type="number"
              min="0"
              max="32"
-             step="1"
-             .value=${data.lookAheadBeats}
+             step="0.125"
+             .value=${data.lookAheadNotes * 8}
              @click="${e => selfSelect(e)}"
              @change="${e => {
-                   experience.setLookAheadBeats(parseFloat(e.srcElement.value) || 0);
+                   experience.setLookAheadNotes(parseFloat(e.srcElement.value / 8) || 0);
                    } }">
-      beat${data.lookAheadBeats > 1 ? 's' : ''}
-      (${Math.round(data.lookAheadSeconds * 1e3)} ms)
+      eight note${data.lookAheadNotes > 1 ? 's' : ''}
+      (${data.lookAheadBeats} beat${data.lookAheadBeats > 1 ? 's' : ''},
+      ${Math.round(data.lookAheadSeconds * 1e3)} ms)
     </div>
 
     <div class="time">
@@ -117,11 +118,14 @@ export function player(data, listeners, {
              min="10"
              max="300"
              step="10"
-             .value=${Math.round(data.tempo)}
+             .value=${
+               // tempo for quarter-note
+               Math.round(data.tempo * data.timeSignature.division / 4)}
              @click="${e => selfSelect(e)}"
              @change="${e => {
-                   experience.setTempo(parseFloat(e.srcElement.value) || 60);
-                   } }">
+               // tempo for quarter-note
+               experience.setTempo(parseFloat(
+                 e.srcElement.value * 4 / data.timeSignature.division) || 60); } }">
       from score:
       <sc-toggle
         .active="${data.tempoFromScore}"

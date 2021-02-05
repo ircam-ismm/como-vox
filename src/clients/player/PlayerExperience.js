@@ -16,6 +16,8 @@ import {SampleManager} from '../shared/SampleManager.js';
 const app = window.app;
 const conversion = app.imports.helpers.conversion;
 const beatsToSeconds = conversion.beatsToSeconds;
+const notesToBeats = conversion.notesToBeats;
+const notesToSeconds = conversion.notesToSeconds;
 const positionAddBeats = conversion.positionAddBeats;
 
 const audio = app.imports.helpers.audio;
@@ -25,7 +27,7 @@ if(typeof app.instruments === 'undefined') {
 }
 
 const beatingSoundDefault = false;
-const lookAheadBeatsDefault = 1;
+const lookAheadNotesDefault = 0.125; // 1 quarter-note
 const metronomeSoundDefault = false;
 const positionDefault = {bar: 1, beat: 1};
 const tempoDefault = 80;
@@ -34,8 +36,14 @@ const transportPlaybackDefault = true;
 
 if(typeof app.data === 'undefined') {
   app.data = {
-    lookAheadBeats: lookAheadBeatsDefault,
-    lookAheadSeconds: 0,
+    lookAheadNotes: lookAheadNotesDefault,
+    lookAheadBeats : notesToBeats(lookAheadNotesDefault, {
+      timeSignature: timeSignatureDefault,
+    }),
+    lookAheadSeconds: notesToSeconds(lookAheadNotesDefault, {
+      timeSignature: timeSignatureDefault,
+      tempo: tempoDefault,
+    }),
     position: positionDefault,
     playback: transportPlaybackDefault,
     tempo: tempoDefault,
@@ -88,7 +96,7 @@ class PlayerExperience extends AbstractExperience {
     // default values
 
     // in beats, not taking account of audioLatency
-    this.lookAheadBeats = lookAheadBeatsDefault;
+    this.lookAheadNotes = lookAheadNotesDefault;
     // in seconds, taking audioLatency into account
     this.lookAheadSeconds = undefined;
 
@@ -228,7 +236,7 @@ class PlayerExperience extends AbstractExperience {
       this.setMetronomeSound(metronomeSoundDefault);
       this.setBeatingSound(beatingSoundDefault);
 
-      this.setLookAheadBeats(lookAheadBeatsDefault);
+      this.setLookAheadNotes(lookAheadNotesDefault);
       this.seekPosition(positionDefault);
 
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
@@ -253,7 +261,7 @@ class PlayerExperience extends AbstractExperience {
           this.setTimeSignature(frame['timeSignature']);
         }
 
-        this.updateLookAhead({allowMoreBeats: false});
+        this.updateLookAhead({allowMoreIncrement: 0});
       });
     });
 
@@ -356,32 +364,36 @@ class PlayerExperience extends AbstractExperience {
     this.updateLookAhead();
   }
 
-  setLookAheadBeats(lookAheadBeats) {
-    this.lookAheadBeats = lookAheadBeats;
-    app.lookAheadBeats = lookAheadBeats;
+  setLookAheadNotes(lookAheadNotes) {
+    this.lookAheadNotes = lookAheadNotes;
+    app.lookAheadNotes = lookAheadNotes;
+
     this.updateLookAhead();
   }
 
   updateLookAhead({
-    allowMoreBeats = true,
+    allowMoreIncrement = 0.25,
   } = {}) {
     const lookAheadSecondsLast = this.lookAheadSeconds;
 
-    if(this.lookAheadBeats === 0) {
+    if(this.lookAheadNotes === 0) {
+      this.lookAheadBeats = 0;
+      app.lookAheadBeats = 0;
       this.lookAheadSeconds = 0;
+      app.lookAheadSeconds = 0;
     } else {
-      if(allowMoreBeats) {
+      if(allowMoreIncrement) {
         while(
-          (this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
+          (this.lookAheadSeconds = notesToSeconds(this.lookAheadNotes, {
             tempo: this.tempo,
             timeSignature: this.timeSignature,
           })
            - this.audioLatency)
            <= this.lookAheadSecondsMin) {
-            ++this.lookAheadBeats;
+            this.lookAheadNotes += allowMoreIncrement;
         }
       } else {
-        this.lookAheadSeconds = beatsToSeconds(this.lookAheadBeats, {
+        this.lookAheadSeconds = notesToSeconds(this.lookAheadNotes, {
           tempo: this.tempo,
           timeSignature: this.timeSignature,
         })
@@ -389,20 +401,12 @@ class PlayerExperience extends AbstractExperience {
       }
     }
 
-    if(lookAheadSecondsLast !== this.lookAheadSeconds) {
-      // bypass graph option
+    app.data.lookAheadSeconds = this.lookAheadSeconds;
 
-      // ['clickSynth', 'samplePlayer'].forEach( (node) => {
-      //   this.setGraphOptions(node, {
-      //     scriptParams: {
-      //       lookAheadSeconds: this.lookAheadSeconds,
-      //     },
-      //   });
-      // });
-
-      app.data.lookAheadSeconds = this.lookAheadSeconds;
-    }
-
+    this.lookAheadBeats = notesToBeats(this.lookAheadNotes, {
+      timeSignature: this.timeSignature,
+    });
+    app.data.lookAheadBeats = this.lookAheadBeats;
   }
 
   setTempo(tempo, {
@@ -563,6 +567,7 @@ class PlayerExperience extends AbstractExperience {
       timeSignature: this.timeSignature,
       timeSignatureFromScore: this.timeSignatureFromScore,
       audioLatency: this.audioLatency,
+      lookAheadNotes: this.lookAheadNotes,
       lookAheadBeats: this.lookAheadBeats,
       lookAheadSeconds: this.lookAheadSeconds,
 

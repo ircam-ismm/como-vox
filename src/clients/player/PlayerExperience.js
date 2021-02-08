@@ -150,7 +150,7 @@ class PlayerExperience extends AbstractExperience {
             if(!scoreURIbase || scoreURIbase === 'none') {
               scoreURI = null;
             } else {
-              scoreURI = location.pathname + '/'
+              scoreURI = location.origin + location.pathname + '/'
                 + this.voxApplicationState.get('scoresPath')
                 + '/'
                 + scoreURIbase;
@@ -194,10 +194,14 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer.setSource(source);
 
     this.audioContext = this.como.audioContext;
+
+    const baseUrl = location.origin + location.pathname
+          + '/soundfonts/acoustic_grand_piano';
+    // + '/soundfonts/bright_acoustic_piano';
+
     this.pianoSampleManager = new SampleManager({
       audioContext: this.audioContext,
-      // baseUrl: './soundfonts/bright_acoustic_piano',
-      baseUrl: location.pathname + '/soundfonts/acoustic_grand_piano',
+      baseUrl,
     });
     app.instruments.pianoSampleManager = this.pianoSampleManager;
 

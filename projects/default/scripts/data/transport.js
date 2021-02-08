@@ -281,10 +281,10 @@ function transport(graph, helpers, outputFrame) {
 
           const tempoNew = median(tempos) / Math.floor(median(beatDeltas) );
 
-          console.log('tempoSmoothDuration',
-                      notesToSeconds(tempoSmoothDuration, {
-                        tempo: tempoNew,
-                      }) );
+          // console.log('tempoSmoothDuration',
+          //             notesToSeconds(tempoSmoothDuration, {
+          //               tempo: tempoNew,
+          //             }) );
 
           tempoSmoother.set({
             inputStart: now.audio,
@@ -344,10 +344,10 @@ function transport(graph, helpers, outputFrame) {
         // First period may be wrong, specially when starting the last beat of
         // a bar: use at least 2 samples to smooth variations.
         if(offsets.length >= 2) {
-          console.log('beatOffsetSmoothDuration',
-                      notesToSeconds(beatOffsetSmoothDuration, {
-                        tempo,
-                      }));
+          // console.log('beatOffsetSmoothDuration',
+          //             notesToSeconds(beatOffsetSmoothDuration, {
+          //               tempo,
+          //             }));
 
           const beatOffsetNew = weightedMean(offsets, offsetWeights);
           beatOffsetSmoother.set({

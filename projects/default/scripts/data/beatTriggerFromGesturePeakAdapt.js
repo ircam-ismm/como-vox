@@ -6,17 +6,17 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
   const feedbackFactor = 0.8; //for the intensity factor initllay set to 0.7
   const gain = 1.; // original gain  = 0.07 with accelerometer / 9.81
-  const deltaOrder = 20;
+  const deltaOrder = 10; //20
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
   const averageOrder = 2;
   const movingAverage = new helpers.algo.MovingAverage(averageOrder);
   
-  const meanThresholdAdapt =  1; // factor to multiply standar deviation
+  const meanThresholdAdapt =  0.5; // factor to multiply standar deviation //1
   const meanThresholdMin = 5; // min threshold
-  const timeIntervalThreshold = 0.2; //  0.2 in seconds
+  let timeIntervalThreshold = 0.2; //  0.2 in seconds
   const meanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
-  const windowMax = 0.3; // in seconds
+  let windowMax = 0.3; // in seconds
   const thresholdRotation = 50;
 
   // initialisation
@@ -44,11 +44,14 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
       // use logical time tag from frame
       const now = inputData['time'].performance;
-
+      
       // @TODO: adapt inhibition to current playing
       const tempo = app.data.tempo;
       const timeSignature = app.data.timeSignature;
       const lookAheadSeconds = app.data.lookAheadSeconds;
+      
+      timeIntervalThreshold = lookAheadSeconds * 0.5;
+      windowMax = lookAheadSeconds * 0.5;
 
       //const intensity = inputData['intensity'].linear;
       const intensityRotation = Math.pow(inputData['rotationRate'].alpha ** 2 +  inputData['rotationRate'].beta ** 2 +  inputData['rotationRate'].gamma ** 2, 0.5);
@@ -68,7 +71,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       delta = intensityFiltered - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin
 
       // 1 for the sensors latency
-      const time = now - inputData.metas.period * (1 + (deltaOrder + averageOrder)/3);
+      const time = now - inputData.metas.period * (1 + (deltaOrder + averageOrder)/2);  // 3 ??
 
       const beat = {
         time,

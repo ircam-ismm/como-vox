@@ -150,7 +150,8 @@ class PlayerExperience extends AbstractExperience {
             if(!scoreURIbase || scoreURIbase === 'none') {
               scoreURI = null;
             } else {
-              scoreURI = location.origin + location.pathname + '/'
+              scoreURI = url.base
+                + '/'
                 + this.voxApplicationState.get('scoresPath')
                 + '/'
                 + scoreURIbase;
@@ -195,7 +196,7 @@ class PlayerExperience extends AbstractExperience {
 
     this.audioContext = this.como.audioContext;
 
-    const baseUrl = location.origin + location.pathname
+    const baseUrl = url.base
           + '/soundfonts/acoustic_grand_piano';
     // + '/soundfonts/bright_acoustic_piano';
 

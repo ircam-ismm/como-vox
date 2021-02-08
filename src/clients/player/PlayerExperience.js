@@ -150,7 +150,8 @@ class PlayerExperience extends AbstractExperience {
             if(!scoreURIbase || scoreURIbase === 'none') {
               scoreURI = null;
             } else {
-              scoreURI = this.voxApplicationState.get('scoresPath')
+              scoreURI = './'
+                + this.voxApplicationState.get('scoresPath')
                 + '/'
                 + scoreURIbase;
             }
@@ -195,8 +196,8 @@ class PlayerExperience extends AbstractExperience {
     this.audioContext = this.como.audioContext;
     this.pianoSampleManager = new SampleManager({
       audioContext: this.audioContext,
-      // baseUrl: 'soundfonts/bright_acoustic_piano',
-      baseUrl: 'soundfonts/acoustic_grand_piano',
+      // baseUrl: './soundfonts/bright_acoustic_piano',
+      baseUrl: './soundfonts/acoustic_grand_piano',
     });
     app.instruments.pianoSampleManager = this.pianoSampleManager;
 
@@ -314,7 +315,7 @@ class PlayerExperience extends AbstractExperience {
       request.responseType = 'arraybuffer'; // binary data
 
       request.onerror = () => {
-        reject(new Error(`Unable to GET ${sourceUrl}, status ${request.status} `
+        reject(new Error(`Unable to GET ${scoreUrl}, status ${request.status} `
                          + `${request.responseText}`) );
       };
 

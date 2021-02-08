@@ -150,7 +150,7 @@ class PlayerExperience extends AbstractExperience {
             if(!scoreURIbase || scoreURIbase === 'none') {
               scoreURI = null;
             } else {
-              scoreURI = './'
+              scoreURI = location.pathname + '/'
                 + this.voxApplicationState.get('scoresPath')
                 + '/'
                 + scoreURIbase;
@@ -197,7 +197,7 @@ class PlayerExperience extends AbstractExperience {
     this.pianoSampleManager = new SampleManager({
       audioContext: this.audioContext,
       // baseUrl: './soundfonts/bright_acoustic_piano',
-      baseUrl: './soundfonts/acoustic_grand_piano',
+      baseUrl: location.pathname + '/soundfonts/acoustic_grand_piano',
     });
     app.instruments.pianoSampleManager = this.pianoSampleManager;
 

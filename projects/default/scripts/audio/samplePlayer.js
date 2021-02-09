@@ -6,7 +6,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
-  const getTime = app.imports.helpers.time.getTime;
+  const getLocalTime = app.imports.helpers.time.getLocalTime;
 
   let nowLast = 0;
   let currentTimeLast = 0;
@@ -21,7 +21,6 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const midiIntensityToAmplitude = conversion.midiIntensityToAmplitude;
   const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
   const positionsToSecondsDelta = conversion.positionsToSecondsDelta;
-  const performanceToAudioContextTime = conversion.performanceToAudioContextTime;
   const beatsToSeconds = conversion.beatsToSeconds;
 
   const audioContext = graph.como.audioContext;

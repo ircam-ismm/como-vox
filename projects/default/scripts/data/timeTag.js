@@ -4,7 +4,7 @@ function timeTag(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const time = app.imports.helpers.time;
-  const getTime = time.getTime;
+  const getLocalTime = time.getLocalTime;
 
   return {
     updateParams(updates) {
@@ -15,11 +15,11 @@ function timeTag(graph, helpers, outputFrame) {
       const outputData = outputFrame.data;
 
       const audio = audioContext.currentTime;
-      const performance = getTime();
+      const local = getLocalTime();
 
       outputData['time'] = {
         audio,
-        performance,
+        local,
       };
       app.data.time = time;
 

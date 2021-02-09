@@ -217,20 +217,5 @@ export function timeDeltaToTempo(timeDelta, beatDelta = 1, {
 };
 Object.assign(e, {timeDeltaToTempo});
 
-export function performanceToAudioContextTime(performanceTime, {audioContext}) {
-  let performanceTimeDelta;
-  let contextTimeReference;
-  if(typeof audioContext.getOutputTimestamp !== 'function') {
-    performanceTimeDelta = performanceTime - window.performance.now();
-    contextTimeReference = audioContext.currentTime;
-  } else {
-    const stamp = audioContext.getOutputTimestamp();
-    performanceTimeDelta = performanceTime - stamp.performanceTime;
-    contextTimeReference = stamp.contextTime;
-  }
-  return contextTimeReference + 1e-3 * performanceTimeDelta;
-}
-Object.assign(e, {performanceToAudioContextTime});
-
 
 export default e;

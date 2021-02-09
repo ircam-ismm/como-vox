@@ -159,7 +159,7 @@ function transport(graph, helpers, outputFrame) {
       const outputData = outputFrame.data;
       // use logical time tag from frame
       // - now.audio for eveything related to position
-      // - now.performance for beat from gestures
+      // - now.local for beat from gestures
       const now = inputData['time'];
 
       const tempo = tempoSmoother.process(now.audio);
@@ -218,7 +218,7 @@ function transport(graph, helpers, outputFrame) {
           time: beatGesture.time,
         });
 
-        // maximum number of beats from now (performance time)
+        // maximum number of beats from now (local time)
         // and minimum number of tempo gestures
         const beatDeltaMax = parameters.gestureWindow.bar * timeSignature.count
               + parameters.gestureWindow.beat;
@@ -226,7 +226,7 @@ function transport(graph, helpers, outputFrame) {
         // remove old gestures
         for(let g = 0; g < beatGestures.length; ++g) {
           const beatGesture = beatGestures[g];
-          const beatDeltaFromNow = secondsToBeats(now.performance - beatGesture.time, {
+          const beatDeltaFromNow = secondsToBeats(now.local - beatGesture.time, {
             timeSignature,
             tempo,
           });
@@ -309,7 +309,7 @@ function transport(graph, helpers, outputFrame) {
         for(let g = beatGestures.length - 1; g >= 0; --g) {
           const beatGesture = beatGestures[g];
 
-          const beatDeltaFromNow = secondsToBeats(now.performance - beatGesture.time, {
+          const beatDeltaFromNow = secondsToBeats(now.local - beatGesture.time, {
             timeSignature,
             tempo,
           });

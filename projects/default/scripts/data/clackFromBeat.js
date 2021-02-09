@@ -1,4 +1,10 @@
 function clackFromBeat(graph, helpers, outputFrame) {
+  const audioContext = graph.como.audioContext;
+  const app = (typeof global !== 'undefined' ? global.app : window.app);
+
+  const localToAudioContextTime
+        = app.imports.helpers.time.localToAudioContextTime;
+
   const pitch = 82; // Bb5
 
   const channel = 'clack';
@@ -25,7 +31,7 @@ function clackFromBeat(graph, helpers, outputFrame) {
       const outputData = outputFrame.data;
 
       const beat = inputData['beat'];
-      const time = beat.time;
+      const time = localToAudioContextTime(beat.time, {audioContext});
 
       const trigger = parameters.onOff && beat.trigger;
 

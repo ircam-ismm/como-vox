@@ -55,6 +55,9 @@ if(typeof app.data === 'undefined') {
   };
 }
 
+// try to get rid of navigation gestures
+window.addEventListener('touchmove', e => e.preventDefault());
+
 // for simple debugging in browser...
 const MOCK_SENSORS = url.paramGet('mock-sensors');
 console.info('> to mock sensors for debugging purpose, append "?mock-sensors=1" to URL');

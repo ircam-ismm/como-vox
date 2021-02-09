@@ -10,7 +10,6 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
   const averageOrder = 2;
   const movingAverage = new helpers.algo.MovingAverage(averageOrder);
-
   const meanThresholdAdapt =  0.5; // factor to multiply standar deviation //1
   const meanThresholdMin = 5; // min threshold
   let timeIntervalThreshold = 0.2; //  0.2 in seconds
@@ -49,6 +48,9 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       const tempo = app.data.tempo;
       const timeSignature = app.data.timeSignature;
       const lookAheadSeconds = app.data.lookAheadSeconds;
+
+      timeIntervalThreshold = lookAheadSeconds * 0.5;
+      windowMax = lookAheadSeconds * 0.5;
 
       timeIntervalThreshold = lookAheadSeconds * 0.5;
       windowMax = lookAheadSeconds * 0.5;

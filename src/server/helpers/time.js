@@ -37,7 +37,7 @@ if(typeof AudioContext === 'undefined' || self === 'undefined'
   const tmpContext = new AudioContext();
   if(typeof tmpContext.getOutputTimestamp !== 'function') {
     performanceToAudioContextTime = (performanceTime, {audioContext}) => {
-      const performanceTimeDelta = performanceTime - window.performance.now();
+      const performanceTimeDelta = performanceTime - self.performance.now();
       const contextTimeReference = audioContext.currentTime;
       return contextTimeReference + 1e-3 * performanceTimeDelta;
     };

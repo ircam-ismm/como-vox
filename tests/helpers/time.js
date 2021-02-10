@@ -1,11 +1,7 @@
 import {describe, it} from 'mocha';
 import {assert, should} from 'chai';
 
-import {assertWithRelativeError} from '../../shared/utils.js';
-
-import {
-  performanceToAudioContextTime,
-} from '../../../src/server/helpers/conversion.js';
+import {assertWithRelativeError} from '../shared/utils.js';
 
 const epsilon = 1e-7;
 
@@ -32,11 +28,14 @@ describe(`Check performanceToAudioContextTime helper`, () => {
     ],
   ];
 
-  it(`should validate values`, () => {
-    testValues.forEach( (values) => {
-      global.window = {
+  it(`should validate values`, async () => {
+    testValues.forEach(async (values) => {
+      global.self = {
         performance: values[0].performance,
       };
+
+      // dynamic import to mock self.performance
+      const {performanceToAudioContextTime} = await import('../../src/server/helpers/time.js');
 
       const time = performanceToAudioContextTime(values[1], values[0]);
       assertWithRelativeError(time, values[2], epsilon, `time ${

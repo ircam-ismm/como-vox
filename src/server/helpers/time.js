@@ -57,7 +57,10 @@ if(typeof self !== 'undefined'
           && typeof self.performance !== 'undefined'
           && typeof self.performance.now === 'function') {
   localToAudioContextTime = (localTime, {audioContext}) => {
-    return performanceToAudioContextTime(localTime, {audioContext});
+    const timeDelta = localTime - getLocalTime();
+    return performanceToAudioContextTime(self.performance.now()
+                                         + 1e3 * timeDelta,
+                                         {audioContext});
   };
 
 } else {

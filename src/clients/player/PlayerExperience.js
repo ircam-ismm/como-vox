@@ -36,12 +36,14 @@ const transportPlaybackDefault = true;
 
 if(typeof app.data === 'undefined') {
   app.data = {
+    playbackLatency: notesToSeconds(lookAheadNotesDefault, {
+      tempo: tempoDefault,
+    }),
     lookAheadNotes: lookAheadNotesDefault,
     lookAheadBeats : notesToBeats(lookAheadNotesDefault, {
       timeSignature: timeSignatureDefault,
     }),
     lookAheadSeconds: notesToSeconds(lookAheadNotesDefault, {
-      timeSignature: timeSignatureDefault,
       tempo: tempoDefault,
     }),
     position: positionDefault,
@@ -413,6 +415,10 @@ class PlayerExperience extends AbstractExperience {
       timeSignature: this.timeSignature,
     });
     app.data.lookAheadBeats = this.lookAheadBeats;
+
+    app.data.playbackLatency = notesToSeconds(this.lookAheadNotes, {
+      tempo: this.tempo,
+    });
   }
 
   setTempo(tempo, {

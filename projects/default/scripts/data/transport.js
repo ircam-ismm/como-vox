@@ -7,6 +7,7 @@ function transport(graph, helpers, outputFrame) {
   const positionAddBeats = conversion.positionAddBeats;
   const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
   const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
+  const positionsToSecondsDelta = conversion.positionsToSecondsDelta;
   const positionRoundBeats = conversion.positionRoundBeats;
   const timeDeltaToTempo = conversion.timeDeltaToTempo;
 
@@ -48,7 +49,14 @@ function transport(graph, helpers, outputFrame) {
     beat: 1,
   };
   let positionWithOffsetLast = positionLast;
-  let positionLastTime = 0; // in seconds
+  let positionLastTime = {
+    audio: 0,
+    local: 0,
+  };
+  let beatChangedLastTime = {
+    audio: 0,
+    local: 0,
+  }; // local time
 
   // for tempo and beat offset
   let beatGestures = [];
@@ -102,7 +110,10 @@ function transport(graph, helpers, outputFrame) {
   const seekPosition = (position) => {
     positionLast = position;
     positionWithOffsetLast = position;
-    positionLastTime = 0;
+    positionLastTime = {
+      audio: 0,
+      local: 0,
+    };
 
     beatGestures.length = 0;
     tempoSmoother.set({
@@ -177,24 +188,28 @@ function transport(graph, helpers, outputFrame) {
         outputData['tempo'] = tempo;
         app.data.tempo = tempo;
 
-        outputData['position'] = {
+        const outputPosition = {
           bar: positionLast.bar,
           beat: positionLast.beat,
           barChanged: false,
           beatChanged: false
         };
-        app.data.position = position;
+        outputData['position'] = outputPosition
+        app.data.position = outputPosition;
 
         // pause
-        if(positionLastTime !== 0) {
-          positionLastTime = now.audio;
+        if(positionLastTime.audio !== 0) {
+          positionLastTime = {
+            audio: now.audio,
+            local: now.local,
+          };
         }
 
         return outputFrame;
       }
 
-      const timeDelta = (positionLastTime !== 0
-                         ? now.audio - positionLastTime
+      const timeDelta = (positionLastTime.audio !== 0
+                         ? now.audio - positionLastTime.audio
                          : 0);
       const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
 
@@ -209,16 +224,32 @@ function transport(graph, helpers, outputFrame) {
       }
 
       const beatGesture = inputData['beat'];
+
+      // // debug only
+      // if(beatGesture && beatGesture.trigger) {
+      //   const timeDeltaFromPlayback = beatChangedLastTime.local
+      //         - (beatGesture.time - app.data.playbackLatency);
+      //   const beatDeltaFromPlaback = secondsToBeats(
+      //     timeDeltaFromPlayback,
+      //     {timeSignature, tempo});
+      //   console.log('beat',
+      //               beatGesture.time,
+      //               now.local,
+      //               timeDeltaFromPlayback,
+      //               beatDeltaFromPlaback);
+      // }
+
       ////////////// beat gestures for tempo and beat offset
       if( (parameters.gestureControlsTempo
            || parameters.gestureControlsBeatOffset)
           && beatGesture && beatGesture.trigger) {
 
+        // time related to scheduled audio
         beatGestures.push({
-          time: beatGesture.time,
+          time: beatGesture.time - app.data.playbackLatency,
         });
 
-        // maximum number of beats from now (local time)
+        // maximum number of beats from last beat (local time)
         // and minimum number of tempo gestures
         const beatDeltaMax = parameters.gestureWindow.bar * timeSignature.count
               + parameters.gestureWindow.beat;
@@ -226,12 +257,11 @@ function transport(graph, helpers, outputFrame) {
         // remove old gestures
         for(let g = 0; g < beatGestures.length; ++g) {
           const beatGesture = beatGestures[g];
-          const beatDeltaFromNow = secondsToBeats(now.local - beatGesture.time, {
-            timeSignature,
-            tempo,
-          });
+          const beatDeltaFromPlayback = secondsToBeats(
+            beatChangedLastTime.local - beatGesture.time,
+            {timeSignature, tempo});
 
-          if(beatDeltaMax < beatDeltaFromNow) {
+          if(beatDeltaMax < beatDeltaFromPlayback) {
             beatGestures[g] = undefined;
           }
         }
@@ -308,15 +338,14 @@ function transport(graph, helpers, outputFrame) {
 
         for(let g = beatGestures.length - 1; g >= 0; --g) {
           const beatGesture = beatGestures[g];
-
-          const beatDeltaFromNow = secondsToBeats(now.local - beatGesture.time, {
-            timeSignature,
-            tempo,
-          });
+          // time related to scheduled audio output
+          const beatDeltaFromPlayback = secondsToBeats(
+            beatChangedLastTime.local - beatGesture.time,
+            {timeSignature, tempo});
 
           // consider only one bar from now,
           // plus and one beat for the fluctuations
-          if(beatDeltaFromNow > timeSignature.count + 1) {
+          if(beatDeltaFromPlayback > timeSignature.count + 1) {
             break;
           }
 
@@ -327,7 +356,7 @@ function transport(graph, helpers, outputFrame) {
           // The new offset as a relative offset, and must be added to the
           // current one.
           const beatGesturePosition = positionAddBeats(positionWithOffset,
-                                                       beatDeltaFromNow,
+                                                       beatDeltaFromPlayback,
                                                        {timeSignature});
 
           const beatGesturePositionRounded
@@ -373,7 +402,7 @@ function transport(graph, helpers, outputFrame) {
 
       const bar = positionWithOffset.bar;
       const beat = positionWithOffset.beat;
-      if(positionLastTime === 0) {
+      if(positionLastTime.audio === 0) {
         // start
         barChanged = true;
         beatChanged = true;
@@ -384,17 +413,59 @@ function transport(graph, helpers, outputFrame) {
                        || barChanged); // count to 1
       }
 
-      outputData['position'] = {
+      if(beatChanged) {
+        const beatChangedPreviousTime = beatChangedLastTime;
+
+        const bar = positionWithOffset.bar;
+        const beat = positionWithOffset.beat;
+
+        const positionWithOffsetRounded = {
+          bar,
+          beat: Math.floor(beat),
+        };
+
+        const beatChangeLastTimeOffset = positionsToSecondsDelta(
+          positionWithOffsetRounded, positionWithOffset, {
+            timeSignature,
+            tempo,
+          });
+
+        beatChangedLastTime = {
+          local: now.local + beatChangeLastTimeOffset,
+          audio: now.audio + beatChangeLastTimeOffset,
+        };
+
+        // // for debug only
+        // const audioContext = graph.como.audioContext;
+        // const localToAudioContextTime = app.imports.helpers.time.localToAudioContextTime;
+        // console.log("beatChangedLastTime = ",
+        //             'local',
+        //             beatChangedLastTime.local,
+        //             beatChangedLastTime.local - beatChangedPreviousTime.local,
+        //             'audio',
+        //             beatChangedLastTime.audio,
+        //             beatChangedLastTime.audio - beatChangedPreviousTime.audio,
+        //             'local - audio',
+        //             localToAudioContextTime(beatChangedLastTime.local, {audioContext})
+        //             - beatChangedLastTime.audio,
+        //            );
+      }
+
+      const outputPosition = {
         bar: positionWithOffset.bar,
         beat: positionWithOffset.beat,
         barChanged,
         beatChanged,
       };
-      app.data.position = position;
+      outputData['position'] = outputPosition;
+      app.data.position = outputPosition;
 
       positionLast = position;
       positionWithOffsetLast = positionWithOffset;
-      positionLastTime = now.audio;
+      positionLastTime = {
+        audio: now.audio,
+        local: now.local,
+      };
 
       return outputFrame;
     },

@@ -19,7 +19,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const thresholdRotation = 50;
 
   // initialisation
-  let lastBeatTime = null;
+  let lastBeatTime = 0;
   let lastMean = +Infinity; // prevent kick on first frame
   let lastStd = 0; // prevent kick on first frame
   let previousIntensity = 0; //intensity at previous frame
@@ -49,11 +49,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       const timeSignature = app.data.timeSignature;
       const lookAheadSeconds = app.data.lookAheadSeconds;
 
-      timeIntervalThreshold = lookAheadSeconds * 0.5;
-      windowMax = lookAheadSeconds * 0.5;
-
-      timeIntervalThreshold = lookAheadSeconds * 0.5;
-      windowMax = lookAheadSeconds * 0.5;
+      // timeIntervalThreshold = lookAheadSeconds * 0.5;
+      // windowMax = lookAheadSeconds * 0.5;
 
       //const intensity = inputData['intensity'].linear;
       const intensityRotation = Math.pow(inputData['rotationRate'].alpha ** 2 +  inputData['rotationRate'].beta ** 2 +  inputData['rotationRate'].gamma ** 2, 0.5);
@@ -68,12 +65,11 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       let intensity = value * gain;
       let intensityFiltered = movingAverage.process(intensity);
 
-
-
       delta = intensityFiltered - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin
 
-      // 1 for the sensors latency
-      const time = now - inputData.metas.period * (1 + (deltaOrder + averageOrder)/2);  // 3 ??
+      const sensorsLatency = inputData.metas.period;
+      const time = now - sensorsLatency
+            - inputData.metas.period * (deltaOrder + averageOrder)/2; // 3?
 
       const beat = {
         time,
@@ -122,6 +118,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
             timeOnset = time;
             beat.timeOnset = timeOnset;
             tempMax = previousIntensity;
+            timeMax = time;
             }
 
         } else {
@@ -140,6 +137,10 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
             lastBeatTime = timeMax;
             tempMax = 0;
             timeMax = 0;
+
+            console.log('beat', {...beat},
+                        'from now', beat.time - now,
+                        'from compensated time', beat.time - time);
 
             // console.log('beat', beat, 'offset from now', beat.time - now);
           }

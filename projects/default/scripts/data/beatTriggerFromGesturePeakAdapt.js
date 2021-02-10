@@ -5,17 +5,25 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const positionAddBeats = conversion.positionAddBeats;
 
   const feedbackFactor = 0.8; //for the intensity factor initllay set to 0.7
-  const gain = 1.; // original gain  = 0.07 with accelerometer / 9.81
+  const intensityNormalisation = 1.; // original gain  = 0.07 with accelerometer / 9.81
   const deltaOrder = 10; //20
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
   const averageOrder = 2;
   const movingAverage = new helpers.algo.MovingAverage(averageOrder);
   const meanThresholdAdapt =  0.5; // factor to multiply standar deviation //1
   const meanThresholdMin = 5; // min threshold
-  let timeIntervalThreshold = 0.2; //  0.2 in seconds
+  let inhibition = {
+    min: 0.2, // seconds
+    max: 0.5, // seconds
+    lookAheadRatio: 0.5, // ratio
+  };
   const meanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
-  let windowMax = 0.3; // in seconds
+  let peakSearch = {
+    min: 0.2, // seconds
+    max: 0.5, // seconds
+    lookAheadRatio: 0.7, // ratio
+  };
   const thresholdRotation = 50;
 
   // initialisation
@@ -49,20 +57,31 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       const timeSignature = app.data.timeSignature;
       const lookAheadSeconds = app.data.lookAheadSeconds;
 
-      // timeIntervalThreshold = lookAheadSeconds * 0.5;
-      // windowMax = lookAheadSeconds * 0.5;
+      const inhibitionDuration
+            = Math.max(inhibition.min,
+                       Math.min(inhibition.max,
+                                inhibition.lookAheadRatio * lookAheadSeconds));
+      const peakSearchDuration
+            = Math.max(peakSearch.min,
+                       Math.min(peakSearch.max,
+                                peakSearch.lookAheadRatio * lookAheadSeconds));
 
       //const intensity = inputData['intensity'].linear;
-      const intensityRotation = Math.pow(inputData['rotationRate'].alpha ** 2 +  inputData['rotationRate'].beta ** 2 +  inputData['rotationRate'].gamma ** 2, 0.5);
-      //const intensity = inputData['accelerationIncludingGravity'].x ** 2 +  inputData['accelerationIncludingGravity'].y ** 2 +  inputData['accelerationIncludingGravity'].z ** 2;
-      //console.log(intensityRotation);
+      const intensityRotation = Math.pow(inputData['rotationRate'].alpha ** 2
+                                         + inputData['rotationRate'].beta ** 2
+                                         + inputData['rotationRate'].gamma ** 2,
+                                         0.5);
+
+      // const intensity = inputData['accelerationIncludingGravity'].x ** 2
+      //       + inputData['accelerationIncludingGravity'].y ** 2
+      //       + inputData['accelerationIncludingGravity'].z ** 2;
 
       // computing intensity using only one axis
       const acceleration = inputData['accelerationIncludingGravity'].x;
       let derivate = movingDelta.process(acceleration, inputData.metas.period);
       value = Math.max(derivate, 0) + feedbackFactor * memory; // store value for next pass
       memory = value;
-      let intensity = value * gain;
+      let intensity = value * intensityNormalisation;
       let intensityFiltered = movingAverage.process(intensity);
 
       delta = intensityFiltered - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin;
@@ -90,7 +109,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       };
 
       // inhibition after last beat
-      if (time - lastBeatTime > timeIntervalThreshold) {
+      if (time - lastBeatTime > inhibitionDuration) {
 
         if (positiveDelta === 0) {
           // onset detection
@@ -103,7 +122,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
           }
         } else {
           // peak detection
-          if (time - timeOnset < windowMax) {
+          if (time - timeOnset < peakSearchDuration) {
             if (intensityFiltered > tempMax) {
               tempMax = intensityFiltered;
               timeMax = time;

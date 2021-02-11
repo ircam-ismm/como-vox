@@ -58,13 +58,17 @@ if(typeof app.data === 'undefined') {
 }
 
 // for simple debugging in browser...
-const MOCK_SENSORS = url.paramGet('mock-sensors');
+const MOCK_SENSORS = url.paramGet('mock-sensors', false);
 console.info('> to mock sensors for debugging purpose, append "?mock-sensors=1" to URL');
 console.info('> mock-sensors', MOCK_SENSORS);
 
-const AUDIO_DEBUG = url.paramGet('audio-debug');
+const AUDIO_DEBUG = url.paramGet('audio-debug', false);
 console.info('> to use audio for debugging purpose, append "?debug-audio=1" to URI');
 console.info('> audio-debug', AUDIO_DEBUG);
+
+const UI_PRESET = url.paramGet('ui', 'simple');
+console.info('> for full interface, append "?ui=full" to URI');
+console.info('> ui', UI_PRESET);
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -163,6 +167,10 @@ class PlayerExperience extends AbstractExperience {
             } catch (error) {
               console.error('Error while loading score: ' + error.message);
             }
+            break;
+          }
+
+          default: {
             break;
           }
         }
@@ -273,9 +281,8 @@ class PlayerExperience extends AbstractExperience {
       });
     });
 
-    if(AUDIO_DEBUG) {
-      this.audioDebugInit();
-    }
+    this.setAudioDebug(AUDIO_DEBUG);
+    this.setUIPreset(UI_PRESET);
 
     window.addEventListener('resize', () => this.render());
 
@@ -538,20 +545,29 @@ class PlayerExperience extends AbstractExperience {
 
   }
 
-  audioDebugInit() {
+  setAudioDebug(enabled) {
+    if(!enabled) {
+      this.audioDebugHandler = null;
+      return;
+    }
+
     const noiseBuffer = audio.generateNoiseBuffer({
       audioContext: this.audioContext,
       duration: 1, // seconds,
       gain: -30, // dB
     });
 
-    const blocked = new Blocked( (duration) => {
+    this.audioDebugHandler = new Blocked( (duration) => {
       console.warn(`---------- blocked for ${duration} ms ---------`);
       audio.playBuffer(noiseBuffer, {
         audioContext: this.audioContext,
         duration: duration * 1e-3,
       });
     }, 50);
+  }
+
+  setUIPreset(preset) {
+    this.uiPreset = preset;
   }
 
   render() {
@@ -561,6 +577,10 @@ class PlayerExperience extends AbstractExperience {
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
                                                  {timeSignature: this.timeSignature});
     const viewData = {
+      ui: {
+        preset: this.uiPreset,
+      },
+
       config: this.config,
       boundingClientRect: this.$container.getBoundingClientRect(),
       project: this.como.project.getValues(),

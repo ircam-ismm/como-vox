@@ -32,6 +32,8 @@ export function player(data, listeners, {
   verbose = false,
   enableSelection = true,
 } = {}) {
+  const ui = data.ui;
+
   const experience = data.experience;
   const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
@@ -48,18 +50,18 @@ export function player(data, listeners, {
 
     <div style="position: relative">
       <span class="info">
+        ${ui.preset === 'full' ? html`
         <span style="${styles.h3}" class="session">Session: ${data.session.name}</span>
+        `: ''}
         <span style="${styles.h3}" class="session">PlayerId: ${data.player.id}</span>
       </span>
 
-      ${enableSelection ?
-        html`
-          <button class="setSession"
-            @click="${e => listeners.setPlayerParams({ sessionId: null })}">
-            change session
-          </button>
-        ` : ``
-      }
+      ${ui.preset === 'full' && enableSelection ? html`
+      <button class="setSession"
+              @click="${e => listeners.setPlayerParams({ sessionId: null })}">
+        change session
+      </button>
+      ` : ''}
     </div>
 
     <div class="audioLatency">Audio Latency:
@@ -75,6 +77,7 @@ export function player(data, listeners, {
       ms
     </div>
 
+    ${ui.preset === 'full' ? html`
     <div class="lookAhead">Look-ahead:
       <input type="number"
              min="0"
@@ -89,6 +92,7 @@ export function player(data, listeners, {
       (${data.lookAheadBeats} beat${data.lookAheadBeats > 1 ? 's' : ''},
       ${Math.round(data.lookAheadSeconds * 1e3)} ms)
     </div>
+    ` : '' }
 
     <div class="time">
       ${data.syncTime.toFixed(3)}
@@ -119,19 +123,21 @@ export function player(data, listeners, {
              max="300"
              step="10"
              .value=${
-               // tempo for quarter-note
-               Math.round(data.tempo * data.timeSignature.division / 4)}
+             // tempo for quarter-note
+             Math.round(data.tempo * data.timeSignature.division / 4)}
              @click="${e => selfSelect(e)}"
              @change="${e => {
-               // tempo for quarter-note
-               experience.setTempo(parseFloat(
-                 e.srcElement.value * 4 / data.timeSignature.division) || 60); } }">
+                   // tempo for quarter-note
+                   experience.setTempo(parseFloat(
+                   e.srcElement.value * 4 / data.timeSignature.division) || 60); } }">
+
+      ${ui.preset === 'full' ? html`
       from score:
       <sc-toggle
         .active="${data.tempoFromScore}"
         @change="${e => experience.setTempoFromScore(e.detail.value)}"
       ></sc-toggle>
-
+      ` : ''}
 
     </div>
 
@@ -166,6 +172,7 @@ export function player(data, listeners, {
     </div>
 
     <div class="position">Position:
+      ${ui.preset === 'full' ? html`
       ${[{bar: -1, beat: 1},
          {bar: 0, beat: 1},
          {bar: 1, beat: 1}].map( (position) => {
@@ -173,36 +180,44 @@ export function player(data, listeners, {
       <button class="seek"
               @click="${e => experience.seekPosition(position)}">
         Seek to ${position.bar < 1
-                  // display for bar < 1 with -1 offset
-                  ? position.bar - 1
-                  : position.bar }:${position.beat}
+        // display for bar < 1 with -1 offset
+        ? position.bar - 1
+        : position.bar }
       </button>
-`;})}
+      `;})}
+    ` : html`
+      <button class="seek"
+              @click="${e => experience.seekPosition({bar: 1, beat: 1})}">
+        Restart</button>
+    `}
 
       <input class="time bar"
              type="number"
              step="1"
              .value=${!data.position
-                      ? 0
-                      : (data.position.bar > 0
-                         ? data.position.bar
-                         : data.position.bar - 1)}
+             ? 0
+             : (data.position.bar > 0
+      ? data.position.bar
+      : data.position.bar - 1)}
+      @click="${e => selfSelect(e)}"
+      @change="${e => experience.seekPosition(getPosition(e) )}"
+      >${ui.preset === 'full' ? html`
+      :<input class="time beat"
+             type="number"
+             step="1"
+             min"1"
+             .value=${!data.position
+             ? 0
+             : Math.floor(beat)}
              @click="${e => selfSelect(e)}"
              @change="${e => experience.seekPosition(getPosition(e) )}"
-      >:<input class="time beat"
-               type="number"
-               step="1"
-               min"1"
-               .value=${!data.position
-                        ? 0
-                        : Math.floor(beat)}
-               @click="${e => selfSelect(e)}"
-               @change="${e => experience.seekPosition(getPosition(e) )}"
-        >
+      >
+      ` : ''}
     </div>
 
     <div class="controls-container">
 
+      ${ui.preset === 'full' ? html`
       <div class="onoff beating audio">Gesture controls beat:
         <sc-toggle
           .active="${data.gesture.controlsBeatOffset}"
@@ -216,7 +231,18 @@ export function player(data, listeners, {
           @change="${e => experience.setGestureControlsTempo(e.detail.value)}"
         ></sc-toggle>
       </div>
-
+      ` : html`
+      <div class="onoff beating audio">Gesture controls tempo:
+        <sc-toggle
+          .active="${data.gesture.controlsTempo}"
+          @change="${e => {
+                        experience.setGestureControlsTempo(e.detail.value)
+                        experience.setGestureControlsBeatOffset(e.detail.value)
+                     }
+                   }"
+        ></sc-toggle>
+      </div>
+      `}
       <div class="onoff beating audio">Gesture controls intensity:
         <sc-toggle
           .active="${data.gesture.controlsIntensity}"
@@ -231,13 +257,14 @@ export function player(data, listeners, {
         ></sc-toggle>
       </div>
 
+      ${ui.preset === 'full' ? html`
       <div class="onoff beating audio">Beating sound:
         <sc-toggle
           .active="${data.beatingSound.onOff}"
           @change="${e => experience.setBeatingSound(e.detail.value)}"
         ></sc-toggle>
       </div>
-
+      ` : ''}
     </div>
 
     ${verbose ?

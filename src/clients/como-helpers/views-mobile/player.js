@@ -14,7 +14,8 @@ function getPosition (event) {
   if(bar <= 0) {
     bar += 1;
   }
-  const beat = parseFloat(parentElement.querySelector('.beat').value) || 1;
+  const beatElement = parentElement.querySelector('.beat');
+  const beat = (beatElement && parseFloat(beatElement.value) ) || 1;
   return {bar, beat};
 }
 

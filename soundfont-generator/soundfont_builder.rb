@@ -46,7 +46,7 @@ SOUNDFONT = "./MuseScore_General.sf3" # Soundfont file path
 # all instruments in the below array. Add or remove as necessary.
 INSTRUMENTS = [
   0,   # Acoustic Grand Piano
-  1,   # Bright Acoustic Piano
+  # 1,   # Bright Acoustic Piano
   # 2,   # Electric Grand Piano
   # 3,   # Honky-tonk Piano
   # 4,   # Electric Piano 1
@@ -97,7 +97,7 @@ INSTRUMENTS = [
   # 49,  # String Ensemble 2
   # 50,  # Synth Strings 1
   # 51,  # Synth Strings 2
-  52,  # Choir Aahs
+  # 52,  # Choir Aahs
   # 53,  # Voice Oohs
   # 54,  # Synth Choir
   # 55,  # Orchestra Hit
@@ -360,7 +360,7 @@ NOTES = {
 }
 
 MIDI_C0 = 12
-VELOCITY = 85
+VELOCITY = 60
 DURATION = Integer(3000) # milliseconds
 TEMP_FILE = "#{BUILD_DIR}/%s%stemp.midi"
 FLUIDSYNTH_RAW = "%s.raw"

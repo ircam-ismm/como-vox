@@ -9,7 +9,7 @@ function reverberator(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     decayTime: 2, // seconds
     lowpassFrequencyStart: 15000, // Hertz
     lowpassFrequencyEnd: 1000, // Hertz
-    wetGain: -6, // dB, dryGain is automatic
+    wetGain: -3, // dB, dryGain is automatic
   };
 
   const reverberatorNode = new ReverberatorNode({

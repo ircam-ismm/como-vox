@@ -8,7 +8,7 @@ html, body {
 }
 
 html {
-  font-size: 62.5%;
+  font-size: 80%;
 }
 
 * {
@@ -72,12 +72,17 @@ body.loading {
   border-radius: 3px;
 }
 
+#__soundworks-container .container {
+  margin: 0.2rem;
+}
+
 #__soundworks-container .time {
   font-size: 60px;
 }
 
-#__soundworks-container .position>button {
-  font-size: 16px;
+#__soundworks-container .position>button,
+#__soundworks-container .tempo>button {
+  font-size: 18px;
   width: auto;
 }
 
@@ -99,7 +104,7 @@ body.loading {
   display: none;
 }
 
-#__soundworks-container .controls-container {
+#__soundworks-container .controls.container {
   display: inline-flex;
 }
 

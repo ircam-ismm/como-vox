@@ -95,6 +95,7 @@ class PlayerExperience extends AbstractExperience {
     this.transportPlayback = transportPlaybackDefault;
 
     this.tempo = tempoDefault;
+    this.tempoToReset = tempoDefault;
     this.tempoFromScore = true;
     this.timeSignature = timeSignatureDefault;
     this.timeSignatureFromScore = true;
@@ -431,12 +432,13 @@ class PlayerExperience extends AbstractExperience {
   setTempo(tempo, {
     transportUpdate = true,
   } = {}) {
-    if(!tempo || tempo === this.tempo) {
+    if(!tempo || (tempo === this.tempo && tempo == this.tempoToReset) ) {
       return;
     }
     this.tempo = tempo;
 
     if(transportUpdate) {
+      this.tempoToReset = this.tempo;
       this.setGraphOptions('transport', {
         scriptParams: {
           tempo,
@@ -450,6 +452,10 @@ class PlayerExperience extends AbstractExperience {
 
   setTempoFromScore(onOff) {
     this.tempoFromScore = onOff;
+  }
+
+  resetTempo() {
+    this.setTempo(this.tempoToReset);
   }
 
   setTimeSignature(timeSignature) {

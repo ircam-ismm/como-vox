@@ -45,27 +45,27 @@ export function player(data, listeners, {
   return html`
     <!-- LOADER -->
     ${data.player.loading ?
-      html`<div style="${styles.loadingBanner}">loading...</div>` : ''
+      html`<div style="${styles.loadingBanner}">Chargement...</div>` : ''
     }
     <!-- HEADER -->
 
-    <div style="position: relative">
+    <div style="position: relative" class="container">
       <span class="info">
         ${ui.preset === 'full' ? html`
         <span style="${styles.h3}" class="session">Session: ${data.session.name}</span>
         `: ''}
-        <span style="${styles.h3}" class="session">PlayerId: ${data.player.id}</span>
+        <span style="${styles.h3}" class="session">Identifiant&nbsp;: ${data.player.id}</span>
       </span>
 
       ${ui.preset === 'full' && enableSelection ? html`
       <button class="setSession"
               @click="${e => listeners.setPlayerParams({ sessionId: null })}">
-        change session
+        Choisir session
       </button>
       ` : ''}
     </div>
 
-    <div class="audioLatency">Audio Latency:
+    <div class="audioLatency container">Latence audio&nbsp;:
       <input type="number"
              min="0"
              max="500"
@@ -79,7 +79,7 @@ export function player(data, listeners, {
     </div>
 
     ${ui.preset === 'full' ? html`
-    <div class="lookAhead">Look-ahead:
+    <div class="lookAhead container">Prévision&nbsp;:
       <input type="number"
              min="0"
              max="32"
@@ -89,17 +89,17 @@ export function player(data, listeners, {
              @change="${e => {
                    experience.setLookAheadNotes(parseFloat(e.srcElement.value / 8) || 0);
                    } }">
-      eight note${data.lookAheadNotes > 1 ? 's' : ''}
-      (${data.lookAheadBeats} beat${data.lookAheadBeats > 1 ? 's' : ''},
+      croche${data.lookAheadNotes > 1 ? 's' : ''}
+      (${data.lookAheadBeats} temps,
       ${Math.round(data.lookAheadSeconds * 1e3)} ms)
     </div>
     ` : '' }
 
-    <div class="time">
+    <div class="time container">
       ${data.syncTime.toFixed(3)}
     </div>
 
-    <div class="score-container">
+    <div class="score container">
       <select class="${!experience.scoreReady ? 'invalid' : ''}"
         @change="${e => {
           const score = (e.target.value === 'none' ? null : e.target.value);
@@ -112,13 +112,13 @@ export function player(data, listeners, {
           .value=${score}
           ?selected="${voxPlayerState.get('score')
             === (score === 'none' ? null : score)}"
-        >${score}</option>
+        >${score === 'none' ? 'aucune' : score}</option>
         `;
         })}
      </select>
     </div>
 
-    <div class="tempo">Tempo:
+    <div class="tempo container">Tempo&nbsp;:
       <input type="number"
              min="10"
              max="300"
@@ -133,16 +133,19 @@ export function player(data, listeners, {
                    e.srcElement.value * 4 / data.timeSignature.division) || 60); } }">
 
       ${ui.preset === 'full' ? html`
-      from score:
+      depuis la partition&nbsp;:
       <sc-toggle
         .active="${data.tempoFromScore}"
         @change="${e => experience.setTempoFromScore(e.detail.value)}"
       ></sc-toggle>
       ` : ''}
+      <button class="tempo"
+              @click="${e => experience.resetTempo()}"
+      >Remettre</button>
 
     </div>
 
-    <div class="timeSignature">Time signature:
+    <div class="timeSignature container">Métrique&nbsp;:
       <input class="count"
              type="number"
              min="1"
@@ -160,10 +163,10 @@ export function player(data, listeners, {
              .value=${data.timeSignature.division}
              @click="${e => selfSelect(e)}"
              @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
-    </span>
+    </div>
 
-    <div class="controls-container">
-      <div class="onoff transport">Playback:
+    <div class="controls container">
+      <div class="onoff transport">Lecture&nbsp;:
         <sc-toggle
           .active="${data.transportPlayback}"
           @change="${e => experience.setTransportPlayback(e.detail.value)}"
@@ -172,7 +175,7 @@ export function player(data, listeners, {
 
     </div>
 
-    <div class="position">Position:
+    <div class="position container">Position&nbsp;:
       ${ui.preset === 'full' ? html`
       ${[{bar: -1, beat: 1},
          {bar: 0, beat: 1},
@@ -180,7 +183,7 @@ export function player(data, listeners, {
            return html`
       <button class="seek"
               @click="${e => experience.seekPosition(position)}">
-        Seek to ${position.bar < 1
+        Aller à ${position.bar < 1
         // display for bar < 1 with -1 offset
         ? position.bar - 1
         : position.bar }
@@ -188,8 +191,8 @@ export function player(data, listeners, {
       `;})}
     ` : html`
       <button class="seek"
-              @click="${e => experience.seekPosition({bar: 1, beat: 1})}">
-        Restart</button>
+              @click="${e => experience.seekPosition({bar: 1, beat: 1})}"
+      >Recommencer</button>
     `}
 
       <input class="time bar"
@@ -216,24 +219,24 @@ export function player(data, listeners, {
       ` : ''}
     </div>
 
-    <div class="controls-container">
+    <div class="controls container">
 
       ${ui.preset === 'full' ? html`
-      <div class="onoff beating audio">Gesture controls beat:
+      <div class="onoff beating audio">Recalage
         <sc-toggle
           .active="${data.gesture.controlsBeatOffset}"
           @change="${e => experience.setGestureControlsBeatOffset(e.detail.value)}"
         ></sc-toggle>
       </div>
 
-      <div class="onoff beating audio">Gesture controls tempo:
+      <div class="onoff beating audio">Tempo
         <sc-toggle
           .active="${data.gesture.controlsTempo}"
           @change="${e => experience.setGestureControlsTempo(e.detail.value)}"
         ></sc-toggle>
       </div>
       ` : html`
-      <div class="onoff beating audio">Gesture controls tempo:
+      <div class="onoff beating audio">Tempo
         <sc-toggle
           .active="${data.gesture.controlsTempo}"
           @change="${e => {
@@ -244,14 +247,14 @@ export function player(data, listeners, {
         ></sc-toggle>
       </div>
       `}
-      <div class="onoff beating audio">Gesture controls intensity:
+      <div class="onoff beating audio">Dynamique
         <sc-toggle
           .active="${data.gesture.controlsIntensity}"
           @change="${e => experience.setGestureControlsIntensity(e.detail.value)}"
         ></sc-toggle>
       </div>
 
-      <div class="onoff metronome audio">Metronome sound:
+      <div class="onoff metronome audio">Métronome
         <sc-toggle
           .active="${data.metronomeSound.onOff}"
           @change="${e => experience.setMetronomeSound(e.detail.value)}"
@@ -259,7 +262,7 @@ export function player(data, listeners, {
       </div>
 
       ${ui.preset === 'full' ? html`
-      <div class="onoff beating audio">Beating sound:
+      <div class="onoff beating audio">Battue
         <sc-toggle
           .active="${data.beatingSound.onOff}"
           @change="${e => experience.setBeatingSound(e.detail.value)}"

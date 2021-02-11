@@ -75,7 +75,9 @@ function score(graph, helpers, outputFrame) {
   };
 
   const setPlayback = (playback) => {
-    resetPartsRequest();
+    if(!playback) {
+      resetPartsRequest();
+    }
 
     parameters.playback = playback;
   };
@@ -133,7 +135,7 @@ function score(graph, helpers, outputFrame) {
       if(!parameters.playback || !score) {
         outputData['notes'] = {};
         outputData['events'] = (resetEvents
-                       ? resetEvents
+                                ? resetEvents
                                 : []);
 
         return outputFrame;

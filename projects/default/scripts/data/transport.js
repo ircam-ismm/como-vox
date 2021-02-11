@@ -73,7 +73,7 @@ function transport(graph, helpers, outputFrame) {
     clip: true,
   });
 
-  const beatOffsetSmoothDuration = 1; // whole note{bar: 1, beat: 0};
+  const beatOffsetSmoothDuration = 2; // whole note{bar: 1, beat: 0};
   // initialisation with fixed value
   const beatOffsetSmoother = new Scaler({
     inputStart: 0,

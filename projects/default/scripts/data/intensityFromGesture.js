@@ -2,6 +2,9 @@ function intensityFromGesture(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
+
+  const notesToSeconds = conversion.notesToSeconds;
+
   const amplitudeToDB = conversion.amplitudeToDB;
   const dBToAmplitude = conversion.dBToAmplitude;
 
@@ -89,6 +92,18 @@ function intensityFromGesture(graph, helpers, outputFrame) {
     max: 127,
   });
 
+  const intensitySmoother = new Scaler({
+    inputStart: 0,
+    inputEnd: 0,
+    outputStart: intensityRangeMediumDefault,
+    outputEnd: intensityRangeMediumDefault,
+    type: 'linear',
+    clip: true,
+  });
+
+  const intensitySmoothDurationUp = 0.25; // quarter note
+  const intensitySmoothDurationDown = 0.25; // quarter note
+
   const parameters = {
     gestureControlsIntensity: false,
     scaleRangeLow: intensityRangeLowDefault, // normalised intensity
@@ -120,6 +135,8 @@ function intensityFromGesture(graph, helpers, outputFrame) {
       const inputData = inputFrame.data;
       const outputData = outputFrame.data;
 
+      const time = inputData['time'];
+      const now = time.audio;
       const timeSignature = inputData['timeSignature'];
       const tempo = inputData['tempo'];
       const position = inputData['position'];
@@ -177,6 +194,15 @@ function intensityFromGesture(graph, helpers, outputFrame) {
       //               valueMax: gestureIntensityMax,
       //               segmentCharacter: '-'}) );
 
+      const intensityScaleSmoothed = intensitySmoother.process(now);
+
+      // console.log('intensityScaleSmoothed',
+      //             (Math.round(100 * intensityScaleSmoothed) * 0.01).toFixed(3),
+      //             barGraph(intensityScaleSmoothed, {
+      //               peak: intensityScaleCurrent,
+      //               valueMin: 0,
+      //               valueMax: intensityRangeHighDefault,
+      //             }) );
 
       if(intensityScaleUpdate) {
         if(gestureIntensityNext < gestureIntensityMedium) {
@@ -191,6 +217,21 @@ function intensityFromGesture(graph, helpers, outputFrame) {
         //             'at position', {...position});
 
         gestureIntensityNext = -Infinity;
+
+        const smoothDuration = (intensityScaleCurrent > intensityScaleSmoothed
+                                ? intensitySmoothDurationUp
+                                : intensitySmoothDurationDown);
+
+        intensitySmoother.set({
+          inputStart: now,
+          inputEnd: now + notesToSeconds(smoothDuration, {
+            tempo,
+            timeSignature,
+          }),
+          outputStart: intensityScaleSmoothed,
+          outputEnd: intensityScaleCurrent,
+        });
+
       }
 
       // change intensity of noteOn event from score
@@ -200,7 +241,7 @@ function intensityFromGesture(graph, helpers, outputFrame) {
           events.forEach( (event) => {
             if(event.type === 'noteOn') {
               event.data.intensity = noteIntensityClipper.process(
-                event.data.intensity * intensityScaleCurrent);
+                event.data.intensity * intensityScaleSmoothed);
             }
           });
         });
@@ -213,7 +254,7 @@ function intensityFromGesture(graph, helpers, outputFrame) {
           const notes = notesContainer[channel];
           notes.forEach( (note) => {
             note.intensity = noteIntensityClipper.process(
-              note.intensity * intensityScaleCurrent);
+              note.intensity * intensityScaleSmoothed);
           });
         };
       }

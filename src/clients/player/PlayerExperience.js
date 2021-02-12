@@ -382,7 +382,7 @@ class PlayerExperience extends AbstractExperience {
 
   setLookAheadNotes(lookAheadNotes) {
     this.lookAheadNotes = lookAheadNotes;
-    app.lookAheadNotes = lookAheadNotes;
+    app.data.lookAheadNotes = lookAheadNotes;
 
     this.updateLookAhead();
   }
@@ -394,9 +394,9 @@ class PlayerExperience extends AbstractExperience {
 
     if(this.lookAheadNotes === 0) {
       this.lookAheadBeats = 0;
-      app.lookAheadBeats = 0;
+      app.data.lookAheadBeats = 0;
       this.lookAheadSeconds = 0;
-      app.lookAheadSeconds = 0;
+      app.data.lookAheadSeconds = 0;
     } else {
       if(allowMoreIncrement) {
         while(

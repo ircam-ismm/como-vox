@@ -2,23 +2,30 @@
 
 ## Todo
 
-- [ ] avoid navigation gestures (swipe from left, swipe from top, etc.)
 - [ ] calibrate latency
-- [ ] beatTriggerFromGesturePeakAdapt: adapt inhibition to tempo & time-signature ++++++
+- [x] beatTriggerFromGesturePeakAdapt: adapt inhibition to tempo and
+      time-signature ++++++
 - [ ] data: bypass graph
   - [x] injection
   - [ ] no mode shared states via setGraphOptions
   - [ ] graph simplification and optimisation
+- [ ] transport
+  - [ ] apply beat phase and tempo on beat change
 - [ ] score
+  - [x] BUG: first note is very short
+  - [ ] apply tempo and time-signature on load, even when playback is paused
   - [ ] normalise
   - [ ] apply time-signature changes
+- [ ] beating
+  - [ ] ratio: 2, 1/2, 3, 1/3
 - [ ] intensity
-  - [ ] lookahead: float 1/2 beat NO: better 1 quarter note ++++++++
+  - [x] lookahead: float 1/2 beat NO: better 1 quarter note
+  - [x] smooth, specially on diminuendo
   - [ ] relative intensity
   - [ ] normalise score
 - [ ] global volume
-  - [x] compressor
-  - [x] reverb
+  - [?] compressor
+  - [?] reverb
 - [ ] start
 - [ ] end
 - [ ] UI

@@ -55,32 +55,32 @@ Object.assign(e, {midiPitchToHertz});
 
 const c1Over127 = 1 / 127;
 
-const midiDBRangeDefault = 60;
+const intensityDBRangeDefault = 60;
 
 export function midiIntensityToDB(
   intensity,
-  {range = midiDBRangeDefault} = {} ) {
+  {range = intensityDBRangeDefault} = {} ) {
   return intensity * c1Over127 * range - range;
 }
 Object.assign(e, {midiIntensityToDB});
 
 export function midiIntensityToAmplitude(
   intensity,
-  {range = midiDBRangeDefault} = {} ) {
+  {range = intensityDBRangeDefault} = {} ) {
   return dBToAmplitude(midiIntensityToDB(intensity, {range}) );
 }
 Object.assign(e, {midiIntensityToAmplitude});
 
 export function intensityToDB(
   intensity,
-  {range = midiDBRangeDefault} = {} ) {
+  {range = intensityDBRangeDefault} = {} ) {
   return intensity * range - range;
 }
 Object.assign(e, {intensityToDB});
 
 export function intensityToAmplitude(
   intensity,
-  {range = midiDBRangeDefault} = {} ) {
+  {range = intensityDBRangeDefault} = {} ) {
   return dBToAmplitude(intensityToDB(intensity, {range}) );
 }
 Object.assign(e, {intensityToAmplitude});
@@ -217,5 +217,19 @@ export function timeDeltaToTempo(timeDelta, beatDelta = 1, {
 };
 Object.assign(e, {timeDeltaToTempo});
 
+// Nyquist normalised frequency is 1
+export function hertzToNormalised(frequencyHertz, {
+  sampleRate = 2,
+} = {}) {
+  return frequencyHertz * 2 / sampleRate;
+}
+Object.assign(e, {hertzToNormalised});
+
+export function normalisedToHertz(frequencyNormalised, {
+  sampleRate = 2,
+} = {}) {
+  return frequencyNormalised * sampleRate * 0.5;
+}
+Object.assign(e, {normalisedToHertz});
 
 export default e;

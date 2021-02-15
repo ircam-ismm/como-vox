@@ -322,7 +322,7 @@ function transport(graph, helpers, outputFrame) {
               tempo: tempoNew,
             }),
             outputStart: tempo,
-            outputEnd: tempoNew
+            outputEnd: tempoNew,
           });
           // now, tempo is still old tempo
         }

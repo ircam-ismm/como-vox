@@ -9,7 +9,7 @@ function score(graph, helpers, outputFrame) {
   let eventsNext = [];
   let positionToSeek = undefined; // undefined to seek to current
 
-  const humaniseJitter = 10e-3; // in seconds
+  const humaniseJitter = 20e-3; // in seconds
 
   const parameters = {
     playback: true,

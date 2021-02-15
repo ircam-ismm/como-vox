@@ -1,4 +1,4 @@
-function intensityFromGesture(graph, helpers, outputFrame) {
+function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
@@ -34,12 +34,12 @@ function intensityFromGesture(graph, helpers, outputFrame) {
     };
 
     const segmentActiveCount = valueToCount(value);
+    let segments = new Array(segmentCount).fill(' ');
 
     if(segmentActiveCount === 0) {
-      return segmentCharacterZero;
+      segments[0] = segmentCharacterZero;
     }
 
-    let segments = new Array(segmentCount).fill(' ');
     for(let s = 0; s < segmentActiveCount && s < segmentCount; ++s) {
       segments[s] = segmentCharacter;
     }

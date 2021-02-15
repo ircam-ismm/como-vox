@@ -85,7 +85,7 @@
       id: 'intensityFromGesture',
       type: 'ScriptData',
       options: {
-        scriptName: 'intensityFromGesture',
+        scriptName: 'intensityFromGestureHysteresis',
       },
     },
     {

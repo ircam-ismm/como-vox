@@ -132,7 +132,24 @@ function score(graph, helpers, outputFrame) {
         resetParts = undefined;
       }
 
+      let outputTempo;
+      if(scoreTempoChanged) {
+        outputTempo = scoreTempo;
+        scoreTempoChanged = false;
+      }
+
+      let outputTimeSignature;
+      if(scoreTimeSignatureChanged) {
+        outputTimeSignature = scoreTimeSignature;
+        scoreTimeSignatureChanged = false;
+      }
+
       if(!parameters.playback || !score) {
+        outputData['score'] = {
+          tempo: outputTempo,
+          timeSignature: outputTimeSignature,
+        };
+
         outputData['notes'] = {};
         outputData['events'] = (resetEvents
                                 ? resetEvents
@@ -210,18 +227,6 @@ function score(graph, helpers, outputFrame) {
       // if the current score contains less parts than the previous one
       for(let p = score.partSet.parts.length; p < resetEvents.length; ++p) {
         eventContainer[p] = [ ...resetEvents[p] ];
-      }
-
-      let outputTempo;
-      if(scoreTempoChanged) {
-        outputTempo = scoreTempo;
-        scoreTempoChanged = false;
-      }
-
-      let outputTimeSignature;
-      if(scoreTimeSignatureChanged) {
-        outputTimeSignature = scoreTimeSignature;
-        scoreTimeSignatureChanged = false;
       }
 
       outputData['score'] = {

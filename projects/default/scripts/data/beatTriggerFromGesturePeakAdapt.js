@@ -78,11 +78,22 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
       // computing intensity using only one axis
       const acceleration = inputData['accelerationIncludingGravity'].x;
-      let derivate = movingDelta.process(acceleration, inputData.metas.period);
+      
+      //version 1
+      //let derivate = movingDelta.process(acceleration, inputData.metas.period);
+      //value = Math.max(derivate, 0) + feedbackFactor * memory; // store value for next pass
+      //memory = value;
+      //let intensity = value * intensityNormalisation;
+      //let intensityFiltered = movingAverage.process(intensity);
+
+      // version 2
+      const accelerationFiltered = movingAverage.process(acceleration);
+      let derivate = movingDelta.process(accelerationFiltered, inputData.metas.period);
       value = Math.max(derivate, 0) + feedbackFactor * memory; // store value for next pass
       memory = value;
-      let intensity = value * intensityNormalisation;
-      let intensityFiltered = movingAverage.process(intensity);
+      const intensity = value * intensityNormalisation;
+      //let intensityFiltered = movingAverage.process(intensity);
+      const intensityFiltered = intensity;
 
       delta = intensityFiltered - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin;
 

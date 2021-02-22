@@ -168,6 +168,7 @@ export function player(data, listeners, {
     <div class="controls container">
       <div class="onoff transport">Lecture&nbsp;:
         <sc-toggle
+          width="48"
           .active="${data.transportPlayback}"
           @change="${e => experience.setTransportPlayback(e.detail.value)}"
         ></sc-toggle>

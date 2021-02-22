@@ -22,7 +22,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let peakSearch = {
     min: 0.35, // seconds
     max: 0.5, // seconds
-    lookAhedRatio: 0.75, // ratio 0.7
+    lookAheadRatio: 0.5, // ratio 0.7
   };
   const thresholdRotation = 20;
   const averageOrderRotation = 20;

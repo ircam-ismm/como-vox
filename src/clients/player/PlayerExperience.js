@@ -111,6 +111,9 @@ class PlayerExperience extends AbstractExperience {
     // @TODO discover and store in localStorage
     this.audioLatency = 0;
 
+    this.gestureControlsPlaybackStart = false;
+    this.gestureControlsTempoPlaybackStop = false;
+
     this.gestureControlsBeatOffset = false;
     this.gestureControlsTempo = false;
     this.gestureControlsTempintensity = false;
@@ -488,6 +491,24 @@ class PlayerExperience extends AbstractExperience {
           seekPosition: position,
         },
       });
+    });
+  }
+
+  setGestureControlsPlaybackStart(control) {
+    this.gestureControlsPlaybackStart = control;
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        gestureControlsPlaybackStart: this.gestureControlsPlaybackStart,
+      },
+    });
+  }
+
+  setGestureControlsPlaybackStop(control) {
+    this.gestureControlsPlaybackStop = control;
+    this.setGraphOptions('transport', {
+      scriptParams: {
+        gestureControlsPlaybackStop: this.gestureControlsPlaybackStop,
+      },
     });
   }
 

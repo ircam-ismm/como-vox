@@ -174,6 +174,20 @@ export function player(data, listeners, {
         ></sc-toggle>
       </div>
 
+      <div class="onoff transport">Départ&nbsp;:
+        <sc-toggle
+          .active="${data.gesture.controlsPlaybackStart}"
+          @change="${e => experience.setGestureControlsPlaybackStart(e.detail.value)}"
+        ></sc-toggle>
+      </div>
+
+      <div class="onoff transport">Arrêt&nbsp;:
+        <sc-toggle
+          .active="${data.gesture.controlsPlaybackSttop}"
+          @change="${e => experience.setGestureControlsPlaybackStop(e.detail.value)}"
+        ></sc-toggle>
+      </div>
+
     </div>
 
     <div class="position container">Position&nbsp;:

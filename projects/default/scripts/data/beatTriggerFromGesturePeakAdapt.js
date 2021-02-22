@@ -11,20 +11,22 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const averageOrder = 2;
   const movingAverage = new helpers.algo.MovingAverage(averageOrder);
   const meanThresholdAdapt =  1.; // factor to multiply standar deviation //1
-  const meanThresholdMin = 5; // min threshold
+  const meanThresholdMin = 10; // min threshold 5
   let inhibition = {
-    min: 0.2, // seconds
+    min: 0.35, // seconds
     max: 0.5, // seconds
-    lookAheadRatio: 0.5, // ratio
+    lookAheadRatio: 0.5, // ratio 0.5
   };
   const meanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
   let peakSearch = {
-    min: 0.2, // seconds
+    min: 0.35, // seconds
     max: 0.5, // seconds
-    lookAheadRatio: 0.7, // ratio
+    lookAhedRatio: 0.75, // ratio 0.7
   };
-  const thresholdRotation = 50;
+  const thresholdRotation = 20;
+  const averageOrderRotation = 20;
+  const movingAverageRotation = new helpers.algo.MovingAverage(averageOrderRotation);
 
   // initialisation
   let lastBeatTime = 0;
@@ -67,11 +69,11 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
                                 peakSearch.lookAheadRatio * lookAheadSeconds));
 
       //const intensity = inputData['intensity'].linear;
-      const intensityRotation = Math.pow(inputData['rotationRate'].alpha ** 2
+      const intensityRotationUnfiltered = Math.pow(inputData['rotationRate'].alpha ** 2
                                          + inputData['rotationRate'].beta ** 2
                                          + inputData['rotationRate'].gamma ** 2,
                                          0.5);
-
+      const intensityRotation = movingAverageRotation.process(intensityRotationUnfiltered);
       // const intensity = inputData['accelerationIncludingGravity'].x ** 2
       //       + inputData['accelerationIncludingGravity'].y ** 2
       //       + inputData['accelerationIncludingGravity'].z ** 2;

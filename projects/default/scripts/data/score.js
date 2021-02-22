@@ -82,27 +82,29 @@ function score(graph, helpers, outputFrame) {
     parameters.playback = playback;
   };
 
+  const updateParams = (updates) => {
+    if(typeof updates.seekPosition !== 'undefined') {
+      seekPosition(updates.seekPosition);
+    }
+
+    if(typeof updates.score !== 'undefined') {
+      setScore(updates.score);
+    }
+
+    if(typeof updates.playback !== 'undefined') {
+      setPlayback(updates.playback);
+    }
+
+    for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
+      }
+    }
+
+  };
+
   return {
-    updateParams(updates) {
-      if(typeof updates.seekPosition !== 'undefined') {
-        seekPosition(updates.seekPosition);
-      }
-
-      if(typeof updates.score !== 'undefined') {
-        setScore(updates.score);
-      }
-
-      if(typeof updates.playback !== 'undefined') {
-        setPlayback(updates.playback);
-      }
-
-      for(const p of Object.keys(updates) ) {
-        if(parameters.hasOwnProperty(p) ) {
-          parameters[p] = updates[p];
-        }
-      }
-
-    },
+    updateParams,
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
@@ -112,6 +114,11 @@ function score(graph, helpers, outputFrame) {
       const timeSignature = inputData['timeSignature'];
       const tempo = inputData['tempo'];
       const position = inputData['position'];
+
+      const playback = app.data.playback;
+      if(playback !== parameters.playback) {
+        updateParams({playback});
+      }
 
       let resetEvents = (score
                          ? score.partSet.parts.map( part => [] )

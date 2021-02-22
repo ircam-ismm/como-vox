@@ -520,13 +520,13 @@ class PlayerExperience extends AbstractExperience {
 
   setTransportPlayback(playback) {
     this.transportPlayback = playback;
-    ['transport', 'score'].forEach( (node) => {
-      this.setGraphOptions(node, {
-        scriptParams: {
-          playback,
-        },
-      });
-    });
+    // ['transport', 'score'].forEach( (node) => {
+    //   this.setGraphOptions(node, {
+    //     scriptParams: {
+    //       playback,
+    //     },
+    //   });
+    // });
 
     app.data.playback = playback;
   }

@@ -136,34 +136,36 @@ function transport(graph, helpers, outputFrame) {
     beatGestures.length = 0;
   }
 
+  const updateParams = (updates) => {
+    if(typeof updates.seekPosition !== 'undefined') {
+      seekPosition(updates.seekPosition);
+    }
+
+    if(typeof updates.timeSignature !== 'undefined') {
+      setTimeSignature(updates.timeSignature);
+    }
+
+    if(typeof updates.tempo !== 'undefined') {
+      // immediately set fixed value
+      tempoSmoother.set({
+        inputStart: 0,
+        inputEnd: 0,
+        outputStart: updates.tempo,
+        outputEnd: updates.tempo,
+      });
+
+    }
+
+    for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
+      }
+    }
+
+  };
+
   return {
-    updateParams(updates) {
-      if(typeof updates.seekPosition !== 'undefined') {
-        seekPosition(updates.seekPosition);
-      }
-
-      if(typeof updates.timeSignature !== 'undefined') {
-        setTimeSignature(updates.timeSignature);
-      }
-
-      if(typeof updates.tempo !== 'undefined') {
-        // immediately set fixed value
-        tempoSmoother.set({
-          inputStart: 0,
-          inputEnd: 0,
-          outputStart: updates.tempo,
-          outputEnd: updates.tempo,
-        });
-
-      }
-
-      for(const p of Object.keys(updates) ) {
-        if(parameters.hasOwnProperty(p) ) {
-          parameters[p] = updates[p];
-        }
-      }
-
-    },
+    updateParams,
 
     process(inputFrame, outputFrame) {
       const inputData = inputFrame.data;
@@ -181,6 +183,12 @@ function transport(graph, helpers, outputFrame) {
       // do not alias playback as it may change
 
       outputData['timeSignature'] = timeSignature;
+
+      const playback = app.data.playback;
+      if(playback !== parameters.playback) {
+        updateParams({playback});
+      }
+
       outputData['playback'] = parameters.playback;
 
       // stop

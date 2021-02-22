@@ -116,6 +116,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         derivate,
         intensity,
         intensityFiltered,
+        intensityRotation,
         delta,
         mean: lastMean,
         std: lastStd,

@@ -32,7 +32,7 @@ const metronomeSoundDefault = false;
 const positionDefault = {bar: 1, beat: 1};
 const tempoDefault = 80;
 const timeSignatureDefault = {count: 4, division: 4};
-const transportPlaybackDefault = true;
+const playbackDefault = true;
 
 if(typeof app.data === 'undefined') {
   app.data = {
@@ -47,7 +47,7 @@ if(typeof app.data === 'undefined') {
       tempo: tempoDefault,
     }),
     position: positionDefault,
-    playback: transportPlaybackDefault,
+    playback: playbackDefault,
     tempo: tempoDefault,
     time: {
       audio: 0,
@@ -92,7 +92,7 @@ class PlayerExperience extends AbstractExperience {
 
     this.position = positionDefault;
 
-    this.transportPlayback = transportPlaybackDefault;
+    this.playback = playbackDefault;
 
     this.tempo = tempoDefault;
     this.tempoToReset = tempoDefault;
@@ -120,6 +120,8 @@ class PlayerExperience extends AbstractExperience {
 
     this.metronomeSound = undefined;
     this.beatingSound = undefined;
+
+    app.experience = this;
 
     // configure como w/ the given experience
     this.como.configureExperience(this);
@@ -249,7 +251,7 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer.onGraphCreated(async () => {
       app.graph = this.coMoPlayer.graph;
 
-      this.setTransportPlayback(transportPlaybackDefault);
+      this.setPlayback(playbackDefault);
       this.setTempo(tempoDefault);
       this.setTimeSignature(timeSignatureDefault);
 
@@ -263,7 +265,7 @@ class PlayerExperience extends AbstractExperience {
         // console.log('frame', JSON.parse(JSON.stringify(frame)));
 
         this.position = frame['position'];
-        this.transportPlayback = frame['playback'];
+        this.playback = frame['playback'];
 
         const score = frame['score'];
         if(this.tempoFromScore && score && score.tempo) {
@@ -539,17 +541,16 @@ class PlayerExperience extends AbstractExperience {
     });
   }
 
-  setTransportPlayback(playback) {
-    this.transportPlayback = playback;
-    // ['transport', 'score'].forEach( (node) => {
-    //   this.setGraphOptions(node, {
-    //     scriptParams: {
-    //       playback,
-    //     },
-    //   });
-    // });
-
+  setPlayback(playback) {
+    this.playback = playback;
     app.data.playback = playback;
+
+    if(!playback) {
+      this.seekPosition({
+        bar: app.data.position.bar,
+        beat: 1,
+      });
+    }
   }
 
   setMetronomeSound(onOff) {
@@ -619,7 +620,7 @@ class PlayerExperience extends AbstractExperience {
       voxPlayerState: this.voxPlayerState,
 
       syncTime,
-      transportPlayback: this.transportPlayback,
+      playback: this.playback,
       position: this.position, // this.positionCompensated,
       tempo: this.tempo,
       tempoFromScore: this.tempoFromScore,

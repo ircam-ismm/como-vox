@@ -11,18 +11,18 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const averageOrder = 2;
   const movingAverage = new helpers.algo.MovingAverage(averageOrder);
   const meanThresholdAdapt =  1.; // factor to multiply standar deviation //1
-  const meanThresholdMin = 30; // min threshold 5
+  const meanThresholdMin = 20; // min threshold 5
   let inhibition = {
-    min: 0.35, // seconds
+    min: 0.2, // seconds
     max: 0.5, // seconds
-    lookAheadRatio: 0.5, // ratio 0.5
+    lookAheadRatio: 0.25, // ratio 0.5
   };
   const meanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
   let peakSearch = {
-    min: 0.35, // seconds
+    min: 0.3, // seconds
     max: 0.5, // seconds
-    lookAheadRatio: 0.5, // ratio 0.7
+    lookAheadRatio: 0.25, // ratio 0.7
   };
   const thresholdRotation = 20;
   const averageOrderRotation = 20;

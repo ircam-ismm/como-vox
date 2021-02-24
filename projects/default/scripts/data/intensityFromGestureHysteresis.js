@@ -86,10 +86,10 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
     clip: true,
   });
 
-  // conform to MIDI intensity
-  const noteIntensityClipper = new Clipper({
-    min: 0,
-    max: 127,
+  // clip before hysteresis for better reactivity on saturation
+  const gestureIntensityClipper = new Clipper({
+    min: gestureIntensityMin,
+    max: gestureIntensityMax,
   });
 
   const lowpassPositionDeltaDown = {
@@ -101,12 +101,18 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
     sampleRate: 1 / inputSamplePeriod, // update later
     lowpassFrequencyUp: 10, // Hz: 180 bpm
     lowpassFrequencyDown: 1 / positionDeltaToSeconds(lowpassPositionDeltaDown, {
-      tempo: 60,
+      tempo: 60, // bpm, will update later
       timeSignature: {
         count: 4,
         division: 4,
       },
     }),
+  });
+
+  // conform to MIDI intensity
+  const noteIntensityClipper = new Clipper({
+    min: 0,
+    max: 127,
   });
 
   const parameters = {
@@ -146,7 +152,9 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       const tempo = inputData['tempo'];
       const position = inputData['position'];
 
-      const sensorsIntensity = inputData['intensity'].compressed;
+      // clip before hysteresis for better reactivity on saturation
+      const gestureIntensity = gestureIntensityClipper.process(
+        inputData['intensity'].compressed);
 
       if(inputSamplePeriod !== inputData.metas.period) {
         inputSamplePeriod = input.metas.period;
@@ -165,7 +173,7 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
 
 
       const gestureIntensitySmoothed
-            = gestureIntensitySmoother.process(sensorsIntensity);
+            = gestureIntensitySmoother.process(gestureIntensity);
 
       if(gestureIntensitySmoothed < gestureIntensityMedium) {
         intensityScale

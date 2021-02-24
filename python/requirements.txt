@@ -4,3 +4,5 @@ numpy
 pandas
 pyqt5
 python-osc
+seaborn
+

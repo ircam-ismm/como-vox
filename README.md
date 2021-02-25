@@ -23,6 +23,7 @@
   - [x] smooth, specially on diminuendo
   - [ ] relative intensity
   - [ ] normalise score
+  - [ ] hold when transport does not stop with beating
 - [ ] global volume
   - [?] compressor
   - [?] reverb
@@ -35,6 +36,11 @@
   - [ ] users
   - [ ] debug
   - [ ] controller
+- [ ] log
+  - [ ] errors and log from clients
+  - [ ] currents settings as meta-data 
+  - [ ] user-agent
+  - [ ] audio settings
 
 
 **Projects are dedicated to exercices types:**

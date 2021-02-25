@@ -58,7 +58,6 @@ function clackFromBeat(graph, helpers, outputFrame) {
             time += oneBeatOffset;
             // transpose to listen for offset
             notePitch -= 3;
-            ++beatOffsetCount;
           }
         }
 

@@ -48,13 +48,17 @@ function clackFromBeat(graph, helpers, outputFrame) {
         // listen one beat after
         const oneBeatOffset = beatsToSeconds(1, {tempo, timeSignature});
 
-        let time = localToAudioContextTime(beat.time, {audioContext});
-
         // compensate for audio latency heard while beating
+        let time = localToAudioContextTime(beat.time, {audioContext});
+        let notePitch = pitch;
         if(app.data.playbackLatency > 0) {
           time -= app.data.playbackLatency;
+          // schedule to the next beat in future
           while(time < now.audio) {
             time += oneBeatOffset;
+            // transpose to listen for offset
+            notePitch -= 3;
+            ++beatOffsetCount;
           }
         }
 
@@ -86,7 +90,7 @@ function clackFromBeat(graph, helpers, outputFrame) {
 
         notes.push({
           time,
-          pitch,
+          pitch: notePitch,
           intensity,
           duration,
         });

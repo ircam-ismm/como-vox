@@ -341,7 +341,7 @@ function transport(graph, helpers, outputFrame) {
 
         // time related to scheduled audio
         beatGestures.push({
-          time: beatGesture.time - app.data.playbackLatency,
+          time: beatGesture.time,
         });
         beatGestureLastTime = beatGesture.time;
 
@@ -436,7 +436,8 @@ function transport(graph, helpers, outputFrame) {
           const beatGesture = beatGestures[g];
           // time related to scheduled audio output
           const beatDeltaFromPlayback = secondsToBeats(
-            beatChangedLastTime.local - beatGesture.time,
+            beatChangedLastTime.local - beatGesture.time
+             - app.data.playbackLatency,
             {timeSignature, tempo});
 
           // consider only one bar from now,
@@ -579,8 +580,7 @@ function transport(graph, helpers, outputFrame) {
             };
 
             // playback on next beat
-            // - as gestures already compensate for audio latency, revert compensation
-            // - revert audio look-ahead
+            // - compensate for audio look-ahead
             // - apply beat offset later, do not compensate
 
             // Start time from first beat gesture whose offset is 0
@@ -591,7 +591,6 @@ function transport(graph, helpers, outputFrame) {
                                              tempo: tempoStart,
                                              timeSignature
                                            })
-                  + app.data.playbackLatency
                   - notesToSeconds(app.data.lookAheadNotes, {tempo: tempoStart});
 
             // console.log('beatGesturesStart[0].time', {...beatGesturesStart[0]}.time,

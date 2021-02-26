@@ -4,6 +4,7 @@
 
 Bugs:
  - [ ] intensity drops
+   - [?] device compresses audio output when clipping?
  - [ ] NaN in position
  - [ ] no tempo adaptation on start
 

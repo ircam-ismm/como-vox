@@ -25,8 +25,8 @@ import comovox_data_read_plot as comovox
 User data
 
 """
-folder_path = '/mypath'
-filename = 'xxx-*'
+folder_path = '/Users/lambert/Documents/CoMo Chœur/mesures/2021-02-23-sebastien/'
+filename = '*coule-dynamique-tempo*'
 
 # folder_path = \
 #   '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/data-test'

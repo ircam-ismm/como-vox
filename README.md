@@ -2,7 +2,14 @@
 
 ## Todo
 
+Bugs:
+ - [ ] intensity drops
+ - [ ] NaN in position
+ - [ ] no tempo adaptation on start
+
 - [ ] calibrate latency
+  - [ ] tap tempo on metronome
+  - [ ] clip with audio context values
 - [x] beatTriggerFromGesturePeakAdapt: adapt inhibition to tempo and
       time-signature ++++++
 - [ ] data: bypass graph
@@ -16,8 +23,11 @@
   - [ ] apply tempo and time-signature on load, even when playback is paused
   - [ ] normalise
   - [ ] apply time-signature changes
+  - [ ] transposition: advanced settings
+  - [ ] choose bar (number or slider): advanced settings
+  - [ ] start end, loop: advanced settings
 - [ ] beating
-  - [ ] ratio: 2, 1/2, 3, 1/3
+  - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings
 - [ ] intensity
   - [x] lookahead: float 1/2 beat NO: better 1 quarter note
   - [x] smooth, specially on diminuendo
@@ -27,8 +37,9 @@
 - [ ] global volume
   - [?] compressor
   - [?] reverb
-- [ ] start
-- [ ] end
+- [x] start
+- [x] end
+  - [ ] quicker
 - [ ] UI
   - [ ] CSS
     - [ ] no more in templates
@@ -38,7 +49,7 @@
   - [ ] controller
 - [ ] log
   - [ ] errors and log from clients
-  - [ ] currents settings as meta-data 
+  - [ ] currents settings as meta-data
   - [ ] user-agent
   - [ ] audio settings
 

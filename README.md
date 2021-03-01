@@ -5,7 +5,7 @@
 Bugs:
  - [ ] intensity drops
    - [?] device compresses audio output when clipping?
- - [ ] NaN in position
+ - [x] NaN in position
  - [ ] no tempo adaptation on start
 
 - [ ] calibrate latency
@@ -18,10 +18,10 @@ Bugs:
   - [ ] no mode shared states via setGraphOptions
   - [ ] graph simplification and optimisation
 - [ ] transport
-  - [ ] apply beat phase and tempo on beat change
+  - [?] apply beat phase and tempo on beat change
 - [ ] score
   - [x] BUG: first note is very short
-  - [ ] apply tempo and time-signature on load, even when playback is paused
+  - [x] apply tempo and time-signature on load, even when playback is paused
   - [ ] normalise
   - [ ] apply time-signature changes
   - [ ] transposition: advanced settings
@@ -42,6 +42,10 @@ Bugs:
 - [x] end
   - [ ] quicker
 - [ ] UI
+  - [ ] presets
+    - [ ] UI
+    - [ ] beating
+    - [ ] generalisation
   - [ ] CSS
     - [ ] no more in templates
     - [ ] SCSS

@@ -141,7 +141,7 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       const tempo = inputData['tempo'];
       const position = inputData['position'];
 
-      const intensityScaleUpdate = position.beatChanged;
+      const intensityScaleUpdate = position.beatChange;
 
       const sensorsIntensity = inputData['intensity'];
 

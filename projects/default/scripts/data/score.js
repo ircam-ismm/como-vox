@@ -21,10 +21,10 @@ function score(graph, helpers, outputFrame) {
   let score = null;
 
   let scoreTempo = undefined;
-  let scoreTempoChanged = false;
+  let scoreTempoChange = false;
 
   let scoreTimeSignature = {count: 4, division: 4};
-  let scoreTimeSignatureChanged = false;
+  let scoreTimeSignatureChange = false;
 
   let resetParts = undefined;
 
@@ -64,12 +64,12 @@ function score(graph, helpers, outputFrame) {
     if(score && score.masterTrack) {
       if(score.masterTrack.tempo) {
         scoreTempo = score.masterTrack.tempo;
-        scoreTempoChanged = true;
+        scoreTempoChange = true;
       }
 
       if(score.masterTrack.timeSignature) {
         scoreTimeSignature = score.masterTrack.timeSignature;
-        scoreTimeSignatureChanged = true;
+        scoreTimeSignatureChange = true;
       }
     }
   };
@@ -140,15 +140,15 @@ function score(graph, helpers, outputFrame) {
       }
 
       let outputTempo;
-      if(scoreTempoChanged) {
+      if(scoreTempoChange) {
         outputTempo = scoreTempo;
-        scoreTempoChanged = false;
+        scoreTempoChange = false;
       }
 
       let outputTimeSignature;
-      if(scoreTimeSignatureChanged) {
+      if(scoreTimeSignatureChange) {
         outputTimeSignature = scoreTimeSignature;
-        scoreTimeSignatureChanged = false;
+        scoreTimeSignatureChange = false;
       }
 
       if(!parameters.playback || !score) {

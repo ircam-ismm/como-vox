@@ -33,7 +33,7 @@ function clickGenerator(graph, helpers, outputFrame) {
       const bar = position.bar;
       const beat = position.beat;
 
-      const trigger = parameters.onOff && position.beatChanged;
+      const trigger = parameters.onOff && position.beatChange;
 
       if(!trigger) {
         outputData['notes'] = notesContainer;

@@ -20,8 +20,8 @@ function defaultMLDescriptors(graph, helpers, outputFrame) {
       // console.log(updates);
     },
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       // Copy the data that must be sent to the ML module into `outputFrame.data`
       // by default, we only forward the values computed by the `motionDescriptors`.

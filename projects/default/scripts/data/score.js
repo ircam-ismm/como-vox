@@ -108,21 +108,21 @@ function score(graph, helpers, outputFrame) {
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       const timeSignature = inputData['timeSignature'];
       const tempo = inputData['tempo'];
       const position = inputData['position'];
 
-      const playback = app.data.playback;
+      const playback = inputData['playback'];
       if(playback !== parameters.playback) {
         updateParams({playback});
       }
 
       let resetEvents = (score
                          ? score.partSet.parts.map( part => [] )
-                         : []);
+                         : {});
       if(resetParts) {
         // reset channels may not match parts
         resetParts.forEach( (part, p) => {
@@ -157,15 +157,19 @@ function score(graph, helpers, outputFrame) {
           timeSignature: outputTimeSignature,
         };
 
-        outputData['notes'] = {};
+        // reset own channel of notes
+        const notesContainer = inputData['notes'] || {};
+        notesContainer['score'] = [];
+        outputData['notes'] = notesContainer;
+
         outputData['events'] = (resetEvents
                                 ? resetEvents
-                                : []);
+                                : {});
 
         return outputFrame;
       }
 
-      const eventContainer = {}; // key is channel
+      const eventContainer = {};
 
       score.partSet.parts.forEach( (part, p) => {
         const events = part.events;
@@ -257,9 +261,9 @@ function score(graph, helpers, outputFrame) {
       //         };
       //       });
 
-      // outputData['notes'] = {
-      //   score: notes,
-      // };
+      // const notesContainer = inputData['notes'] || {};
+      // notesContainer['score'] = notes;
+      // outputData['notes'] = notesContainer;
 
       return outputFrame;
     },

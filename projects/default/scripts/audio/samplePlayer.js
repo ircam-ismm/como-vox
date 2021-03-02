@@ -104,9 +104,9 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     },
 
     process(inputFrame) {
-      const lookAheadSeconds = app.data.lookAheadSeconds;
+      const inputData = app.data;
 
-      const inputData = inputFrame.data;
+      const lookAheadSeconds = inputData['lookAheadSeconds'];
 
       const currentPosition = inputData['position'];
       // use logical time tag from frame
@@ -120,7 +120,8 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
         return;
       }
 
-      eventsContainer.forEach( (events, part) => {
+      for(const part in eventsContainer) {
+        const events = eventsContainer[part];
         if(typeof parts[part] === 'undefined') {
           parts[part] = {
             samplesPlaying: new Map(),
@@ -226,7 +227,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
         });
 
-      });
+      }
     },
 
     destroy() {

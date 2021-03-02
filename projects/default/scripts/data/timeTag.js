@@ -10,8 +10,7 @@ function timeTag(graph, helpers, outputFrame) {
     },
 
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const outputData = app.data;
 
       const audio = audioContext.currentTime;
       const local = getLocalTime();
@@ -20,8 +19,8 @@ function timeTag(graph, helpers, outputFrame) {
         audio,
         local,
       };
+
       outputData['time'] = time;
-      app.data.time = time;
 
       return outputFrame;
     },

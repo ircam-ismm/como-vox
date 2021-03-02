@@ -49,15 +49,15 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
     },
 
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       // use logical time tag from frame
       const now = inputData['time'].local;
 
       // @TODO: adapt inhibition to current playing
       const tempo = app.data.tempo;
-      const timeSignature = app.data.timeSignature;
+      const timeSignature = inputData['timeSignature'];
 
       const inhibitionDuration
             = Math.max(inhibition.min,

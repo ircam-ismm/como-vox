@@ -127,6 +127,8 @@ function transport(graph, helpers, outputFrame) {
   };
 
   const setPlayback = (playback) => {
+
+
     if(playback) {
       playbackStartRequest = null;
     } else {
@@ -154,9 +156,9 @@ function transport(graph, helpers, outputFrame) {
       app.experience.setPlayback(playback);
     }
     // reset also stopped time on pause
-    positionStoppedTime = app.data.time;
+    positionStoppedTime = app.data['time'];
 
-    app.data.playback = playback;
+    app.data['playback'] = playback;
     parameters.playback = playback;
   };
 
@@ -231,8 +233,8 @@ function transport(graph, helpers, outputFrame) {
     updateParams,
 
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
       // use logical time tag from frame
       // - now.audio for eveything related to position
       // - now.local for beat from gestures
@@ -247,7 +249,7 @@ function transport(graph, helpers, outputFrame) {
 
       outputData['timeSignature'] = timeSignature;
 
-      const playback = app.data.playback;
+      const playback = inputData['playback'];
       if(playback !== parameters.playback) {
         updateParams({playback});
       }
@@ -290,7 +292,7 @@ function transport(graph, helpers, outputFrame) {
       // stop
       if(!parameters.playback && !parameters.gestureControlsPlaybackStart) {
         outputData['tempo'] = tempo;
-        app.data.tempo = tempo;
+        outputData['tempo'] = tempo;
 
         const outputPosition = {
           bar: positionStopped.bar,
@@ -299,7 +301,6 @@ function transport(graph, helpers, outputFrame) {
           beatChange: false
         };
         outputData['position'] = outputPosition
-        app.data.position = outputPosition;
 
         // pause
         if(positionLastTime.audio !== 0) {
@@ -517,6 +518,8 @@ function transport(graph, helpers, outputFrame) {
       if(parameters.gestureControlsBeatOffset
          && beatGesture && beatGesture.trigger) {
 
+        const playbackLatency = inputData['playbackLatency'];
+
         let offsets = [];
         let offsetWeights = [];
 
@@ -525,8 +528,7 @@ function transport(graph, helpers, outputFrame) {
           // time related to scheduled audio output:
           // compensate for look-ahead latency
           const beatDeltaFromPlayback = secondsToBeats(
-            beatChangeLastTime.local - beatGesture.time
-             - app.data.playbackLatency,
+            beatChangeLastTime.local - beatGesture.time - playbackLatency,
             {timeSignature, tempo});
 
           // consider only one bar from now,
@@ -540,8 +542,7 @@ function transport(graph, helpers, outputFrame) {
           // time related to scheduled audio output:
           // compensate for look-ahead latency
           const beatDeltaFromReference = secondsToBeats(
-            beatReference.time.local - beatGesture.time
-              - app.data.playbackLatency,
+            beatReference.time.local - beatGesture.time - playbackLatency,
             {
               timeSignature: beatReference.timeSignature,
               tempo: beatReference.tempo,
@@ -691,6 +692,8 @@ function transport(graph, helpers, outputFrame) {
             // - compensate for audio look-ahead
             // - apply beat offset later, do not compensate
 
+            const lookAheadNotes = app.data.lookAheadNotes;
+
             // Start time from first beat gesture whose offset is 0
             const timeStart = beatGesturesStart[0].time
                   + positionDeltaToSeconds({bar: 0,
@@ -699,7 +702,7 @@ function transport(graph, helpers, outputFrame) {
                                              tempo: tempoStart,
                                              timeSignature
                                            })
-                  - notesToSeconds(app.data.lookAheadNotes, {tempo: tempoStart});
+                  - notesToSeconds(lookAheadNotes, {tempo: tempoStart});
 
             playbackStartRequest = {
               time: timeStart,
@@ -728,8 +731,6 @@ function transport(graph, helpers, outputFrame) {
       }
 
       outputData['tempo'] = tempo;
-      app.data.tempo = tempo;
-
 
       const outputPosition = (playback
                               ? {
@@ -748,7 +749,6 @@ function transport(graph, helpers, outputFrame) {
         debugger;
       }
       outputData['position'] = outputPosition;
-      app.data.position = outputPosition;
 
       if(playback) {
         positionLast = position;

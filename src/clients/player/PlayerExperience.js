@@ -35,27 +35,28 @@ const timeSignatureDefault = {count: 4, division: 4};
 const playbackDefault = true;
 
 if(typeof app.data === 'undefined') {
-  app.data = {
-    playbackLatency: notesToSeconds(lookAheadNotesDefault, {
-      tempo: tempoDefault,
-    }),
-    lookAheadNotes: lookAheadNotesDefault,
-    lookAheadBeats : notesToBeats(lookAheadNotesDefault, {
-      timeSignature: timeSignatureDefault,
-    }),
-    lookAheadSeconds: notesToSeconds(lookAheadNotesDefault, {
-      tempo: tempoDefault,
-    }),
-    position: positionDefault,
-    playback: playbackDefault,
-    tempo: tempoDefault,
-    time: {
-      audio: 0,
-      performance: 0,
-    },
-    timeSignature: timeSignatureDefault,
-  };
+  app.data = {};
 }
+Object.assign(app.data, {
+  playbackLatency: notesToSeconds(lookAheadNotesDefault, {
+    tempo: tempoDefault,
+  }),
+  lookAheadNotes: lookAheadNotesDefault,
+  lookAheadBeats : notesToBeats(lookAheadNotesDefault, {
+    timeSignature: timeSignatureDefault,
+  }),
+  lookAheadSeconds: notesToSeconds(lookAheadNotesDefault, {
+    tempo: tempoDefault,
+  }),
+  position: positionDefault,
+  playback: playbackDefault,
+  tempo: tempoDefault,
+  time: {
+    audio: 0,
+    performance: 0,
+  },
+  timeSignature: timeSignatureDefault,
+});
 
 // for simple debugging in browser...
 const MOCK_SENSORS = url.paramGet('mock-sensors', false);

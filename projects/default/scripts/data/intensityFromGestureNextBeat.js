@@ -132,8 +132,8 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
     },
 
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       const time = inputData['time'];
       const now = time.audio;
@@ -262,7 +262,7 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       // be sure to replicate the output of score, as this node is a filter
       outputData['notes'] = notesContainer;
       outputData['events'] = eventsContainer;
-      outputData['score'] = inputData['score'];
+      outputData['score'] = inputData['score']; // note needed any more
 
       return outputFrame;
    },

@@ -12,15 +12,18 @@ function kick(graph, helpers, outputFrame) {
 
     },
     process(inputFrame, outputFrame) {
+      const inputData = app.data;
+      const outputData = app.data;
+
       const now = Date.now() / 1000;
-      const intensity = inputFrame.data['intensity'].linear;
+      const intensity = inputData['intensity'].linear;
       const delta = intensity - lastMedian;
 
-      outputFrame.data['beat-trigger'] = 0;
+      outputData['beat-trigger'] = 0;
 
       if (delta > threshold && lastKickTime === null) {
         lastKickTime = now;
-        outputFrame.data['beat-trigger'] = 1;
+        outputData['beat-trigger'] = 1;
       }
 
       if (lastKickTime !== null && now - lastKickTime > minInter) {

@@ -127,17 +127,8 @@ function transport(graph, helpers, outputFrame) {
   };
 
   const setPlayback = (playback) => {
-
-
     if(playback) {
       playbackStartRequest = null;
-    } else {
-      playbackStartRequest = null;
-      positionStopped = positionLast;
-
-      beatGestures.length = 0;
-      beatGestureLastTime = 0;
-      beatChanges.length = 0;
       tempoSmoother.set({
         inputStart: 0,
         inputEnd: 0,
@@ -148,9 +139,16 @@ function transport(graph, helpers, outputFrame) {
       beatOffsetSmoother.set({
         inputStart: 0,
         inputEnd: 0,
-        outputStart: 0,
+        outputStart: beatOffsetSmoother.outputEnd,
         outputEnd: 0,
       });
+    } else {
+      playbackStartRequest = null;
+      positionStopped = positionLast;
+
+      beatGestures.length = 0;
+      beatGestureLastTime = 0;
+      beatChanges.length = 0;
 
       // needs experience to seek to beginning of bar (for score also)
       app.experience.setPlayback(playback);

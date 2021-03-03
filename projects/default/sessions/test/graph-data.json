@@ -15,17 +15,6 @@
       type: 'Merge',
     },
     {
-      id: 'select-ml-data',
-      type: 'ScriptData',
-      options: {
-        scriptName: 'ml-select-all',
-      },
-    },
-    {
-      id: 'ml-decoder',
-      type: 'MLDecoder',
-    },
-    {
       id: 'to-dataInput',
       type: 'Merge',
     },
@@ -136,18 +125,6 @@
     ],
     [
       'merge-descriptors',
-      'select-ml-data',
-    ],
-    [
-      'select-ml-data',
-      'ml-decoder',
-    ],
-    [
-      'merge-descriptors',
-      'to-dataInput',
-    ],
-    [
-      'ml-decoder',
       'to-dataInput',
     ],
     [

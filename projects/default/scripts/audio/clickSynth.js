@@ -38,7 +38,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
         return;
       }
 
-      for(const channel in notesContainer) {
+      for(const channel of Object.keys(notesContainer) ) {
         // do not play 'score' channel
         if(channel !== 'click' && channel !== 'clack') {
           continue;

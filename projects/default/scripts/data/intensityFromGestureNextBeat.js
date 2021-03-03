@@ -250,7 +250,7 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       // notes for clickSynth from clickGenerator clackFromBeat
       const notesContainer = inputData['notes'];
       if(parameters.gestureControlsIntensity && notesContainer) {
-        for(const channel in notesContainer) {
+        for(const channel of Object.keys(notesContainer) ) {
           const notes = notesContainer[channel];
           notes.forEach( (note) => {
             note.intensity = noteIntensityClipper.process(

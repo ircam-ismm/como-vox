@@ -120,7 +120,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
         return;
       }
 
-      for(const part in eventsContainer) {
+      for(const part of Object.keys(eventsContainer) ) {
         const events = eventsContainer[part];
         if(typeof parts[part] === 'undefined') {
           parts[part] = {

@@ -39,7 +39,7 @@ function defaultMLDescriptors(graph, helpers, outputFrame) {
           }
         // handle objects
         } else if (Object.prototype.toString.call(inputData[desc]) === '[object Object]') {
-          for (let key in inputData[desc]) {
+          for (const key of Object.keys( inputData[desc]) ) {
             outputData[index] = inputData[desc][key];
             index += 1;
           }

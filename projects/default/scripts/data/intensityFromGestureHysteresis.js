@@ -194,20 +194,20 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       // change intensity of noteOn event from score
       const eventsContainer = inputData['events'];
       if(parameters.gestureControlsIntensity && eventsContainer) {
-        eventsContainer.forEach( (events, part) => {
+        for(const [part, events] of Object.entries(eventsContainer) ) {
           events.forEach( (event) => {
             if(event.type === 'noteOn') {
               event.data.intensity = noteIntensityClipper.process(
                 event.data.intensity * intensityScale);
             }
           });
-        });
+        };
       }
 
       // notes for clickSynth from clickGenerator clackFromBeat
       const notesContainer = inputData['notes'];
       if(parameters.gestureControlsIntensity && notesContainer) {
-        for(const channel in notesContainer) {
+        for(const channel of Object.keys(notesContainer) ) {
           const notes = notesContainer[channel];
           notes.forEach( (note) => {
             note.intensity = noteIntensityClipper.process(

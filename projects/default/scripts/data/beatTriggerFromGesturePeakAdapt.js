@@ -1,6 +1,7 @@
 function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
   const conversion = app.imports.helpers.conversion;
+  const beatsToSeconds = conversion.beatsToSeconds;
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;
 
@@ -15,14 +16,14 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let inhibition = {
     min: 0.2, // seconds
     max: 0.5, // seconds
-    lookAheadRatio: 0.25, // ratio 0.5
+    beats: 0.5,
   };
   const meanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
   let peakSearch = {
     min: 0.3, // seconds
     max: 0.5, // seconds
-    lookAheadRatio: 0.25, // ratio 0.7
+    beats: 0.5,
   };
   const thresholdRotation = 20;
   const averageOrderRotation = 20;
@@ -48,25 +49,24 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
     },
 
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       // use logical time tag from frame
       const now = inputData['time'].local;
 
       // @TODO: adapt inhibition to current playing
       const tempo = app.data.tempo;
-      const timeSignature = app.data.timeSignature;
-      const lookAheadSeconds = app.data.lookAheadSeconds;
+      const timeSignature = inputData['timeSignature'];
 
       const inhibitionDuration
             = Math.max(inhibition.min,
                        Math.min(inhibition.max,
-                                inhibition.lookAheadRatio * lookAheadSeconds));
+                                beatsToSeconds(inhibition.beats, {tempo, timeSignature})));
       const peakSearchDuration
             = Math.max(peakSearch.min,
                        Math.min(peakSearch.max,
-                                peakSearch.lookAheadRatio * lookAheadSeconds));
+                                beatsToSeconds(peakSearch.beats, {tempo, timeSignature})));
 
       //const intensity = inputData['intensity'].linear;
       const intensityRotationUnfiltered = Math.pow(inputData['rotationRate'].alpha ** 2

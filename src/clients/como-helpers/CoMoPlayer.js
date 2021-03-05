@@ -20,7 +20,7 @@ class CoMoPlayer {
     this._graphCreatedSubscriptions = new Set();
 
     this._unsubscribePlayer = this.player.subscribe(async updates => {
-      for (let name in updates) {
+      for (let name of Object.keys(updates) ) {
         switch (name) {
           case 'sessionId': {
             await this.createSessionAndGraph(updates[name]);

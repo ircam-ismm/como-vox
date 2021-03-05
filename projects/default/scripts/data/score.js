@@ -21,10 +21,10 @@ function score(graph, helpers, outputFrame) {
   let score = null;
 
   let scoreTempo = undefined;
-  let scoreTempoChanged = false;
+  let scoreTempoChange = false;
 
   let scoreTimeSignature = {count: 4, division: 4};
-  let scoreTimeSignatureChanged = false;
+  let scoreTimeSignatureChange = false;
 
   let resetParts = undefined;
 
@@ -64,12 +64,12 @@ function score(graph, helpers, outputFrame) {
     if(score && score.masterTrack) {
       if(score.masterTrack.tempo) {
         scoreTempo = score.masterTrack.tempo;
-        scoreTempoChanged = true;
+        scoreTempoChange = true;
       }
 
       if(score.masterTrack.timeSignature) {
         scoreTimeSignature = score.masterTrack.timeSignature;
-        scoreTimeSignatureChanged = true;
+        scoreTimeSignatureChange = true;
       }
     }
   };
@@ -108,21 +108,21 @@ function score(graph, helpers, outputFrame) {
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       const timeSignature = inputData['timeSignature'];
       const tempo = inputData['tempo'];
       const position = inputData['position'];
 
-      const playback = app.data.playback;
+      const playback = inputData['playback'];
       if(playback !== parameters.playback) {
         updateParams({playback});
       }
 
       let resetEvents = (score
                          ? score.partSet.parts.map( part => [] )
-                         : []);
+                         : {});
       if(resetParts) {
         // reset channels may not match parts
         resetParts.forEach( (part, p) => {
@@ -140,15 +140,15 @@ function score(graph, helpers, outputFrame) {
       }
 
       let outputTempo;
-      if(scoreTempoChanged) {
+      if(scoreTempoChange) {
         outputTempo = scoreTempo;
-        scoreTempoChanged = false;
+        scoreTempoChange = false;
       }
 
       let outputTimeSignature;
-      if(scoreTimeSignatureChanged) {
+      if(scoreTimeSignatureChange) {
         outputTimeSignature = scoreTimeSignature;
-        scoreTimeSignatureChanged = false;
+        scoreTimeSignatureChange = false;
       }
 
       if(!parameters.playback || !score) {
@@ -157,15 +157,19 @@ function score(graph, helpers, outputFrame) {
           timeSignature: outputTimeSignature,
         };
 
-        outputData['notes'] = {};
+        // reset own channel of notes
+        const notesContainer = inputData['notes'] || {};
+        notesContainer['score'] = [];
+        outputData['notes'] = notesContainer;
+
         outputData['events'] = (resetEvents
                                 ? resetEvents
-                                : []);
+                                : {});
 
         return outputFrame;
       }
 
-      const eventContainer = {}; // key is channel
+      const eventContainer = {};
 
       score.partSet.parts.forEach( (part, p) => {
         const events = part.events;
@@ -257,9 +261,9 @@ function score(graph, helpers, outputFrame) {
       //         };
       //       });
 
-      // outputData['notes'] = {
-      //   score: notes,
-      // };
+      // const notesContainer = inputData['notes'] || {};
+      // notesContainer['score'] = notes;
+      // outputData['notes'] = notesContainer;
 
       return outputFrame;
     },

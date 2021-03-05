@@ -132,8 +132,8 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
     },
 
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       const time = inputData['time'];
       const now = time.audio;
@@ -141,7 +141,7 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       const tempo = inputData['tempo'];
       const position = inputData['position'];
 
-      const intensityScaleUpdate = position.beatChanged;
+      const intensityScaleUpdate = position.beatChange;
 
       const sensorsIntensity = inputData['intensity'];
 
@@ -250,7 +250,7 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       // notes for clickSynth from clickGenerator clackFromBeat
       const notesContainer = inputData['notes'];
       if(parameters.gestureControlsIntensity && notesContainer) {
-        for(const channel in notesContainer) {
+        for(const channel of Object.keys(notesContainer) ) {
           const notes = notesContainer[channel];
           notes.forEach( (note) => {
             note.intensity = noteIntensityClipper.process(
@@ -262,7 +262,7 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       // be sure to replicate the output of score, as this node is a filter
       outputData['notes'] = notesContainer;
       outputData['events'] = eventsContainer;
-      outputData['score'] = inputData['score'];
+      outputData['score'] = inputData['score']; // note needed any more
 
       return outputFrame;
    },

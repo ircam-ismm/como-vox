@@ -2,7 +2,15 @@
 
 ## Todo
 
+Bugs:
+ - [ ] intensity drops
+   - [?] device compresses audio output when clipping?
+ - [x] NaN in position
+ - [ ] no tempo adaptation on start
+
 - [ ] calibrate latency
+  - [ ] tap tempo on metronome
+  - [ ] clip with audio context values
 - [x] beatTriggerFromGesturePeakAdapt: adapt inhibition to tempo and
       time-signature ++++++
 - [ ] data: bypass graph
@@ -10,31 +18,45 @@
   - [ ] no mode shared states via setGraphOptions
   - [ ] graph simplification and optimisation
 - [ ] transport
-  - [ ] apply beat phase and tempo on beat change
+  - [?] apply beat phase and tempo on beat change
 - [ ] score
   - [x] BUG: first note is very short
-  - [ ] apply tempo and time-signature on load, even when playback is paused
+  - [x] apply tempo and time-signature on load, even when playback is paused
   - [ ] normalise
   - [ ] apply time-signature changes
+  - [ ] transposition: advanced settings
+  - [ ] choose bar (number or slider): advanced settings
+  - [ ] start end, loop: advanced settings
 - [ ] beating
-  - [ ] ratio: 2, 1/2, 3, 1/3
+  - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings
 - [ ] intensity
   - [x] lookahead: float 1/2 beat NO: better 1 quarter note
   - [x] smooth, specially on diminuendo
   - [ ] relative intensity
   - [ ] normalise score
+  - [ ] hold when transport does not stop with beating
 - [ ] global volume
   - [?] compressor
   - [?] reverb
-- [ ] start
-- [ ] end
+- [x] start
+- [x] end
+  - [ ] quicker
 - [ ] UI
+  - [ ] presets
+    - [ ] UI
+    - [ ] beating
+    - [ ] generalisation
   - [ ] CSS
     - [ ] no more in templates
     - [ ] SCSS
   - [ ] users
   - [ ] debug
   - [ ] controller
+- [ ] log
+  - [ ] errors and log from clients
+  - [ ] currents settings as meta-data
+  - [ ] user-agent
+  - [ ] audio settings
 
 
 **Projects are dedicated to exercices types:**

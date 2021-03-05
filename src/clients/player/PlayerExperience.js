@@ -117,7 +117,7 @@ class PlayerExperience extends AbstractExperience {
 
     this.gestureControlsBeatOffset = false;
     this.gestureControlsTempo = false;
-    this.gestureControlsTempintensity = false;
+    this.gestureControlsIntensity = false;
 
     this.metronomeSound = undefined;
     this.beatingSound = undefined;

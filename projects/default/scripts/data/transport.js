@@ -700,7 +700,8 @@ function transport(graph, helpers, outputFrame) {
                                              tempo: tempoStart,
                                              timeSignature
                                            })
-                  - notesToSeconds(lookAheadNotes, {tempo: tempoStart});
+                  - notesToSeconds(lookAheadNotes, {tempo: tempoStart})
+                  - beatOffsetStart;
 
             playbackStartRequest = {
               time: timeStart,

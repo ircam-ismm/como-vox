@@ -13,12 +13,12 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let inhibition = {
     min: 0.35, // seconds
     max: 0.5, // seconds
-    beats: 0.4,
+    beats: 0.5,
   };
   let peakSearch = {
     min: 0.35, // seconds
     max: 0.5, // seconds
-    beats: 0.4,
+    beats: 0.5,
   };
 
   // other parameters
@@ -127,7 +127,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         acceleration,
         derivate,
         intensity,
-        intensityFiltered,
+        intensityNormalized,
         intensityRotation,
         delta,
         mean: lastMean,
@@ -139,7 +139,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
         if (positiveDelta === 0) {
           // onset detection
-          if (intensityRotation > thresholdRotation && delta > 0 && lastDelta < 0) {
+          if (intensityRotation > rotationThreshold && delta > 0 && lastDelta < 0) {
             positiveDelta = 1;
             timeOnset = time;
             beat.timeOnset = timeOnset;
@@ -149,8 +149,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         } else {
           // peak detection
           if (time - timeOnset < peakSearchDuration) {
-            if (intensityFiltered > tempMax) {
-              tempMax = intensityFiltered;
+            if (intensityNormalized > tempMax) {
+              tempMax = intensityNormalized;
               timeMax = time;
             }
           } else {
@@ -170,7 +170,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         }
       }
 
-      [lastMean, lastStd] = movingMeanStd.process(intensityFiltered);
+      [lastMean, lastStd] = movingMeanStd.process(intensityNormalized);
       lastDelta = delta;
       outputData['beat'] = beat;
       return outputFrame;

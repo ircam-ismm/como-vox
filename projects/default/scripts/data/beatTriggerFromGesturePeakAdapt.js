@@ -1,33 +1,45 @@
 function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
+  
   const app = (typeof global !== 'undefined' ? global.app : window.app);
   const conversion = app.imports.helpers.conversion;
   const beatsToSeconds = conversion.beatsToSeconds;
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;
 
+  // importanat parameters for sensitivity
+  const meanThresholdAdapt =  2.; // factor to multiply standar deviation //1
+  const meanThresholdMin = 10; // min threshold 5
+  const rotationThreshold = 20;
+  let inhibition = {
+    min: 0.35, // seconds
+    max: 0.5, // seconds
+    beats: 0.4,
+  };
+  let peakSearch = {
+    min: 0.35, // seconds
+    max: 0.5, // seconds
+    beats: 0.4,
+  };
+
+  // other parameters
+
+  //acceleration filtering
+  const accelerationAverageOrder = 2;
+  const movingAverage = new helpers.algo.MovingAverage(accelerationAverageOrder);
+  
+  // comuting intenssity
   const feedbackFactor = 0.8; //for the intensity factor initllay set to 0.7
   const intensityNormalisation = 1.; // original gain  = 0.07 with accelerometer / 9.81
   const deltaOrder = 10; //20
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
-  const averageOrder = 2;
-  const movingAverage = new helpers.algo.MovingAverage(averageOrder);
-  const meanThresholdAdapt =  1.; // factor to multiply standar deviation //1
-  const meanThresholdMin = 5; // min threshold 5
-  let inhibition = {
-    min: 0.2, // seconds
-    max: 0.5, // seconds
-    beats: 0.5,
-  };
-  const meanStdOrder = 10;
-  const movingMeanStd = new helpers.algo.MovingMeanStd(meanStdOrder);
-  let peakSearch = {
-    min: 0.3, // seconds
-    max: 0.5, // seconds
-    beats: 0.5,
-  };
-  const thresholdRotation = 20;
-  const averageOrderRotation = 20;
-  const movingAverageRotation = new helpers.algo.MovingAverage(averageOrderRotation);
+  
+  //onset detection
+  const onsetMeanStdOrder = 10;
+  const movingMeanStd = new helpers.algo.MovingMeanStd(onsetMeanStdOrder);
+ 
+  // orientation intenisty filtering
+  const rotationAverageOrder = 20;
+  const rotationMovingAverage = new helpers.algo.MovingAverage(rotationAverageOrder);
 
   // initialisation
   let lastBeatTime = 0;
@@ -36,10 +48,9 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let previousIntensity = 0; //intensity at previous frame
   let positiveDelta = 0; // 1 if intensity > delta
   let delta = 0;
-  let value = 0;
-  let memory = 0; // intensity[time-1]
+  let intensity = 0;
+  let previousIntenity = 0; // intensity[time-1]
   let lastDelta = -1;
-  let detection = 0;
   let timeOnset = 0;
   let timeMax = 0;
   let tempMax = 0;
@@ -55,7 +66,12 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       // use logical time tag from frame
       const now = inputData['time'].local;
 
-      // @TODO: adapt inhibition to current playing
+      // latency estimation
+      const sensorsLatency = inputData.metas.period;
+      const time = now - sensorsLatency
+            - inputData.metas.period * (deltaOrder + accelerationAverageOrder)/2; // 3?
+
+      // adapt inhibition to current playing
       const tempo = app.data.tempo;
       const timeSignature = app.data.timeSignature;
 
@@ -68,41 +84,37 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
                        Math.min(peakSearch.max,
                                 beatsToSeconds(peakSearch.beats, {tempo, timeSignature})));
 
-      //const intensity = inputData['intensity'].linear;
+
+      // rotation intensity computin
       const intensityRotationUnfiltered = Math.pow(inputData['rotationRate'].alpha ** 2
                                          + inputData['rotationRate'].beta ** 2
                                          + inputData['rotationRate'].gamma ** 2,
                                          0.5);
-      const intensityRotation = movingAverageRotation.process(intensityRotationUnfiltered);
-      // const intensity = inputData['accelerationIncludingGravity'].x ** 2
-      //       + inputData['accelerationIncludingGravity'].y ** 2
-      //       + inputData['accelerationIncludingGravity'].z ** 2;
+      const intensityRotation = rotationMovingAverage.process(intensityRotationUnfiltered);
 
       // computing intensity using only one axis
       const acceleration = inputData['accelerationIncludingGravity'].x;
       
-      //version 1
-      //let derivate = movingDelta.process(acceleration, inputData.metas.period);
-      //value = Math.max(derivate, 0) + feedbackFactor * memory; // store value for next pass
-      //memory = value;
-      //let intensity = value * intensityNormalisation;
-      //let intensityFiltered = movingAverage.process(intensity);
-
-      // version 2
+      // compute 1D accleration intensity
       const accelerationFiltered = movingAverage.process(acceleration);
       let derivate = movingDelta.process(accelerationFiltered, inputData.metas.period);
-      value = Math.max(derivate, 0) + feedbackFactor * memory; // store value for next pass
-      memory = value;
-      const intensity = value * intensityNormalisation;
-      //let intensityFiltered = movingAverage.process(intensity);
-      const intensityFiltered = intensity;
+      intensity = Math.max(derivate, 0) + feedbackFactor * previousIntenity; // store value for next pass
+      previousIntenity = intensity;
+      
+      //other choices posssible
+      //const intensity = inputData['intensity'].linear;
+      // const intensity = inputData['accelerationIncludingGravity'].x ** 2
+      //       + inputData['accelerationIncludingGravity'].y ** 2
+      //       + inputData['accelerationIncludingGravity'].z ** 2;
 
-      delta = intensityFiltered - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin;
 
-      const sensorsLatency = inputData.metas.period;
-      const time = now - sensorsLatency
-            - inputData.metas.period * (deltaOrder + averageOrder)/2; // 3?
+      // norlmalization and filtering
+      const intensityNormalized = intensity * intensityNormalisation;
 
+      // delta computing
+      delta = intensityNormalized - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin;
+
+      // datastructure to output
       const beat = {
         time,
         trigger: 0,

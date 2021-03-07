@@ -29,19 +29,20 @@ function clackFromBeat(graph, helpers, outputFrame) {
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
-      const timeSignature = app.data.timeSignature;
-      const tempo = app.data.tempo;
+      const timeSignature = inputData['timeSignature'];
+      const tempo = inputData['tempo'];
 
-      const now = app.data.time;
+      const now = inputData['time'];
 
       const beat = inputData['beat'];
       const trigger = parameters.onOff && beat.trigger;
 
       const notes = [];
-      const notesContainer = {};
+      // reset own channel
+      const notesContainer = inputData['notes'] || {};
       notesContainer[channel] = notes;
 
       if(trigger) {
@@ -51,8 +52,9 @@ function clackFromBeat(graph, helpers, outputFrame) {
         // compensate for audio latency heard while beating
         let time = localToAudioContextTime(beat.time, {audioContext});
         let notePitch = pitch;
-        if(app.data.playbackLatency > 0) {
-          time -= app.data.playbackLatency;
+        const playbackLatency = inputData['playbackLatency'];
+        if(playbackLatency > 0) {
+          time -= playbackLatency;
           // schedule to the next beat in future
           while(time < now.audio) {
             time += oneBeatOffset;
@@ -63,14 +65,14 @@ function clackFromBeat(graph, helpers, outputFrame) {
 
         // debug only
         // const positionAddSeconds = conversion.positionAddSeconds;
-        // const position = app.data.position;
+        // const position = inputData['position'];
 
         // const beatPosition = positionAddSeconds(position,
         //                                         beat.time - now.local,
         //                                         {tempo, timeSignature});
         // const clackPosition = positionAddSeconds(position,
         //                                          beat.time - now.local
-        //                                          - app.data.playbackLatency
+        //                                          - inputData['playbackLatency']
         //                                          + beatsToSeconds(1, {tempo, timeSignature}),
         //                                          {tempo, timeSignature});
 
@@ -81,11 +83,11 @@ function clackFromBeat(graph, helpers, outputFrame) {
         // console.log('clack', beat.time,
         //             'from now local', beat.time - now.local,
         //             'scheduled audio', time,
-        //             'playback latency', app.data.playbackLatency,
+        //             'playback latency', inputData['playbackLatency'],
         //             'next beat', beatsToSeconds(1, {tempo, timeSignature}),
         //             'audio time', audioContext.currentTime,
         //             'audio delta', time - audioContext.currentTime,
-        //             'position', app.data.position);
+        //             'position', inputData['position']);
 
         notes.push({
           time,

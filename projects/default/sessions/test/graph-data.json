@@ -7,13 +7,6 @@
       type: 'Input',
     },
     {
-      id: 'timeTag',
-      type: 'ScriptData',
-      options: {
-        scriptName: 'timeTag',
-      },
-    },
-    {
       id: 'motion-descriptors',
       type: 'MotionDescriptors',
     },
@@ -22,19 +15,22 @@
       type: 'Merge',
     },
     {
-      id: 'select-ml-data',
+      id: 'to-dataInput',
+      type: 'Merge',
+    },
+    {
+      id: 'dataInput',
       type: 'ScriptData',
       options: {
-        scriptName: 'ml-select-all',
+        scriptName: 'dataInput',
       },
     },
     {
-      id: 'ml-decoder',
-      type: 'MLDecoder',
-    },
-    {
-      id: 'to-transport',
-      type: 'Merge',
+      id: 'timeTag',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'timeTag',
+      },
     },
     {
       id: 'transport',
@@ -45,10 +41,6 @@
           gestureControlsTempo: true,
         },
       },
-    },
-    {
-      id: 'merge-descriptors-position',
-      type: 'Merge',
     },
     {
       id: 'clickGenerator',
@@ -78,10 +70,6 @@
       },
     },
     {
-      id: 'to-intensityFromGesture',
-      type: 'Merge',
-    },
-    {
       id: 'intensityFromGesture',
       type: 'ScriptData',
       options: {
@@ -98,6 +86,14 @@
         },
       },
     },
+    {
+      id: 'dataOutput',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'dataOutput',
+      },
+    },
+
     {
       id: 'output',
       type: 'Output',
@@ -117,120 +113,58 @@
   connections: [
     [
       'input',
-      'output',
-    ],
-    [
-      'input',
       'merge-descriptors',
     ],
     [
       'input',
+      'motion-descriptors',
+    ],
+    [
+      'motion-descriptors',
+      'merge-descriptors',
+    ],
+    [
+      'merge-descriptors',
+      'to-dataInput',
+    ],
+    [
+      'to-dataInput',
+      'dataInput',
+    ],
+    [
+      'dataInput',
       'timeTag',
     ],
     [
       'timeTag',
-      'merge-descriptors',
-    ],
-    [
-      'input',
-      'motion-descriptors',
-    ],
-    [
-      'motion-descriptors',
-      'output',
-    ],
-    [
-      'motion-descriptors',
-      'merge-descriptors',
-    ],
-    [
-      'merge-descriptors',
-      'output',
-    ],
-    [
-      'merge-descriptors',
-      'select-ml-data',
-    ],
-    [
-      'merge-descriptors',
-      'to-transport',
-    ],
-    [
-      'to-transport',
-      'transport',
-    ],
-    [
-      'merge-descriptors',
-      'merge-descriptors-position',
-    ],
-    [
-      'transport',
-      'merge-descriptors-position',
-    ],
-    [
-      'merge-descriptors',
       'beatTriggerFromGesture',
     ],
     [
-      'select-ml-data',
-      'ml-decoder',
+      'beatTriggerFromGesture',
+      'transport',
     ],
     [
       'transport',
-      'output',
-    ],
-    [
-      'merge-descriptors-position',
       'clickGenerator',
     ],
     [
-      'clickGenerator',
-      'to-intensityFromGesture',
-    ],
-    [
-      'merge-descriptors-position',
+      'transport',
       'score',
     ],
     [
-      'beatTriggerFromGesture',
+      'transport',
       'clackFromBeat',
     ],
     [
-      'beatTriggerFromGesture',
-      'to-transport',
-    ],
-    [
-      'beatTriggerFromGesture',
-      'output',
-    ],
-    [
-      'merge-descriptors-position',
-      'to-intensityFromGesture',
-    ],
-    [
       'score',
-      'to-intensityFromGesture',
-    ],
-    // do not connect score to output,
-    // as it is filtered by intensity
-    [
-      'beatTriggerFromGesture',
-      'to-intensityFromGesture',
-    ],
-    [
-      'to-intensityFromGesture',
       'intensityFromGesture',
     ],
     [
       'intensityFromGesture',
-      'output',
+      'dataOutput',
     ],
     [
-      'clackFromBeat',
-      'to-intensityFromGesture',
-    ],
-    [
-      'ml-decoder',
+      'dataOutput',
       'output',
     ],
     [

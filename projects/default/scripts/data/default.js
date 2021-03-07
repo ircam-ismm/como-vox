@@ -20,8 +20,8 @@ function defaultMLDescriptors(graph, helpers, outputFrame) {
       // console.log(updates);
     },
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       // Copy the data that must be sent to the ML module into `outputFrame.data`
       // by default, we only forward the values computed by the `motionDescriptors`.
@@ -39,7 +39,7 @@ function defaultMLDescriptors(graph, helpers, outputFrame) {
           }
         // handle objects
         } else if (Object.prototype.toString.call(inputData[desc]) === '[object Object]') {
-          for (let key in inputData[desc]) {
+          for (const key of Object.keys( inputData[desc]) ) {
             outputData[index] = inputData[desc][key];
             index += 1;
           }

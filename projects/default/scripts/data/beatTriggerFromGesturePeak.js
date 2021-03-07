@@ -20,8 +20,8 @@ function beatTriggerFromGestureMax(graph, helpers, outputFrame) {
     },
 
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       const sensorsLatency = inputData.metas.period;
 

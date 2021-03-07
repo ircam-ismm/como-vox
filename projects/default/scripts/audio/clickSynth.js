@@ -22,9 +22,9 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
-      const lookAheadSeconds = app.data.lookAheadSeconds;
+      const inputData = app.data;
 
-      const inputData = inputFrame.data;
+      const lookAheadSeconds = inputData['lookAheadSeconds'];
 
       const currentPosition = inputData['position'];
       // use logical time tag from frame
@@ -38,7 +38,8 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
         return;
       }
 
-      for(const channel in notesContainer) {
+      for(const channel of Object.keys(notesContainer) ) {
+        // do not play 'score' channel
         if(channel !== 'click' && channel !== 'clack') {
           continue;
         }

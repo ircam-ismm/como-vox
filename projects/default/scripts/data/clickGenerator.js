@@ -22,12 +22,12 @@ function clickGenerator(graph, helpers, outputFrame) {
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
-      const inputData = inputFrame.data;
-      const outputData = outputFrame.data;
+      const inputData = app.data;
+      const outputData = app.data;
 
       const position = inputData['position'];
       const notes = [];
-      const notesContainer = {};
+      const notesContainer = inputData['notes'] || {};
       notesContainer[channel] = notes;
 
       const bar = position.bar;
@@ -36,6 +36,7 @@ function clickGenerator(graph, helpers, outputFrame) {
       const trigger = parameters.onOff && position.beatChange;
 
       if(!trigger) {
+        // empty notes container
         outputData['notes'] = notesContainer;
         return outputFrame;
       }

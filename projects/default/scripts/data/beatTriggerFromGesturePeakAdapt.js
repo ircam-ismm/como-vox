@@ -6,8 +6,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;
 
-  // importanat parameters for sensitivity
-  const meanThresholdAdapt =  2.; // factor to multiply standar deviation //1
+  // important parameters for sensitivity
+  const meanThresholdAdapt =  2.; // factor to multiply standars deviation //1
   const meanThresholdMin = 10; // min threshold 5
   const rotationThreshold = 20;
   let inhibition = {
@@ -27,8 +27,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const accelerationAverageOrder = 2;
   const movingAverage = new helpers.algo.MovingAverage(accelerationAverageOrder);
   
-  // comuting intenssity
-  const feedbackFactor = 0.8; //for the intensity factor initllay set to 0.7
+  // computing intensity
+  const feedbackFactor = 0.8; //for the intensity factor initially set to 0.7
   const intensityNormalisation = 1.; // original gain  = 0.07 with accelerometer / 9.81
   const deltaOrder = 10; //20
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
@@ -37,7 +37,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const onsetMeanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(onsetMeanStdOrder);
  
-  // orientation intenisty filtering
+  // orientation intensity filtering
   const rotationAverageOrder = 20;
   const rotationMovingAverage = new helpers.algo.MovingAverage(rotationAverageOrder);
 
@@ -45,11 +45,10 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let lastBeatTime = 0;
   let lastMean = +Infinity; // prevent kick on first frame
   let lastStd = 0; // prevent kick on first frame
-  let previousIntensity = 0; //intensity at previous frame
   let positiveDelta = 0; // 1 if intensity > delta
   let delta = 0;
   let intensity = 0;
-  let previousIntenity = 0; // intensity[time-1]
+  let previousIntensity = 0; //intensity at previous frame
   let lastDelta = -1;
   let timeOnset = 0;
   let timeMax = 0;
@@ -85,7 +84,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
                                 beatsToSeconds(peakSearch.beats, {tempo, timeSignature})));
 
 
-      // rotation intensity computin
+      // rotation intensity computing
       const intensityRotationUnfiltered = Math.pow(inputData['rotationRate'].alpha ** 2
                                          + inputData['rotationRate'].beta ** 2
                                          + inputData['rotationRate'].gamma ** 2,
@@ -94,12 +93,13 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
       // computing intensity using only one axis
       const acceleration = inputData['accelerationIncludingGravity'].x;
-      
-      // compute 1D accleration intensity
+
+      // compute 1D acceleration intensity
       const accelerationFiltered = movingAverage.process(acceleration);
       let derivate = movingDelta.process(accelerationFiltered, inputData.metas.period);
-      intensity = Math.max(derivate, 0) + feedbackFactor * previousIntenity; // store value for next pass
-      previousIntenity = intensity;
+      intensity = Math.max(derivate, 0) + feedbackFactor * previousIntensity;
+      // store value for next pass
+      previousIntensity = intensity;
       
       //other choices posssible
       //const intensity = inputData['intensity'].linear;
@@ -108,13 +108,13 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       //       + inputData['accelerationIncludingGravity'].z ** 2;
 
 
-      // norlmalization and filtering
+      // normalisation and filtering
       const intensityNormalized = intensity * intensityNormalisation;
 
       // delta computing
       delta = intensityNormalized - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin;
 
-      // datastructure to output
+      // data structure to output
       const beat = {
         time,
         trigger: 0,

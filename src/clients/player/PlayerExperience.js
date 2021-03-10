@@ -2,6 +2,7 @@ import { AbstractExperience } from '@soundworks/core/client';
 import { render, html } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 
+import {EventEmitter} from 'events'; // node.js or babel
 import {Blocked} from '@ircam/blocked';
 
 import url from '../shared/url.js';
@@ -37,6 +38,7 @@ const playbackDefault = true;
 if(typeof app.data === 'undefined') {
   app.data = {};
 }
+
 Object.assign(app.data, {
   playbackLatency: notesToSeconds(lookAheadNotesDefault, {
     tempo: tempoDefault,
@@ -58,12 +60,19 @@ Object.assign(app.data, {
   timeSignature: timeSignatureDefault,
 });
 
+app.events = new EventEmitter();
+app.events.setMaxListeners(0);
+if(typeof app.state === 'undefined') {
+  app.state = {};
+}
+
 // for simple debugging in browser...
 const MOCK_SENSORS = url.paramGet('mock-sensors', false);
 console.info('> to mock sensors for debugging purpose, append "?mock-sensors=1" to URL');
 console.info('> mock-sensors', MOCK_SENSORS);
 
-const AUDIO_DEBUG = url.paramGet('audio-debug', false);
+const AUDIO_DEBUG = (url.paramGet('audio-debug', false)
+                     ? true : false);
 console.info('> to use audio for debugging purpose, append "?debug-audio=1" to URI');
 console.info('> audio-debug', AUDIO_DEBUG);
 
@@ -85,21 +94,20 @@ class PlayerExperience extends AbstractExperience {
     this.player = null;
     this.session = null;
 
+    this.events = app.events;
+    this.state = app.state;
+    this.stream = app.data;
+
     this.voxApplicationState = null;
     this.voxPlayerState = null;
-
-    this.score = null;
-    this.scoreReady = false;
 
     this.position = positionDefault;
 
     this.playback = playbackDefault;
 
     this.tempo = tempoDefault;
-    this.tempoToReset = tempoDefault;
-    this.tempoFromScore = true;
+    this.tempoReference = tempoDefault;
     this.timeSignature = timeSignatureDefault;
-    this.timeSignatureFromScore = true;
 
     // default values
 
@@ -111,13 +119,6 @@ class PlayerExperience extends AbstractExperience {
     // in seconds
     // @TODO discover and store in localStorage
     this.audioLatency = 0;
-
-    this.gestureControlsPlaybackStart = false;
-    this.gestureControlsTempoPlaybackStop = false;
-
-    this.gestureControlsBeatOffset = false;
-    this.gestureControlsTempo = false;
-    this.gestureControlsIntensity = false;
 
     this.metronomeSound = undefined;
     this.beatingSound = undefined;
@@ -142,45 +143,13 @@ class PlayerExperience extends AbstractExperience {
     // 1. create a como player instance w/ a unique id (we default to the nodeId)
     const player = await this.como.project.createPlayer(this.como.client.id);
     this.voxPlayerState = await this.client.stateManager.create('vox-player');
+    this.initialiseState();
+
+    const voxPlayerSchema = this.voxPlayerState.getSchema();
 
     this.voxPlayerState.subscribe(async (updates) => {
-      for (let [key, value] of Object.entries(updates)) {
-        switch (key) {
-          case 'record': {
-            if (updates['record'] && this.coMoPlayer && this.coMoPlayer.graph) {
-              this.coMoPlayer.graph.modules['bridge'].addListener(frame => {
-                // console.log(frame);
-              });
-            } else {
-              this.voxPlayerState.set({ record: false });
-            }
-            break;
-          }
-
-          case 'score': {
-            let scoreURI;
-            const scoreURIbase = this.voxPlayerState.get('score');
-            if(!scoreURIbase || scoreURIbase === 'none') {
-              scoreURI = null;
-            } else {
-              scoreURI = url.base
-                + '/'
-                + this.voxApplicationState.get('scoresPath')
-                + '/'
-                + scoreURIbase;
-            }
-            try {
-              await this.setScore(scoreURI)
-            } catch (error) {
-              console.error('Error while loading score: ' + error.message);
-            }
-            break;
-          }
-
-          default: {
-            break;
-          }
-        }
+      for (let [key, value] of Object.entries(updates) ) {
+        this.updateFromState(key, value);
       }
     });
 
@@ -252,35 +221,26 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer.onGraphCreated(async () => {
       app.graph = this.coMoPlayer.graph;
 
-      this.setPlayback(playbackDefault);
-      this.setTempo(tempoDefault);
-      this.setTimeSignature(timeSignatureDefault);
-
-      this.setMetronomeSound(metronomeSoundDefault);
-      this.setBeatingSound(beatingSoundDefault);
-
-      this.setLookAheadNotes(lookAheadNotesDefault);
       this.seekPosition(positionDefault);
 
       this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
-        // console.log('frame', JSON.parse(JSON.stringify(frame)));
-
         this.position = frame['position'];
         this.playback = frame['playback'];
 
         const score = frame['score'];
-        if(this.tempoFromScore && score && score.tempo) {
-          this.setTempo(score.tempo);
+        if(this.state.scoreControlsTempo && score && score.tempo) {
+          this.events.emit('tempo', score.tempo);
         } else {
-          // avoid loop-back
-          this.setTempo(frame['tempo'], {transportUpdate: false});
+          // internal stream: no propagation of update
+          this.setTempo(frame['tempo'], {referenceUpdate: false});
         }
 
-        if(this.timeSignatureFromScore) {
+        if(this.state.scoreControlsTimeSignature) {
           if(score && score.timeSignature) {
-            this.setTimeSignature(score.timeSignature);
+            this.events.emit('timeSignature', score.timeSignature);
           }
         } else {
+          // internal stream: no propagation of update
           this.setTimeSignature(frame['timeSignature']);
         }
 
@@ -288,8 +248,9 @@ class PlayerExperience extends AbstractExperience {
       });
     });
 
-    this.setAudioDebug(AUDIO_DEBUG);
-    this.setUIPreset(UI_PRESET);
+    this.events.emit('audioDebug', AUDIO_DEBUG);
+    this.uiPreset = UI_PRESET;
+    this.events.emit('uiPreset', UI_PRESET);
 
     window.addEventListener('resize', () => this.render());
 
@@ -301,6 +262,152 @@ class PlayerExperience extends AbstractExperience {
     this.rafId = window.requestAnimationFrame(updateClock);
   }
 
+  updateFromState(key, value) {
+    const voxPlayerSchema = this.voxPlayerState.getSchema();
+    const event = voxPlayerSchema[key].event;
+
+    if(event || JSON.stringify(value) !== JSON.stringify(this.state[key] ) ) {
+      app.events.emit(key, value);
+    }
+
+  }
+
+  // immediate to data and asynchronously to voxPlayerState
+  updateFromEvent(key, value) {
+    const voxPlayerSchema = this.voxPlayerState.getSchema();
+    const event = voxPlayerSchema[key].event;
+
+    this.state[key] = value;
+
+    switch(key) {
+      case 'scoreData': {
+        // do not update shared state
+        break;
+      }
+
+      default: {
+        // do not forward local events to shared state
+        if(!event
+           && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
+          this.voxPlayerState.set({[key]: value});
+        }
+        break;
+      }
+    }
+  }
+
+  // declare everything if voxPlayerSchema
+  initialiseState() {
+    for(const [key, value] of Object.entries(this.voxPlayerState.getValues() ) ) {
+      this.events.on(key, (value) => {
+      });
+
+      this.state[key] = value;
+      switch(key) {
+
+        case 'audioDebug': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.setAudioDebug(value);
+          });
+          break;
+        }
+
+        case 'audioLatency': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.setAudioLatency(value);
+          });
+          break;
+        }
+
+        case 'lookAheadNotes': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.setLookAheadNotes(value);
+          });
+          break;
+        }
+
+        case 'record': {
+          this.events.on(key, (value) => {
+            if (value && this.coMoPlayer && this.coMoPlayer.graph) {
+              // this.coMoPlayer.graph.modules['bridge'].addListener(frame => {
+              //   // console.log(frame);
+              // });
+              this.updateFromEvent(key, value);
+            } else {
+              // do not update from event
+              this.events.emit('record', false);
+            }
+          });
+          break;
+        }
+
+        case 'scoreFileName': {
+          this.events.on(key, async (value) => {
+            this.updateFromEvent(key, value);
+            let scoreURI;
+            const scoreURIbase = this.state[key];
+            if(!scoreURIbase || scoreURIbase === 'none') {
+              scoreURI = null;
+            } else {
+              scoreURI = url.base
+                + '/'
+                + this.voxApplicationState.get('scoresPath')
+                + '/'
+                + scoreURIbase;
+            }
+            try {
+              await this.setScore(scoreURI)
+            } catch (error) {
+              console.error('Error while loading score: ' + error.message);
+            }
+          });
+          break;
+        }
+
+        case 'playback': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.setPlayback(value);
+          });
+          break;
+        }
+
+        case 'tempo': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.setTempo(value, true);
+          });
+          break;
+        }
+
+        case 'tempoReset': {
+          this.events.on(key, (value) => {
+            this.resetTempo();
+          });
+          break;
+        }
+
+        case 'timeSignature': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.setTimeSignature(value);
+          });
+          break;
+        }
+
+        default: {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+          });
+          break;
+        }
+      }
+    }
+  }
+
   setGraphOptions(node, updates) {
     if(this.coMoPlayer && this.coMoPlayer.graph
        && this.coMoPlayer.graph.modules[node]) {
@@ -310,34 +417,23 @@ class PlayerExperience extends AbstractExperience {
 
   async setScore(scoreURI) {
     if(!scoreURI) {
-      this.score = null;
-      this.scoreReady = true;
-      this.setGraphOptions('score', {
-        scriptParams: {
-          score: this.score,
-        },
-      });
+      this.events.emit('scoreData', null);
+      this.events.emit('scoreReady', true);
 
       // do not delete notes of previously loaded score
       return Promise.resolve(null);
     }
 
     const promise = new Promise( (resolve, reject) => {
-      this.score = null;
-      this.scoreReady = false;
-      this.setGraphOptions('score', {
-        scriptParams: {
-          score: this.score,
-        },
-      });
+      this.events.emit('scoreReady', false);
+      this.events.emit('scoreData', null);
 
       const request = new window.XMLHttpRequest();
       request.open('GET', scoreURI, true);
       request.responseType = 'arraybuffer'; // binary data
 
       request.onerror = () => {
-        reject(new Error(`Unable to GET ${scoreUrl}, status ${request.status} `
-                         + `${request.responseText}`) );
+        reject(new Error(`Unable to GET ${scoreURI}, status ${request.status}`) );
       };
 
       request.onload = async () => {
@@ -347,10 +443,10 @@ class PlayerExperience extends AbstractExperience {
         }
 
         try {
-          const score = midi.parse(request.response);
+          const scoreData = midi.parse(request.response);
           // no duplicates in set
           const notes = new Set();
-          score.partSet.forEach( (part, p) => {
+          scoreData.partSet.forEach( (part, p) => {
             part.events.forEach( (event) => {
               if(event.type === 'noteOn') {
                 notes.add(event.data.pitch);
@@ -359,22 +455,18 @@ class PlayerExperience extends AbstractExperience {
           });
 
           await this.pianoSampleManager.update({notes});
-          this.score = score;
-          this.scoreReady = true;
-          this.setGraphOptions('score', {
-            scriptParams: {
-              score: this.score,
-            },
-          });
-          resolve(this.score);
+
+          this.events.emit('scoreData', scoreData);
+          this.events.emit('scoreReady', true);
+          resolve(this.scoreData);
         } catch (error) {
           reject(new Error(`Error with midi file ${scoreURI}: `
                            + error.message) );
         }
       };
 
-      this.scoreReady = false;
-      this.score = null;
+      this.events.emit('scoreReady', false);
+      this.events.emit('scoreData', null);
       request.send(null);
     });
 
@@ -411,8 +503,8 @@ class PlayerExperience extends AbstractExperience {
             timeSignature: this.timeSignature,
           })
            - this.audioLatency)
-           <= this.lookAheadSecondsMin) {
-            this.lookAheadNotes += allowMoreIncrement;
+            <= this.lookAheadSecondsMin) {
+          this.lookAheadNotes += allowMoreIncrement;
         }
       } else {
         this.lookAheadSeconds = notesToSeconds(this.lookAheadNotes, {
@@ -436,32 +528,24 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setTempo(tempo, {
-    transportUpdate = true,
+    referenceUpdate = true,
   } = {}) {
-    if(!tempo || (tempo === this.tempo && tempo == this.tempoToReset) ) {
+    if(!tempo || (tempo === this.tempo && tempo == this.tempoReference) ) {
       return;
     }
-    this.tempo = tempo;
 
-    if(transportUpdate) {
-      this.tempoToReset = this.tempo;
-      this.setGraphOptions('transport', {
-        scriptParams: {
-          tempo,
-        },
-      });
+    if(referenceUpdate) {
+      this.tempoReference = tempo;
     }
+
+    this.tempo = tempo;
 
     app.data.tempo = tempo;
     this.updateLookAhead();
   }
 
-  setTempoFromScore(onOff) {
-    this.tempoFromScore = onOff;
-  }
-
   resetTempo() {
-    this.setTempo(this.tempoToReset);
+    this.events.emit('tempo', this.tempoReference);
   }
 
   setTimeSignature(timeSignature) {
@@ -473,78 +557,16 @@ class PlayerExperience extends AbstractExperience {
     }
 
     this.timeSignature = timeSignature;
-    this.setGraphOptions('transport', {
-      scriptParams: {
-        timeSignature,
-      },
-    });
-
     app.data.timeSignature = timeSignature;
     this.updateLookAhead();
   }
 
-  setTimeSignatureFromScore(onOff) {
-    this.timeSignatureFromScore = onOff;
-  }
-
   seekPosition(position) {
-    ['transport', 'score'].forEach( (script) => {
-      this.setGraphOptions(script, {
-        scriptParams: {
-          seekPosition: position,
-        },
-      });
-    });
-  }
-
-  setGestureControlsPlaybackStart(control) {
-    this.gestureControlsPlaybackStart = control;
-    this.setGraphOptions('transport', {
-      scriptParams: {
-        gestureControlsPlaybackStart: this.gestureControlsPlaybackStart,
-      },
-    });
-  }
-
-  setGestureControlsPlaybackStop(control) {
-    this.gestureControlsPlaybackStop = control;
-    this.setGraphOptions('transport', {
-      scriptParams: {
-        gestureControlsPlaybackStop: this.gestureControlsPlaybackStop,
-      },
-    });
-  }
-
-  setGestureControlsBeatOffset(control) {
-    this.gestureControlsBeatOffset = control;
-    this.setGraphOptions('transport', {
-      scriptParams: {
-        gestureControlsBeatOffset: this.gestureControlsBeatOffset,
-      },
-    });
-  }
-
-  setGestureControlsTempo(control) {
-    this.gestureControlsTempo = control;
-    this.setGraphOptions('transport', {
-      scriptParams: {
-        gestureControlsTempo: this.gestureControlsTempo,
-      },
-    });
-  }
-
-  setGestureControlsIntensity(control) {
-    this.gestureControlsIntensity = control;
-    this.setGraphOptions('intensityFromGesture', {
-      scriptParams: {
-        gestureControlsIntensity: this.gestureControlsIntensity,
-      },
-    });
+    this.events.emit('seekPosition', position);
   }
 
   setPlayback(playback) {
     this.playback = playback;
-    app.data.playback = playback;
 
     if(!playback) {
       this.seekPosition({
@@ -554,28 +576,11 @@ class PlayerExperience extends AbstractExperience {
     }
   }
 
-  setMetronomeSound(onOff) {
-    this.metronomeSound = onOff;
-    this.setGraphOptions('clickGenerator', {
-      scriptParams: {
-        onOff,
-      },
-    });
-
-  }
-
-  setBeatingSound(onOff) {
-    this.beatingSound = onOff;
-    this.setGraphOptions('clackFromBeat', {
-      scriptParams: {
-        onOff,
-      },
-    });
-
-  }
-
   setAudioDebug(enabled) {
     if(!enabled) {
+      if(this.audioDebugHandler) {
+        this.audioDebugHandler.stop();
+      }
       this.audioDebugHandler = null;
       return;
     }
@@ -595,52 +600,32 @@ class PlayerExperience extends AbstractExperience {
     }, 50);
   }
 
-  setUIPreset(preset) {
-    this.uiPreset = preset;
-  }
-
   render() {
     const syncTime = this.sync.getSyncTime();
 
     // warning: syncTime is NOT compensated
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
                                                  {timeSignature: this.timeSignature});
-    const viewData = {
-      ui: {
-        preset: this.uiPreset,
-      },
 
-      config: this.config,
+    const viewData = this.state;
+
+    Object.assign(viewData, {
       boundingClientRect: this.$container.getBoundingClientRect(),
-      project: this.como.project.getValues(),
-      player: this.coMoPlayer.player.getValues(),
-      session: this.coMoPlayer.session ? this.coMoPlayer.session.getValues() : null,
+      config: this.config,
       experience: this,
-
-      voxApplicationState: this.voxApplicationState,
-      voxPlayerState: this.voxPlayerState,
-
-      syncTime,
-      playback: this.playback,
-      position: this.position, // this.positionCompensated,
-      tempo: this.tempo,
-      tempoFromScore: this.tempoFromScore,
-      timeSignature: this.timeSignature,
-      timeSignatureFromScore: this.timeSignatureFromScore,
-      audioLatency: this.audioLatency,
-      lookAheadNotes: this.lookAheadNotes,
       lookAheadBeats: this.lookAheadBeats,
       lookAheadSeconds: this.lookAheadSeconds,
-
-      gesture: {
-        controlsBeatOffset: this.gestureControlsBeatOffset,
-        controlsTempo: this.gestureControlsTempo,
-        controlsIntensity: this.gestureControlsIntensity,
-      },
-
-      metronomeSound: {onOff: this.metronomeSound},
-      beatingSound: {onOff: this.beatingSound},
-    };
+      player: this.coMoPlayer.player.getValues(),
+      position: this.position,
+      project: this.como.project.getValues(),
+      session: (this.coMoPlayer.session
+                ? this.coMoPlayer.session.getValues()
+                : null),
+      syncTime,
+      tempo: this.tempo, // override state tempo which is reference tempo
+      voxApplicationState: this.voxApplicationState,
+      voxPlayerState: this.voxPlayerState,
+    });
 
     const listeners = this.listeners;
 

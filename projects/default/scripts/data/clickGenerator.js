@@ -8,17 +8,32 @@ function clickGenerator(graph, helpers, outputFrame) {
   const duration = 0.5; // in beats
 
   const parameters = {
-    onOff: false,
+    metronomeSound: false,
   };
 
-  return {
-    updateParams(updates) {
-      for(const p of Object.keys(updates) ) {
-        if(parameters.hasOwnProperty(p) ) {
-          parameters[p] = updates[p];
-        }
+  const updateParams = (updates) => {
+    for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
       }
-    },
+    }
+  };
+
+  ///// Events and data (defined only in browser)
+  if(app.events && app.state) {
+    [
+      'metronomeSound',
+    ].forEach( (event) => {
+      app.events.on(event, (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      });
+      updateParams({[event]: app.state[event]});
+    });
+  }
+
+  return {
+    updateParams,
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
@@ -33,7 +48,7 @@ function clickGenerator(graph, helpers, outputFrame) {
       const bar = position.bar;
       const beat = position.beat;
 
-      const trigger = parameters.onOff && position.beatChange;
+      const trigger = parameters.metronomeSound && position.beatChange;
 
       if(!trigger) {
         // empty notes container

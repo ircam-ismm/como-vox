@@ -12,22 +12,39 @@ function metronome(graph, helpers, outputFrame) {
   };
   let positionLastTime = 0; // in seconds
 
+  const updateParams = (updates) => {
+    if(typeof updates.tempo !== 'undefined') {
+      tempo = updates.tempo;
+    }
+
+    if(typeof updates.timeSignature !== 'undefined') {
+      timeSignature = updates.timeSignature;
+    }
+
+    if(typeof updates.seekPosition !== 'undefined') {
+      positionLast = updates.position;
+      positionLastTime = 0;
+    }
+  };
+
+  ///// Events and data (defined only in browser)
+  if(app.events && app.state) {
+    [
+      'tempo',
+      'seekPosition',
+      'timeSignature',
+    ].forEach( (event) => {
+      app.events.on(event, (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      });
+      updateParams({[event]: app.state[event]});
+    });
+  }
+
+
   return {
-    updateParams(updates) {
-      if(typeof updates.tempo !== 'undefined') {
-        tempo = updates.tempo;
-      }
-
-      if(typeof updates.timeSignature !== 'undefined') {
-        timeSignature = updates.timeSignature;
-      }
-
-      if(typeof updates.position !== 'undefined') {
-        positionLast = updates.position;
-        positionLastTime = 0;
-      }
-    },
-
+    updateParams,
     process(inputFrame, outputFrame) {
       const inputData = app.data;
       const outputData = app.data;

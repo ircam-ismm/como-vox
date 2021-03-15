@@ -33,6 +33,12 @@ export default {
     default: false,
   },
 
+  gestureControlsPlaybackStartInit: {
+    type: 'boolean',
+    event: true,
+    default: null,
+  },
+
   gestureControlsPlaybackStop: {
     type: 'boolean',
     default: false,

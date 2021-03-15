@@ -33,6 +33,20 @@
       },
     },
     {
+      id: 'stillness',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'stillness',
+      },
+    },
+    {
+      id: 'startFromStillness',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'startFromStillness',
+      },
+    },
+    {
       id: 'transport',
       type: 'ScriptData',
       options: {
@@ -138,6 +152,14 @@
     [
       'timeTag',
       'beatTriggerFromGesture',
+    ],
+    [
+      'timeTag',
+      'stillness',
+    ],
+    [
+      'stillness',
+      'startFromStillness',
     ],
     [
       'beatTriggerFromGesture',

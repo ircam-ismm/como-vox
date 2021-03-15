@@ -167,9 +167,10 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       const tempo = inputData['tempo'];
       const position = inputData['position'];
 
+      const sensorsIntensity = inputData['intensity'].compressed;
       // clip before hysteresis for better reactivity on saturation
-      const gestureIntensity = gestureIntensityClipper.process(
-        inputData['intensity'].compressed);
+      const gestureIntensity
+            = gestureIntensityClipper.process(sensorsIntensity);
 
       if(inputSamplePeriod !== inputData.metas.period) {
         inputSamplePeriod = input.metas.period;

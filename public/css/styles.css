@@ -100,6 +100,11 @@ body.loading {
   width: 1.5em;
 }
 
+#__soundworks-container .count>.bar,
+#__soundworks-container .count>.beat {
+  width: 2.5em;
+}
+
 #__soundworks-container .sensorsLatency {
   display: none;
 }

@@ -63,6 +63,22 @@ export default {
     default: false,
   },
 
+  playbackStartAfterCount: {
+    type: 'any',
+    default: {
+      bar: 1,
+      beat: 1,
+    },
+  },
+
+  playbackStopAfterCount: {
+    type: 'any',
+    default: {
+      bar: 1,
+      beat: 0,
+    },
+  },
+
   record: {
     type: 'boolean',
     default: false,

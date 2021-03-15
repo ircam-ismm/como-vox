@@ -8,6 +8,13 @@ function getTimeSignature (event) {
   return {count, division};
 }
 
+function getBarBeat (event) {
+  const parentElement = event.srcElement.parentElement;
+  const bar = parseFloat(parentElement.querySelector('.bar').value) || 0;
+  const beat = parseFloat(parentElement.querySelector('.beat').value) || 0;
+  return {bar, beat};
+}
+
 function getPosition (event) {
   const parentElement = event.srcElement.parentElement;
   let bar = parseFloat(parentElement.querySelector('.bar').value) || 1;
@@ -179,19 +186,74 @@ export function player(data, listeners, {
         ></sc-toggle>
       </div>
 
+      ${uiPreset === 'full' ? html`
       <div class="onoff transport">Départ&nbsp;:
         <sc-toggle
           .active="${data.gestureControlsPlaybackStart}"
           @change="${e => voxPlayerState.set({gestureControlsPlaybackStart: (e.detail.value)}) }"
         ></sc-toggle>
+        <div class="count container">après&nbsp;:
+          <input class="bar"
+                 type="number"
+                 min="0"
+                 max="3"
+                 step="1"
+                 .value=${data.playbackStartAfterCount.bar}
+                 @click="${e => selfSelect(e)}"
+                 @change="${e => voxPlayerState.set({playbackStartAfterCount: (getBarBeat(e) )}) }">
+          mesure${data.playbackStartAfterCount.bar > 1 ? 's' : ''}
+          <input class="beat"
+                 type="number"
+                 min="0"
+                 max="16"
+                 step="1"
+                 .value=${data.playbackStartAfterCount.beat}
+                 @click="${e => selfSelect(e)}"
+                 @change="${e => voxPlayerState.set({playbackStartAfterCount: (getBarBeat(e) )}) }">
+          temps
+        </div>
       </div>
-
       <div class="onoff transport">Arrêt&nbsp;:
         <sc-toggle
           .active="${data.gestureControlsPlaybackStop}"
           @change="${e => voxPlayerState.set({gestureControlsPlaybackStop: (e.detail.value)}) }"
         ></sc-toggle>
+        <div class="count container">après&nbsp;:
+          <input class="bar"
+                 type="number"
+                 min="0"
+                 max="3"
+                 step="0.5"
+                 .value=${data.playbackStopAfterCount.bar}
+                 @click="${e => selfSelect(e)}"
+                 @change="${e => voxPlayerState.set({playbackStopAfterCount: (getBarBeat(e) )}) }">
+          mesure${data.playbackStartAfterCount.bar > 1 ? 's' : ''}
+          <input class="beat"
+                 type="number"
+                 min="0"
+                 max="32"
+                 step="1"
+                 .value=${data.playbackStopAfterCount.beat}
+                 @click="${e => selfSelect(e)}"
+                 @change="${e => voxPlayerState.set({playbackStopAfterCount: (getBarBeat(e) )}) }">
+          temps
+        </div>
+
       </div>
+          ` : html`
+      <div class="onoff transport">Suivant le geste&nbsp;:
+        <sc-toggle
+          .active="${data.gestureControlsPlaybackStart && data.gestureControlsPlaybackStop}"
+          @change="${e => {
+                       voxPlayerState.set({gestureControlsPlaybackStart: (e.detail.value)});
+                       voxPlayerState.set({gestureControlsPlaybackStop: (e.detail.value)});
+                     }
+                   }"
+        ></sc-toggle>
+      </div>
+      `}
+
+
 
     </div>
 
@@ -258,7 +320,7 @@ export function player(data, listeners, {
       ` : html`
       <div class="onoff beating audio">Tempo
         <sc-toggle
-          .active="${data.gestureControlsTempo}"
+          .active="${data.gestureControlsBeatOffset && data.gestureControlsTempo}"
           @change="${e => {
                         voxPlayerState.set({gestureControlsTempo:(e.detail.value)});
                         voxPlayerState.set({gestureControlsBeatOffset:(e.detail.value)});

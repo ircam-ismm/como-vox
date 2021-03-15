@@ -30,6 +30,14 @@ function transport(graph, helpers, outputFrame) {
     audioLatency: 0,
     timeSignature: timeSignatureDefault,
     playback: true,
+    playbackStartAfterCount: {
+      bar: 1,
+      beat: 1, // start on last time
+    },
+    playbackStopAfterCount: {
+      bar: 1,
+      beat: 0,
+    },
     gestureControlsPlaybackStart: false,
     gestureControlsPlaybackStop: false,
     gestureControlsBeatOffset: false,
@@ -45,7 +53,7 @@ function transport(graph, helpers, outputFrame) {
       absoluteMax: 180,
       relativeMin: 0, // no relative min
       relativeMax: 10, //  no relative max
-    }
+    },
   };
 
   let playbackStartRequest = null;
@@ -246,6 +254,8 @@ function transport(graph, helpers, outputFrame) {
       'gestureControlsPlaybackStop',
       'gestureControlsTempo',
       'playback',
+      'playbackStartAfterCount',
+      'playbackStopAfterCount',
       'tempo',
       'seekPosition',
       'timeSignature',
@@ -628,10 +638,9 @@ function transport(graph, helpers, outputFrame) {
       //////////// auto start
       if(!playback && parameters.gestureControlsPlaybackStart
          && !playbackStartRequest) {
-        // wait for 4 beats on 1/4 and 2/4 time signature
-        const startAfterBeats = (timeSignature.count < 3
-                                 ? 4
-                                 : timeSignature.count);
+        const startAfterBeats
+              = parameters.playbackStartAfterCount.bar * timeSignature.count
+                + parameters.playbackStartAfterCount.beat;
 
         const beatGesturesStart = [];
         // keep gestures after stop, do not change ordering
@@ -750,9 +759,9 @@ function transport(graph, helpers, outputFrame) {
       if(playback && parameters.gestureControlsPlaybackStop) {
 
         // wait for 4 beats on 1/4 and 2/4 time signature
-        const stopAfterBeats = (timeSignature.count < 3
-                                ? 4
-                                : timeSignature.count);
+        const stopAfterBeats
+              = parameters.playbackStopAfterCount.bar * timeSignature.count
+              + parameters.playbackStopAfterCount.beat;
 
         const stopAfterDuration = beatsToSeconds(stopAfterBeats, {tempo, timeSignature});
 

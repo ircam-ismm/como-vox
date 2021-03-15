@@ -1,16 +1,19 @@
 export default {
 
-  audioDebug: {
+  audioLatency: {
+    type: 'float',
+    default: 10e-3,
+    metas: {
+      exported: false, // local
+    },
+  },
+
+  beatingSound: {
     type: 'boolean',
     default: false,
   },
 
-  audioLatency: {
-    type: 'float',
-    default: 10e-3,
-  },
-
-  beatingSound: {
+  debugAudio: {
     type: 'boolean',
     default: false,
   },
@@ -50,6 +53,11 @@ export default {
     default: false,
   },
 
+  mockSensors: {
+    type: 'boolean',
+    default: false,
+  },
+
   playback: {
     type: 'boolean',
     default: false,
@@ -58,12 +66,9 @@ export default {
   record: {
     type: 'boolean',
     default: false,
-  },
-
-  score: {
-    type: 'any',
-    default: null,
-    nullable: true,
+    metas: {
+      exported: false,
+    },
   },
 
   scoreControlsTempo: {
@@ -80,6 +85,10 @@ export default {
     type: 'any',
     default: null,
     nullable: true,
+    metas: {
+      exported: false,
+      shared: false, // might be big
+    },
   },
 
   scoreFileName: {
@@ -91,6 +100,9 @@ export default {
   scoreReady: {
     type: 'boolean',
     default: false,
+    metas: {
+      exported: false,
+    },
   },
 
   seekPosition: {

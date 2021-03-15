@@ -6,6 +6,7 @@ import {EventEmitter} from 'events'; // node.js or babel
 import {Blocked} from '@ircam/blocked';
 
 import url from '../shared/url.js';
+import schema from '../../shared/schema.js';
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
 import views from '../como-helpers/views-mobile/index.js';
 
@@ -67,18 +68,18 @@ if(typeof app.state === 'undefined') {
 }
 
 // for simple debugging in browser...
-const MOCK_SENSORS = url.paramGet('mock-sensors', false);
-console.info('> to mock sensors for debugging purpose, append "?mock-sensors=1" to URL');
+const MOCK_SENSORS = url.paramGet('mockSensors', false);
+console.info('> to mock sensors for debugging purpose, append "?mockSensors=1" to URL');
 console.info('> mock-sensors', MOCK_SENSORS);
 
-const AUDIO_DEBUG = (url.paramGet('audio-debug', false)
+const DEBUG_AUDIO = (url.paramGet('debugAudio', false)
                      ? true : false);
-console.info('> to use audio for debugging purpose, append "?debug-audio=1" to URI');
-console.info('> audio-debug', AUDIO_DEBUG);
+console.info('> to use audio for debugging purpose, append "?debugAudio=1" to URI');
+console.info('> debugAudio', DEBUG_AUDIO);
 
-const UI_PRESET = url.paramGet('ui', 'simple');
-console.info('> for full interface, append "?ui=full" to URI');
-console.info('> ui', UI_PRESET);
+const UI_PRESET = url.paramGet('uiPreset', 'simple');
+console.info('> for full interface, append "?uiPreset=full" to URI');
+console.info('> uiPreset', UI_PRESET);
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -146,6 +147,8 @@ class PlayerExperience extends AbstractExperience {
     this.initialiseState();
 
     const voxPlayerSchema = this.voxPlayerState.getSchema();
+    url.parse(voxPlayerSchema);
+
 
     this.voxPlayerState.subscribe(async (updates) => {
       for (let [key, value] of Object.entries(updates) ) {
@@ -248,7 +251,7 @@ class PlayerExperience extends AbstractExperience {
       });
     });
 
-    this.events.emit('audioDebug', AUDIO_DEBUG);
+    this.events.emit('debugAudio', DEBUG_AUDIO);
     this.uiPreset = UI_PRESET;
     this.events.emit('uiPreset', UI_PRESET);
 
@@ -275,40 +278,28 @@ class PlayerExperience extends AbstractExperience {
   // immediate to data and asynchronously to voxPlayerState
   updateFromEvent(key, value) {
     const voxPlayerSchema = this.voxPlayerState.getSchema();
-    const event = voxPlayerSchema[key].event;
+    const event = schema.isEvent(voxPlayerSchema, key);
+    const shared = schema.isShared(voxPlayerSchema, key);
 
     this.state[key] = value;
 
-    switch(key) {
-      case 'scoreData': {
-        // do not update shared state
-        break;
-      }
-
-      default: {
-        // do not forward local events to shared state
-        if(!event
-           && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
-          this.voxPlayerState.set({[key]: value});
-        }
-        break;
-      }
+    // do not forward local events to shared state
+    if(!event && shared
+       && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
+      this.voxPlayerState.set({[key]: value});
     }
   }
 
   // declare everything if voxPlayerSchema
   initialiseState() {
     for(const [key, value] of Object.entries(this.voxPlayerState.getValues() ) ) {
-      this.events.on(key, (value) => {
-      });
-
       this.state[key] = value;
       switch(key) {
 
-        case 'audioDebug': {
+        case 'debugAudio': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
-            this.setAudioDebug(value);
+            this.setDebugAudio(value);
           });
           break;
         }
@@ -576,12 +567,12 @@ class PlayerExperience extends AbstractExperience {
     }
   }
 
-  setAudioDebug(enabled) {
+  setDebugAudio(enabled) {
     if(!enabled) {
-      if(this.audioDebugHandler) {
-        this.audioDebugHandler.stop();
+      if(this.debugAudioHandler) {
+        this.debugAudioHandler.stop();
       }
-      this.audioDebugHandler = null;
+      this.debugAudioHandler = null;
       return;
     }
 
@@ -591,7 +582,7 @@ class PlayerExperience extends AbstractExperience {
       gain: -30, // dB
     });
 
-    this.audioDebugHandler = new Blocked( (duration) => {
+    this.debugAudioHandler = new Blocked( (duration) => {
       console.warn(`---------- blocked for ${duration} ms ---------`);
       audio.playBuffer(noiseBuffer, {
         audioContext: this.audioContext,

@@ -33,14 +33,14 @@ export function player(data, listeners, {
   verbose = false,
   enableSelection = true,
 } = {}) {
-  const ui = data.ui;
-
-  const experience = data.experience;
   const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
+  const uiPreset = data.uiPreset;
 
   const bar = data.position.bar;
   const beat = data.position.beat;
+
+  const lookAheadNotes = data.lookAheadNotes;
 
   return html`
     <!-- LOADER -->
@@ -51,13 +51,13 @@ export function player(data, listeners, {
 
     <div style="position: relative" class="container">
       <span class="info">
-        ${ui.preset === 'full' ? html`
+        ${uiPreset === 'full' ? html`
         <span style="${styles.h3}" class="session">Session: ${data.session.name}</span>
         `: ''}
         <span style="${styles.h3}" class="session">Identifiant&nbsp;: ${data.player.id}</span>
       </span>
 
-      ${ui.preset === 'full' && enableSelection ? html`
+      ${uiPreset === 'full' && enableSelection ? html`
       <button class="setSession"
               @click="${e => listeners.setPlayerParams({ sessionId: null })}">
         Choisir session
@@ -73,23 +73,27 @@ export function player(data, listeners, {
              .value=${data.audioLatency * 1e3}
              @click="${e => selfSelect(e)}"
              @change="${e => {
-                   experience.setAudioLatency(parseFloat(e.srcElement.value * 1e-3) || 0);
-                   } }">
+                          voxPlayerState.set({
+                            audioLatency: (parseFloat(e.srcElement.value * 1e-3) || 0),
+                          });
+                        } }">
       ms
     </div>
 
-    ${ui.preset === 'full' ? html`
+    ${uiPreset === 'full' ? html`
     <div class="lookAhead container">Prévision&nbsp;:
       <input type="number"
              min="0"
              max="32"
              step="0.125"
-             .value=${data.lookAheadNotes * 8}
+    .value=${lookAheadNotes * 8}
              @click="${e => selfSelect(e)}"
              @change="${e => {
-                   experience.setLookAheadNotes(parseFloat(e.srcElement.value / 8) || 0);
+                     voxPlayerState.set({
+                       lookAheadNotes: (parseFloat(e.srcElement.value / 8) || 0),
+                     });
                    } }">
-      croche${data.lookAheadNotes > 1 ? 's' : ''}
+      croche${lookAheadNotes * 8 > 1 ? 's' : ''}
       (${data.lookAheadBeats} temps,
       ${Math.round(data.lookAheadSeconds * 1e3)} ms)
     </div>
@@ -100,19 +104,19 @@ export function player(data, listeners, {
     </div>
 
     <div class="score container">
-      <select class="${!experience.scoreReady ? 'invalid' : ''}"
+      <select class="${!data.scoreReady ? 'invalid' : ''}"
         @change="${e => {
-          const score = (e.target.value === 'none' ? null : e.target.value);
-          voxPlayerState.set({score});
+          const scoreFileName = (e.target.value === 'none' ? null : e.target.value);
+          voxPlayerState.set({scoreFileName});
         }}"
       >
-        ${['none', ...voxApplicationState.get('scores')].map( (score) => {
+        ${['none', ...voxApplicationState.get('scores')].map( (scoreFileName) => {
         return html`
         <option
-          .value=${score}
-          ?selected="${voxPlayerState.get('score')
-            === (score === 'none' ? null : score)}"
-        >${score === 'none' ? 'aucune' : score}</option>
+          .value=${scoreFileName}
+          ?selected="${data.scoreFileName
+            === (scoreFileName === 'none' ? null : scoreFileName)}"
+        >${scoreFileName === 'none' ? 'aucune' : scoreFileName}</option>
         `;
         })}
      </select>
@@ -129,18 +133,19 @@ export function player(data, listeners, {
              @click="${e => selfSelect(e)}"
              @change="${e => {
                    // tempo for quarter-note
-                   experience.setTempo(parseFloat(
-                   e.srcElement.value * 4 / data.timeSignature.division) || 60); } }">
+                   voxPlayerState.set({
+                     tempo: (parseFloat(
+                       e.srcElement.value * 4 / data.timeSignature.division) || 60) }) } }">
 
-      ${ui.preset === 'full' ? html`
+      ${uiPreset === 'full' ? html`
       depuis la partition&nbsp;:
       <sc-toggle
-        .active="${data.tempoFromScore}"
-        @change="${e => experience.setTempoFromScore(e.detail.value)}"
+        .active="${data.scoreControlsTempo}"
+        @change="${e => voxPlayerState.set({scoreControlsTempo: (e.detail.value)})}"
       ></sc-toggle>
       ` : ''}
       <button class="tempo"
-              @click="${e => experience.resetTempo()}"
+              @click="${e => voxPlayerState.set({tempoReset: true}) }"
       >Remettre</button>
 
     </div>
@@ -153,7 +158,7 @@ export function player(data, listeners, {
              step="1"
              .value=${data.timeSignature.count}
              @click="${e => selfSelect(e)}"
-             @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
+             @change="${e => voxPlayerState.set({timeSignature: (getTimeSignature(e) )}) }">
       /
       <input class="division"
              type="number"
@@ -162,7 +167,7 @@ export function player(data, listeners, {
              step="1"
              .value=${data.timeSignature.division}
              @click="${e => selfSelect(e)}"
-             @change="${e => experience.setTimeSignature(getTimeSignature(e) )}">
+             @change="${e => voxPlayerState.set({timeSignature: (getTimeSignature(e) )}) }">
     </div>
 
     <div class="controls container">
@@ -170,34 +175,34 @@ export function player(data, listeners, {
         <sc-toggle
           width="48"
           .active="${data.playback}"
-          @change="${e => experience.setPlayback(e.detail.value)}"
+          @change="${e => voxPlayerState.set({playback: (e.detail.value)}) }"
         ></sc-toggle>
       </div>
 
       <div class="onoff transport">Départ&nbsp;:
         <sc-toggle
-          .active="${data.gesture.controlsPlaybackStart}"
-          @change="${e => experience.setGestureControlsPlaybackStart(e.detail.value)}"
+          .active="${data.gestureControlsPlaybackStart}"
+          @change="${e => voxPlayerState.set({gestureControlsPlaybackStart: (e.detail.value)}) }"
         ></sc-toggle>
       </div>
 
       <div class="onoff transport">Arrêt&nbsp;:
         <sc-toggle
-          .active="${data.gesture.controlsPlaybackSttop}"
-          @change="${e => experience.setGestureControlsPlaybackStop(e.detail.value)}"
+          .active="${data.gestureControlsPlaybackStop}"
+          @change="${e => voxPlayerState.set({gestureControlsPlaybackStop: (e.detail.value)}) }"
         ></sc-toggle>
       </div>
 
     </div>
 
     <div class="position container">Position&nbsp;:
-      ${ui.preset === 'full' ? html`
+      ${uiPreset === 'full' ? html`
       ${[{bar: -1, beat: 1},
          {bar: 0, beat: 1},
          {bar: 1, beat: 1}].map( (position) => {
            return html`
       <button class="seek"
-              @click="${e => experience.seekPosition(position)}">
+              @click="${e => voxPlayerState.set({seekPosition: position}) }">
         Aller à ${position.bar < 1
         // display for bar < 1 with -1 offset
         ? position.bar - 1
@@ -206,7 +211,7 @@ export function player(data, listeners, {
       `;})}
     ` : html`
       <button class="seek"
-              @click="${e => experience.seekPosition({bar: 1, beat: 1})}"
+              @click="${e => voxPlayerState.set({seekPosition: {bar: 1, beat: 1}}) }"
       >Recommencer</button>
     `}
 
@@ -219,8 +224,8 @@ export function player(data, listeners, {
       ? data.position.bar
       : data.position.bar - 1)}
       @click="${e => selfSelect(e)}"
-      @change="${e => experience.seekPosition(getPosition(e) )}"
-      >${ui.preset === 'full' ? html`
+      @change="${e => voxPlayerState.set({seekPosition: getPosition(e) }) }"
+      >${uiPreset === 'full' ? html`
       :<input class="time beat"
              type="number"
              step="1"
@@ -229,34 +234,34 @@ export function player(data, listeners, {
              ? 0
              : Math.floor(beat)}
              @click="${e => selfSelect(e)}"
-             @change="${e => experience.seekPosition(getPosition(e) )}"
+             @change="${e => voxPlayerState.set({seekPosition: getPosition(e) }) }"
       >
       ` : ''}
     </div>
 
     <div class="controls container">
 
-      ${ui.preset === 'full' ? html`
+      ${uiPreset === 'full' ? html`
       <div class="onoff beating audio">Recalage
         <sc-toggle
-          .active="${data.gesture.controlsBeatOffset}"
-          @change="${e => experience.setGestureControlsBeatOffset(e.detail.value)}"
+          .active="${data.gestureControlsBeatOffset}"
+          @change="${e => voxPlayerState.set({gestureControlsBeatOffset: (e.detail.value)}) }"
         ></sc-toggle>
       </div>
 
       <div class="onoff beating audio">Tempo
         <sc-toggle
-          .active="${data.gesture.controlsTempo}"
-          @change="${e => experience.setGestureControlsTempo(e.detail.value)}"
+          .active="${data.gestureControlsTempo}"
+          @change="${e => voxPlayerState.set({gestureControlsTempo:(e.detail.value)}) }"
         ></sc-toggle>
       </div>
       ` : html`
       <div class="onoff beating audio">Tempo
         <sc-toggle
-          .active="${data.gesture.controlsTempo}"
+          .active="${data.gestureControlsTempo}"
           @change="${e => {
-                        experience.setGestureControlsTempo(e.detail.value)
-                        experience.setGestureControlsBeatOffset(e.detail.value)
+                        voxPlayerState.set({gestureControlsTempo:(e.detail.value)});
+                        voxPlayerState.set({gestureControlsBeatOffset:(e.detail.value)});
                      }
                    }"
         ></sc-toggle>
@@ -264,23 +269,23 @@ export function player(data, listeners, {
       `}
       <div class="onoff beating audio">Dynamique
         <sc-toggle
-          .active="${data.gesture.controlsIntensity}"
-          @change="${e => experience.setGestureControlsIntensity(e.detail.value)}"
+          .active="${data.gestureControlsIntensity}"
+          @change="${e => voxPlayerState.set({gestureControlsIntensity:(e.detail.value)}) }"
         ></sc-toggle>
       </div>
 
       <div class="onoff metronome audio">Métronome
         <sc-toggle
-          .active="${data.metronomeSound.onOff}"
-          @change="${e => experience.setMetronomeSound(e.detail.value)}"
+          .active="${data.metronomeSound}"
+          @change="${e => voxPlayerState.set({metronomeSound:(e.detail.value)}) }"
         ></sc-toggle>
       </div>
 
-      ${ui.preset === 'full' ? html`
+      ${uiPreset === 'full' ? html`
       <div class="onoff beating audio">Battue
         <sc-toggle
-          .active="${data.beatingSound.onOff}"
-          @change="${e => experience.setBeatingSound(e.detail.value)}"
+          .active="${data.beatingSound}"
+          @change="${e => voxPlayerState.set({beatingSound:(e.detail.value)}) }"
         ></sc-toggle>
       </div>
       ` : ''}

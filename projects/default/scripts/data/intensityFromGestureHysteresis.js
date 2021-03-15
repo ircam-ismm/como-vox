@@ -121,26 +121,41 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
     scaleRangeHigh: intensityRangeHighDefault, // normalised intensity
   };
 
+  const updateParams = (updates) => {
+    if(typeof updates.scaleRangeLow !== 'undefined') {
+      gestureToIntensityLow.set({
+        outputStart: dBToAmplitude(updates.scaleRangeLow),
+      });
+    }
+
+    if(typeof updates.scaleRangeHigh !== 'undefined') {
+      gestureToIntensityHigh.set({
+        outputEnd: dBToAmplitude(updates.scaleRangeHigh),
+      });
+    }
+
+    for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
+      }
+    }
+  };
+
+  ///// Events and data (defined only in browser)
+  if(app.events && app.state) {
+    [
+      'gestureControlsIntensity',
+    ].forEach( (event) => {
+      app.events.on(event, (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      });
+      updateParams({[event]: app.state[event]});
+    });
+  }
+
   return {
-    updateParams(updates) {
-      if(typeof updates.scaleRangeLow !== 'undefined') {
-        gestureToIntensityLow.set({
-          outputStart: dBToAmplitude(updates.scaleRangeLow),
-        });
-      }
-
-      if(typeof updates.scaleRangeHigh !== 'undefined') {
-        gestureToIntensityHigh.set({
-          outputEnd: dBToAmplitude(updates.scaleRangeHigh),
-        });
-      }
-
-      for(const p of Object.keys(updates) ) {
-        if(parameters.hasOwnProperty(p) ) {
-          parameters[p] = updates[p];
-        }
-      }
-    },
+    updateParams,
 
     process(inputFrame, outputFrame) {
       const inputData = app.data;

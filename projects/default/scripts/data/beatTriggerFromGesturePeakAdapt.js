@@ -11,7 +11,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const meanThresholdMin = 10; // min threshold 5
   const rotationThreshold = 20;
   let inhibition = {
-    min: 0.35, // seconds
+    min: 0.25, // seconds
     max: 0.5, // seconds
     beats: 0.5,
   };
@@ -71,7 +71,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
             - inputData.metas.period * (deltaOrder + accelerationAverageOrder)/2; // 3?
 
       // adapt inhibition to current playing
-      const tempo = app.data.tempo;
+      const tempo = inputData['tempo'];
       const timeSignature = inputData['timeSignature'];
 
       const inhibitionDuration
@@ -100,8 +100,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       intensity = Math.max(derivate, 0) + feedbackFactor * previousIntensity;
       // store value for next pass
       previousIntensity = intensity;
-      
-      //other choices posssible
+
+      //other possible choices
       //const intensity = inputData['intensity'].linear;
       // const intensity = inputData['accelerationIncludingGravity'].x ** 2
       //       + inputData['accelerationIncludingGravity'].y ** 2

@@ -127,6 +127,10 @@ function transport(graph, helpers, outputFrame) {
   };
 
   const setPlayback = (playback) => {
+    if(playback === parameters.playback) {
+      return;
+    }
+
     if(playback) {
       playbackStartRequest = null;
       tempoSmoother.set({
@@ -149,15 +153,11 @@ function transport(graph, helpers, outputFrame) {
       beatGestures.length = 0;
       beatGestureLastTime = 0;
       beatChanges.length = 0;
-
-      // needs experience to seek to beginning of bar (for score also)
-      app.experience.setPlayback(playback);
     }
     // reset also stopped time on pause
     positionStoppedTime = app.data['time'];
 
     app.data['playback'] = playback;
-    parameters.playback = playback;
   };
 
   const seekPosition = (position) => {
@@ -227,6 +227,26 @@ function transport(graph, helpers, outputFrame) {
 
   };
 
+  ///// Events and data (defined only in browser)
+  if(app.events && app.state) {
+    [
+      'gestureControlsBeatOffset',
+      'gestureControlsPlaybackStart',
+      'gestureControlsPlaybackStop',
+      'gestureControlsTempo',
+      'playback',
+      'tempo',
+      'seekPosition',
+      'timeSignature',
+    ].forEach( (event) => {
+      app.events.on(event, (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      });
+      updateParams({[event]: app.state[event]});
+    });
+  }
+
   return {
     updateParams,
 
@@ -282,7 +302,7 @@ function transport(graph, helpers, outputFrame) {
           outputEnd: beatOffset,
         });
 
-        setPlayback(true);
+        app.events.emit('playback', true);
         playbackStartRequest = null;
       }
 
@@ -725,7 +745,7 @@ function transport(graph, helpers, outputFrame) {
 
         const stop = now.local > beatGestureLastTime + stopAfterDuration;
         if(stop) {
-          setPlayback(false);
+          app.events.emit('playback', false);
         }
       }
 

@@ -27,6 +27,7 @@ function transport(graph, helpers, outputFrame) {
   };
 
   const parameters = {
+    audioLatency: 0,
     timeSignature: timeSignatureDefault,
     playback: true,
     gestureControlsPlaybackStart: false,
@@ -98,6 +99,9 @@ function transport(graph, helpers, outputFrame) {
     clip: true,
   });
 
+  // auto start
+  let positionGestureStartTime = positionStoppedTime;
+
   // half a beat before and half a beat after
   const beatOffsetRange = 1;
   const beatOffsetRangeInverse = 1 / beatOffsetRange;
@@ -122,8 +126,14 @@ function transport(graph, helpers, outputFrame) {
   }
 
   const setGestureControlsPlaybackStart = (control) => {
-    gestureControlsPlaybackStart = control;
-    playbackStartRequest = null;
+    parameters.gestureControlsPlaybackStart = control;
+    if(control) {
+      playbackStartRequest = null;
+      beatGestures.length = 0;
+      beatGestureLastTime = 0;
+      beatChanges.length = 0;
+      positionGestureStartTime = app.data['time'];
+    }
   };
 
   const setPlayback = (playback) => {
@@ -153,10 +163,10 @@ function transport(graph, helpers, outputFrame) {
       beatGestures.length = 0;
       beatGestureLastTime = 0;
       beatChanges.length = 0;
+      // reset also stopped time on pause
+      positionStoppedTime = app.data['time'];
+      positionGestureStartTime = app.data['time'];
     }
-    // reset also stopped time on pause
-    positionStoppedTime = app.data['time'];
-
     app.data['playback'] = playback;
   };
 
@@ -196,7 +206,7 @@ function transport(graph, helpers, outputFrame) {
       setPlayback(updates.playback);
     }
 
-    if(typeof updates.gestureControlsTempoPlaybackStart !== 'undefined') {
+    if(typeof updates.gestureControlsPlaybackStart !== 'undefined') {
       setGestureControlsPlaybackStart(updates.gestureControlsPlaybackStart);
     }
 
@@ -230,6 +240,7 @@ function transport(graph, helpers, outputFrame) {
   ///// Events and data (defined only in browser)
   if(app.events && app.state) {
     [
+      'audioLatency',
       'gestureControlsBeatOffset',
       'gestureControlsPlaybackStart',
       'gestureControlsPlaybackStop',
@@ -310,7 +321,6 @@ function transport(graph, helpers, outputFrame) {
       // stop
       if(!parameters.playback && !parameters.gestureControlsPlaybackStart) {
         outputData['tempo'] = tempo;
-        outputData['tempo'] = tempo;
 
         const outputPosition = {
           bar: positionStopped.bar,
@@ -331,7 +341,7 @@ function transport(graph, helpers, outputFrame) {
         return outputFrame;
       }
 
-      const timeDelta = (positionLastTime.audio !== 0
+      const timeDelta = (playback && positionLastTime.audio !== 0
                          ? now.audio - positionLastTime.audio
                          : 0);
       const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
@@ -626,7 +636,8 @@ function transport(graph, helpers, outputFrame) {
         const beatGesturesStart = [];
         // keep gestures after stop, do not change ordering
         for(let g = 0; g < beatGestures.length; ++g) {
-          if(beatGestures[g].time < positionStoppedTime) {
+          if(beatGestures[g].time < positionStoppedTime
+             || beatGestures[g].time < positionGestureStartTime) {
             continue;
           }
           beatGesturesStart.push(beatGestures[g]);
@@ -707,9 +718,10 @@ function transport(graph, helpers, outputFrame) {
             };
 
             // playback on next beat
-            // - compensate for audio look-ahead
+            // - compensate for audio look-ahead (playback
             // - apply beat offset later, do not compensate
 
+            const audioLatency = parameters.audioLatency;
             const lookAheadNotes = app.data.lookAheadNotes;
 
             // Start time from first beat gesture whose offset is 0
@@ -721,6 +733,7 @@ function transport(graph, helpers, outputFrame) {
                                              timeSignature
                                            })
                   - notesToSeconds(lookAheadNotes, {tempo: tempoStart})
+                  - audioLatency
                   - beatOffsetStart;
 
             playbackStartRequest = {

@@ -9,7 +9,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   // important parameters for sensitivity
   const meanThresholdAdapt =  2.; // factor to multiply standars deviation //1
   const meanThresholdMin = 10; // min threshold 5
-  const rotationThreshold = 20;
+  const rotationThreshold = 50;
   let inhibition = {
     min: 0.25, // seconds
     max: 0.5, // seconds

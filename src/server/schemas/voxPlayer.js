@@ -33,12 +33,6 @@ export default {
     default: false,
   },
 
-  gestureControlsPlaybackStartInit: {
-    type: 'boolean',
-    event: true,
-    default: null,
-  },
-
   gestureControlsPlaybackStop: {
     type: 'boolean',
     default: false,
@@ -88,6 +82,20 @@ export default {
   record: {
     type: 'boolean',
     default: false,
+    metas: {
+      exported: false,
+    },
+  },
+
+  scenarioStartStopWithBeating: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioStatus: {
+    type: 'string',
+    nullable: true,
+    default: null,
     metas: {
       exported: false,
     },

@@ -1,12 +1,12 @@
-function startFromStillness(graph, helpers, outputFrame) {
+function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   let status = 'off'
   let startTime = 0;
 
-  const waitSoundPitch = 94; // Bb6
+  const soundChannel = 'scenario';
+
   const initSoundPitch = 99; // E7
-  const initSoundChannel = 'ding';
   const initSoundIntensity = 80;
   const initSoundDuration = 1; // in beats
 
@@ -16,20 +16,24 @@ function startFromStillness(graph, helpers, outputFrame) {
   };
 
   const updateParams = (updates) => {
-    if(typeof updates.gestureControlsPlaybackStartInit !== 'undefined') {
-      const init = updates.gestureControlsPlaybackStartInit;
-      parameters.gestureControlsPlaybackStartInit = init;
-      if(init) {
+    if(typeof updates.scenarioStartStopWithBeating !== 'undefined') {
+      const active = updates.scenarioStartStopWithBeating;
+      parameters.scenarioStartStopWithBeating = active;
+      if(active) {
         startTime = app.data['time'].local;
-        status = 'init'
+        status = 'init';
+        app.events.emit('scenarioStatus', status);
         app.events.emit('gestureControlsPlaybackStart', false);
+        app.events.emit('gestureControlsPlaybackStop', true);
         app.events.emit('playback', false);
         app.events.emit('tempoReset', true);
+        app.events.emit('seekPosition',  {bar: 1, beat: 1});
+      } else {
+        status = 'off';
+        app.events.emit('scenarioStatus', status);
+        app.events.emit('gestureControlsPlaybackStart', false);
+        app.events.emit('gestureControlsPlaybackStop', false);
       }
-    }
-
-    if(typeof updates.gestureControlsPlaybackStart !== 'undefined') {
-      app.events.emit('gestureControlsPlaybackStartInit', false);
     }
 
     for(const p of Object.keys(updates) ) {
@@ -43,8 +47,8 @@ function startFromStillness(graph, helpers, outputFrame) {
   if(app.events && app.state) {
     [
       'gestureControlsPlaybackStart',
-      'gestureControlsPlaybackStartInit',
       'playback',
+      'scenarioStartStopWithBeating',
     ].forEach( (event) => {
       app.events.on(event, (value) => {
         // compatibility with setGraphOption
@@ -65,12 +69,12 @@ function startFromStillness(graph, helpers, outputFrame) {
       const notes = [];
       // reset own channel
       const notesContainer = inputData['notes'] || {};
-      notesContainer[initSoundChannel] = notes;
+      notesContainer[soundChannel] = notes;
       outputData['notes'] = notesContainer;
 
       const stillness = inputData['stillness'];
 
-      if(!parameters.gestureControlsPlaybackStartInit
+      if(!parameters.scenarioStartStopWithBeating
         || !stillness) {
         return outputFrame;
       }
@@ -80,19 +84,14 @@ function startFromStillness(graph, helpers, outputFrame) {
       switch(status) {
         case 'init': {
           status = 'waiting';
-          notes.push({
-            time: time.audio,
-            pitch: waitSoundPitch,
-            intensity: initSoundIntensity,
-            duration: initSoundDuration,
-          });
-
+          app.events.emit('scenarioStatus', status);
           break;
         }
 
         case 'waiting': {
           if(time.local - startTime >= parameters.waitDuration) {
             status = 'stillness';
+            app.events.emit('scenarioStatus', status);
             startTime = time.local;
           }
           break;
@@ -103,8 +102,8 @@ function startFromStillness(graph, helpers, outputFrame) {
             startTime = time.local;
           } else {
             if(time.local - startTime >= parameters.stillnessDurationMin) {
-              status = 'off';
-              app.events.emit('gestureControlsPlaybackStartInit', false);
+              status = 'running';
+              app.events.emit('scenarioStatus', status);
               app.events.emit('gestureControlsPlaybackStart', true);
 
               notes.push({

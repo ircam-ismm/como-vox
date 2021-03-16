@@ -36,20 +36,6 @@ function selfSelect(event) {
   }
 }
 
-async function initStartWithBeating(voxPlayerState) {
-  await voxPlayerState.set({
-    playback: false,
-  });
-  await voxPlayerState.set({
-    gestureControlsPlaybackStop: true,
-    tempoReset: true,
-    seekPosition: {bar: 1, beat: 1},
-  });
-  await voxPlayerState.set({
-    gestureControlsPlaybackStartInit: true,
-  });
-}
-
 export function player(data, listeners, {
   verbose = false,
   enableSelection = true,
@@ -203,7 +189,7 @@ export function player(data, listeners, {
       ${uiPreset === 'full' ? html`
       <div class="onoff transport">Départ&nbsp;:
         <button class="init"
-          @click="${e => initStartWithBeating(voxPlayerState) }"
+                @click="${e => voxPlayerState.set({scenarioStartStopWithBeating: true}) }"
         >Init</button>
         <sc-toggle
           .active="${data.gestureControlsPlaybackStart}"
@@ -260,7 +246,7 @@ export function player(data, listeners, {
           ` : html`
       <div class="onoff transport">Suivant le geste&nbsp;:
         <button class="init"
-          @click="${e => initStartWithBeating(voxPlayerState) }"
+          @click="${e => voxPlayerState.set({scenarioStartStopWithBeating: true}) }"
         >Préparer</button>
         <sc-toggle
           .active="${data.gestureControlsPlaybackStart && data.gestureControlsPlaybackStop}"

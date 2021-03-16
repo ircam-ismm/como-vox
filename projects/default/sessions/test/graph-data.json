@@ -40,10 +40,10 @@
       },
     },
     {
-      id: 'startFromStillness',
+      id: 'scenarioStartStopWithBeating',
       type: 'ScriptData',
       options: {
-        scriptName: 'startFromStillness',
+        scriptName: 'scenarioStartStopWithBeating',
       },
     },
     {
@@ -159,7 +159,7 @@
     ],
     [
       'stillness',
-      'startFromStillness',
+      'scenarioStartStopWithBeating',
     ],
     [
       'beatTriggerFromGesture',

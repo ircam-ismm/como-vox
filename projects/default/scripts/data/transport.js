@@ -280,6 +280,7 @@ function transport(graph, helpers, outputFrame) {
       const now = inputData['time'];
 
       const tempo = tempoSmoother.process(now.audio);
+      // const tempo = tempoSmoother.process(now.audio) * 1.05;
       const beatOffset = beatOffsetSmoother.process(now.audio);
 
       const timeSignature = parameters.timeSignature;

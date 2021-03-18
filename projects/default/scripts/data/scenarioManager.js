@@ -61,8 +61,10 @@ function scenarioManager(graph, helpers, outputFrame) {
       'scenarioCurrent',
       ...scenarioNames,
     ].forEach( (event) => {
+      console.log('scenarioManager register', event);
       app.events.on(event, (value) => {
         // compatibility with setGraphOption
+        console.log('scenarioManager event', event, value);
         updateParams({[event]: value});
       });
       updateParams({[event]: app.state[event]});

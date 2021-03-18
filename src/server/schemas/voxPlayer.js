@@ -87,6 +87,12 @@ export default {
     },
   },
 
+  scenarioCurrent: {
+    type: 'string',
+    default: null,
+    nullable: true,
+  },
+
   scenarioStartStopWithBeating: {
     type: 'boolean',
     event: true,

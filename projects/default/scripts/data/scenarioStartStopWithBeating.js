@@ -18,8 +18,10 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   const updateParams = (updates) => {
     if(typeof updates.scenarioStartStopWithBeating !== 'undefined') {
       const active = updates.scenarioStartStopWithBeating;
+      const activeChanged = active != parameters.scenarioStartStopWithBeating;
       parameters.scenarioStartStopWithBeating = active;
       if(active) {
+        // may retrigger, even if already active
         startTime = app.data['time'].local;
         status = 'init';
         app.events.emit('scenarioStatus', status);
@@ -30,9 +32,12 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         app.events.emit('seekPosition',  {bar: 1, beat: 1});
       } else {
         status = 'off';
-        app.events.emit('scenarioStatus', status);
-        app.events.emit('gestureControlsPlaybackStart', false);
-        app.events.emit('gestureControlsPlaybackStop', false);
+        // trigger only on deactivation
+        if(activeChanged) {
+          app.events.emit('scenarioStatus', status);
+          app.events.emit('gestureControlsPlaybackStart', false);
+          app.events.emit('gestureControlsPlaybackStop', false);
+        }
       }
     }
 

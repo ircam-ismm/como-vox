@@ -33,6 +33,34 @@
       },
     },
     {
+      id: 'stillness',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'stillness',
+      },
+    },
+    {
+      id: 'scenarioManager',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioManager',
+      },
+    },
+    {
+      id: 'scenarioHandednessValidation',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioHandednessValidation',
+      },
+    },
+    {
+      id: 'scenarioStartStopWithBeating',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioStartStopWithBeating',
+      },
+    },
+    {
       id: 'transport',
       type: 'ScriptData',
       options: {
@@ -47,9 +75,6 @@
       type: 'ScriptData',
       options: {
         scriptName: 'clickGenerator',
-        scriptParams: {
-          onOff: false,
-        },
       },
     },
     {
@@ -57,9 +82,6 @@
       type: 'ScriptData',
       options: {
         scriptName: 'score',
-        scriptParams: {
-          onOff: false,
-        },
       },
     },
     {
@@ -81,9 +103,6 @@
       type: 'ScriptData',
       options: {
         scriptName: 'clackFromBeat',
-        scriptParams: {
-          onOff: true,
-        },
       },
     },
     {
@@ -138,6 +157,22 @@
     [
       'timeTag',
       'beatTriggerFromGesture',
+    ],
+    [
+      'timeTag',
+      'scenarioManager',
+    ],
+    [
+      'timeTag',
+      'stillness',
+    ],
+    [
+      'stillness',
+      'scenarioStartStopWithBeating',
+    ],
+    [
+      'stillness',
+      'scenarioHandednessValidation',
     ],
     [
       'beatTriggerFromGesture',

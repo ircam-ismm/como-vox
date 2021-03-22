@@ -60,6 +60,14 @@ body.loading {
   border-radius: 3px;
 }
 
+#__soundworks-container button.selected {
+  color: #454545;
+  background-color: #ffffff;
+  border: 1px solid #989898;
+  border-radius: 3px;
+}
+
+
 #__soundworks-container select {
   border: 1px solid #686868;
   border-radius: 3px;
@@ -98,6 +106,11 @@ body.loading {
 
 #__soundworks-container .position>.beat {
   width: 1.5em;
+}
+
+#__soundworks-container .count>.bar,
+#__soundworks-container .count>.beat {
+  width: 2.5em;
 }
 
 #__soundworks-container .sensorsLatency {

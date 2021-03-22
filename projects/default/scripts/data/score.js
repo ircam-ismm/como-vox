@@ -1,4 +1,4 @@
-function score(graph, helpers, outputFrame) {
+function scoreData(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
@@ -18,7 +18,7 @@ function score(graph, helpers, outputFrame) {
     humanise: true,
   };
 
-  let score = null;
+  let scoreData = null;
 
   let scoreTempo = undefined;
   let scoreTempoChange = false;
@@ -34,8 +34,8 @@ function score(graph, helpers, outputFrame) {
       return;
     }
     // reset channels of current score
-    resetParts = (score
-                  ? score.partSet.parts
+    resetParts = (scoreData
+                  ? scoreData.partSet.parts
                   : undefined);
   };
 
@@ -49,26 +49,27 @@ function score(graph, helpers, outputFrame) {
     eventsNext.fill(undefined);
   }
 
+
   const setScore = (scoreRequest) => {
     resetPartsRequest();
 
-    score = scoreRequest;
-    console.log("score = ", score);
-    eventsNext.length = (score
-                         ? score.partSet.parts.length
+    scoreData = scoreRequest;
+    console.log("score = ", scoreData);
+    eventsNext.length = (scoreData
+                         ? scoreData.partSet.parts.length
                          : 0);
     seekPosition(undefined);
 
     scoreTempo = undefined;
     scoreTimeSignature = undefined;
-    if(score && score.masterTrack) {
-      if(score.masterTrack.tempo) {
-        scoreTempo = score.masterTrack.tempo;
+    if(scoreData && scoreData.masterTrack) {
+      if(scoreData.masterTrack.tempo) {
+        scoreTempo = scoreData.masterTrack.tempo;
         scoreTempoChange = true;
       }
 
-      if(score.masterTrack.timeSignature) {
-        scoreTimeSignature = score.masterTrack.timeSignature;
+      if(scoreData.masterTrack.timeSignature) {
+        scoreTimeSignature = scoreData.masterTrack.timeSignature;
         scoreTimeSignatureChange = true;
       }
     }
@@ -87,8 +88,8 @@ function score(graph, helpers, outputFrame) {
       seekPosition(updates.seekPosition);
     }
 
-    if(typeof updates.score !== 'undefined') {
-      setScore(updates.score);
+    if(typeof updates.scoreData !== 'undefined') {
+      setScore(updates.scoreData);
     }
 
     if(typeof updates.playback !== 'undefined') {
@@ -102,6 +103,27 @@ function score(graph, helpers, outputFrame) {
     }
 
   };
+
+  ///// Events and data (defined only in browser)
+  const registeredEvents = [];
+  if(app.events && app.state) {
+    [
+      'playback',
+      'tempo',
+      'scoreData',
+      'seekPosition',
+      'timeSignature',
+    ].forEach( (event) => {
+      const callback = (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
+      updateParams({[event]: app.state[event]});
+    });
+  }
 
   return {
     updateParams,
@@ -120,8 +142,8 @@ function score(graph, helpers, outputFrame) {
         updateParams({playback});
       }
 
-      let resetEvents = (score
-                         ? score.partSet.parts.map( part => [] )
+      let resetEvents = (scoreData
+                         ? scoreData.partSet.parts.map( part => [] )
                          : {});
       if(resetParts) {
         // reset channels may not match parts
@@ -151,7 +173,7 @@ function score(graph, helpers, outputFrame) {
         scoreTimeSignatureChange = false;
       }
 
-      if(!parameters.playback || !score) {
+      if(!parameters.playback || !scoreData) {
         outputData['score'] = {
           tempo: outputTempo,
           timeSignature: outputTimeSignature,
@@ -171,7 +193,7 @@ function score(graph, helpers, outputFrame) {
 
       const eventContainer = {};
 
-      score.partSet.parts.forEach( (part, p) => {
+      scoreData.partSet.parts.forEach( (part, p) => {
         const events = part.events;
 
         // output all notes with respective position
@@ -227,7 +249,6 @@ function score(graph, helpers, outputFrame) {
             }
             notes.push(noteEvent);
           }
-
         }
 
         eventsNext[p] = e;
@@ -236,7 +257,7 @@ function score(graph, helpers, outputFrame) {
       }); // parts.forEach
 
       // if the current score contains less parts than the previous one
-      for(let p = score.partSet.parts.length; p < resetEvents.length; ++p) {
+      for(let p = scoreData.partSet.parts.length; p < resetEvents.length; ++p) {
         eventContainer[p] = [ ...resetEvents[p] ];
       }
 
@@ -269,7 +290,10 @@ function score(graph, helpers, outputFrame) {
     },
 
     destroy() {
-
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
-  }
+
+  };
 }

@@ -5,13 +5,17 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const beatsToSeconds = conversion.beatsToSeconds;
   const secondsToBeats = conversion.secondsToBeats;
   const positionAddBeats = conversion.positionAddBeats;
+  const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
+
+  const Hysteresis = app.imports.helpers.Hysteresis;
 
   // important parameters for sensitivity
-  const meanThresholdAdapt =  2.; // factor to multiply standars deviation //1
+  const meanThresholdAdapt =  1.; // factor to multiply standars deviation //1
   const meanThresholdMin = 10; // min threshold 5
   const rotationThreshold = 20;
+  const intensityRotationUnfilteredMax = 100; // 
   let inhibition = {
-    min: 0.35, // seconds
+    min: 0.25, // seconds
     max: 0.5, // seconds
     beats: 0.5,
   };
@@ -41,6 +45,25 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const rotationAverageOrder = 20;
   const rotationMovingAverage = new helpers.algo.MovingAverage(rotationAverageOrder);
 
+  let inputSamplePeriod = 0.02; // seconds
+
+  const rotationIntensityLowpassDown = {
+    bar: 0.5,
+    beat: 0,
+  }; // 1 bar to go down
+
+  const rotationIntensitySmoother = new Hysteresis({
+    sampleRate: 1 / inputSamplePeriod, // update later
+    lowpassFrequencyUp: 10, // Hz: 180 bpm
+    lowpassFrequencyDown: 1 / positionDeltaToSeconds(rotationIntensityLowpassDown, {
+      tempo: 60, // bpm, will update later
+      timeSignature: {
+        count: 4,
+        division: 4,
+      },
+    }),
+  });
+
   // initialisation
   let lastBeatTime = 0;
   let lastMean = +Infinity; // prevent kick on first frame
@@ -54,6 +77,48 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let timeMax = 0;
   let tempMax = 0;
 
+ // debug
+  const barGraph = (value, {
+    peak = undefined,
+    valueMin = 0,
+    valueMax = 1,
+    segmentCount = 80,
+    segmentCharacter = '-',
+    segmentCharacterZero = 'o',
+    segmentCharacterClip = '*',
+    segmentCharacterPeak = '+',
+  } = {}) => {
+    const range = valueMax - valueMin;
+
+    const valueToCount = (value) => {
+      return Math.abs(Math.round(
+        (Math.min(valueMax,
+                  Math.max(valueMin, value) )
+         - valueMin)
+          / range * segmentCount) );
+    };
+
+    const segmentActiveCount = valueToCount(value);
+    let segments = new Array(segmentCount).fill(' ');
+
+    if(segmentActiveCount === 0) {
+      segments[0] = segmentCharacterZero;
+    }
+
+    for(let s = 0; s < segmentActiveCount && s < segmentCount; ++s) {
+      segments[s] = segmentCharacter;
+    }
+
+    if(segmentActiveCount >= segmentCount) {
+      segments[segments.length - 1] = segmentCharacterClip;
+    } else if(typeof peak !== 'undefined') {
+      const segmentPeak = valueToCount(peak);
+      segments[segmentPeak] = segmentCharacterPeak;
+    }
+
+    return segments.join('');
+  };
+
   return {
     updateParams(updates) {
     },
@@ -64,6 +129,13 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
       // use logical time tag from frame
       const now = inputData['time'].local;
+
+      if(inputSamplePeriod !== inputData.metas.period) {
+        inputSamplePeriod = input.metas.period;
+        rotationIntensitySmoother.set({
+          sampleRate: 1 / inputSamplePeriod,
+        });
+      }
 
       // latency estimation
       const sensorsLatency = inputData.metas.period;
@@ -89,7 +161,30 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
                                          + inputData['rotationRate'].beta ** 2
                                          + inputData['rotationRate'].gamma ** 2,
                                          0.5);
-      const intensityRotation = rotationMovingAverage.process(intensityRotationUnfiltered);
+
+      const lowpassFrequencyDown =
+            1 / positionDeltaToSeconds(rotationIntensityLowpassDown, {
+              tempo,
+              timeSignature,
+            });
+
+      const intensityRotationClipped = Math.min(intensityRotationUnfilteredMax, 
+                                                intensityRotationUnfiltered);
+
+      rotationIntensitySmoother.set({lowpassFrequencyDown});
+      const intensityRotation = rotationIntensitySmoother.process(intensityRotationClipped);
+
+      // // debug visualization  
+      // console.log('intensityRotation',
+      //             (Math.round(100 * intensityRotation) * 0.01).toFixed(3),
+      //             barGraph(intensityRotation, {
+      //               peak: intensityRotationClipped,
+      //               valueMin: 0,
+      //               valueMax: intensityRotationUnfilteredMax,
+      //               segmentCharacter: '-'}) );
+
+
+      // const intensityRotation = rotationMovingAverage.process(intensityRotationUnfiltered);
 
       // computing intensity using only one axis
       const acceleration = inputData['accelerationIncludingGravity'].x;

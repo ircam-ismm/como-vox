@@ -4,11 +4,11 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   let status = 'off'
   let startTime = 0;
 
-  const soundChannel = 'scenario';
+  const noteChannel = 'scenario';
 
-  const initSoundPitch = 99; // E7
-  const initSoundIntensity = 80;
-  const initSoundDuration = 1; // in beats
+  const initNotePitch = 99; // E7
+  const initNoteIntensity = 80;
+  const initNoteDuration = 1; // in beats
 
   const parameters = {
     waitDuration: 1, // in seconds, before stillness
@@ -32,12 +32,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         app.events.emit('seekPosition',  {bar: 1, beat: 1});
       } else {
         status = 'off';
-        // trigger only on deactivation
-        if(activeChanged) {
-          app.events.emit('scenarioStatus', status);
-          app.events.emit('gestureControlsPlaybackStart', false);
-          app.events.emit('gestureControlsPlaybackStop', false);
-        }
+        // do not trigger anything on deactivation
       }
     }
 
@@ -49,16 +44,20 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   };
 
   ///// Events and data (defined only in browser)
+  const registeredEvents = [];
   if(app.events && app.state) {
     [
       'gestureControlsPlaybackStart',
       'playback',
       'scenarioStartStopWithBeating',
     ].forEach( (event) => {
-      app.events.on(event, (value) => {
+      const callback = (value) => {
         // compatibility with setGraphOption
         updateParams({[event]: value});
-      });
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
       updateParams({[event]: app.state[event]});
     });
   }
@@ -71,10 +70,12 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       const inputData = app.data;
       const outputData = app.data;
 
-      const notes = [];
-      // reset own channel
-      const notesContainer = inputData['notes'] || {};
-      notesContainer[soundChannel] = notes;
+      // channel shared by multiple scenarios
+      // managed by scenarioManager
+      const notesContainer = inputData['notes'] || {
+        [noteChannel]: [],
+      };
+      const notes = notesContainer[noteChannel];
       outputData['notes'] = notesContainer;
 
       const stillness = inputData['stillness'];
@@ -111,12 +112,14 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
               app.events.emit('scenarioStatus', status);
               app.events.emit('gestureControlsPlaybackStart', true);
 
-              notes.push({
+              const note = {
+                channel: noteChannel,
                 time: time.audio,
-                pitch: initSoundPitch,
-                intensity: initSoundIntensity,
-                duration: initSoundDuration,
-              });
+                pitch: initNotePitch,
+                intensity: initNoteIntensity,
+                duration: initNoteDuration,
+              };
+              notes.push(note);
             }
 
           }
@@ -133,6 +136,9 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     },
 
     destroy() {
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
 
   };

@@ -4,7 +4,8 @@ export default {
     type: 'float',
     default: 10e-3,
     metas: {
-      exported: false, // local
+      exported: false,
+      localstorage: true,
     },
   },
 
@@ -41,6 +42,21 @@ export default {
   gestureControlsTempo: {
     type: 'boolean',
     default: false,
+  },
+
+  handedness: {
+    type: 'string',
+    default: null,
+    nullable: true,
+    metas: {
+      exported: false,
+      localStorage: true,
+    },
+  },
+
+  handednessValidation: {
+    type: 'boolean',
+    event: true,
   },
 
   lookAheadNotes: {
@@ -91,6 +107,11 @@ export default {
     type: 'string',
     default: null,
     nullable: true,
+  },
+
+  scenarioHandednessValidation: {
+    type: 'boolean',
+    event: true,
   },
 
   scenarioStartStopWithBeating: {

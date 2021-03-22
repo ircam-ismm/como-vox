@@ -72,6 +72,29 @@ export function player(data, listeners, {
       ` : ''}
     </div>
 
+    <div class="handedness container">Main utilisée&nbsp;:
+      ${ ['left', 'right'].map( (handedness) => {
+           return html`
+       <button class="set handedness ${data.handedness === handedness
+                                       ? 'selected' : ''}"
+               @click="${e => voxPlayerState.set({handedness}) }">
+         ${handedness === 'left' ? 'Gauche' : 'Droite'}
+       </button>
+          `;
+         }) }
+
+      ${data.handedness ? html`
+      <div class="separator"></div>
+
+           Tenir le téléphone dans la main correspondante, pouce vers le haut, sans bouger pendant 2 secondes, puis
+
+           <button class="validation handedness"
+                   @click="${e => voxPlayerState.set({scenarioHandednessValidation: true}) }">
+             Valider
+           </button>
+         ` : ''}
+    </div>
+
     <div class="audioLatency container">Latence audio&nbsp;:
       <input type="number"
              min="0"

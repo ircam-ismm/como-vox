@@ -105,6 +105,7 @@ function scoreData(graph, helpers, outputFrame) {
   };
 
   ///// Events and data (defined only in browser)
+  const registeredEvents = [];
   if(app.events && app.state) {
     [
       'playback',
@@ -113,10 +114,13 @@ function scoreData(graph, helpers, outputFrame) {
       'seekPosition',
       'timeSignature',
     ].forEach( (event) => {
-      app.events.on(event, (value) => {
+      const callback = (value) => {
         // compatibility with setGraphOption
         updateParams({[event]: value});
-      });
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
       updateParams({[event]: app.state[event]});
     });
   }
@@ -286,7 +290,10 @@ function scoreData(graph, helpers, outputFrame) {
     },
 
     destroy() {
-
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
-  }
+
+  };
 }

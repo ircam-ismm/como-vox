@@ -60,6 +60,14 @@ body.loading {
   border-radius: 3px;
 }
 
+#__soundworks-container button.selected {
+  color: #454545;
+  background-color: #ffffff;
+  border: 1px solid #989898;
+  border-radius: 3px;
+}
+
+
 #__soundworks-container select {
   border: 1px solid #686868;
   border-radius: 3px;

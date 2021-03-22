@@ -246,6 +246,7 @@ function transport(graph, helpers, outputFrame) {
   };
 
   ///// Events and data (defined only in browser)
+  const registeredEvents = [];
   if(app.events && app.state) {
     [
       'audioLatency',
@@ -260,10 +261,13 @@ function transport(graph, helpers, outputFrame) {
       'seekPosition',
       'timeSignature',
     ].forEach( (event) => {
-      app.events.on(event, (value) => {
+      const callback = (value) => {
         // compatibility with setGraphOption
         updateParams({[event]: value});
-      });
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
       updateParams({[event]: app.state[event]});
     });
   }
@@ -328,7 +332,6 @@ function transport(graph, helpers, outputFrame) {
         playbackStartRequest = null;
       }
 
-      outputData['playback'] = parameters.playback;
       // stop
       if(!parameters.playback && !parameters.gestureControlsPlaybackStart) {
         outputData['tempo'] = tempo;
@@ -758,7 +761,6 @@ function transport(graph, helpers, outputFrame) {
 
       //////////// auto stop
       if(playback && parameters.gestureControlsPlaybackStop) {
-
         // wait for 4 beats on 1/4 and 2/4 time signature
         const stopAfterBeats
               = parameters.playbackStopAfterCount.bar * timeSignature.count
@@ -772,6 +774,7 @@ function transport(graph, helpers, outputFrame) {
         }
       }
 
+      outputData['playback'] = parameters.playback;
       outputData['tempo'] = tempo;
 
       const outputPosition = (playback
@@ -792,7 +795,7 @@ function transport(graph, helpers, outputFrame) {
       }
       outputData['position'] = outputPosition;
 
-      if(playback) {
+     if(playback) {
         positionLast = position;
         positionWithOffsetLast = positionWithOffset;
       }
@@ -807,7 +810,10 @@ function transport(graph, helpers, outputFrame) {
     },
 
     destroy() {
-
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
+
   };
 }

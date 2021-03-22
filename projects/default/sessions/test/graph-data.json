@@ -47,6 +47,13 @@
       },
     },
     {
+      id: 'scenarioHandednessValidation',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioHandednessValidation',
+      },
+    },
+    {
       id: 'scenarioStartStopWithBeating',
       type: 'ScriptData',
       options: {
@@ -153,7 +160,7 @@
     ],
     [
       'timeTag',
-      'scenarioManager'
+      'scenarioManager',
     ],
     [
       'timeTag',
@@ -162,6 +169,10 @@
     [
       'stillness',
       'scenarioStartStopWithBeating',
+    ],
+    [
+      'stillness',
+      'scenarioHandednessValidation',
     ],
     [
       'beatTriggerFromGesture',

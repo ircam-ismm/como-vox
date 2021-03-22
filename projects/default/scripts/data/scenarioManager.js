@@ -2,8 +2,11 @@ function scenarioManager(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const scenarioNames = [
+    'scenarioHandednessValidation',
     'scenarioStartStopWithBeating',
   ];
+
+  const noteChannel = 'scenario';
 
   const parameters = {
     scenarioCurrent: null,
@@ -18,8 +21,8 @@ function scenarioManager(graph, helpers, outputFrame) {
       // exclusive scenarioCurrent: disable others
       parameters.scenarioCurrent = updates.scenarioCurrent;
       scenarioNames.forEach( (scenarioName) => {
-        if(scenarioName &&
-           scenarioName !== parameters.scenarioCurrent
+        if(scenarioName
+           && scenarioName !== parameters.scenarioCurrent
            && parameters[scenarioName]) {
           app.events.emit(scenarioName, false);
         }
@@ -36,9 +39,13 @@ function scenarioManager(graph, helpers, outputFrame) {
         if(scenarioName) {
           const scenarioActive = updates[p];
           if(scenarioActive) {
-            // active is new current
-            parameters.scenarioCurrent = scenarioName;
-            app.events.emit('scenarioCurrent', parameters.scenarioCurrent);
+            if(parameters.scenarioCurrent !== scenarioName) {
+              // active is new current
+              parameters.scenarioCurrent = scenarioName;
+              app.events.emit('scenarioCurrent', parameters.scenarioCurrent);
+            } else {
+              // old current one: do nothing
+            }
           } else if(scenarioName === parameters.scenarioCurrent) {
             // currently active was disabled, no current any more
             parameters.scenarioCurrent = null;
@@ -56,17 +63,19 @@ function scenarioManager(graph, helpers, outputFrame) {
   };
 
   ///// Events and data (defined only in browser)
+  const registeredEvents = [];
   if(app.events && app.state) {
     [
       'scenarioCurrent',
       ...scenarioNames,
     ].forEach( (event) => {
-      console.log('scenarioManager register', event);
-      app.events.on(event, (value) => {
+      const callback = (value) => {
         // compatibility with setGraphOption
-        console.log('scenarioManager event', event, value);
         updateParams({[event]: value});
-      });
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
       updateParams({[event]: app.state[event]});
     });
   }
@@ -76,10 +85,22 @@ function scenarioManager(graph, helpers, outputFrame) {
     updateParams,
 
     process(inputFrame, outputFrame) {
+      const inputData = app.data;
+      const outputData = app.data;
+
+      const notes = [];
+      // reset own channel
+      const notesContainer = inputData['notes'] || {};
+      notesContainer[noteChannel] = notes;
+      outputData['notes'] = notesContainer;
+
       return outputFrame;
     },
 
     destroy() {
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
 
   };

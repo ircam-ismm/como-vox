@@ -651,8 +651,13 @@ function transport(graph, helpers, outputFrame) {
       //////////// auto start
       if(!playback && parameters.gestureControlsPlaybackStart
          && !playbackStartRequest) {
+        // wait for 4 beats on 1/4 and 2/4 time signature
+        const barCount = (timeSignature.count > 3
+                          ? timeSignature.count
+                          : 4);
+
         const startAfterBeats
-              = parameters.playbackStartAfterCount.bar * timeSignature.count
+              = parameters.playbackStartAfterCount.bar * barCount
                 + parameters.playbackStartAfterCount.beat;
 
         const beatGesturesStart = [];
@@ -771,8 +776,11 @@ function transport(graph, helpers, outputFrame) {
       //////////// auto stop
       if(playback && parameters.gestureControlsPlaybackStop) {
         // wait for 4 beats on 1/4 and 2/4 time signature
+        const barCount = (timeSignature.count > 3
+                          ? timeSignature.count
+                          : 4);
         const stopAfterBeats
-              = parameters.playbackStopAfterCount.bar * timeSignature.count
+              = parameters.playbackStopAfterCount.bar * barCount
               + parameters.playbackStopAfterCount.beat;
 
         const stopAfterDuration = beatsToSeconds(stopAfterBeats, {tempo, timeSignature});

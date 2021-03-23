@@ -20,7 +20,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
     beats: 0.5,
   };
   let peakSearch = {
-    min: 0.35, // seconds
+    min: 0.25, // seconds
     max: 0.5, // seconds
     beats: 0.5,
   };

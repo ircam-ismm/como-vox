@@ -96,7 +96,16 @@ function transport(graph, helpers, outputFrame) {
     clip: true,
   });
 
-  const beatOffsetSmoothDuration = 0.25; // quarter note
+  // more stable when tempo is higher
+  const beatOffsetSmoothDurationFromTempo = new Scaler({
+    inputStart: 60, // bpm
+    inputEnd: 120,
+    outputStart: 1, // seconds
+    outputEnd: 2,
+    type: 'linear',
+    clip: true,
+  });
+
   // initialisation with fixed value
   const beatOffsetSmoother = new Scaler({
     inputStart: 0,
@@ -626,12 +635,12 @@ function transport(graph, helpers, outputFrame) {
         // First period may be wrong, specially when starting the last beat of
         // a bar: use at least 2 samples to smooth variations.
         if(offsets.length >= 2) {
+          const beatOffsetSmoothDuration
+                = beatOffsetSmoothDurationFromTempo.process(tempo);
           const beatOffsetNew = weightedMean(offsets, offsetWeights);
           beatOffsetSmoother.set({
             inputStart: now.audio,
-            inputEnd: now.audio + notesToSeconds(beatOffsetSmoothDuration, {
-              tempo,
-            }),
+            inputEnd: now.audio + beatOffsetSmoothDuration,
             outputStart: beatOffset,
             // new offset is relative
             outputEnd: beatOffset + beatOffsetNew,

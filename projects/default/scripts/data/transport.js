@@ -101,7 +101,7 @@ function transport(graph, helpers, outputFrame) {
     inputStart: 60, // bpm
     inputEnd: 120,
     outputStart: 1, // seconds
-    outputEnd: 2,
+    outputEnd: 1, // 2
     type: 'linear',
     clip: true,
   });

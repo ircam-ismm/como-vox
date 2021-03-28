@@ -22,6 +22,8 @@ function transport(graph, helpers, outputFrame) {
   const Scaler = app.imports.helpers.Scaler;
 
   const tempoDefault = 80;
+  let tempoLast = tempoDefault;
+
   const timeSignatureDefault = {
     count: 4,
     division: 4,
@@ -51,7 +53,7 @@ function transport(graph, helpers, outputFrame) {
     tempoLimits: {
       absoluteMin: 40,
       absoluteMax: 160,
-      relativeMin: 0.75,
+      relativeMin: 0.51,
       relativeMax: 1.49,
     },
   };
@@ -95,6 +97,8 @@ function transport(graph, helpers, outputFrame) {
     type: 'linear',
     clip: true,
   });
+
+  let beatOffsetLast = 0;
 
   // more stable when tempo is higher
   const beatOffsetSmoothDurationFromTempo = new Scaler({
@@ -160,26 +164,28 @@ function transport(graph, helpers, outputFrame) {
 
     if(playback) {
       playbackStartRequest = null;
+    } else {
+      playbackStartRequest = null;
+      positionStopped = positionWithOffsetLast;
+
+      beatGestures.length = 0;
+      beatGestureLastTime = 0;
+      beatChanges.length = 0;
+
       tempoSmoother.set({
         inputStart: 0,
         inputEnd: 0,
-        // end now
-        outputStart: tempoSmoother.outputEnd,
+        outputStart: tempoLast,
+        outputEnd: tempoLast,
       });
 
       beatOffsetSmoother.set({
         inputStart: 0,
         inputEnd: 0,
-        outputStart: beatOffsetSmoother.outputEnd,
+        outputStart: 0,
         outputEnd: 0,
       });
-    } else {
-      playbackStartRequest = null;
-      positionStopped = positionLast;
 
-      beatGestures.length = 0;
-      beatGestureLastTime = 0;
-      beatChanges.length = 0;
       // reset also stopped time on pause
       positionStoppedTime = app.data['time'];
       positionGestureStartTime = app.data['time'];
@@ -188,30 +194,26 @@ function transport(graph, helpers, outputFrame) {
   };
 
   const seekPosition = (position) => {
+    if(!position) {
+      // seekPosition is an event, thus nullable
+      return;
+    }
+    const timeSignature = app.data['timeSignature'];
+
+    // given position is position with offset
     positionStopped = position;
     // keep last positionStoppedTime
-    positionLast = position;
     positionWithOffsetLast = position;
+    positionLast = positionAddBeats(position, -beatOffsetLast, {timeSignature});
+
     positionLastTime = {
       audio: 0,
       local: 0,
     };
 
-    beatGestures.length = 0;
     beatChanges.length = 0;
-    tempoSmoother.set({
-      inputStart: 0,
-      inputEnd: 0,
-      // end now
-      outputStart: tempoSmoother.outputEnd,
-    });
-
-    beatOffsetSmoother.set({
-      inputStart: 0,
-      inputEnd: 0,
-      outputStart: 0,
-      outputEnd: 0,
-    });
+    // do not reset tempo or beatOffset smoothers to ensure continuity
+    // (auto-start, loop, etc.)
   }
 
   const setTimeSignature = (timeSignature) => {
@@ -244,6 +246,7 @@ function transport(graph, helpers, outputFrame) {
         outputEnd: updates.tempo,
       });
 
+      tempoLast = updates.tempo;
     }
 
     for(const p of Object.keys(updates) ) {
@@ -291,27 +294,39 @@ function transport(graph, helpers, outputFrame) {
       // - now.local for beat from gestures
       const now = inputData['time'];
 
-      const tempo = tempoSmoother.process(now.audio);
-      // const tempo = tempoSmoother.process(now.audio) * 1.05;
-      const beatOffset = beatOffsetSmoother.process(now.audio);
-
       const timeSignature = parameters.timeSignature;
 
       // do not alias playback as it may change
 
       outputData['timeSignature'] = timeSignature;
 
-      const playback = inputData['playback'];
-      if(playback !== parameters.playback) {
-        updateParams({playback});
-      }
-
       if(playbackStartRequest && now.local >= playbackStartRequest.time) {
         const {time, tempo, position, beatOffset} = playbackStartRequest;
 
-        // @TODO: currently not possible to seek instantly
+        // reset beat gestures for a stable start
+        beatGestures.length = 0;
+
+        // immediately set fixed values
+        beatOffsetSmoother.set({
+          inputStart: 0,
+          inputEnd: 0,
+          outputStart: beatOffset,
+          outputEnd: beatOffset,
+        });
+        beatOffsetLast = beatOffset;
+
+        tempoSmoother.set({
+          inputStart: 0,
+          inputEnd: 0,
+          outputStart: tempo,
+          outputEnd: tempo,
+        });
+        tempoLast = tempo;
+
+        positionWithOffsetLast = position;
+        positionLast = positionAddBeats(position, -beatOffset, {timeSignature});
+
         seekPosition(position);
-        // instead, seek to beginning of bar on stop (playerExperience)
 
         const timeOffsetFromNow = time - now.local;
 
@@ -320,24 +335,23 @@ function transport(graph, helpers, outputFrame) {
           local: now.local + timeOffsetFromNow,
         };
 
-        // immediately set fixed values
-        tempoSmoother.set({
-          inputStart: 0,
-          inputEnd: 0,
-          outputStart: tempo,
-          outputEnd: tempo,
-        });
-
-        beatOffsetSmoother.set({
-          inputStart: 0,
-          inputEnd: 0,
-          outputStart: beatOffset,
-          outputEnd: beatOffset,
-        });
+        // positionLastTime = {
+        //   audio: 0,
+        //   local: 0,
+        // };
 
         app.events.emit('playback', true);
         playbackStartRequest = null;
       }
+
+      const playback = inputData['playback'];
+      if(playback !== parameters.playback) {
+        updateParams({playback});
+      }
+
+      const tempo = tempoSmoother.process(now.audio);
+      // const tempo = tempoSmoother.process(now.audio) * 1.05;
+      const beatOffset = beatOffsetSmoother.process(now.audio);
 
       const playbackLatency = inputData['playbackLatency'];
       const lookAheadNotes = app.data.lookAheadNotes;
@@ -345,6 +359,7 @@ function transport(graph, helpers, outputFrame) {
       // stop
       if(!parameters.playback && !parameters.gestureControlsPlaybackStart) {
         outputData['tempo'] = tempo;
+        tempoLast = tempo;
 
         const outputPosition = {
           bar: positionStopped.bar,
@@ -704,10 +719,17 @@ function transport(graph, helpers, outputFrame) {
 
           }
 
+          // avoid extra or missing beats
           // one less because tempos are intervals between gestures
-          if(tempos.length >= Math.floor(startAfterBeatsWithLookAhead) - 1) {
+          if(tempos.length !== beatGesturesStart.length - 1) {
+            // @TODO: emit cancel event (and note)
+            console.log('no start, mismatch',
+                        'beatGesturesStart.length', beatGesturesStart.length,
+                        'tempos.length', tempos.length);
+            app.events.emit('gestureControlsPlaybackStart', false);
+          } else {
 
-            // use mean for stability, instead of median?
+            // use mean for stability, instead of median
             const tempoStart = mean(tempos);
 
             /////// beat offset
@@ -799,28 +821,23 @@ function transport(graph, helpers, outputFrame) {
 
       outputData['playback'] = parameters.playback;
       outputData['tempo'] = tempo;
+      tempoLast = tempo;
 
-      const outputPosition = (playback
-                              ? {
-                                  bar: positionWithOffset.bar,
-                                  beat: positionWithOffset.beat,
-                                  barChange,
-                                  beatChange,
-                              }
-                              : {
-                                  bar: positionStopped.bar,
-                                  beat: positionStopped.beat,
-                                  barChange: false,
-                                  beatChange: false,
-                              });
-      if(isNaN(outputPosition.bar) || isNaN(outputPosition.beat) ) {
-        debugger;
-      }
-      outputData['position'] = outputPosition;
+      if(playback) {
+        const outputPosition = {
+          bar: positionWithOffset.bar,
+          beat: positionWithOffset.beat,
+          barChange,
+          beatChange,
+        };
+        if(isNaN(outputPosition.bar) || isNaN(outputPosition.beat) ) {
+          debugger;
+        }
 
-     if(playback) {
+        outputData['position'] = outputPosition;
         positionLast = position;
         positionWithOffsetLast = positionWithOffset;
+        beatOffsetLast = beatOffset;
       }
 
       // clock always advances

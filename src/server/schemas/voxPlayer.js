@@ -109,11 +109,6 @@ export default {
     nullable: true,
   },
 
-  scenarioHandednessValidation: {
-    type: 'boolean',
-    event: true,
-  },
-
   scenarioStartStopWithBeating: {
     type: 'boolean',
     event: true,

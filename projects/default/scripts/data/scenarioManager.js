@@ -2,7 +2,6 @@ function scenarioManager(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const scenarioNames = [
-    'scenarioHandednessValidation',
     'scenarioStartStopWithBeating',
   ];
 

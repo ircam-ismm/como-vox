@@ -82,17 +82,6 @@ export function player(data, listeners, {
        </button>
           `;
          }) }
-
-      ${data.handedness ? html`
-      <div class="separator"></div>
-
-           Tenir le téléphone dans la main correspondante, pouce vers le haut, sans bouger pendant 2 secondes, puis
-
-           <button class="validation handedness"
-                   @click="${e => voxPlayerState.set({scenarioHandednessValidation: true}) }">
-             Valider
-           </button>
-         ` : ''}
     </div>
 
     <div class="audioLatency container">Latence audio&nbsp;:

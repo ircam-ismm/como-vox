@@ -694,6 +694,8 @@ function transport(graph, helpers, outputFrame) {
           beatGesturesStart.push(beatGestures[g]);
         }
 
+        // note: there is one beat less than the possible maximum, to cope with
+        // the added latency of beat gesture analysis and audio playback
         if(beatGesturesStart.length >= Math.floor(startAfterBeatsWithLookAhead) ) {
           ////// tempo
           // @TODO: factorise tempo computation

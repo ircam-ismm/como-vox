@@ -218,10 +218,11 @@ function scoreData(graph, helpers, outputFrame) {
                                      positionToSeek,
                                      {timeSignature}) < 0;
             ++e) {
-          const event = events[e];
+          // copy to allow for further modifications without affecting the score
+          const event = JSON.parse(JSON.stringify(events[e]));
 
           if(event.type !== 'noteOn' && event.type !== 'noteOff') {
-            nonNotes.set(event.type, {...event, ...barBeatToPosition(event)});
+            nonNotes.set(event.type, {...barBeatToPosition(event)});
           }
         }
 
@@ -232,10 +233,11 @@ function scoreData(graph, helpers, outputFrame) {
                                      position,
                                      {timeSignature}) <= 0;
             ++e) {
-          const event = events[e];
+          // copy to allow for further modifications without affecting the score
+          const event = JSON.parse(JSON.stringify(events[e]));
 
           if(event.type !== 'noteOn' && event.type !== 'noteOff') {
-            nonNotes.set(event.type, {...event, ...barBeatToPosition(event)});
+            nonNotes.set(event.type, {...barBeatToPosition(event)});
           } else {
             const noteEvent = barBeatToPosition(event);
             if(parameters.humanise) {

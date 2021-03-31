@@ -38,6 +38,71 @@ export function mean(values) {
 }
 Object.assign(e, {mean});
 
+/**
+ * Compute mean and variance, using Welford’s method.
+ *
+ * With optional parameter {ddof: 1}, which is the default, the result is
+ * similar to Matlab var(value) and Python numpy.var(values, ddof=1).
+ *
+ * @see {@link https://jonisalonen.com/2013/deriving-welfords-method-for-computing-variance/}
+ * @param {Array<Number>} values
+ * @param {Object} [options]
+ * @param {Number} [option.ddof=1] Delta degrees of freedom, similar to Python numpy,
+ * used for normalisation, as (values.length - options.ddof).
+ *
+ * @returns {Object} with mean and variance attributes
+ */
+export function meanVariance(values, {
+  ddof = 1,
+} = {}) {
+  let mean = 0;
+  let meanLast = 0;
+  let squaredDifference = 0;
+  values.forEach( (value, index) => {
+    meanLast = mean;
+    mean += (value - mean) / (index + 1);
+    squaredDifference += (value - mean) * (value - meanLast);
+  });
+
+  const normalisationFactor = (values.length > ddof
+                               ? 1 / (values.length - ddof)
+                               : 1);
+  const variance = squaredDifference * normalisationFactor;
+
+  return {
+    mean,
+    variance,
+  };
+}
+Object.assign(e, {meanVariance});
+
+/**
+ * Compute mean and standard deviation, using Welford’s method.
+ *
+ * With optional parameter {ddof: 1}, which is the default, the result is
+ * similar to Matlab var(value) and Python numpy.var(values, ddof=1).
+ *
+ * @see {@linkcode meanVariance}
+ * @param {Array<Number>} values
+ * @param {Object} [options]
+ * @param {Number} [option.ddof=1] Delta Degrees of Freedom, similar to Python numpy,
+ * used for normalisation, as values.length - options.ddof
+ *
+ *
+ * @returns {Object} with mean, variance and standardDeviation attributes
+ */
+export function meanStandardDeviation(values, {
+  ddof = 1,
+} = {}) {
+  const {mean, variance} = meanVariance(values, {ddof});
+  const standardDeviation = Math.sqrt(variance);
+  return {
+    mean,
+    standardDeviation,
+    variance,
+  };
+}
+Object.assign(e, {meanStandardDeviation});
 
 /**
  * Compute the weighted mean of an array of values, with an other array of

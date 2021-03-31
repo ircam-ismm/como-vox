@@ -34,7 +34,7 @@ def delta(x, y, order):
     return dy
 
 
-def accel_intensity(accelerometers_data, orientation, time, axis_weights,
+def accel_intensity(accelerometers_data, time, axis_weights,
                     integration_parameter, acceleration_average_order, compression, 
                     scaling, delta_order):
     
@@ -46,18 +46,11 @@ def accel_intensity(accelerometers_data, orientation, time, axis_weights,
     # acc_y_derivate = np.gradient(accelerometers_data['acc.y'])
     # acc_z_derivate = np.gradient(accelerometers_data['acc.z'])
     
-    # g = -9.81
-    g = 0
-    
-    acc_x = accelerometers_data['acc.x'] - (orientation['orientation.x'] * g)
-    acc_y = accelerometers_data['acc.y'] - (orientation['orientation.y'] * g)
-    acc_z = accelerometers_data['acc.z'] - (orientation['orientation.z'] * g)
-    
-    acc_x_filterd = acc_x.rolling(
+    acc_x_filterd = accelerometers_data['acc.x'].rolling(
         window = acceleration_average_order, min_periods = 1).mean()
-    acc_y_filterd = acc_y.rolling(
+    acc_y_filterd = accelerometers_data['acc.y'].rolling(
         window = acceleration_average_order, min_periods = 1).mean()
-    acc_z_filterd = acc_z.rolling(
+    acc_z_filterd = accelerometers_data['acc.z'].rolling(
         window = acceleration_average_order, min_periods = 1).mean()
     
     acc_x_derivate = delta(time, acc_x_filterd, delta_order)
@@ -90,8 +83,6 @@ def accel_intensity(accelerometers_data, orientation, time, axis_weights,
                                     + axis_weights[2]*(acc_z_int**2))
                                     /sum(axis_weights))
                                     **(0.5/compression))
-    
-
     # testing with max values between max
     #size = np.size(acc_x_derivate)
     # int = np.zeros(size)
@@ -235,7 +226,7 @@ def peak(dataframe_x, threshold, threshold_min, onset_order,
 
 
 
-def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation_threshold,
+def peak_as_script(df_acc_int, df_diff, df_rotation, tempo, rotation_threshold,
                       inhibition_duration, peak_search_window, 
                       inhibition, peakSearch):
     """ 
@@ -272,23 +263,22 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
         delta = df_diff[time]
         lastDelta =df_diff[time - 1]  
         intensityNormalized = df_acc_int[time]
-        acceleration_raw = df_acc_raw[time]
         intensityRotation = df_rotation[time]
         
         #adaptation
-        # inhibitionDuration = max(inhibition['min'],
-        #                       min(inhibition['max'],
-        #                           inhibition['beats']*60/tempo_estimated[time]))
-        # peakSearchDuration = max(peakSearch['min'],
-        #                       min(peakSearch['max'],
-        #                           peakSearch['beats']*60/tempo_estimated[time]))
-        
         inhibitionDuration = max(inhibition['min'],
                               min(inhibition['max'],
-                                  inhibition['beats']*60/tempo[time]))
+                                  inhibition['beats']*60/tempo_estimated[time]))
         peakSearchDuration = max(peakSearch['min'],
                               min(peakSearch['max'],
-                                  peakSearch['beats']*60/tempo[time]))
+                                  peakSearch['beats']*60/tempo_estimated[time]))
+        
+        # inhibitionDuration = max(inhibition['min'],
+        #                      min(inhibition['max'],
+        #                          inhibition['beats']*60/tempo[time]))
+        # peakSearchDuration = max(peakSearch['min'],
+        #                      min(peakSearch['max'],
+        #                          peakSearch['beats']*60/tempo[time]))
         
         
         tempo_estimated[time] = tempo_estimated[time - 1]
@@ -305,10 +295,8 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
             else:
                     # peak detect_upion
                 if (time - timeOnset < peakSearchDuration):
-                    # if (intensityNormalized > tempMax):
-                    if (acceleration_raw > tempMax):
-                        # tempMax = intensityNormalized;
-                        tempMax = acceleration_raw;
+                    if (intensityNormalized > tempMax):
+                        tempMax = intensityNormalized;
                         timeMax = time;
                 else:
                     df_peak_script[time] = 1;
@@ -318,9 +306,7 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
                     delta_time_clipped = max(20, min(75,delta_time))
                     interval_filtered = (delta_time_clipped*(1 - 0.7) 
                                               + previous_delta*0.7)
-                    
                     previous_delta =  interval_filtered
-                    interval_filtered = delta_time_clipped
                     # interval_filtered = delta_time_clipped
                     if interval_filtered > 0:
                         tempo_estimated[time] = 60/(0.02 * interval_filtered)
@@ -358,11 +344,10 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
    
     acceleration = sensors['acceleration']
     rotation = sensors['rotation']
-    orientation = sensors['orientation']
     time = sensors['time']
     tempo = sensors['tempo']
     acceleration['int.recomputed'] = accel_intensity(
-                                                acceleration, orientation, time,
+                                                acceleration, time,
                                                 axis_weights,
                                                 integration_parameter, 
                                                 acceleration_average_order, 
@@ -375,27 +360,14 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
                              threshold_min, onset_order, inhibition_duration, 
                              peak_search_window, detect_up)
     
-    acceleration_script = peak_as_script(sensors['beat']['beat.intensityNormalized'],
-                                         sensors['beat']['beat.acceleration'],
-                            sensors['beat']['beat.delta'],
+    acceleration_script = peak_as_script(acceleration['int.recomputed'],
+                            acceleration_temp['diff'],
                             rotation['rot.int2'],
                             tempo,
                             rotation_threshold,
                             inhibition_duration, 
                             peak_search_window,
                             inhibition, peakSearch)
-    
-    # acceleration_script = peak_as_script(acceleration['int.recomputed'],
-    #                                      sensors['beat']['beat.acceleration'],
-    #                         acceleration_temp['diff'],
-    #                         rotation['rot.int2'],
-    #                         tempo,
-    #                         rotation_threshold,
-    #                         inhibition_duration, 
-    #                         peak_search_window,
-    #                         inhibition, peakSearch)
-    
-    
     
     #acceleration['acc.beat'] = acceleration_temp['beat']
     acceleration['acc.peak'] = acceleration_temp['peak']
@@ -482,14 +454,13 @@ def sensors_read(filename):
     time = data_frame.loc[:, 'time']
     
     tempo = data_frame.loc[:, 'tempo']
-    orientation = data_frame.loc[:,['orientation.x', 'orientation.y', 'orientation.z']] 
     acceleration = data_frame.loc[:, ['acc.x', 'acc.y', 'acc.z']] 
     rotation = data_frame.loc[:, ['rot.alpha', 'rot.beta', 'rot.gamma']]
     intensity = data_frame.loc[:, ['int.lin', 'int.comp']]
     
     # ver 20 
-    # beat = data_frame.loc[:, ['beat.time', 'beat.trigger', \
-    #                           'beat.intensity', 'beat.delta']]#, 'beat.median']]
+    beat = data_frame.loc[:, ['beat.time', 'beat.trigger', \
+                              'beat.intensity', 'beat.delta']]#, 'beat.median']]
     # ver 21 test 
     # beat = data_frame.loc[:, ['beat.time', 
     #                           'beat.timeOnset',
@@ -505,19 +476,19 @@ def sensors_read(filename):
     #                           'beat.std']]
     
     # 21 - 2 
-    beat = data_frame.loc[:, ['beat.time', 
-                              'beat.timeOnset',
-                              'beat.timeMax',
-                              'beat.timePlot',
-                              'beat.trigger', 
-                              'beat.acceleration', 
-                              'beat.derivate',
-                              'beat.intensity', 
-                              'beat.intensityNormalized',
-                              'beat.intensityRotation',
-                              'beat.delta',
-                              'beat.mean',
-                              'beat.std']]
+    # beat = data_frame.loc[:, ['beat.time', 
+    #                           'beat.timeOnset',
+    #                           'beat.timeMax',
+    #                           'beat.timePlot',
+    #                           'beat.trigger', 
+    #                           'beat.acceleration', 
+    #                           'beat.derivate',
+    #                           'beat.intensity', 
+    #                           'beat.intensityNormalized',
+    #                           'beat.intensityRotation',
+    #                           'beat.delta',
+    #                           'beat.mean',
+    #                           'beat.std']]
     
     position = data_frame.loc[:, ['position.bar', 'position.beat']]
     position['position.beat'] = position['position.beat'].apply(np.floor)  
@@ -536,7 +507,6 @@ def sensors_read(filename):
             'position' : position,
             'metronome' : metronome,
             'tempo' :tempo,
-            'orientation' : orientation,
             #'notes' : notes
             }
 
@@ -578,31 +548,29 @@ def sensors_plot(sensors, title, y_limits,
     """
  
 #setting data
-    # time = sensors['time']
-    time = sensors['beat']['beat.timePlot']
+    time = sensors['time']
+    # time = sensors['beat']['beat.timePlot']
     acceleration = sensors['acceleration']
     
     # acceleration_x = pd.DataFrame(sensors['beat']['beat.acceleration'])
-    acceleration['acc_x'] = sensors['beat']['beat.acceleration']
-    acceleration['derivate'] =  sensors['beat']['beat.derivate']
-    acceleration['intensity'] =  sensors['beat']['beat.intensity']
-    acceleration['intFilt'] = sensors['beat']['beat.intensityNormalized']
-    acceleration['delta'] = sensors['beat']['beat.delta']
-    acceleration['timeMax'] = sensors['beat']['beat.timeMax']
-    acceleration['mean'] = sensors['beat']['beat.mean']
-    acceleration['std'] = sensors['beat']['beat.std'] 
-    acceleration['intensityRotation'] = sensors['beat']['beat.intensityRotation']
+    # acceleration['acc_x'] = sensors['beat']['beat.acceleration']
+    # acceleration['derivate'] =  sensors['beat']['beat.derivate']
+    # acceleration['intensity'] =  sensors['beat']['beat.intensity']
+    # acceleration['intFilt'] = sensors['beat']['beat.intensityNormalized']
+    # acceleration['delta'] = sensors['beat']['beat.delta']
+    # acceleration['timeMax'] = sensors['beat']['beat.timeMax']
+    # acceleration['mean'] = sensors['beat']['beat.mean']
+    # acceleration['std'] = sensors['beat']['beat.std'] 
+    # acceleration['intensityRotation'] = sensors['beat']['beat.intensityRotation']
     acceleration['peak.script'] = sensors['acceleration']['intensity.script'] 
     acceleration['tempo_estimaated'] = sensors['acceleration']['tempo_estimated'] 
     acceleration['tempo'] = sensors['tempo']
     
+#    # acceleration_selected = acceleration[['acc_x',
+    #                                       'intFilt',
+    #                                       'delta','tempo','tempo_estimated']]
     
-    acceleration_selected = acceleration[['acc_x',
-                                          'intFilt', 'int.recomputed',
-                                          'delta','intensityRotation',
-                                          'tempo','tempo_estimated']]
-
-    
+    acceleration_selected = acceleration[['acc.x', 'tempo','tempo_estimated']]
     
     rotation = pd.DataFrame(sensors['rotation']['rot.int2'])
     intensity = sensors['intensity']
@@ -614,8 +582,8 @@ def sensors_plot(sensors, title, y_limits,
 # setting time for beats and bars    
     metronome_beat = time[metronome.loc[metronome['position.beat'] != 0].index]
     metronome_bar = time[metronome.loc[metronome['position.bar'] == 1].index]
-    #sensors_beat = time[beat.loc[beat['beat.trigger'] == 1].index]
-    sensors_beat = beat.loc[beat['beat.trigger'] ==  1]['beat.time']
+    sensors_beat = time[beat.loc[beat['beat.trigger'] == 1].index]
+    # sensors_beat = beat.loc[beat['beat.trigger'] ==  1]['beat.time']
 
 
     # acceleration_beat = time[acceleration.loc[acceleration['acc.beat'] 
@@ -684,31 +652,31 @@ def sensors_plot(sensors, title, y_limits,
 
 
 #rotation plots
-    # for i in enumerate(rotation):  
-    #     label = ('rotation' if i == 0 else None)
-    #     j = i[0] + acceleration_columns_number
-    #     all_figure_axes[j].\
-    #         plot(time, rotation.iloc[:, i[0]],'tab:orange',
-    #               marker ='.',markersize = 3 ,label=label)
-    #     all_figure_axes[j].set_ylabel(i[1],rotation=0,ha ='right')
+    for i in enumerate(rotation):  
+        label = ('rotation' if i == 0 else None)
+        j = i[0] + acceleration_columns_number
+        all_figure_axes[j].\
+            plot(time, rotation.iloc[:, i[0]],'tab:orange',
+                  marker ='.',markersize = 3 ,label=label)
+        all_figure_axes[j].set_ylabel(i[1],rotation=0,ha ='right')
       
-    #     if y_limits != 0:
-    #         all_figure_axes[j].set_ylim(y_limits['rotation'])
-    #         y_min = y_limits['rotation'][0]
-    #         y_max = y_limits['rotation'][1]
-    #     else:
-    #         y_min = all_figure_axes[j].get_ylim()[0]
-    #         y_max = all_figure_axes[j].get_ylim()[1]
+        if y_limits != 0:
+            all_figure_axes[j].set_ylim(y_limits['rotation'])
+            y_min = y_limits['rotation'][0]
+            y_max = y_limits['rotation'][1]
+        else:
+            y_min = all_figure_axes[j].get_ylim()[0]
+            y_max = all_figure_axes[j].get_ylim()[1]
        
-    #     # all_figure_axes[j].vlines(metronome_beat, y_min, y_max,
-    #     #                           'tab:blue', zorder=3) 
-    #     # all_figure_axes[j].vlines(metronome_bar, y_min, y_max, 
-    #     #                           'black', zorder=3, linewidths = 2) 
-    #     all_figure_axes[j].vlines(sensors_beat, y_min, y_max, 'tab:blue') 
-    #     #all_figure_axes[j].vlines(acceleration_beat, y_min, y_max, 'tab:cyan')
-    #     # all_figure_axes[j].vlines(acceleration_peak, y_min, y_max, 
-    #     #                           'tab:orange', zorder=3)
-    #     all_figure_axes[j].label_outer()
+        # all_figure_axes[j].vlines(metronome_beat, y_min, y_max,
+        #                           'tab:blue', zorder=3) 
+        # all_figure_axes[j].vlines(metronome_bar, y_min, y_max, 
+        #                           'black', zorder=3, linewidths = 2) 
+        all_figure_axes[j].vlines(sensors_beat, y_min, y_max, 'tab:blue') 
+        #all_figure_axes[j].vlines(acceleration_beat, y_min, y_max, 'tab:cyan')
+        # all_figure_axes[j].vlines(acceleration_peak, y_min, y_max, 
+        #                           'tab:orange', zorder=3)
+        all_figure_axes[j].label_outer()
 
 # intensity plots       
     # for i in enumerate(intensity): 

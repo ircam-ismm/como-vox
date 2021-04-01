@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 # import seaborn as sns
 
 import comovox_data_read_plot_test as comovox
+# import comovox_data_read_plot_2020_1 as comovox
 
 # %matplotlib
 
@@ -49,8 +50,21 @@ User data
 # folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-02-12-mesures-lucie-olivier'
 # filename = '20210212-*'
 
-folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-02-23-mesures-sebastien'
-filename = '20210223-*'
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-02-23-mesures-sebastien'
+# filename = '20210223-*'
+
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-12-benjamin'
+# filename = '20210312-*'
+
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-15-morgan'
+# filename = '20210315-*'
+
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-22-fred-jp'
+# filename = '20210322-*'
+
+folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-29-morgan'
+filename = '20210329-*'
+
 
 
 """
@@ -86,8 +100,8 @@ compression = 1
 scaling = 1 
 delta_order= 10
 
-threshold = 2
-threshold_min = 20
+threshold = 1
+threshold_min = 10
 onset_order = 10  #10
 inhibition_duration = 20
 peak_search_window = 20
@@ -96,22 +110,22 @@ detect_up = 1
 #rotation
 axis_weights_rotation = [1,1,1]
 rotation_average_order = 20
-rotation_threshold = 20
+rotation_threshold = 1
 
 # adaptation
 
 sampling_period = 0.02 # sedonds
 
 inhibition = {
-    'min': 0.3 / sampling_period, 
+    'min': 0.25 / sampling_period, 
     'max': 0.5 / sampling_period, 
-    'beats': 0.4 / sampling_period,
+    'beats': 0.5 / sampling_period,
   };
 
 peakSearch = {
-    'min': 0.3 / sampling_period, 
+    'min': 0.25 / sampling_period, 
     'max': 0.5 / sampling_period, 
-    'beats': 0.4 / sampling_period,
+    'beats': 0.5 / sampling_period,
   };
 
 
@@ -119,9 +133,9 @@ save_figure = False
 text ='adapt4_delta_10_max'
 
 
-beat_trigger = False
-beat_offline = True 
-metronome = False
+beat_trigger = True   # displays beat detected in the phone (blue)
+beat_offline = True  # displays beat detected re-calculated offline (orange)
+metronome = False       # displays the metronome beats
 
 
 

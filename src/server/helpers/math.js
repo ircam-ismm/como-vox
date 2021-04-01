@@ -55,6 +55,13 @@ Object.assign(e, {mean});
 export function meanVariance(values, {
   ddof = 1,
 } = {}) {
+  if(values.length === 0) {
+    return {
+      mean: undefined,
+      variance: undefined,
+    };
+  }
+
   let mean = 0;
   let meanLast = 0;
   let squaredDifference = 0;
@@ -95,7 +102,9 @@ export function meanStandardDeviation(values, {
   ddof = 1,
 } = {}) {
   const {mean, variance} = meanVariance(values, {ddof});
-  const standardDeviation = Math.sqrt(variance);
+  const standardDeviation = (typeof variance !== 'undefined'
+                             ? Math.sqrt(variance)
+                             : undefined);
   return {
     mean,
     standardDeviation,

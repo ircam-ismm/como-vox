@@ -137,8 +137,8 @@ describe(`Check meanVariance`, () => {
     [
       [],
       {},
-      0,
-      0,
+      undefined,
+      undefined,
     ],
     [
       [1.00000215, 1.00000565, 1.00000415, 1.00000662, 1.00000092,
@@ -166,8 +166,12 @@ describe(`Check meanVariance`, () => {
 JSON.stringify({value: values[0]})
     }`;
 
-      assertWithRelativeError(mean, values[2], epsilon, message);
-      assertWithRelativeError(variance, values[3], epsilon, message);
+      if(typeof values[2] !== 'undefined') {
+        assertWithRelativeError(mean, values[2], epsilon, message);
+        assertWithRelativeError(variance, values[3], epsilon, message);
+      } else {
+        assert.equal(mean, values[2], message);
+      }
     });
   });
 
@@ -198,9 +202,9 @@ describe(`Check meanStandardDeviation`, () => {
     [
       [],
       {},
-      0,
-      0,
-      0,
+      undefined,
+      undefined,
+      undefined,
     ],
     [
       [2],
@@ -226,10 +230,14 @@ describe(`Check meanStandardDeviation`, () => {
 JSON.stringify({value: values[0]})
     }`;
 
-      assertWithRelativeError(mean, values[2], epsilon, message);
-      assertWithRelativeError(variance, values[3], epsilon, message);
-      assertWithRelativeError(standardDeviation, values[4], epsilon, message);
-      assertWithRelativeError(Math.sqrt(variance), standardDeviation, epsilon, message);
+      if(typeof values[2] !== 'undefined') {
+        assertWithRelativeError(mean, values[2], epsilon, message);
+        assertWithRelativeError(variance, values[3], epsilon, message);
+        assertWithRelativeError(standardDeviation, values[4], epsilon, message);
+        assertWithRelativeError(Math.sqrt(variance), standardDeviation, epsilon, message);
+      } else {
+        assert.equal(mean, values[2], message);
+      }
     });
   });
 

@@ -692,6 +692,28 @@ function transport(graph, helpers, outputFrame) {
             continue;
           }
           beatGesturesStart.push(beatGestures[g]);
+
+          // cancel as soon as there is something wrong
+          if(beatGesturesStart.length > 1) {
+            const last = beatGesturesStart.length - 1;
+            const timeDelta = beatGesturesStart[last].time - beatGesturesStart[last - 1].time;
+            const tempoFromGesture = timeDeltaToTempo(timeDelta,
+                                                      1,
+                                                      {timeSignature});
+            const {
+              absoluteMin,
+              absoluteMax,
+              relativeMin,
+              relativeMax,
+            } = parameters.tempoLimits;
+            if(tempoFromGesture <= absoluteMin
+               || tempoFromGesture >= absoluteMax
+               || tempoFromGesture <= relativeMin * tempo
+               || tempoFromGesture >= relativeMax * tempo) {
+              console.log('no start, tap tempo out of bounds', tempoFromGesture);
+              app.events.emit('gestureControlsPlaybackStart', false);
+            }
+          }
         }
 
         // note: there is one beat less than the possible maximum, to cope with
@@ -717,6 +739,9 @@ function transport(graph, helpers, outputFrame) {
                && tempoFromGesture > relativeMin * tempo
                && tempoFromGesture < relativeMax * tempo) {
               tempos.push(tempoFromGesture);
+            } else {
+              console.log('no start, tap tempo out of bounds', tempoFromGesture);
+              app.events.emit('gestureControlsPlaybackStart', false);
             }
 
           }
@@ -724,8 +749,7 @@ function transport(graph, helpers, outputFrame) {
           // avoid extra or missing beats
           // one less because tempos are intervals between gestures
           if(tempos.length !== beatGesturesStart.length - 1) {
-            // @TODO: emit cancel event (and note)
-            console.log('no start, mismatch',
+            console.log('no start, wrong number of beat gestures',
                         'beatGesturesStart.length', beatGesturesStart.length,
                         'tempos.length', tempos.length);
             app.events.emit('gestureControlsPlaybackStart', false);

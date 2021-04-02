@@ -1,39 +1,58 @@
 function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
-  let status = 'off'
-  let startTime = 0;
-
-  const noteChannel = 'scenario';
-
-  const initNotePitch = 99; // E7
-  const initNoteIntensity = 80;
-  const initNoteDuration = 1; // in beats
+  const conversion = app.imports.helpers.conversion;
 
   const parameters = {
-    waitDuration: 1, // in seconds, before stillness
-    stillnessDurationMin: 0.5, // in seconds
+    scenarioStatus: 'off',
+    initialWaitingDuration: 1, // in seconds, before stillness
+    stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start
+    stillnessWaitingDurationMax: 2, // in seconds, for time-out
+    beatGestureWaitingDurationMax: 2, // in seconds, for time-out
+  };
+
+  let status = 'off'
+  let statusTime = 0;
+  let timeoutTime = 0;
+  let beatGestureTriggered = false;
+  const statusUpdate = (statusRequest) => {
+    const statusChanged = status !== statusRequest;
+    status = statusRequest;
+    statusTime = app.data['time'].local;
+    if(statusChanged) {
+      app.events.emit('scenarioStatus', status);
+    }
   };
 
   const updateParams = (updates) => {
+    if(parameters.scenarioStartStopWithBeating
+       && updates.scenarioStatus === 'cancel') {
+      app.events.emit('gestureControlsPlaybackStart', false);
+      app.events.emit('gestureControlsPlaybackStop', false);
+      app.events.emit('scenarioStartStopWithBeating', false);
+    }
+
     if(typeof updates.scenarioStartStopWithBeating !== 'undefined') {
       const active = updates.scenarioStartStopWithBeating;
-      const activeChanged = active != parameters.scenarioStartStopWithBeating;
       parameters.scenarioStartStopWithBeating = active;
       if(active) {
         // may retrigger, even if already active
-        startTime = app.data['time'].local;
-        status = 'init';
-        app.events.emit('scenarioStatus', status);
+        statusTime = app.data['time'].local;
+        statusUpdate('init');
         app.events.emit('gestureControlsPlaybackStart', false);
         app.events.emit('gestureControlsPlaybackStop', true);
         app.events.emit('playback', false);
         app.events.emit('tempoReset', true);
         app.events.emit('seekPosition',  {bar: 1, beat: 1});
       } else {
-        status = 'off';
         // do not trigger anything on deactivation
       }
+    }
+
+    if(typeof updates.gestureControlsPlaybackStart !== 'undefined'
+       && !updates.gestureControlsPlaybackStart
+       && parameters.scenarioStatus === 'ready') {
+      statusUpdate('cancel');
     }
 
     for(const p of Object.keys(updates) ) {
@@ -48,8 +67,8 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   if(app.events && app.state) {
     [
       'gestureControlsPlaybackStart',
-      'playback',
       'scenarioStartStopWithBeating',
+      'scenarioStatus',
     ].forEach( (event) => {
       const callback = (value) => {
         // compatibility with setGraphOption
@@ -70,14 +89,6 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       const inputData = app.data;
       const outputData = app.data;
 
-      // channel shared by multiple scenarios
-      // managed by scenarioManager
-      const notesContainer = inputData['notes'] || {
-        [noteChannel]: [],
-      };
-      const notes = notesContainer[noteChannel];
-      outputData['notes'] = notesContainer;
-
       const stillness = inputData['stillness'];
 
       if(!parameters.scenarioStartStopWithBeating
@@ -86,44 +97,50 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       }
 
       const time = inputData['time'];
+      const playback = inputData['playback'];
 
       switch(status) {
         case 'init': {
-          status = 'waiting';
-          app.events.emit('scenarioStatus', status);
+          statusUpdate('waiting');
           break;
         }
 
         case 'waiting': {
-          if(time.local - startTime >= parameters.waitDuration) {
-            status = 'stillness';
-            app.events.emit('scenarioStatus', status);
-            startTime = time.local;
+          if(time.local - statusTime >= parameters.initialWaitingDuration) {
+            timeoutTime = time.local;
+            statusUpdate('waitingForStillness');
           }
           break;
         }
 
-        case 'stillness': {
-          if(!stillness.status) {
-            startTime = time.local;
-          } else {
-            if(time.local - startTime >= parameters.stillnessDurationMin) {
-              status = 'running';
-              app.events.emit('scenarioStatus', status);
-              app.events.emit('gestureControlsPlaybackStart', true);
-
-              const note = {
-                channel: noteChannel,
-                time: time.audio,
-                pitch: initNotePitch,
-                intensity: initNoteIntensity,
-                duration: initNoteDuration,
-              };
-              notes.push(note);
-            }
-
+        case 'waitingForStillness': {
+          if(time.local - timeoutTime >= parameters.stillnessWaitingDurationMax) {
+            statusUpdate('cancel');
+          } else if(!stillness.status) {
+            // not still, restart
+            statusUpdate('waitingForStillness');
+          } else if(time.local - statusTime >= parameters.stillnessWaitingDurationMin) {
+            timeoutTime = time.local;
+            beatGestureTriggered = false;
+            statusUpdate('ready');
+            app.events.emit('gestureControlsPlaybackStart', true);
           }
 
+          break;
+        }
+
+        case 'ready': {
+          const beatGesture = inputData['beat'];
+          if(beatGesture && beatGesture.trigger) {
+            beatGestureTriggered = true;
+          }
+          if(!beatGestureTriggered
+             && time.local - timeoutTime >= parameters.beatGestureWaitingDurationMax) {
+            // no start, cancel
+            statusUpdate('cancel');
+          } else if(playback) {
+            statusUpdate('playing');
+          }
           break;
         }
 

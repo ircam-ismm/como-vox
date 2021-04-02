@@ -54,6 +54,13 @@
       },
     },
     {
+      id: 'scenarioSonification',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioSonification',
+      },
+    },
+    {
       id: 'transport',
       type: 'ScriptData',
       options: {
@@ -162,6 +169,10 @@
     [
       'stillness',
       'scenarioStartStopWithBeating',
+    ],
+    [
+      'scenarioManager',
+      'scenarioSonification',
     ],
     [
       'beatTriggerFromGesture',

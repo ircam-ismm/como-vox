@@ -59,11 +59,6 @@ export default {
     },
   },
 
-  handednessValidation: {
-    type: 'boolean',
-    event: true,
-  },
-
   lookAheadNotes: {
     type: 'float',
     default: 0.125, // 1 quarter-note

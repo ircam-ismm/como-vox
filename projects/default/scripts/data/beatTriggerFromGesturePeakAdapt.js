@@ -30,17 +30,18 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   //acceleration filtering
   const accelerationAverageOrder = 2;
   const movingAverage = new helpers.algo.MovingAverage(accelerationAverageOrder);
-  
+
   // computing intensity
   const feedbackFactor = 0.8; //for the intensity factor initially set to 0.7
   const intensityNormalisation = 1.; // original gain  = 0.07 with accelerometer / 9.81
+  let handednessNormalisation = 1; // right hand is 1, left is -1
   const deltaOrder = 10; //20
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
-  
+
   //onset detection
   const onsetMeanStdOrder = 10;
   const movingMeanStd = new helpers.algo.MovingMeanStd(onsetMeanStdOrder);
- 
+
   // orientation intensity filtering
   const rotationAverageOrder = 20;
   const rotationMovingAverage = new helpers.algo.MovingAverage(rotationAverageOrder);
@@ -77,7 +78,54 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let timeMax = 0;
   let tempMax = 0;
 
- // debug
+  // shared parameters, according to player schema
+  const parameters = {
+    handedness: null,
+  };
+
+  const updateParams = (updates) => {
+    for(const p of Object.keys(updates) ) {
+      switch(p) {
+        case 'handedness': {
+          handednessNormalisation = (updates['handedness'] === 'left'
+                                     ? -1
+                                     : 1);
+          break;
+        }
+
+        default: {
+          break;
+        }
+      }
+
+
+
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
+      }
+    }
+  };
+
+  ///// Events and data (defined only in browser)
+  const registeredEvents = [];
+  if(app.events && app.state) {
+    [
+      'handedness',
+      'scenarioCurrent',
+      'scenarioStatus',
+    ].forEach( (event) => {
+      const callback = (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
+      updateParams({[event]: app.state[event]});
+    });
+  }
+
+  // debug
   const barGraph = (value, {
     peak = undefined,
     valueMin = 0,
@@ -120,8 +168,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   };
 
   return {
-    updateParams(updates) {
-    },
+    updateParams,
 
     process(inputFrame, outputFrame) {
       const inputData = app.data;
@@ -190,7 +237,9 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       const acceleration = inputData['accelerationIncludingGravity'].x;
 
       // compute 1D acceleration intensity
-      const accelerationFiltered = movingAverage.process(acceleration);
+      const accelerationFiltered = movingAverage.process(
+        acceleration * intensityNormalisation * handednessNormalisation);
+
       let derivate = movingDelta.process(accelerationFiltered, inputData.metas.period);
       intensity = Math.max(derivate, 0) + feedbackFactor * previousIntensity;
       // store value for next pass
@@ -204,7 +253,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
 
       // normalisation and filtering
-      const intensityNormalized = intensity * intensityNormalisation;
+      const intensityNormalized = intensity;
 
       // delta computing
       delta = intensityNormalized - lastMean - lastStd*meanThresholdAdapt - meanThresholdMin;
@@ -272,7 +321,9 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
     },
 
     destroy() {
-
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
   }
 }

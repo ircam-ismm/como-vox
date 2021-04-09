@@ -66,6 +66,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   const registeredEvents = [];
   if(app.events && app.state) {
     [
+      'beatGestureWaitingDurationMax',
       'gestureControlsPlaybackStart',
       'scenarioStartStopWithBeating',
       'scenarioStatus',

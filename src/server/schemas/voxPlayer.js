@@ -9,6 +9,11 @@ export default {
     },
   },
 
+  beatGestureWaitingDurationMax: {
+    type: 'float',
+    default: 2, // in seconds, for time-out
+  },
+
   beatingSound: {
     type: 'boolean',
     default: false,
@@ -83,7 +88,7 @@ export default {
     type: 'any',
     default: {
       bar: 1,
-      beat: 1,
+      beat: 1, // one more for upbeat before start
     },
   },
 

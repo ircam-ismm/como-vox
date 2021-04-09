@@ -87,7 +87,7 @@ export default {
   playbackStartAfterCount: {
     type: 'any',
     default: {
-      bar: 1,
+      bar: 2,
       beat: 1, // one more for upbeat before start
     },
   },

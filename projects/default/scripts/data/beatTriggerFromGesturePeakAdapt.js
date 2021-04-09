@@ -138,7 +138,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       }
 
       // latency estimation
-      const sensorsLatency = inputData.metas.period;
+      const sensorsLatency = 0;
       const time = now - sensorsLatency
             - inputData.metas.period * (deltaOrder + accelerationAverageOrder)/2; // 3?
 

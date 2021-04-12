@@ -560,10 +560,29 @@ class PlayerExperience extends AbstractExperience {
     this.playback = playback;
 
     if(!playback) {
-      this.seekPosition({
-        bar: app.data.position.bar,
-        beat: 1,
-      });
+      switch(app.state['playbackStopSeek']) {
+        case 'barStart': {
+          this.seekPosition({
+            bar: app.data.position.bar,
+            beat: 1,
+          });
+          break;
+        }
+
+        case 'start': {
+          this.seekPosition({
+            bar: 1,
+            beat: 1,
+          });
+          break;
+        }
+
+        default: {
+          // do not seek (pause)
+          break;
+        }
+      }
+
     }
   }
 

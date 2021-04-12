@@ -196,7 +196,20 @@ export function player(data, listeners, {
           .active="${data.playback}"
           @change="${e => voxPlayerState.set({playback: (e.detail.value)}) }"
         ></sc-toggle>
-      </div>
+        <div class="playbackStopSeek container">Arrêt&nbsp;:
+          ${['barStart', 'start', null].map( (seek) => {
+             return html`
+          <button class="set playbackStop mode ${data.playbackStopSeek === seek
+                                                 ? 'selected' : ''}"
+                  @click="${e => voxPlayerState.set({playbackStopSeek: seek}) }">
+            ${seek === 'start' ? 'Début' : ''}
+            ${seek === 'barStart' ? 'Mesure' : ''}
+            ${seek === null ? 'Pause' : ''}
+          </button>
+          `;
+         }) }
+       </div>
+     </div>
 
       ${uiPreset === 'full' ? html`
       <div class="onoff transport">Départ&nbsp;:

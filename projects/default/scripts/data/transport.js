@@ -59,6 +59,7 @@ function transport(graph, helpers, outputFrame) {
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
   };
 
+  let playbackStartNew = false;
   let playbackStartRequest = null;
 
   let positionStopped = {
@@ -163,10 +164,11 @@ function transport(graph, helpers, outputFrame) {
       return;
     }
 
+    playbackStartRequest = null;
+
     if(playback) {
-      playbackStartRequest = null;
+      playbackStartNew = true;
     } else {
-      playbackStartRequest = null;
       positionStopped = positionWithOffsetLast;
 
       beatGestures.length = 0;
@@ -328,10 +330,7 @@ function transport(graph, helpers, outputFrame) {
         positionWithOffsetLast = position;
         positionLast = positionAddBeats(position, -beatOffset, {timeSignature});
 
-        seekPosition(position);
-
         const timeOffsetFromNow = time - now.local;
-
         positionLastTime = {
           audio: now.audio + timeOffsetFromNow,
           local: now.local + timeOffsetFromNow,
@@ -341,6 +340,8 @@ function transport(graph, helpers, outputFrame) {
         //   audio: 0,
         //   local: 0,
         // };
+
+        console.log('playbackStartRequest', position);
 
         app.events.emit('playback', true);
         playbackStartRequest = null;
@@ -359,7 +360,7 @@ function transport(graph, helpers, outputFrame) {
       const lookAheadNotes = app.data.lookAheadNotes;
 
       // stop
-      if(!parameters.playback && !parameters.gestureControlsPlaybackStart) {
+      if(!parameters.playback) {
         outputData['tempo'] = tempo;
         tempoLast = tempo;
 
@@ -379,7 +380,9 @@ function transport(graph, helpers, outputFrame) {
           };
         }
 
-        return outputFrame;
+        if(!parameters.gestureControlsPlaybackStart) {
+          return outputFrame;
+        }
       }
 
       const timeDelta = (playback && positionLastTime.audio !== 0
@@ -408,15 +411,16 @@ function transport(graph, helpers, outputFrame) {
 
       const bar = positionWithOffset.bar;
       const beat = positionWithOffset.beat;
-      if(playback && positionLastTime.audio === 0) {
+      if(playback
+         && (positionLastTime.audio === 0 || playbackStartNew) ) {
         // start
-        barChange = true;
-        beatChange = true;
+        beatChange = positionStopped.beat === Math.floor(positionStopped.beat);
+        barChange = beatChange && positionStopped.beat === 1;
       } else {
         barChange = bar !== barLast;
         // on beat change
         beatChange = (Math.floor(beat) !== Math.floor(beatLast)
-                       || barChange); // count to 1
+                      || barChange); // count to 1
       }
 
       if(beatChange) {
@@ -916,6 +920,8 @@ function transport(graph, helpers, outputFrame) {
         positionWithOffsetLast = positionWithOffset;
         beatOffsetLast = beatOffset;
       }
+
+      playbackStartNew = false;
 
       // clock always advances
       positionLastTime = {

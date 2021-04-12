@@ -43,7 +43,6 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         app.events.emit('gestureControlsPlaybackStop', true);
         app.events.emit('playback', false);
         app.events.emit('tempoReset', true);
-        app.events.emit('seekPosition',  {bar: 1, beat: 1});
       } else {
         // do not trigger anything on deactivation
       }

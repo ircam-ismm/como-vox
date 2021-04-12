@@ -95,6 +95,12 @@ export default {
     },
   },
 
+  playbackStopSeek: {
+    type: 'string',
+    default: 'barStart', // 'barStart', 'start', or null
+    nullable: true,
+  },
+
   record: {
     type: 'boolean',
     default: false,

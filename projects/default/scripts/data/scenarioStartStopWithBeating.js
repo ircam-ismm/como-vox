@@ -41,6 +41,11 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         statusUpdate('init');
         app.events.emit('gestureControlsPlaybackStart', false);
         app.events.emit('gestureControlsPlaybackStop', true);
+        // must start at the beginning of a bar (from start is fine, too)
+        if(app.state.playbackStopSeek !== 'start'
+           && app.state.playbackStopSeek !== 'barStart') {
+          app.events.emit('playbackStopSeek', 'barStart');
+        }
         app.events.emit('playback', false);
         app.events.emit('tempoReset', true);
       } else {
@@ -67,6 +72,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     [
       'beatGestureWaitingDurationMax',
       'gestureControlsPlaybackStart',
+      'playbackStopSeek',
       'scenarioStartStopWithBeating',
       'scenarioStatus',
     ].forEach( (event) => {

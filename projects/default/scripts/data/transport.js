@@ -156,6 +156,7 @@ function transport(graph, helpers, outputFrame) {
       beatGestureLastTime = 0;
       beatChanges.length = 0;
       beatGestureStartTime = app.data['time'];
+      app.events.emit('gestureControlsPlaybackStartStatus', 'init');
     }
   };
 
@@ -724,6 +725,7 @@ function transport(graph, helpers, outputFrame) {
              (tempoNow < tempoAbsoluteMin
               || tempoNow < tempoRelativeMin * tempo) ) {
             console.log('no start, no more beating', tempoNow);
+            app.events.emit('gestureControlsPlaybackStartStatus', 'tooSlow');
             app.events.emit('gestureControlsPlaybackStart', false);
           }
         }
@@ -737,16 +739,27 @@ function transport(graph, helpers, outputFrame) {
                                                     1,
                                                     {timeSignature});
           if(tempoFromGesture < tempoAbsoluteMin
-             || tempoFromGesture > tempoAbsoluteMax
-             || tempoFromGesture < tempoRelativeMin * tempo
+             || tempoFromGesture < tempoRelativeMin * tempo) {
+            console.log('no start, tap tempo out of bounds', tempoFromGesture,
+                        'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
+                        'relative to', tempo,
+                        tempoRelativeMin, tempoRelativeMin * tempo,
+                        tempoRelativeMax, tempoRelativeMax * tempo);
+            app.events.emit('gestureControlsPlaybackStartStatus', 'tooSlow');
+            app.events.emit('gestureControlsPlaybackStart', false);
+          }
+
+          else if(tempoFromGesture > tempoAbsoluteMax
              || tempoFromGesture > tempoRelativeMax * tempo) {
             console.log('no start, tap tempo out of bounds', tempoFromGesture,
                         'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
                         'relative to', tempo,
                         tempoRelativeMin, tempoRelativeMin * tempo,
                         tempoRelativeMax, tempoRelativeMax * tempo);
+            app.events.emit('gestureControlsPlaybackStartStatus', 'tooFast');
             app.events.emit('gestureControlsPlaybackStart', false);
           }
+
         }
 
         // note: there is one beat less than the possible maximum, to cope with
@@ -773,20 +786,27 @@ function transport(graph, helpers, outputFrame) {
             const tempoFromGesture = timeDeltaToTempo(timeDelta,
                                                       1,
                                                       {timeSignature});
-            if(tempoFromGesture > tempoAbsoluteMin
-               && tempoFromGesture < tempoAbsoluteMax
-               && tempoFromGesture > tempoRelativeMin * tempo
-               && tempoFromGesture < tempoRelativeMax * tempo) {
-              tempos.push(tempoFromGesture);
-            } else {
-            console.log('no start, tap tempo out of bounds', tempoFromGesture,
-                        'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
-                        'relative to', tempo,
-                        tempoRelativeMin, tempoRelativeMin * tempo,
-                        tempoRelativeMax, tempoRelativeMax * tempo);
+            if(tempoFromGesture < tempoAbsoluteMin
+               || tempoFromGesture < tempoRelativeMin * tempo) {
+              console.log('no start, tap tempo out of bounds', tempoFromGesture,
+                          'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
+                          'relative to', tempo,
+                          tempoRelativeMin, tempoRelativeMin * tempo,
+                          tempoRelativeMax, tempoRelativeMax * tempo);
+              app.events.emit('gestureControlsPlaybackStartStatus', 'tooSlow');
               app.events.emit('gestureControlsPlaybackStart', false);
+            } else if(tempoFromGesture > tempoAbsoluteMax
+                      || tempoFromGesture > tempoRelativeMax * tempo) {
+              console.log('no start, tap tempo out of bounds', tempoFromGesture,
+                          'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
+                          'relative to', tempo,
+                          tempoRelativeMin, tempoRelativeMin * tempo,
+                          tempoRelativeMax, tempoRelativeMax * tempo);
+              app.events.emit('gestureControlsPlaybackStartStatus', 'tooFast');
+              app.events.emit('gestureControlsPlaybackStart', false);
+            } else {
+              tempos.push(tempoFromGesture);
             }
-
           }
 
           // avoid extra or missing beats
@@ -795,6 +815,7 @@ function transport(graph, helpers, outputFrame) {
             console.log('no start, wrong number of beat gestures',
                         'beatGesturesStart.length', beatGesturesStart.length,
                         'tempos.length', tempos.length);
+            app.events.emit('gestureControlsPlaybackStartStatus', 'tooMuchJitter');
             app.events.emit('gestureControlsPlaybackStart', false);
           } else {
 

@@ -24,9 +24,24 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     }
   };
 
+  const statusIsError = (status) => {
+    return status === 'cancel'
+      || status === 'tooFast'
+      || status === 'tooSlow'
+      || status === 'tooMuchJitter'
+      || status === 'error'
+  };
+
   const updateParams = (updates) => {
+    // propagate error from beating
     if(parameters.scenarioStartStopWithBeating
-       && updates.scenarioStatus === 'cancel') {
+       && !statusIsError(status)
+       && statusIsError(updates.gestureControlsPlaybackStartStatus) ) {
+      statusUpdate(updates.gestureControlsPlaybackStartStatus);
+    }
+
+    if(parameters.scenarioStartStopWithBeating
+       && statusIsError(updates.scenarioStatus) ) {
       app.events.emit('gestureControlsPlaybackStart', false);
       app.events.emit('gestureControlsPlaybackStop', false);
       app.events.emit('scenarioStartStopWithBeating', false);
@@ -55,7 +70,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
 
     if(typeof updates.gestureControlsPlaybackStart !== 'undefined'
        && !updates.gestureControlsPlaybackStart
-       && parameters.scenarioStatus === 'ready') {
+       && status === 'ready') {
       statusUpdate('cancel');
     }
 
@@ -72,6 +87,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     [
       'beatGestureWaitingDurationMax',
       'gestureControlsPlaybackStart',
+      'gestureControlsPlaybackStartStatus',
       'playbackStopSeek',
       'scenarioStartStopWithBeating',
       'scenarioStatus',

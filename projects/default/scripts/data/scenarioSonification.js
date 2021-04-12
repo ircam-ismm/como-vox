@@ -18,7 +18,27 @@ function scenarioSonification(graph, helpers, outputFrame) {
   const cancelNoteRepetition = 3;
   const cancelNoteRepetitionInterval = 1 / 32; // in whole notes
 
-  let scenarioStatusLast = 'off';
+  let tooSlowRequest = false;
+  const tooSlowNotePitch = 77; // C6
+  const tooSlowNoteIntensity = 80;
+  const tooSlowNoteDuration = 1; // in whole notes
+  const tooSlowNoteRepetition = 2;
+  const tooSlowNoteRepetitionInterval = 1 / 4; // in whole notes
+
+  let tooFastRequest = false;
+  const tooFastNotePitch = 85; // G6
+  const tooFastNoteIntensity = 80;
+  const tooFastNoteDuration = 1 / 8; // in whole notes
+  const tooFastNoteRepetition = 8;
+  const tooFastNoteRepetitionInterval = 1 / 64; // in whole notes
+
+  let tooMuchJitterRequest = false;
+  const tooMuchJitterNotes = [
+    {pitch: 82, intensity: 80, duration: 1/8, delay: 0},
+    {pitch: 77, intensity: 80, duration: 1,   delay: 1/16},
+    {pitch: 82, intensity: 80, duration: 1/3, delay: 1/5},
+    {pitch: 77, intensity: 80, duration: 1/4, delay: 1/7},
+  ];
 
   const parameters = {
     scenarioCurrent: null,
@@ -35,6 +55,21 @@ function scenarioSonification(graph, helpers, outputFrame) {
 
         case 'cancel': {
           cancelRequest = true;
+          break;
+        }
+
+        case 'tooSlow': {
+          tooSlowRequest = true;
+          break;
+        }
+
+        case 'tooFast': {
+          tooFastRequest = true;
+          break;
+        }
+
+        case 'tooMuchJitter': {
+          tooMuchJitterRequest = true;
           break;
         }
 
@@ -111,6 +146,52 @@ function scenarioSonification(graph, helpers, outputFrame) {
           };
           notes.push(note);
         }
+      }
+
+      if(tooSlowRequest) {
+        tooSlowRequest = false;
+        for(let n = 0; n < tooSlowNoteRepetition; ++n) {
+          const note = {
+            channel: noteChannel,
+            time: time.audio + n * notesToSeconds(tooSlowNoteRepetitionInterval,
+                                                  {tempo, timeSignature}),
+            pitch: tooSlowNotePitch,
+            intensity: tooSlowNoteIntensity,
+            duration: tooSlowNoteDuration,
+          };
+          notes.push(note);
+        }
+      }
+
+      if(tooFastRequest) {
+        tooFastRequest = false;
+        for(let n = 0; n < tooFastNoteRepetition; ++n) {
+          const note = {
+            channel: noteChannel,
+            time: time.audio + n * notesToSeconds(tooFastNoteRepetitionInterval,
+                                                  {tempo, timeSignature}),
+            pitch: tooFastNotePitch,
+            intensity: tooFastNoteIntensity,
+            duration: tooFastNoteDuration,
+          };
+          notes.push(note);
+        }
+      }
+
+      if(tooMuchJitterRequest) {
+        tooMuchJitterRequest = false;
+        let timeCurrent = time.audio;
+        tooMuchJitterNotes.forEach( (note) => {
+          timeCurrent += notesToSeconds(note.delay, {tempo, timeSignature});
+          const {pitch, intensity, duration} = note;
+          notes.push({
+            channel: noteChannel,
+            time: timeCurrent,
+            pitch,
+            intensity,
+            duration,
+          });
+        });
       }
 
       outputData['notes'] = notesContainer;

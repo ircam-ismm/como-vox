@@ -39,6 +39,15 @@ export default {
     default: false,
   },
 
+  gestureControlsPlaybackStartStatus: {
+    type: 'string',
+    default: null,
+    nullable: true,
+    metas: {
+      exported: false,
+    },
+  },
+
   gestureControlsPlaybackStop: {
     type: 'boolean',
     default: false,

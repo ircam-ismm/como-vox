@@ -18,6 +18,13 @@ function scenarioSonification(graph, helpers, outputFrame) {
   const cancelNoteRepetition = 3;
   const cancelNoteRepetitionInterval = 1 / 32; // in whole notes
 
+  let errorRequest = false;
+  const errorNotePitch = 81; // Eb6
+  const errorNoteIntensity = 80;
+  const errorNoteDuration = 1 / 4; // in whole notes
+  const errorNoteRepetition = 4;
+  const errorNoteRepetitionInterval = 1 / 16; // in whole notes
+
   let tooSlowRequest = false;
   const tooSlowNotePitch = 77; // C6
   const tooSlowNoteIntensity = 80;
@@ -55,6 +62,11 @@ function scenarioSonification(graph, helpers, outputFrame) {
 
         case 'cancel': {
           cancelRequest = true;
+          break;
+        }
+
+        case 'error': {
+          errorRequest = true;
           break;
         }
 
@@ -143,6 +155,21 @@ function scenarioSonification(graph, helpers, outputFrame) {
             pitch: cancelNotePitch,
             intensity: cancelNoteIntensity,
             duration: cancelNoteDuration,
+          };
+          notes.push(note);
+        }
+      }
+
+      if(errorRequest) {
+        errorRequest = false;
+        for(let n = 0; n < errorNoteRepetition; ++n) {
+          const note = {
+            channel: noteChannel,
+            time: time.audio + n * notesToSeconds(errorNoteRepetitionInterval,
+                                                  {tempo, timeSignature}),
+            pitch: errorNotePitch,
+            intensity: errorNoteIntensity,
+            duration: errorNoteDuration,
           };
           notes.push(note);
         }

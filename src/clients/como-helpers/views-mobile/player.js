@@ -89,7 +89,7 @@ export function player(data, listeners, {
              min="0"
              max="500"
              step="10"
-             .value=${data.audioLatency * 1e3}
+             .value=${Math.round(data.audioLatency * 1e3)}
              @click="${e => selfSelect(e)}"
              @change="${e => {
                           voxPlayerState.set({
@@ -97,6 +97,10 @@ export function player(data, listeners, {
                           });
                         } }">
       ms
+        <button class="scenario ${data.scenarioCurrent === 'scenarioLatencyCalibration' ? 'selected' : ''}"
+                @click="${e => voxPlayerState.set({scenarioLatencyCalibration: true}) }"
+        >Calibrer</button>
+
     </div>
 
     ${uiPreset === 'full' ? html`
@@ -213,9 +217,9 @@ export function player(data, listeners, {
 
       ${uiPreset === 'full' ? html`
       <div class="onoff transport">Départ&nbsp;:
-        <button class="init"
+        <button class="scenario ${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}"
                 @click="${e => voxPlayerState.set({scenarioStartStopWithBeating: true}) }"
-        >Init</button>
+        >Suivre</button>
         <sc-toggle
           .active="${data.gestureControlsPlaybackStart}"
           @change="${e => voxPlayerState.set({gestureControlsPlaybackStart: (e.detail.value)}) }"
@@ -270,9 +274,9 @@ export function player(data, listeners, {
       </div>
           ` : html`
       <div class="onoff transport">Suivant le geste&nbsp;:
-        <button class="init"
+        <button class="scenario ${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}"
           @click="${e => voxPlayerState.set({scenarioStartStopWithBeating: true}) }"
-        >Préparer</button>
+        >Suivre</button>
         <sc-toggle
           .active="${data.gestureControlsPlaybackStart && data.gestureControlsPlaybackStop}"
           @change="${e => {

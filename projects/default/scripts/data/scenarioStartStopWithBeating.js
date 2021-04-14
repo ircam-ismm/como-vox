@@ -52,7 +52,6 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       parameters.scenarioStartStopWithBeating = active;
       if(active) {
         // may retrigger, even if already active
-        statusTime = app.data['time'].local;
         statusUpdate('init');
         app.events.emit('gestureControlsPlaybackStart', false);
         app.events.emit('gestureControlsPlaybackStop', true);

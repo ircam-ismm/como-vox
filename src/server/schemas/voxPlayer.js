@@ -125,7 +125,7 @@ export default {
 
   playbackStopSeek: {
     type: 'string',
-    default: 'barStart', // 'barStart', 'start', or null
+    default: 'start', // 'barStart', 'start', or null
     nullable: true,
   },
 
@@ -144,6 +144,11 @@ export default {
   },
 
   scenarioStartStopWithBeating: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioLatencyCalibration: {
     type: 'boolean',
     event: true,
   },

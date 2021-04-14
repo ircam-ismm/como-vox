@@ -54,6 +54,13 @@
       },
     },
     {
+      id: 'scenarioLatencyCalibration',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioLatencyCalibration',
+      },
+    },
+    {
       id: 'scenarioStartStopWithBeating',
       type: 'ScriptData',
       options: {
@@ -180,6 +187,10 @@
     [
       'stillness',
       'scenarioStartStopWithBeating',
+    ],
+    [
+      'stillness',
+      'scenarioLatencyCalibration',
     ],
     [
       'scenarioManager',

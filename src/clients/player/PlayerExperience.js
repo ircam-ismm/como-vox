@@ -28,6 +28,10 @@ if(typeof app.instruments === 'undefined') {
   app.instruments = {};
 }
 
+if(typeof app.measures === 'undefined') {
+  app.measures = {};
+}
+
 const beatingSoundDefault = false;
 const lookAheadNotesDefault = 0.125; // 1 quarter-note
 const metronomeSoundDefault = false;
@@ -281,7 +285,9 @@ class PlayerExperience extends AbstractExperience {
     const event = schema.isEvent(voxPlayerSchema, key);
     const shared = schema.isShared(voxPlayerSchema, key);
 
-    this.state[key] = value;
+    if(!event) {
+      this.state[key] = value;
+    }
 
     // do not forward local events to shared state
     if(!event && shared
@@ -557,9 +563,17 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setPlayback(playback) {
+    const playbackChanged = this.playback !== playback;
     this.playback = playback;
 
-    if(!playback) {
+    if(playback) {
+      if(app.state['measures'] && playbackChanged) {
+        app.events.emit('measuresClear', true);
+      }
+    } else {
+      if(app.state['measures'] && playbackChanged) {
+        app.events.emit('measuresFinalise', true);
+      }
       switch(app.state['playbackStopSeek']) {
         case 'barStart': {
           this.seekPosition({

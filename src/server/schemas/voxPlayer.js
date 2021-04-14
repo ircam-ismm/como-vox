@@ -73,6 +73,25 @@ export default {
     default: 0.125, // 1 quarter-note
   },
 
+  measures: {
+    type: 'boolean',
+    default: true,
+    metas: {
+      exported: false,
+      shared: false,
+    },
+  },
+
+  measuresClear: {
+    type: 'boolean',
+    event: true,
+  },
+
+  measuresFinalise: {
+    type: 'boolean',
+    event: true,
+  },
+
   metronomeSound: {
     type: 'boolean',
     default: false,

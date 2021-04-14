@@ -50,6 +50,7 @@ function transport(graph, helpers, outputFrame) {
       bar: 1,
       beat: 1,
     },
+    measures: true,
     tempoLimits: {
       absoluteMin: 40,
       absoluteMax: 160,
@@ -270,6 +271,7 @@ function transport(graph, helpers, outputFrame) {
       'gestureControlsPlaybackStart',
       'gestureControlsPlaybackStop',
       'gestureControlsTempo',
+      'measures',
       'playback',
       'playbackStartAfterCount',
       'playbackStopAfterCount',
@@ -342,8 +344,6 @@ function transport(graph, helpers, outputFrame) {
         //   local: 0,
         // };
 
-        console.log('playbackStartRequest', position);
-
         app.events.emit('playback', true);
         playbackStartRequest = null;
       }
@@ -381,7 +381,8 @@ function transport(graph, helpers, outputFrame) {
           };
         }
 
-        if(!parameters.gestureControlsPlaybackStart) {
+        if(!parameters.gestureControlsPlaybackStart
+           && !parameters.measures) {
           return outputFrame;
         }
       }
@@ -479,7 +480,8 @@ function transport(graph, helpers, outputFrame) {
       if( (parameters.gestureControlsTempo
            || parameters.gestureControlsBeatOffset
            || parameters.gestureControlsPlaybackStart
-           || parameters.gestureControlsPlaybackStop)
+           || parameters.gestureControlsPlaybackStop
+           || parameters.measures)
           && beatGesture && beatGesture.trigger) {
 
         let beatChangeClosest;
@@ -537,8 +539,9 @@ function transport(graph, helpers, outputFrame) {
       }
 
       ////////////////// tempo
-      if(parameters.gestureControlsTempo
-         && beatGesture && beatGesture.trigger) {
+      if( (parameters.gestureControlsTempo
+           || parameters.measures)
+          && beatGesture && beatGesture.trigger) {
         const {
           absoluteMin,
           absoluteMax,
@@ -560,8 +563,14 @@ function transport(graph, helpers, outputFrame) {
                && tempoFromGesture < absoluteMax
                && tempoFromGesture > relativeMin * tempo
                && tempoFromGesture < relativeMax * tempo) {
-              tempos.push(tempoFromGesture);
-              beatDeltas.push(beatDeltaRounded);
+              if(parameters.gestureControlsTempo) {
+                tempos.push(tempoFromGesture);
+                beatDeltas.push(beatDeltaRounded);
+              }
+
+              if(parameters.measures && g === beatGestures.length - 1) {
+                app.measures.tempos.push(tempoFromGesture);
+              }
             }
           }
         }
@@ -570,7 +579,7 @@ function transport(graph, helpers, outputFrame) {
         // specially when starting the last beat of a bar
         // use at least 2 samples to smooth variations
         // warning: with 2 samples, mean of 2 intermediate values is used
-        if(tempos.length >= 2) {
+        if(parameters.gestureControlsTempo && tempos.length >= 2) {
           // - use median(tempos) to avoid outliers, instead of mean
           // - use median(beatDeltas) to halve tempo
           //   (with transition with mean on middle values)
@@ -591,8 +600,9 @@ function transport(graph, helpers, outputFrame) {
       }
 
       ///////////////////// beat offset
-      if(parameters.gestureControlsBeatOffset
-         && beatGesture && beatGesture.trigger) {
+      if( (parameters.gestureControlsBeatOffset
+           || parameters.measures)
+          && beatGesture && beatGesture.trigger) {
 
         const playbackLatency = inputData['playbackLatency'];
 
@@ -651,9 +661,19 @@ function transport(graph, helpers, outputFrame) {
             debugger;
           }
 
-          offsets.push(offset);
-          const offsetWeight = beatOffsetGestureWeigthGet(offset);
-          offsetWeights.push(offsetWeight);
+          if(parameters.gestureControlsBeatOffset) {
+            offsets.push(offset);
+            const offsetWeight = beatOffsetGestureWeigthGet(offset);
+            offsetWeights.push(offsetWeight);
+          }
+
+          if(parameters.measures && g === beatGestures.length - 1) {
+            app.measures.beatOffsetsBeats.push(offset);
+            app.measures.beatOffsetsSeconds.push(beatsToSeconds(offset, {
+              tempo: beatReference.tempo,
+              timeSignature: beatReference.timeSignature
+            }));
+          }
         }
 
         // First period may be wrong, specially when starting the last beat of
@@ -877,7 +897,7 @@ function transport(graph, helpers, outputFrame) {
             };
 
             // Start time from first beat gesture whose offset is 0
-            const durationFromReferenceGesture = positionDeltaToSeconds({
+            const durationFromReferenceGesture =positionDeltaToSeconds({
               bar: 0,
               beat: startAfterBeatsWithLookAhead - beatGestureStartReference,
             }, {

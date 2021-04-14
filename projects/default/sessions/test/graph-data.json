@@ -40,6 +40,13 @@
       },
     },
     {
+      id: 'measures',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'measures',
+      },
+    },
+    {
       id: 'scenarioManager',
       type: 'ScriptData',
       options: {
@@ -161,6 +168,10 @@
     [
       'timeTag',
       'scenarioManager',
+    ],
+    [
+      'timeTag',
+      'measures',
     ],
     [
       'timeTag',

@@ -29,13 +29,25 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
 
   //acceleration filtering
   const accelerationAverageOrder = 2;
+  const accelerationAverageLatency = accelerationAverageOrder / 2; // half window
   const movingAverage = new helpers.algo.MovingAverage(accelerationAverageOrder);
 
   // computing intensity
+  const deltaOrder = 10; // 20
+  const deltaLatency = deltaOrder / 2; // half window
+
   const feedbackFactor = 0.8; //for the intensity factor initially set to 0.7
+  // integration removes some of the delta latency, hence the negative sign
+  const feedbackLatency = -deltaLatency * feedbackFactor; // rule of thumb
+
   const intensityNormalisation = 1.; // original gain  = 0.07 with accelerometer / 9.81
   let handednessNormalisation = 1; // right hand is 1, left is -1
-  const deltaOrder = 10; //20
+
+  const sensorsLatency = 1;
+  // latency in samples
+  const analysisLatency = sensorsLatency + accelerationAverageLatency
+        + deltaLatency + feedbackLatency;
+
   const movingDelta = new helpers.algo.MovingDelta(deltaOrder);
 
   //onset detection
@@ -97,8 +109,6 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
           break;
         }
       }
-
-
 
       if(parameters.hasOwnProperty(p) ) {
         parameters[p] = updates[p];
@@ -184,10 +194,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         });
       }
 
-      // latency estimation
-      const sensorsLatency = 0;
-      const time = now - sensorsLatency
-            - inputData.metas.period * (deltaOrder + accelerationAverageOrder)/2; // 3?
+      const time = now - inputData.metas.period * analysisLatency;
 
       // adapt inhibition to current playing
       const tempo = inputData['tempo'];

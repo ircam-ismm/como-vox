@@ -12,7 +12,12 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   // important parameters for sensitivity
   const meanThresholdAdapt =  1.; // factor to multiply standars deviation //1
   const meanThresholdMin = 10; // min threshold 5
-  const rotationThreshold = 1;
+
+  const rotationThresholdPlayback = 1; // sensitive
+  const rotationThresholdStart = 40; // safe
+
+  let rotationThreshold = rotationThresholdStart;
+
   const intensityRotationUnfilteredMax = 100; // clip for hysteresis
   let inhibition = {
     min: 0.25, // seconds
@@ -93,6 +98,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   // shared parameters, according to player schema
   const parameters = {
     handedness: null,
+    playback : 0,
   };
 
   const updateParams = (updates) => {
@@ -104,6 +110,14 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
                                      : 1);
           break;
         }
+
+        case 'playback': {
+          const playback = updates['playback'];
+          rotationThreshold = (playback
+                               ? rotationThresholdPlayback
+                               : rotationThresholdStart);
+          break;
+        };
 
         default: {
           break;
@@ -121,8 +135,7 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   if(app.events && app.state) {
     [
       'handedness',
-      'scenarioCurrent',
-      'scenarioStatus',
+      'playback',
     ].forEach( (event) => {
       const callback = (value) => {
         // compatibility with setGraphOption

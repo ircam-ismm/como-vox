@@ -6,6 +6,8 @@ function scenarioSonification(graph, helpers, outputFrame) {
 
   const noteChannel = 'scenario';
 
+  const tempoReference = 60; // do not follow current tempo
+
   let readyRequest = false;
   const readyNotePitch = 99; // E7
   const readyNoteIntensity = 80;
@@ -30,7 +32,7 @@ function scenarioSonification(graph, helpers, outputFrame) {
   const tooSlowNoteIntensity = 80;
   const tooSlowNoteDuration = 1; // in whole notes
   const tooSlowNoteRepetition = 2;
-  const tooSlowNoteRepetitionInterval = 1 / 4; // in whole notes
+  const tooSlowNoteRepetitionInterval = 1 / 2; // in whole notes
 
   let tooFastRequest = false;
   const tooFastNotePitch = 85; // G6
@@ -123,7 +125,8 @@ function scenarioSonification(graph, helpers, outputFrame) {
       const outputData = app.data;
 
       const time = inputData['time'];
-      const tempo = inputData['tempo'];
+      const tempo = tempoReference;
+      // const tempo = inputData['tempo'];
       const timeSignature = inputData['timeSignature'];
 
       // channel shared by multiple scenarios

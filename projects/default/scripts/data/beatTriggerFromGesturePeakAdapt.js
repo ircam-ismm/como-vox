@@ -13,18 +13,22 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const meanThresholdAdapt =  1.; // factor to multiply standars deviation //1
   const meanThresholdMin = 10; // min threshold 5
 
-  const rotationThresholdPlayback = 1; // sensitive
-  const rotationThresholdStart = 40; // safe
+  const rotationThresholdSensitive = 1; // sensitive
+  const rotationThresholdSafe = 20; // safe
+  let rotationThreshold = rotationThresholdSafe;
 
-  let rotationThreshold = rotationThresholdStart;
+  const peakThresholdSensitive = 30; // sensitive
+  const peakThresholdSafe = 100; // safe
+  let peakThreshold = peakThresholdSafe;
+
 
   const intensityRotationUnfilteredMax = 100; // clip for hysteresis
-  let inhibition = {
+  let inhibitionLimits = {
     min: 0.25, // seconds
     max: 0.5, // seconds
     beats: 0.5,
   };
-  let peakSearch = {
+  let peakSearchLimits = {
     min: 0.25, // seconds
     max: 0.5, // seconds
     beats: 0.5,
@@ -86,14 +90,34 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let lastBeatTime = 0;
   let lastMean = +Infinity; // prevent kick on first frame
   let lastStd = 0; // prevent kick on first frame
-  let positiveDelta = 0; // 1 if intensity > delta
   let delta = 0;
   let intensity = 0;
   let previousIntensity = 0; //intensity at previous frame
   let lastDelta = -1;
-  let timeOnset = 0;
-  let timeMax = 0;
-  let tempMax = 0;
+
+  const PeakSearch = class {
+    constructor({startTime, searchDuration}) {
+      this.startTime = startTime;
+      this.peakFound = false;
+      this.searchDuration = searchDuration;
+      this.peakIntensity = 0;
+      this.peakTime = startTime;
+    }
+
+    process({time, intensity}) {
+      if(time - this.startTime < this.searchDuration) {
+        if(intensity > this.peakIntensity) {
+          this.peakIntensity = intensity;
+          this.peakTime = time;
+        }
+      } else {
+        this.peakFound = true;
+      }
+      return this;
+    }
+
+  };
+  const peakSearches = new Set();
 
   // shared parameters, according to player schema
   const parameters = {
@@ -114,8 +138,12 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         case 'playback': {
           const playback = updates['playback'];
           rotationThreshold = (playback
-                               ? rotationThresholdPlayback
-                               : rotationThresholdStart);
+                               ? rotationThresholdSensitive
+                               : rotationThresholdSafe);
+
+          peakThreshold = (playback
+                           ? peakThresholdSensitive
+                           : peakThresholdSafe);
           break;
         };
 
@@ -214,13 +242,13 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       const timeSignature = inputData['timeSignature'];
 
       const inhibitionDuration
-            = Math.max(inhibition.min,
-                       Math.min(inhibition.max,
-                                beatsToSeconds(inhibition.beats, {tempo, timeSignature})));
+            = Math.max(inhibitionLimits.min,
+                       Math.min(inhibitionLimits.max,
+                                beatsToSeconds(inhibitionLimits.beats, {tempo, timeSignature})));
       const peakSearchDuration
-            = Math.max(peakSearch.min,
-                       Math.min(peakSearch.max,
-                                beatsToSeconds(peakSearch.beats, {tempo, timeSignature})));
+            = Math.max(peakSearchLimits.min,
+                       Math.min(peakSearchLimits.max,
+                                beatsToSeconds(peakSearchLimits.beats, {tempo, timeSignature})));
 
 
       // rotation intensity computing
@@ -298,45 +326,41 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
         std: lastStd,
       };
 
-      // inhibition after last beat
-      if (time - lastBeatTime > inhibitionDuration) {
+      const onset = intensityRotation > rotationThreshold && delta > 0 && lastDelta < 0;
+      // new search process on each onset
+      if(onset) {
+        peakSearches.add(new PeakSearch({
+          startTime: time,
+          searchDuration: peakSearchDuration,
+        }) );
+      }
 
-        if (positiveDelta === 0) {
-          // onset detection
-          if (intensityRotation > rotationThreshold && delta > 0 && lastDelta < 0) {
-            positiveDelta = 1;
-            timeOnset = time;
-            beat.timeOnset = timeOnset;
-            tempMax = 0;
-            timeMax = time;
-          }
-        } else {
-          // peak detection
-          if (time - timeOnset < peakSearchDuration) {
-            if (intensityNormalized > tempMax) {
-              tempMax = intensityNormalized;
-              timeMax = time;
-            }
-          } else {
-            beat.trigger = 1;
-            beat.time = timeMax;
-            beat.timeMax = timeMax;
-            beat.intensity = tempMax;
-            positiveDelta = 0;
-            lastBeatTime = timeMax;
-            tempMax = 0;
-            timeMax = 0;
+      peakSearches.forEach( (search) => {
+        const result = search.process({
+          time,
+          intensity: intensityNormalized,
+        });
 
-            // console.log('beat', {...beat},
-            //             'from now', beat.time - now,
-            //             'from compensated time', beat.time - time);
+        if(result.peakFound) {
+          peakSearches.delete(search);
+          // filter peaks
+          if(result.peakTime - lastBeatTime > inhibitionDuration
+             && result.peakIntensity > peakThreshold) {
+            beat.timeOnset = result.startTime;
+            beat.trigger = (result.peakFound ? 1 : 0);
+            beat.time = result.peakTime;
+            beat.intensity = result.peakIntensity;
+            beat.timeMax = result.peakTime;
+
+            lastBeatTime = result.peakTime;
           }
         }
-      }
+      });
 
       [lastMean, lastStd] = movingMeanStd.process(intensityNormalized);
       lastDelta = delta;
       outputData['beat'] = beat;
+
       return outputFrame;
     },
 

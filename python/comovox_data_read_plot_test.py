@@ -233,11 +233,33 @@ def peak(dataframe_x, threshold, threshold_min, onset_order,
 
     return {'peak': df_peak, 'diff': df_diff}
 
+class PeakSearch:
+    def __init__(self, *, startTime, searchDuration):
+        self.startTime = startTime;
+        self.peakFound = False;
+        self.searchDuration = searchDuration;
+        self.peakIntensity = 0;
+        self.peakTime = startTime;
+    
 
+    def process(self, *, time, intensity):
+        if (time - self.startTime < self.searchDuration):
+            if (intensity > self.peakIntensity):
+               self.peakIntensity = intensity;
+               self.peakTime = time;
+        else:
+            if (intensity >= self.peakIntensity):
+                print('window too short')
+            else:
+                self.peakFound = True;
+      
+        return self
+    
+peakSearches = set();
 
 def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation_threshold,
                       inhibition_duration, peak_search_window, 
-                      inhibition, peakSearch):
+                      inhibitionLimits, peakSearchLimits, playback, peak_threshold):
     """ 
     code matches algorithm in beatTriggerFromGesturePeakAdapt.js
     """
@@ -258,13 +280,13 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
     timeMax = 0
     tempMax = 0
     inhibitionDuration = inhibition_duration
-    rotationThreshold = rotation_threshold
+    rotationThreshold = rotation_threshold['safe']
+    peakThreshold = peak_threshold['safe']
     peakSearchDuration = peak_search_window
     previous_timeMax = 0
     previous_delta = 30
     interval_filtered = 30
-    
-    
+
     
     for i in range(size - inhibition_duration - 1):   
            
@@ -274,47 +296,59 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
         intensityNormalized = df_acc_int[time]
         acceleration_raw = df_acc_raw[time]
         intensityRotation = df_rotation[time]
+
+        if (playback[time]):
+            rotationThreshold = rotation_threshold['sensitive']
+            peakThreshold = peak_threshold['sensitive']
+        else:
+            rotationThreshold = rotation_threshold['safe']
+            peakThreshold = peak_threshold['safe']
+
         
         #adaptation
-        # inhibitionDuration = max(inhibition['min'],
-        #                       min(inhibition['max'],
-        #                           inhibition['beats']*60/tempo_estimated[time]))
-        # peakSearchDuration = max(peakSearch['min'],
-        #                       min(peakSearch['max'],
-        #                           peakSearch['beats']*60/tempo_estimated[time]))
+        # inhibitionDuration = max(inhibitionLimits['min'],
+        #                       min(inhibitionLimits['max'],
+        #                           inhibitionLimits['beats']*60/tempo_estimated[time]))
+        # peakSearchDuration = max(peakSearchLimits['min'],
+        #                       min(peakSearchLimits['max'],
+        #                           peakSearchLimits['beats']*60/tempo_estimated[time]))
         
-        inhibitionDuration = max(inhibition['min'],
-                              min(inhibition['max'],
-                                  inhibition['beats']*60/tempo[time]))
-        peakSearchDuration = max(peakSearch['min'],
-                              min(peakSearch['max'],
-                                  peakSearch['beats']*60/tempo[time]))
+        inhibitionDuration = max(inhibitionLimits['min'],
+                              min(inhibitionLimits['max'],
+                                  inhibitionLimits['beats']*60/tempo[time]))
+        peakSearchDuration = max(peakSearchLimits['min'],
+                              min(peakSearchLimits['max'],
+                                  peakSearchLimits['beats']*60/tempo[time]))
         
         
         tempo_estimated[time] = tempo_estimated[time - 1]
         
-        if (time - lastBeatTime > inhibitionDuration):
-            if (positiveDelta == 0):
-                # onset detect_upion
-                if ((intensityRotation > rotationThreshold) and (delta > 0) and (lastDelta < 0)):
-                    positiveDelta = 1;
-                    timeOnset = time;
-                    df_onset_script[time] = 1;
-                    tempMax = 0;
-                    timeMax = time;   
-            else:
-                    # peak detect_upion
-                if (time - timeOnset < peakSearchDuration):
-                    # if (intensityNormalized > tempMax):
-                    if (acceleration_raw > tempMax):
-                        # tempMax = intensityNormalized;
-                        tempMax = acceleration_raw;
-                        timeMax = time;
-                else:
-                    df_peak_script[time] = 1;
-                    df_intensity_script[timeMax] = tempMax;
-                    delta_time = timeMax - previous_timeMax
+        onset = (intensityRotation > rotationThreshold) and (delta > 0) and (lastDelta < 0)
+        
+        #### with several process
+        
+        
+        # if (onset and time - lastBeatTime > inhibitionDuration):
+        if (onset):
+            peakSearches.add(PeakSearch(startTime=time, searchDuration=peakSearchDuration))
+         
+        peakSearchesLoop = set(peakSearches)
+        for search in peakSearchesLoop:
+            result = search.process(time=time, intensity=intensityNormalized)
+            
+
+            if (result.peakFound):
+                peakSearches.remove(search)
+                # filter peaks
+                if (result.peakTime - lastBeatTime > inhibitionDuration
+                    and result.peakIntensity > peakThreshold):
+                    df_onset_script[result.startTime] = 1;
+                    df_peak_script[time] = (1 if result.peakFound else 0)
+                    df_intensity_script[result.peakTime] = result.peakIntensity;
+                    
                     previous_timeMax = timeMax
+                    timeMax = result.peakTime
+                    delta_time = timeMax - previous_timeMax
                     delta_time_clipped = max(20, min(75,delta_time))
                     interval_filtered = (delta_time_clipped*(1 - 0.7) 
                                               + previous_delta*0.7)
@@ -324,10 +358,51 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
                     # interval_filtered = delta_time_clipped
                     if interval_filtered > 0:
                         tempo_estimated[time] = 60/(0.02 * interval_filtered)
-                    positiveDelta = 0;
-                    lastBeatTime = timeMax;
-                    tempMax = 0;
-                    timeMax = 0;
+
+                    lastBeatTime = result.peakTime
+              
+    
+    # peakSearches.clear()        
+        
+        # #### old version without process 
+        # if (time - lastBeatTime > inhibitionDuration):
+        #     if (positiveDelta == 0):
+        #         # onset detect_upion
+        #         if (onset):
+        #             positiveDelta = 1;
+        #             timeOnset = time;
+        #             df_onset_script[time] = 1;
+        #             tempMax = 0;
+        #             timeMax = time;   
+        #     else:
+        #             # peak detect_upion
+        #         if (time - timeOnset < peakSearchDuration):
+        #             if (intensityNormalized > tempMax):
+        #                 tempMax = intensityNormalized;
+                    
+        #             # if (acceleration_raw > tempMax):
+        #             #     tempMax = acceleration_raw;
+                        
+        #                 timeMax = time;
+                                            
+        #         else:
+        #             df_peak_script[time] = 1;
+        #             df_intensity_script[timeMax] = tempMax;
+        #             delta_time = timeMax - previous_timeMax
+        #             previous_timeMax = timeMax
+        #             delta_time_clipped = max(20, min(75,delta_time))
+        #             interval_filtered = (delta_time_clipped*(1 - 0.7) 
+        #                                       + previous_delta*0.7)
+                    
+        #             previous_delta =  interval_filtered
+        #             interval_filtered = delta_time_clipped
+        #             # interval_filtered = delta_time_clipped
+        #             if interval_filtered > 0:
+        #                 tempo_estimated[time] = 60/(0.02 * interval_filtered)
+        #             positiveDelta = 0;
+        #             lastBeatTime = timeMax;
+        #             tempMax = 0;
+        #             timeMax = 0;
                 
     
     return {'peak_script': df_peak_script, 'onset_script': df_onset_script, 
@@ -352,15 +427,19 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
                     acceleration_average_order, compression, scaling, delta_order,
                     threshold, threshold_min, onset_order, inhibition_duration, 
                     peak_search_window, 
-                    inhibition, peakSearch,
-                    rotation_threshold, detect_up):
+                    inhibitionLimits, peakSearchLimits,
+                    rotation_threshold, peak_threshold,  detect_up):
     """ adding intensity and kick/beat"""
-   
+    
+    
     acceleration = sensors['acceleration']
     rotation = sensors['rotation']
     orientation = sensors['orientation']
     time = sensors['time']
     tempo = sensors['tempo']
+    playback = sensors['playback']['playback']
+    
+    
     acceleration['int.recomputed'] = accel_intensity(
                                                 acceleration, orientation, time,
                                                 axis_weights,
@@ -368,6 +447,7 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
                                                 acceleration_average_order, 
                                                 compression, scaling, 
                                                 delta_order)
+    
 
     # acceleration_temp = kick(acceleration['int.recomputed'], threshold,
     #                                  onset_order, inhibition_duration, detect_up)
@@ -383,7 +463,8 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
                             rotation_threshold,
                             inhibition_duration, 
                             peak_search_window,
-                            inhibition, peakSearch)
+                            inhibitionLimits, peakSearchLimits, 
+                            playback, peak_threshold)
     
     # acceleration_script = peak_as_script(acceleration['int.recomputed'],
     #                                      sensors['beat']['beat.acceleration'],
@@ -393,7 +474,7 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
     #                         rotation_threshold,
     #                         inhibition_duration, 
     #                         peak_search_window,
-    #                         inhibition, peakSearch)
+    #                         inhibitionLimits, peakSearchLimits)
     
     
     
@@ -404,7 +485,7 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
     acceleration['peak.script'] = acceleration_script['peak_script']
     acceleration['intensity.script'] = acceleration_script['intensity_script']
     acceleration['tempo_estimated'] = acceleration_script['tempo_estimated']
-    
+ 
     
     return acceleration
 
@@ -525,6 +606,8 @@ def sensors_read(filename):
     metronome = position.diff()
     metronome['position.beat'] = metronome['position.beat'].apply(np.abs) 
     
+    playback = data_frame.loc[:, ['playback']]
+    
     #notes = data_frame.loc[:,['notes']]
     
     return {'index': index, 
@@ -537,6 +620,7 @@ def sensors_read(filename):
             'metronome' : metronome,
             'tempo' :tempo,
             'orientation' : orientation,
+            'playback' : playback,
             #'notes' : notes
             }
 
@@ -614,7 +698,7 @@ def sensors_plot(sensors, title, y_limits,
 # setting time for beats and bars    
     metronome_beat = time[metronome.loc[metronome['position.beat'] != 0].index]
     metronome_bar = time[metronome.loc[metronome['position.bar'] == 1].index]
-    #sensors_beat = time[beat.loc[beat['beat.trigger'] == 1].index]
+    # sensors_beat = time[beat.loc[beat['beat.trigger'] == 1].index]
     sensors_beat = beat.loc[beat['beat.trigger'] ==  1]['beat.time']
 
 

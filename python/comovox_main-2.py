@@ -65,6 +65,10 @@ User data
 folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-29-morgan'
 filename = '20210329-*'
 
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-04-14-fred'
+# filename = '20210414-*'
+
+
 
 
 """
@@ -110,19 +114,29 @@ detect_up = 1
 #rotation
 axis_weights_rotation = [1,1,1]
 rotation_average_order = 20
-rotation_threshold = 1
+rotation_threshold = {
+    'safe': 1,
+    'sensitive': 1,
+  }
+
+
+peak_threshold = {
+    'safe': 100,
+    'sensitive': 30,
+  }
+
 
 # adaptation
 
 sampling_period = 0.02 # sedonds
 
-inhibition = {
+inhibitionLimits = {
     'min': 0.25 / sampling_period, 
     'max': 0.5 / sampling_period, 
     'beats': 0.5 / sampling_period,
   };
 
-peakSearch = {
+peakSearchLimits = {
     'min': 0.25 / sampling_period, 
     'max': 0.5 / sampling_period, 
     'beats': 0.5 / sampling_period,
@@ -155,8 +169,10 @@ def make_figure(data_string, figure_no):
                                        onset_order,
                                        inhibition_duration,
                                        peak_search_window, 
-                                       inhibition, peakSearch,
-                                       rotation_threshold, detect_up)
+                                       inhibitionLimits, peakSearchLimits,
+                                       rotation_threshold, 
+                                       peak_threshold,
+                                       detect_up)
     comovox.sensors_plot(data[data_string], data_string, y_limits,
                          beat_trigger, beat_offline,
                          metronome, figure_no) 

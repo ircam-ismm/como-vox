@@ -99,8 +99,9 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const PeakSearch = class {
     constructor({startTime, searchDuration}) {
       this.startTime = startTime;
-      this.peakFound = false;
       this.searchDuration = searchDuration;
+      this.searchCompleted = false;
+      this.peakFound = false;
       this.peakIntensity = 0;
       this.peakTime = startTime;
     }
@@ -112,7 +113,11 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
           this.peakTime = time;
         }
       } else {
-        this.peakFound = true;
+        this.searchCompleted = true;
+        // avoid bad peak when still increasing at the end of the search window
+        if(intensity < this.peakIntensity) {
+          this.peakFound = true;
+        }
       }
       return this;
     }
@@ -342,10 +347,11 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
           intensity: intensityNormalized,
         });
 
-        if(result.peakFound) {
+        if(result.searchCompleted) {
           peakSearches.delete(search);
           // filter peaks
-          if(result.peakTime - lastBeatTime > inhibitionDuration
+          if(result.peakFound
+             && result.peakTime - lastBeatTime > inhibitionDuration
              && result.peakIntensity > peakThreshold) {
             beat.timeOnset = result.startTime;
             beat.trigger = (result.peakFound ? 1 : 0);

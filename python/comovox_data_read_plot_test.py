@@ -235,26 +235,27 @@ def peak(dataframe_x, threshold, threshold_min, onset_order,
 
 class PeakSearch:
     def __init__(self, *, startTime, searchDuration):
-        self.startTime = startTime;
-        self.peakFound = False;
-        self.searchDuration = searchDuration;
-        self.peakIntensity = 0;
-        self.peakTime = startTime;
-    
+        self.startTime = startTime
+        self.peakFound = False
+        self.searchDuration = searchDuration
+        self.searchCompleted = False
+        self.peakIntensity = 0
+        self.peakTime = startTime
+
 
     def process(self, *, time, intensity):
         if (time - self.startTime < self.searchDuration):
             if (intensity > self.peakIntensity):
-               self.peakIntensity = intensity;
-               self.peakTime = time;
+               self.peakIntensity = intensity
+               self.peakTime = time
         else:
-            if (intensity >= self.peakIntensity):
-                print('window too short')
-            else:
-                self.peakFound = True;
-      
+            self.searchCompleted = True
+            # avoid bad peak when still increasing at the end of the search window
+            if (intensity < self.peakIntensity):
+                self.peakFound = True
+
         return self
-    
+
 peakSearches = set();
 
 def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation_threshold,
@@ -331,21 +332,22 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
         # if (onset and time - lastBeatTime > inhibitionDuration):
         if (onset):
             peakSearches.add(PeakSearch(startTime=time, searchDuration=peakSearchDuration))
-         
+
+        # copy to remove completed searches
         peakSearchesLoop = set(peakSearches)
         for search in peakSearchesLoop:
             result = search.process(time=time, intensity=intensityNormalized)
-            
 
-            if (result.peakFound):
+            if (result.searchCompleted):
                 peakSearches.remove(search)
                 # filter peaks
-                if (result.peakTime - lastBeatTime > inhibitionDuration
+                if (result.peakFound
+                    and result.peakTime - lastBeatTime > inhibitionDuration
                     and result.peakIntensity > peakThreshold):
-                    df_onset_script[result.startTime] = 1;
-                    df_peak_script[time] = (1 if result.peakFound else 0)
-                    df_intensity_script[result.peakTime] = result.peakIntensity;
-                    
+                    df_onset_script[result.startTime] = 1
+                    df_peak_script[time] = 1
+                    df_intensity_script[result.peakTime] = result.peakIntensity
+
                     previous_timeMax = timeMax
                     timeMax = result.peakTime
                     delta_time = timeMax - previous_timeMax

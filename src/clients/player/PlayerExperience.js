@@ -7,6 +7,7 @@ import {Blocked} from '@ircam/blocked';
 
 import url from '../shared/url.js';
 import schema from '../../shared/schema.js';
+import storage from '../shared/storage.js';
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
 import views from '../como-helpers/views-mobile/index.js';
 
@@ -151,14 +152,22 @@ class PlayerExperience extends AbstractExperience {
     this.initialiseState();
 
     const voxPlayerSchema = this.voxPlayerState.getSchema();
-    url.parse(voxPlayerSchema);
-
-
     this.voxPlayerState.subscribe(async (updates) => {
       for (let [key, value] of Object.entries(updates) ) {
         this.updateFromState(key, value);
       }
     });
+
+    for(const key of Object.keys(voxPlayerSchema) ) {
+      if(schema.isStored(voxPlayerSchema, key)) {
+        const value = storage.load(key);
+        if(typeof value !== 'undefined') {
+          this.voxPlayerState.set({[key]: value});
+        }
+      }
+    }
+
+    url.parse(voxPlayerSchema);
 
     // 2. create a sensor source to be used within the graph.
     // We create a `RandomSource` if deviceMotion is not available for development
@@ -271,7 +280,7 @@ class PlayerExperience extends AbstractExperience {
 
   updateFromState(key, value) {
     const voxPlayerSchema = this.voxPlayerState.getSchema();
-    const event = voxPlayerSchema[key].event;
+    const event = schema.isEvent(voxPlayerSchema, key);
 
     if(event || JSON.stringify(value) !== JSON.stringify(this.state[key] ) ) {
       app.events.emit(key, value);
@@ -283,16 +292,19 @@ class PlayerExperience extends AbstractExperience {
   updateFromEvent(key, value) {
     const voxPlayerSchema = this.voxPlayerState.getSchema();
     const event = schema.isEvent(voxPlayerSchema, key);
-    const shared = schema.isShared(voxPlayerSchema, key);
-
     if(!event) {
       this.state[key] = value;
-    }
 
-    // do not forward local events to shared state
-    if(!event && shared
-       && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
-      this.voxPlayerState.set({[key]: value});
+      const shared = schema.isShared(voxPlayerSchema, key);
+      if(shared
+         && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
+        this.voxPlayerState.set({[key]: value});
+      }
+
+      const stored = schema.isStored(voxPlayerSchema, key);
+      if(stored) {
+        storage.save(key, value);
+      }
     }
   }
 
@@ -360,6 +372,20 @@ class PlayerExperience extends AbstractExperience {
             } catch (error) {
               console.error('Error while loading score: ' + error.message);
             }
+          });
+          break;
+        }
+
+        case 'storageClear': {
+          this.events.on(key, (value) => {
+            storage.clear(value);
+          });
+          break;
+        }
+
+        case 'storageClearAll': {
+          this.events.on(key, (value) => {
+            storage.clearAll();
           });
           break;
         }

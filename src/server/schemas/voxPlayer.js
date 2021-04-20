@@ -5,7 +5,7 @@ export default {
     default: 10e-3,
     metas: {
       exported: false,
-      localstorage: true,
+      stored: true,
     },
   },
 
@@ -64,7 +64,7 @@ export default {
     nullable: true,
     metas: {
       exported: false,
-      localStorage: true,
+      stored: true,
     },
   },
 
@@ -198,6 +198,16 @@ export default {
 
   seekPosition: {
     type: 'any',
+    event: true,
+  },
+
+  storageClear: {
+    type: 'string',
+    event: true,
+  },
+
+  storageClearAll: {
+    type: 'boolean',
     event: true,
   },
 

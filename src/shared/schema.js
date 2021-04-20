@@ -39,8 +39,9 @@ export function isExported(schema, key) {
   const entry = schema[key];
   // event is not exported by default
   const event = isEvent(schema, key);
+  // export by default if not event
   const exported = (entry.metas && typeof entry.metas.exported !== 'undefined'
-                    ? schema[key].metas.exported
+                    ? entry.metas.exported
                     : !event);
   return exported;
 }
@@ -48,10 +49,20 @@ Object.assign(e, {isExported});
 
 export function isShared(schema, key) {
   const entry = schema[key];
+  // share by default
   return (entry.metas && typeof entry.metas.shared !== 'undefined'
-          ? schema[key].metas.shared
+          ? entry.metas.shared
           : true);
 }
 Object.assign(e, {isShared});
+
+export function isStored(schema, key) {
+  const entry = schema[key];
+  // do not store by default
+  return (entry.metas && typeof entry.metas.stored !== 'undefined'
+          ? entry.metas.stored
+          : false);
+}
+Object.assign(e, {isStored});
 
 export default e;

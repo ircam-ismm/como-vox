@@ -152,6 +152,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
       const {
         beat: beatGesture,
         playback,
+        playbackLatency,
         positon,
         tempo,
         time,
@@ -206,7 +207,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
           });
 
           if(!beatGestureTriggered
-             && time.local - statusTime > listeningDuration) {
+             && time.local - statusTime >= listeningDuration) {
             app.events.emit('measuresClear', true);
             statusUpdate('ready');
           }
@@ -219,8 +220,10 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
             beatGestureTriggered = true;
           }
 
+          // wait until hearing playback: add playbackLatency
           if(beatGestureTriggered
-             && time.local - statusTime >= parameters.beatGestureWaitingDurationMax) {
+             && (time.local - statusTime - playbackLatency
+                 >= parameters.beatGestureWaitingDurationMax) ) {
             // no start, cancel
             statusUpdate('playing');
           }
@@ -249,7 +252,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
 
           if(typeof mean === 'undefined') {
             statusUpdate('error');
-          } else if(standardDeviation > parameters.beatingStandardDeviationMax) {
+          } else if(standardDeviation >= parameters.beatingStandardDeviationMax) {
             statusUpdate('tooMuchJitter');
           } else {
             const audioLatency = Math.max(0, parameters.audioLatency - median);

@@ -110,15 +110,17 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       const inputData = app.data;
       const outputData = app.data;
 
-      const stillness = inputData['stillness'];
+      const {
+        playback,
+        playbackLatency,
+        stillness,
+        time,
+      } = inputData;
 
       if(!parameters.scenarioStartStopWithBeating
         || !stillness) {
         return outputFrame;
       }
-
-      const time = inputData['time'];
-      const playback = inputData['playback'];
 
       switch(status) {
         case 'init': {
@@ -155,8 +157,11 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
           if(beatGesture && beatGesture.trigger) {
             beatGestureTriggered = true;
           }
+
+          // wait until hearing playback: add playbackLatency
           if(!beatGestureTriggered
-             && time.local - timeoutTime >= parameters.beatGestureWaitingDurationMax) {
+             && (time.local - timeoutTime - playbackLatency
+                 >= parameters.beatGestureWaitingDurationMax) ) {
             // no start, cancel
             statusUpdate('cancel');
           } else if(playback) {

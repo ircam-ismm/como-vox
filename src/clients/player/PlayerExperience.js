@@ -56,6 +56,8 @@ Object.assign(app.data, {
   lookAheadSeconds: notesToSeconds(lookAheadNotesDefault, {
     tempo: tempoDefault,
   }),
+  // try to avoid jitter with some look-ahead
+  lookAheadSecondsMin: 100e-3,
   position: positionDefault,
   playback: playbackDefault,
   tempo: tempoDefault,
@@ -118,9 +120,11 @@ class PlayerExperience extends AbstractExperience {
     // default values
 
     // in beats, not taking account of audioLatency
+    this.lookAheadNotesRequest = lookAheadNotesDefault;
     this.lookAheadNotes = lookAheadNotesDefault;
     // in seconds, taking audioLatency into account
     this.lookAheadSeconds = undefined;
+    this.lookAheadSecondsMin = app.data.lookAheadSecondsMin;
 
     // in seconds
     // @TODO discover and store in localStorage
@@ -330,10 +334,10 @@ class PlayerExperience extends AbstractExperience {
           break;
         }
 
-        case 'lookAheadNotes': {
+        case 'lookAheadNotesRequest': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
-            this.setLookAheadNotes(value);
+            this.setLookAheadNotesRequest(value);
           });
           break;
         }
@@ -501,33 +505,42 @@ class PlayerExperience extends AbstractExperience {
     this.updateLookAhead();
   }
 
-  setLookAheadNotes(lookAheadNotes) {
-    this.lookAheadNotes = lookAheadNotes;
-    app.data.lookAheadNotes = lookAheadNotes;
+  setLookAheadNotesRequest(lookAheadNotesRequest) {
+    this.lookAheadNotesRequest = lookAheadNotesRequest;
 
     this.updateLookAhead();
   }
 
   updateLookAhead({
-    allowMoreIncrement = 0.25,
+    allowMoreIncrement = 0.125,
   } = {}) {
-    const lookAheadSecondsLast = this.lookAheadSeconds;
-
-    if(this.lookAheadNotes === 0) {
+    if(this.lookAheadNotesRequest === 0) {
+      this.lookAheadNotes = 0;
+      app.data.lookAheadNotes = 0;
+      if(this.state.lookAheadNotes !== 0) {
+        this.events.emit('lookAheadNotes', 0);
+      }
       this.lookAheadBeats = 0;
       app.data.lookAheadBeats = 0;
       this.lookAheadSeconds = 0;
       app.data.lookAheadSeconds = 0;
     } else {
       if(allowMoreIncrement) {
+        // request value is the minimum
+        const {absoluteMax: tempoMax} = this.state.tempoLimits;
+        this.lookAheadNotes = this.lookAheadNotesRequest;
         while(
           (this.lookAheadSeconds = notesToSeconds(this.lookAheadNotes, {
-            tempo: this.tempo,
+            tempo: tempoMax,
             timeSignature: this.timeSignature,
           })
            - this.audioLatency)
-            <= this.lookAheadSecondsMin) {
+            < this.lookAheadSecondsMin) {
           this.lookAheadNotes += allowMoreIncrement;
+        }
+        app.data.lookAheadNotes = this.lookAheadNotes;
+        if(this.state.lookAheadNotes !== this.lookAheadNotes) {
+          this.events.emit('lookAheadNotes', this.lookAheadNotes);
         }
       } else {
         this.lookAheadSeconds = notesToSeconds(this.lookAheadNotes, {
@@ -657,12 +670,12 @@ class PlayerExperience extends AbstractExperience {
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
                                                  {timeSignature: this.timeSignature});
 
-    const viewData = this.state;
-
-    Object.assign(viewData, {
+    const viewData = {
+      ...this.state,
       boundingClientRect: this.$container.getBoundingClientRect(),
       config: this.config,
       experience: this,
+      lookAheadNotes: this.lookAheadNotes,
       lookAheadBeats: this.lookAheadBeats,
       lookAheadSeconds: this.lookAheadSeconds,
       player: this.coMoPlayer.player.getValues(),
@@ -675,7 +688,7 @@ class PlayerExperience extends AbstractExperience {
       tempo: this.tempo, // override state tempo which is reference tempo
       voxApplicationState: this.voxApplicationState,
       voxPlayerState: this.voxPlayerState,
-    });
+    };
 
     const listeners = this.listeners;
 

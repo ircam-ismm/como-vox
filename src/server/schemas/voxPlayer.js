@@ -68,6 +68,13 @@ export default {
     },
   },
 
+  // minimum as a request, actual value may be more
+  lookAheadNotesRequest: {
+    type: 'float',
+    default: 0.125, // 1 quarter-note
+  },
+
+  // actual value, depending on audio latency and maximum tempo
   lookAheadNotes: {
     type: 'float',
     default: 0.125, // 1 quarter-note
@@ -214,6 +221,16 @@ export default {
   tempo: {
     type: 'float',
     default: 80,
+  },
+
+  tempoLimits: {
+    type: 'any',
+    default: {
+      absoluteMin: 40,
+      absoluteMax: 160,
+      relativeMin: 0.51,
+      relativeMax: 1.49,
+    },
   },
 
   tempoReset: {

@@ -276,6 +276,7 @@ function transport(graph, helpers, outputFrame) {
       'playbackStartAfterCount',
       'playbackStopAfterCount',
       'tempo',
+      'tempoLimits',
       'seekPosition',
       'timeSignature',
     ].forEach( (event) => {

@@ -47,8 +47,6 @@ export function player(data, listeners, {
   const bar = data.position.bar;
   const beat = data.position.beat;
 
-  const lookAheadNotes = data.lookAheadNotes;
-
   return html`
     <!-- LOADER -->
     ${data.player.loading ?
@@ -104,20 +102,22 @@ export function player(data, listeners, {
     </div>
 
     ${uiPreset === 'full' ? html`
-    <div class="lookAhead container">Prévision&nbsp;:
+    <div class="lookAhead container">Prévision minimale&nbsp;:
       <input type="number"
              min="0"
              max="32"
-             step="0.125"
-    .value=${lookAheadNotes * 8}
+             step="1"
+    .value=${data.lookAheadNotesRequest * 8}
              @click="${e => selfSelect(e)}"
              @change="${e => {
                      voxPlayerState.set({
-                       lookAheadNotes: (parseFloat(e.srcElement.value / 8) || 0),
+                       lookAheadNotesRequest: (parseFloat(e.srcElement.value / 8) || 0),
                      });
                    } }">
-      croche${lookAheadNotes * 8 > 1 ? 's' : ''}
-      (${data.lookAheadBeats} temps,
+      croche${data.lookAheadNotesRequest * 8 > 1 ? 's' : ''}
+      (courante&nbsp;: ${data.lookAheadNotes * 8}
+      croche${data.lookAheadNotes * 8 > 1 ? 's' : ''},
+      ${data.lookAheadBeats} temps,
       ${Math.round(data.lookAheadSeconds * 1e3)} ms)
     </div>
     ` : '' }

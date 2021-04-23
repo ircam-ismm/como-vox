@@ -31,6 +31,7 @@
     "@webcomponents/webcomponentsjs": "^2.4.3",
     "como": "github:ircam-ismm/como#develop",
     "core-js": "^3.6.5",
+    "json-url": "^2.6.0",
     "json5": "^2.1.0",
     "jzz": "^1.1.2",
     "jzz-midi-smf": "^1.4.0",

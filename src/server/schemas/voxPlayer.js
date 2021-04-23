@@ -110,6 +110,10 @@ export default {
   mockSensors: {
     type: 'boolean',
     default: false,
+    metas: {
+      exported: false,
+      stored: true,
+    },
   },
 
   playback: {

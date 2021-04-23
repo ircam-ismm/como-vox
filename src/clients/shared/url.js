@@ -1,11 +1,18 @@
-const e = {};
+import jsonURL from 'json-url';
+const codec = jsonURL('lzstring');
 
 import schema from '../../shared/schema.js';
+
+const compressedKey = 'z';
+const searchSplitExpression = '?';
+const parametersSplitExpression = /[\?#&]/;
 
 let origin = window.location.origin;
 if(!origin || origin === 'null') {
   origin = 'file://'
 }
+
+const e = {};
 
 // Base URI of window.location, without optional parameters.
 // Be sure to include window.location.pathname to allow for non-root URL.
@@ -25,56 +32,73 @@ export function paramGet(name, defaultValue) {
 }
 Object.assign(e, {paramGet});
 
-export function parse(clientSchema) {
+export async function parse(clientSchema) {
+  const URI = window.location.href;
 
-  const data = {};
-
-  for(const [key, entry] of Object.entries(clientSchema) ) {
-    if(!schema.isExported(clientSchema, key) ) {
-      continue;
-    }
-
-    const defaultValue = schema.getDefaultValue(clientSchema, key);
-    const value = paramGet(key, defaultValue);
-
-    data[key] = value;
+  let parametersString = '';
+  // split on first '?'
+  const URIArray = URI.split(searchSplitExpression);
+  if(URIArray.length > 1) {
+    parametersString = URIArray[1];
   }
 
-  console.log("data = ", data);
+  const data = {}
+
+  const parametersArray = parametersString.split(parametersSplitExpression);
+  for(const parameterString of parametersArray) {
+
+    // split on first '='
+    const parameterArray = parameterString.split('=');
+    if(parameterArray.length === 2) {
+      try {
+        const key = parameterArray[0];
+        let value = parameterArray[1];
+
+        if(key === compressedKey && value.length > 0) {
+          const decompressed = await codec.decompress(value);
+          Object.assign(data, decompressed);
+        } else {
+          const type = clientSchema[key].type;
+
+          if(type !== 'string') {
+            value = JSON.parse(value);
+          }
+
+          if(type === 'boolean') {
+            // coerce 0 and 0 to boolean
+            value = (value ? true : false);
+          }
+
+          data[key] = value;
+        }
+
+      } catch(error) {
+        console.error(`Error while parsing URL parameter '${key}': ${error.message}`);
+      }
+
+    }
+
+  }
 
   return data;
 }
 Object.assign(e, {parse} );
 
-export function update(data) {
-
-  const pathname = window.location.pathname;
-
-  let location = origin + pathname
-    + '#'
-    + '?navigation=' + data.navigation;
-
-  if(data.event) {
-    location += '&event=' + data.event;
+export async function update(clientSchema, data) {
+  try {
+    const exported = {}
+    for(const key of Object.keys(data) ) {
+      if(schema.isExported(clientSchema, key) ) {
+        exported[key] = data[key];
+      }
+    }
+    const compressed = await codec.compress(exported);
+    const pathname = window.location.pathname;
+    const location = `${origin}${pathname}#?${compressedKey}=${compressed}`;
+    window.location.replace(location);
+  } catch(error) {
+    new Error('Error while updating URI:' + error.message);
   }
-
-  if(data.pass) {
-    location += '&pass=' + data.pass;
-  }
-
-  if(data.eventExtra) {
-    location += '&event-extra=' + data.eventExtra;
-  }
-
-  if(data.passExtra) {
-    location += '&pass-extra=' + data.passExtra;
-  }
-
-  if(data.debug) {
-    location += '&debug=' + data.debug;
-  }
-
-  window.location = location;
 
 }
 Object.assign(e, {update});

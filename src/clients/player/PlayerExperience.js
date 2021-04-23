@@ -75,18 +75,9 @@ if(typeof app.state === 'undefined') {
 }
 
 // for simple debugging in browser...
-const MOCK_SENSORS = url.paramGet('mockSensors', false);
-console.info('> to mock sensors for debugging purpose, append "?mockSensors=1" to URL');
-console.info('> mock-sensors', MOCK_SENSORS);
-
-const DEBUG_AUDIO = (url.paramGet('debugAudio', false)
-                     ? true : false);
-console.info('> to use audio for debugging purpose, append "?debugAudio=1" to URI');
-console.info('> debugAudio', DEBUG_AUDIO);
-
-const UI_PRESET = url.paramGet('uiPreset', 'simple');
-console.info('> for full interface, append "?uiPreset=full" to URI');
-console.info('> uiPreset', UI_PRESET);
+console.info('> to mock sensors for debugging purpose, append "&mockSensors=1" to URL');
+console.info('> to use audio for debugging purpose, append "&debugAudio=1" to URI');
+console.info('> for full interface, append "&uiPreset=full" to URI');
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -142,7 +133,7 @@ class PlayerExperience extends AbstractExperience {
   }
 
   async start() {
-    super.start();
+    await super.start();
     // console.log('hasDeviceMotion', this.como.hasDeviceMotion);
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');
@@ -161,17 +152,6 @@ class PlayerExperience extends AbstractExperience {
         this.updateFromState(key, value);
       }
     });
-
-    for(const key of Object.keys(voxPlayerSchema) ) {
-      if(schema.isStored(voxPlayerSchema, key)) {
-        const value = storage.load(key);
-        if(typeof value !== 'undefined') {
-          this.voxPlayerState.set({[key]: value});
-        }
-      }
-    }
-
-    url.parse(voxPlayerSchema);
 
     // 2. create a sensor source to be used within the graph.
     // We create a `RandomSource` if deviceMotion is not available for development
@@ -201,6 +181,20 @@ class PlayerExperience extends AbstractExperience {
     this.coMoPlayer.setSource(source);
 
     this.audioContext = this.como.audioContext;
+
+    for(const key of Object.keys(voxPlayerSchema) ) {
+      if(schema.isStored(voxPlayerSchema, key)) {
+        const value = storage.load(key);
+        if(typeof value !== 'undefined') {
+          this.events.emit(key, value);
+        }
+      }
+    }
+
+    const loadedState = await url.parse(voxPlayerSchema);
+    for( const [key, value] of Object.entries(loadedState) ) {
+      this.events.emit(key, value);
+    }
 
     const baseUrl = url.base
           + '/soundfonts/acoustic_grand_piano';
@@ -268,10 +262,6 @@ class PlayerExperience extends AbstractExperience {
       });
     });
 
-    this.events.emit('debugAudio', DEBUG_AUDIO);
-    this.uiPreset = UI_PRESET;
-    this.events.emit('uiPreset', UI_PRESET);
-
     window.addEventListener('resize', () => this.render());
 
     const updateClock = () => {
@@ -309,6 +299,8 @@ class PlayerExperience extends AbstractExperience {
       if(stored) {
         storage.save(key, value);
       }
+
+      url.update(voxPlayerSchema, this.state);
     }
   }
 
@@ -694,7 +686,7 @@ class PlayerExperience extends AbstractExperience {
 
     let screen = ``;
 
-    if (!this.como.hasDeviceMotion && !MOCK_SENSORS) {
+    if (!this.como.hasDeviceMotion && !this.state['mockSensors'] ) {
       screen = views.sorry(viewData, listeners);
     } else if (this.coMoPlayer.session === null) {
       screen = views.manageSessions(viewData, listeners, {

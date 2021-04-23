@@ -78,6 +78,9 @@ export default {
   lookAheadNotes: {
     type: 'float',
     default: 0.125, // 1 quarter-note
+    metas: {
+      exported: false,
+    },
   },
 
   measures: {

@@ -30,7 +30,7 @@ function selfSelect(event) {
   const element = event.srcElement;
   try {
     // mainly for mobile
-    element.setSelectionRange(0, element.value.length);
+    element.select();
   } catch (error) {
     // forget it
   }

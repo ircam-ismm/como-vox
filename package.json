@@ -8,12 +8,12 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run clean && soundworks-template-build -b",
-    "build:production": "npm run clean && soundworks-template-build -b -m",
+    "build": "npm run clean && (webpack --mode=development & soundworks-template-build -b)",
+    "build:production": "npm run clean && (webpack --mode=production & soundworks-template-build -b -m)",
     "clean": "soundworks-template-build -c",
-    "watch-process": "soundworks-template-build -p",
-    "watch-process:inspect": "soundworks-template-build -i -p",
-    "dev": "npm run build && (npm run watch-process:inspect server & soundworks-template-build -b -w)",
+    "watch-process": "webpack --mode=development --watch & soundworks-template-build -p",
+    "watch-process:inspect": "webpack --mode=development --watch & soundworks-template-build -i -p",
+    "dev": "npm run build && (webpack --mode=development --watch & npm run watch-process:inspect server & soundworks-template-build -b -w)",
     "postinstall": "mkdir -p .vendors/public && cp -R node_modules/@webcomponents/webcomponentsjs .vendors/public",
     "test": "mocha 'tests/**/*.js'",
     "test-watch": "mocha --watch 'tests/**/*.js'",
@@ -50,7 +50,14 @@
     "@soundworks/template-build": "^3.0.1",
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
+    "css-loader": "^5.2.4",
     "eslint": "^7.12.0",
-    "mocha": "^8.2.0"
+    "mini-css-extract-plugin": "^1.5.1",
+    "mocha": "^8.2.0",
+    "sass": "^1.32.12",
+    "sass-loader": "^11.0.1",
+    "webpack": "^5.36.1",
+    "webpack-cli": "^4.6.0",
+    "webpack-remove-empty-scripts": "^0.7.1"
   }
 }

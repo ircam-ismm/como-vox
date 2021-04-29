@@ -1,5 +1,6 @@
 /* user defined */
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -67,7 +68,6 @@ body.loading {
   border-radius: 3px;
 }
 
-
 #__soundworks-container select {
   border: 1px solid #686868;
   border-radius: 3px;
@@ -124,4 +124,3 @@ body.loading {
 #__soundworks-container .invalid {
   background-color: red;
 }
-

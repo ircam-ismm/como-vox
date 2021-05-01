@@ -1,0 +1,87 @@
+@use 'color';
+
+.player {
+  button {
+    background-color: color.$widget-background-color;
+    color: color.$widget-color;
+    width: fit-content;
+  }
+
+  select {
+    width: auto;
+  }
+
+  input {
+    width: auto;
+  }
+
+  input,
+  select {
+    background-color: color.$widget-color;
+    color: invert(color.$widget-color);
+  }
+
+  button,
+  select,
+  input {
+    height: 40px;
+    border: 1px solid color.$widget-border-color;
+    border-radius: 3px;
+
+    &:active {
+      border-color: color.$active-border-color;
+      color: color.$active-color;
+    }
+
+    &.selected {
+      background-color: color.$widget-selected-background-color;
+      color: color.$widget-selected-color;
+    }
+  }
+
+  .container {
+    margin: 0.2rem;
+    // border: 1px solid color.$widget-border-color;
+    // border-radius: 3px;
+  }
+
+  .time {
+    font-size: 60px;
+  }
+
+  .position {
+    .bar {
+      width: 2.5em;
+    }
+
+    .beat {
+      width: 1.5em;
+    }
+
+    .bar,
+    .beat {
+      font-size: 40px;
+      height: 40px;
+      padding: 0;
+    }
+  }
+
+  .count {
+    .bar,
+    .beat {
+      width: 2.5em;
+    }
+  }
+
+  .sensorsLatency {
+    display: none;
+  }
+
+  // .controls.container {
+  //   display: inline-flex;
+  // }
+
+  .invalid {
+    background-color: color.$invalid-background-color;
+  }
+}

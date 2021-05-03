@@ -1,3 +1,5 @@
+import debounce from 'lodash.debounce';
+
 import jsonURL from 'json-url';
 const codec = jsonURL('lzstring');
 
@@ -87,7 +89,7 @@ export async function parse(clientSchema) {
 }
 Object.assign(e, {parse} );
 
-export async function update(clientSchema, data) {
+async function _update(clientSchema, data) {
   try {
     const exported = {}
     for(const key of Object.keys(data) ) {
@@ -104,6 +106,9 @@ export async function update(clientSchema, data) {
   }
 
 }
+
+// limit URL update period to 500 ms
+export const update = debounce(_update, 500);
 Object.assign(e, {update});
 
 

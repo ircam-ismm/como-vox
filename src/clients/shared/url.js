@@ -50,14 +50,17 @@ export async function parse(clientSchema) {
     // split on first '='
     const parameterArray = parameterString.split('=');
     if(parameterArray.length === 2) {
+      const key = parameterArray[0];
+      let value = parameterArray[1];
       try {
-        const key = parameterArray[0];
-        let value = parameterArray[1];
-
         if(key === compressedKey && value.length > 0) {
           const decompressed = await codec.decompress(value);
           Object.assign(data, decompressed);
         } else {
+          if(!clientSchema.hasOwnProperty(key)) {
+            throw new Error(`Unkown parameter '${key}'`);
+          }
+
           const type = clientSchema[key].type;
 
           if(type !== 'string') {
@@ -94,10 +97,10 @@ export async function update(clientSchema, data) {
     }
     const compressed = await codec.compress(exported);
     const pathname = window.location.pathname;
-    const location = `${origin}${pathname}#?${compressedKey}=${compressed}`;
-    window.location.replace(location);
+    const URL = `${origin}${pathname}#?${compressedKey}=${compressed}`;
+    window.location.replace(URL);
   } catch(error) {
-    new Error('Error while updating URI:' + error.message);
+    new Error('Error while updating URL:' + error.message);
   }
 
 }

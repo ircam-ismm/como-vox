@@ -151,6 +151,9 @@ class PlayerExperience extends AbstractExperience {
       for (let [key, value] of Object.entries(updates) ) {
         this.updateFromState(key, value);
       }
+
+      // update URL on state change, to avoid update for each parameter
+      url.update(voxPlayerSchema, this.state);
     });
 
     // 2. create a sensor source to be used within the graph.
@@ -299,8 +302,6 @@ class PlayerExperience extends AbstractExperience {
       if(stored) {
         storage.save(key, value);
       }
-
-      url.update(voxPlayerSchema, this.state);
     }
   }
 

@@ -62,11 +62,11 @@ User data
 # folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-22-fred-jp'
 # filename = '20210322-*'
 
-folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-29-morgan'
-filename = '20210329-*'
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-29-morgan'
+# filename = '20210329-*'
 
-# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-04-14-fred'
-# filename = '20210414-*'
+folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-04-14-fred'
+filename = '20210414-*'
 
 
 

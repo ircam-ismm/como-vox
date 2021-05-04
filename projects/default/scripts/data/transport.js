@@ -543,12 +543,17 @@ function transport(graph, helpers, outputFrame) {
       if( (parameters.gestureControlsTempo
            || parameters.measures)
           && beatGesture && beatGesture.trigger) {
-        const {
+        let {
           absoluteMin,
           absoluteMax,
           relativeMin,
           relativeMax,
         } = parameters.tempoLimits;
+
+        // tempo is always for quarter-notes
+        absoluteMin *= 4 / timeSignature.division;
+        absoluteMax *= 4 / timeSignature.division;
+
         let tempos = [];
         let beatDeltas = [];
         for(let g = beatGestures.length - 1; g > 0; --g) {
@@ -698,7 +703,7 @@ function transport(graph, helpers, outputFrame) {
       if(!playback && parameters.gestureControlsPlaybackStart
          && !playbackStartRequest) {
         // wait for 4 beats on 1/4 and 2/4 time signature
-        const barCount = (timeSignature.count > 3
+        const barCount = (timeSignature.count >= 3
                           ? timeSignature.count
                           : 4);
 
@@ -712,13 +717,15 @@ function transport(graph, helpers, outputFrame) {
               + parameters.playbackStartAfterCount.beat
               - startLookAheadBeats;
 
-        const {
+        let {
           absoluteMin: tempoAbsoluteMin,
           absoluteMax: tempoAbsoluteMax,
           relativeMin: tempoRelativeMin,
           relativeMax: tempoRelativeMax,
         } = parameters.tempoLimits;
-
+        // tempo is always for quarter-notes
+        tempoAbsoluteMin *= 4 / timeSignature.division;
+        tempoAbsoluteMax *= 4 / timeSignature.division;
 
         const beatGesturesStart = [];
         // keep gestures after stop, do not change ordering
@@ -926,7 +933,7 @@ function transport(graph, helpers, outputFrame) {
       //////////// auto stop
       if(playback && parameters.gestureControlsPlaybackStop) {
         // wait for 4 beats on 1/4 and 2/4 time signature
-        const barCount = (timeSignature.count > 3
+        const barCount = (timeSignature.count >= 3
                           ? timeSignature.count
                           : 4);
         const stopAfterBeats

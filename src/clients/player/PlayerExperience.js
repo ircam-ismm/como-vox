@@ -358,11 +358,10 @@ class PlayerExperience extends AbstractExperience {
             if(!scoreURIbase || scoreURIbase === 'none') {
               scoreURI = null;
             } else {
-              scoreURI = url.base
-                + '/'
-                + this.voxApplicationState.get('scoresPath')
-                + '/'
-                + scoreURIbase;
+              scoreURI = encodeURI(url.base
+                                   + this.voxApplicationState.get('scoresPath')
+                                   + '/'
+                                   + scoreURIbase);
             }
             try {
               await this.setScore(scoreURI)

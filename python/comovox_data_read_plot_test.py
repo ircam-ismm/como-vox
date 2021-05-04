@@ -332,6 +332,7 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
         # if (onset and time - lastBeatTime > inhibitionDuration):
         if (onset):
             peakSearches.add(PeakSearch(startTime=time, searchDuration=peakSearchDuration))
+            df_onset_script[time] = 1
 
         # copy to remove completed searches
         peakSearchesLoop = set(peakSearches)
@@ -344,7 +345,7 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
                 if (result.peakFound
                     and result.peakTime - lastBeatTime > inhibitionDuration
                     and result.peakIntensity > peakThreshold):
-                    df_onset_script[result.startTime] = 1
+                    # df_onset_script[result.startTime] = 1
                     df_peak_script[time] = 1
                     df_intensity_script[result.peakTime] = result.peakIntensity
 
@@ -409,7 +410,7 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
     
     return {'peak_script': df_peak_script, 'onset_script': df_onset_script, 
             'intensity_script': df_intensity_script,
-            'tempo_estimated': tempo_estimated}
+            'tempo_estimated': tempo_estimated, 'delta_script': df_diff}
 
 
 def rotation_analysis(sensors,axis_weights,rotation_average_order, scaling):
@@ -487,6 +488,7 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
     acceleration['peak.script'] = acceleration_script['peak_script']
     acceleration['intensity.script'] = acceleration_script['intensity_script']
     acceleration['tempo_estimated'] = acceleration_script['tempo_estimated']
+    acceleration['delta.script'] = acceleration_script['delta_script']
  
     
     return acceleration
@@ -673,12 +675,15 @@ def sensors_plot(sensors, title, y_limits,
     acceleration['derivate'] =  sensors['beat']['beat.derivate']
     acceleration['intensity'] =  sensors['beat']['beat.intensity']
     acceleration['intFilt'] = sensors['beat']['beat.intensityNormalized']
-    acceleration['delta'] = sensors['beat']['beat.delta']
+    # acceleration['delta'] = sensors['beat']['beat.delta']
+    acceleration['delta'] = sensors['acceleration']['delta.script']
     acceleration['timeMax'] = sensors['beat']['beat.timeMax']
     acceleration['mean'] = sensors['beat']['beat.mean']
     acceleration['std'] = sensors['beat']['beat.std'] 
     acceleration['intensityRotation'] = sensors['beat']['beat.intensityRotation']
     acceleration['peak.script'] = sensors['acceleration']['intensity.script'] 
+    acceleration['onset.script'] = sensors['acceleration']['onset.script']
+    
     acceleration['tempo_estimaated'] = sensors['acceleration']['tempo_estimated'] 
     acceleration['tempo'] = sensors['tempo']
     
@@ -708,6 +713,8 @@ def sensors_plot(sensors, title, y_limits,
     #                                                               > 0].index]
     # acceleration_peak = time[acceleration.loc[acceleration['acc.peak'] 
     #                                                                 > 0].index]
+    acceleration_onset = time[acceleration.loc[acceleration['onset.script'] 
+                                                                    > 0].index]
     acceleration_peak = time[acceleration.loc[acceleration['peak.script'] 
                                                                     > 0].index]
     
@@ -766,6 +773,8 @@ def sensors_plot(sensors, title, y_limits,
         if beat_offline  == True:
             all_figure_axes[j].vlines(acceleration_peak, y_min, y_max, 
                                     'tab:orange', zorder=3)
+            # all_figure_axes[j].vlines(acceleration_onset, y_min, y_max, 
+            #                         'tab:green', zorder=3)
         all_figure_axes[j].label_outer()
 
 

@@ -19,6 +19,11 @@ export default {
     default: false,
   },
 
+  clockTimeUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   debugAudio: {
     type: 'boolean',
     default: false,
@@ -67,6 +72,12 @@ export default {
       stored: true,
     },
   },
+
+  handednessUi: {
+    type: 'boolean',
+    default: true,
+  },
+
 
   // minimum as a request, actual value may be more
   lookAheadNotesRequest: {
@@ -143,6 +154,11 @@ export default {
     nullable: true,
   },
 
+  playerIdUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   record: {
     type: 'boolean',
     default: false,
@@ -208,6 +224,16 @@ export default {
     metas: {
       exported: false,
     },
+  },
+
+  sessionNameUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  sessionSelectionUi: {
+    type: 'boolean',
+    default: false,
   },
 
   seekPosition: {

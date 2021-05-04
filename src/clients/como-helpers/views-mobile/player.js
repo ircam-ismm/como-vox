@@ -1,5 +1,10 @@
 import { html } from 'lit-html';
 
+import {session} from '../shared/sessionTemplate.js';
+import {clock} from '../shared/clockTemplate.js';
+import {handedness} from '../shared/handednessTemplate.js';
+
+
 function getTimeSignature (event) {
   const parentElement = event.srcElement.parentElement;
   const count = parseFloat(parentElement.querySelector('.count').value) || 4;
@@ -52,36 +57,12 @@ export function player(data, listeners, {
       ${data.player.loading ?
       html`<div class="loadingBanner">Chargement...</div>` : ''
       }
-      <!-- HEADER -->
 
-      <div class="positionRelative container">
-        <span class="info">
-          ${uiPreset === 'full' ? html`
-          <span class="h3 session">Session: ${data.session.name}</span>
-          <span class="h3 session">/</span>
-          `: ''}
-          <span class="h3 session">Identifiant : ${data.player.id}</span>
-        </span>
-
-        ${uiPreset === 'full' && enableSelection ? html`
-        <button class="setSession"
-                @click="${e => listeners.setPlayerParams({ sessionId: null })}">
-          Choisir session
-        </button>
-        ` : ''}
-      </div>
-
-      <div class="handedness container">Main utilisée :
-        ${ ['left', 'right'].map( (handedness) => {
-        return html`
-        <button class="set handedness ${data.handedness === handedness
-                       ? 'selected' : ''}"
-                @click="${e => voxPlayerState.set({handedness}) }">
-          ${handedness === 'left' ? 'Gauche' : 'Droite'}
-        </button>
-        `;
-        }) }
-      </div>
+      <!-- vvv NEW vvv -->
+      ${session(data)}
+      ${clock(data)}
+      ${handedness(data)}
+      <!-- ^^^ (NEW) ^^^ -->
 
       <div class="audioLatency container">Latence audio :
         <input type="number"
@@ -122,10 +103,6 @@ export function player(data, listeners, {
         ${Math.round(data.lookAheadSeconds * 1e3)} ms)
       </div>
       ` : '' }
-
-      <div class="time container">
-        ${data.syncTime.toFixed(3)}
-      </div>
 
       <div class="score container">
         <select class="${!data.scoreReady ? 'invalid' : ''}"

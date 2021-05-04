@@ -101,7 +101,7 @@ axis_weights_accel = [1,0,0]
 integration_parameter = -0.8
 acceleration_average_order = 2
 compression = 1
-scaling = 1 
+scaling = 1
 delta_order= 10
 
 threshold = 1
@@ -131,15 +131,17 @@ peak_threshold = {
 sampling_period = 0.02 # sedonds
 
 inhibitionLimits = {
-    'min': 0.25 / sampling_period, 
-    'max': 0.5 / sampling_period, 
+    'min': 0.25 / sampling_period,
+    'max': 0.5 / sampling_period,
     'beats': 0.5 / sampling_period,
   };
 
 peakSearchLimits = {
-    'min': 0.25 / sampling_period, 
-    'max': 0.5 / sampling_period, 
-    'beats': 0.5 / sampling_period,
+    'min': 0.25 / sampling_period,
+    'max': 0.4 / sampling_period,
+    'beats': 0.4 / sampling_period,
+    # extension for 'max' and 'beats' when peak is still increasing at end of window
+    'extensionFactor': 1.5,
   };
 
 
@@ -156,47 +158,47 @@ metronome = False       # displays the metronome beats
 def make_figure(data_string, figure_no):
     # single data
     comovox.rotation_analysis(data[data_string],
-                                  axis_weights_rotation, 
+                                  axis_weights_rotation,
                                   rotation_average_order, 1)
     comovox.acceleration_analysis(data[data_string],
                                        axis_weights_accel,
-                                       integration_parameter, 
-                                       acceleration_average_order, 
-                                       compression, 
-                                       scaling, 
+                                       integration_parameter,
+                                       acceleration_average_order,
+                                       compression,
+                                       scaling,
                                        delta_order,
                                        threshold, threshold_min,
                                        onset_order,
                                        inhibition_duration,
-                                       peak_search_window, 
+                                       peak_search_window,
                                        inhibitionLimits, peakSearchLimits,
-                                       rotation_threshold, 
+                                       rotation_threshold,
                                        peak_threshold,
                                        detect_up)
     comovox.sensors_plot(data[data_string], data_string, y_limits,
                          beat_trigger, beat_offline,
-                         metronome, figure_no) 
-    plt.figtext(0.15 ,0.93, 
-                'ACC - ' + 
-                ' | axis_weights_accel: ' + str(axis_weights_accel) + 
-                ' | integration_parameter: ' + str(integration_parameter) +  
+                         metronome, figure_no)
+    plt.figtext(0.15 ,0.93,
+                'ACC - ' +
+                ' | axis_weights_accel: ' + str(axis_weights_accel) +
+                ' | integration_parameter: ' + str(integration_parameter) +
                 ' | accel_average_order: ' + str(acceleration_average_order) +
                 ' | compression: ' + str(compression) +
                 ' | scaling: ' + str(scaling) +
                 ' | threshold: ' + str(threshold) +
                 ' | threshold_min: ' + str(threshold_min) +
                 ' | inhibition_duration: ' + str(inhibition_duration) +
-                ' | peak_search_window: ' + str(peak_search_window) + 
-                ' | rotation_threshold: ' + str(rotation_threshold) + 
+                ' | peak_search_window: ' + str(peak_search_window) +
+                ' | rotation_threshold: ' + str(rotation_threshold) +
                 ' | detect_up: ' + str(detect_up),
                 fontsize = 10)
-    plt.figtext(0.15 ,0.91, 
-                'ROT - ' + 
-                ' | axis_weights_rotation: ' + str(axis_weights_accel) + 
+    plt.figtext(0.15 ,0.91,
+                'ROT - ' +
+                ' | axis_weights_rotation: ' + str(axis_weights_accel) +
                 ' | rotation_average_order: ' + str(rotation_average_order),
                 fontsize = 10)
     if save_figure == True:
-        plt.savefig(folder_path + '/figures/' 
+        plt.savefig(folder_path + '/figures/'
                     + data_string + '-' + text + '.pdf')
 
 #single plot
@@ -226,7 +228,7 @@ def make_figure(data_string, figure_no):
 
 
 #looping over data_list
-for i in data_list:   
+for i in data_list:
     make_figure(i, None)
     print(i)
 

@@ -234,18 +234,22 @@ def peak(dataframe_x, threshold, threshold_min, onset_order,
     return {'peak': df_peak, 'diff': df_diff}
 
 class PeakSearch:
-    def __init__(self, *, startTime, searchDuration):
+    def __init__(self, *, startTime, searchDurationMin, searchDurationMax):
         self.startTime = startTime
         self.peakFound = False
-        self.searchDuration = searchDuration
+        self.searchDurationMin = searchDurationMin
+        self.searchDurationMax = searchDurationMax
         self.searchCompleted = False
         self.peakIntensity = 0
         self.peakTime = startTime
 
 
     def process(self, *, time, intensity):
-        if (time - self.startTime < self.searchDuration):
-            if (intensity > self.peakIntensity):
+        peakNew = intensity >= self.peakIntensity
+        searchDuration = self.searchDurationMax if peakNew else self.searchDurationMin
+
+        if (time - self.startTime < searchDuration):
+            if (peakNew):
                self.peakIntensity = intensity
                self.peakTime = time
         else:
@@ -259,12 +263,12 @@ class PeakSearch:
 peakSearches = set();
 
 def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation_threshold,
-                      inhibition_duration, peak_search_window, 
+                      inhibition_duration, peak_search_window,
                       inhibitionLimits, peakSearchLimits, playback, peak_threshold):
-    """ 
+    """
     code matches algorithm in beatTriggerFromGesturePeakAdapt.js
     """
-    
+
     # algo to match code in real time
     size = np.size(df_diff)
     df_peak_script = np.zeros(size)
@@ -272,7 +276,7 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
     df_intensity_script = np.zeros(size)
     tempo_estimated = np.ones(size) * 100
 
-    
+
     # intialization
     positiveDelta = 0
     lastBeatTime = 0
@@ -288,12 +292,12 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
     previous_delta = 30
     interval_filtered = 30
 
-    
-    for i in range(size - inhibition_duration - 1):   
-           
+
+    for i in range(size - inhibition_duration - 1):
+
         time = i+1
         delta = df_diff[time]
-        lastDelta =df_diff[time - 1]  
+        lastDelta =df_diff[time - 1]
         intensityNormalized = df_acc_int[time]
         acceleration_raw = df_acc_raw[time]
         intensityRotation = df_rotation[time]
@@ -305,7 +309,7 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
             rotationThreshold = rotation_threshold['safe']
             peakThreshold = peak_threshold['safe']
 
-        
+
         #adaptation
         # inhibitionDuration = max(inhibitionLimits['min'],
         #                       min(inhibitionLimits['max'],
@@ -313,25 +317,28 @@ def peak_as_script(df_acc_int, df_acc_raw, df_diff, df_rotation, tempo, rotation
         # peakSearchDuration = max(peakSearchLimits['min'],
         #                       min(peakSearchLimits['max'],
         #                           peakSearchLimits['beats']*60/tempo_estimated[time]))
-        
+
         inhibitionDuration = max(inhibitionLimits['min'],
-                              min(inhibitionLimits['max'],
-                                  inhibitionLimits['beats']*60/tempo[time]))
-        peakSearchDuration = max(peakSearchLimits['min'],
-                              min(peakSearchLimits['max'],
-                                  peakSearchLimits['beats']*60/tempo[time]))
-        
-        
+                                 min(inhibitionLimits['max'],
+                                     inhibitionLimits['beats']*60/tempo[time]))
+        peakSearchDurationMin = max(peakSearchLimits['min'],
+                                    min(peakSearchLimits['max'],
+                                        peakSearchLimits['beats']*60/tempo[time]))
+        peakSearchDurationMax = peakSearchDurationMin * peakSearchLimits['extensionFactor']
+
+
         tempo_estimated[time] = tempo_estimated[time - 1]
-        
+
         onset = (intensityRotation > rotationThreshold) and (delta > 0) and (lastDelta < 0)
-        
+
         #### with several process
-        
-        
+
+
         # if (onset and time - lastBeatTime > inhibitionDuration):
         if (onset):
-            peakSearches.add(PeakSearch(startTime=time, searchDuration=peakSearchDuration))
+            peakSearches.add(PeakSearch(startTime=time,
+                                        searchDurationMin=peakSearchDurationMin,
+                                        searchDurationMax=peakSearchDurationMax))
 
         # copy to remove completed searches
         peakSearchesLoop = set(peakSearches)

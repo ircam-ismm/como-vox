@@ -31,8 +31,10 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   };
   let peakSearchLimits = {
     min: 0.25, // seconds
-    max: 0.5, // seconds
-    beats: 0.5,
+    max: 0.4, // seconds
+    beats: 0.4,
+    // extension for 'max' and 'beats' when peak is still increasing at end of window
+    extensionFactor: 1.5,
   };
 
   // other parameters
@@ -97,9 +99,10 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   let lastDelta = -1;
 
   const PeakSearch = class {
-    constructor({startTime, searchDuration}) {
+    constructor({startTime, searchDurationMin, searchDurationMax}) {
       this.startTime = startTime;
-      this.searchDuration = searchDuration;
+      this.searchDurationMin = searchDurationMin;
+      this.searchDurationMax = searchDurationMax;
       this.searchCompleted = false;
       this.peakFound = false;
       this.peakIntensity = 0;
@@ -107,7 +110,12 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
     }
 
     process({time, intensity}) {
-      if(time - this.startTime < this.searchDuration) {
+      const peakNew = intensity >= this.peakIntensity;
+      const searchDuration = (peakNew
+                              ? this.searchDurationMax
+                              : this.searchDurationMin);
+
+      if(time - this.startTime < searchDuration) {
         if(intensity > this.peakIntensity) {
           this.peakIntensity = intensity;
           this.peakTime = time;
@@ -251,10 +259,12 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
             = Math.max(inhibitionLimits.min,
                        Math.min(inhibitionLimits.max,
                                 beatsToSeconds(inhibitionLimits.beats, {tempo, timeSignature})));
-      const peakSearchDuration
+      const peakSearchDurationMin
             = Math.max(peakSearchLimits.min,
                        Math.min(peakSearchLimits.max,
                                 beatsToSeconds(peakSearchLimits.beats, {tempo, timeSignature})));
+      const peakSearchDurationMax
+            = peakSearchDurationMin * peakSearchLimits.extensionFactor;
 
 
       // rotation intensity computing
@@ -269,13 +279,13 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
               timeSignature,
             });
 
-      const intensityRotationClipped = Math.min(intensityRotationUnfilteredMax, 
+      const intensityRotationClipped = Math.min(intensityRotationUnfilteredMax,
                                                 intensityRotationUnfiltered);
 
       rotationIntensitySmoother.set({lowpassFrequencyDown});
       const intensityRotation = rotationIntensitySmoother.process(intensityRotationClipped);
 
-      // // debug visualization  
+      // // debug visualization
       // console.log('intensityRotation',
       //             (Math.round(100 * intensityRotation) * 0.01).toFixed(3),
       //             barGraph(intensityRotation, {
@@ -337,7 +347,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       if(onset) {
         peakSearches.add(new PeakSearch({
           startTime: time,
-          searchDuration: peakSearchDuration,
+          searchDurationMin: peakSearchDurationMin,
+          searchDurationMax: peakSearchDurationMax,
         }) );
       }
 

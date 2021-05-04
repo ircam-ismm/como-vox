@@ -138,10 +138,10 @@ inhibitionLimits = {
 
 peakSearchLimits = {
     'min': 0.25 / sampling_period,
-    'max': 0.4 / sampling_period,
-    'beats': 0.4 / sampling_period,
+    'max': 0.5 / sampling_period,
+    'beats': 0.5 / sampling_period,
     # extension for 'max' and 'beats' when peak is still increasing at end of window
-    'extensionFactor': 1.5,
+    'extensionFactor': 1.2,
   };
 
 

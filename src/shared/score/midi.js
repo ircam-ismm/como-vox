@@ -362,8 +362,14 @@ ${typeof data}, ${data.constructor}`);
               case 3:
                 // sequence/track name
 
-                // Latin-1 to UTF-8 conversion
-                name = decodeURIComponent(escape(event.dd));
+                try {
+                  // Latin-1 to UTF-8 conversion
+                  name = decodeURIComponent(escape(event.dd));
+                } catch (error) {
+                  // already UTF-8? Ignore conversion in any case
+                  name = event.dd;
+                }
+
                 // remove control characters
                 name = name.replace(/[\t\r\n\v\f\0]/g, '');
                 part.name = name;

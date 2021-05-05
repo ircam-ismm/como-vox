@@ -6,19 +6,20 @@ Bugs:
  - [ ] intensity drops
    - [?] device compresses audio output when clipping?
  - [x] NaN in position
- - [ ] no tempo adaptation on start
+ - [x] no tempo adaptation on start
 
 - [ ] calibrate latency
-  - [ ] tap tempo on metronome
+  - [x] tap tempo on metronome
+  - [x] adapt look-ahead with latency and maximum tempo
   - [ ] clip with audio context values
 - [x] beatTriggerFromGesturePeakAdapt: adapt inhibition to tempo and
       time-signature ++++++
-- [ ] data: bypass graph
+- [x] data: bypass graph
   - [x] injection
-  - [ ] no mode shared states via setGraphOptions
-  - [ ] graph simplification and optimisation
-- [ ] transport
-  - [?] apply beat phase and tempo on beat change
+  - [x] no more shared states via setGraphOptions
+  - [x] graph simplification and optimisation
+- [x] transport
+  - [x] apply beat phase and tempo on beat change
 - [ ] score
   - [x] BUG: first note is very short
   - [x] apply tempo and time-signature on load, even when playback is paused
@@ -40,24 +41,41 @@ Bugs:
   - [?] reverb
 - [x] start
 - [x] end
-  - [ ] quicker
+  - [?] quicker
 - [ ] UI
   - [ ] presets
     - [ ] UI
     - [ ] beating
     - [ ] generalisation
   - [ ] CSS
-    - [ ] no more in templates
-    - [ ] SCSS
+    - [x] no more in templates
+    - [x] SCSS
   - [ ] users
   - [ ] debug
   - [ ] controller
 - [ ] log
+  - [ ] plugin logger
   - [ ] errors and log from clients
   - [ ] currents settings as meta-data
   - [ ] user-agent
   - [ ] audio settings
 
+
+- [ ] application
+  - [ ] nativ, (React, Flutter)
+  - [ ] format: JSON or flat
+  - [ ] transport: WebSocket or OSC over UDP
+  - [ ] updates (via stores)
+
+
+- [ ] server / host application 
+  - connection
+    - [ ] QR code: separate module
+      - [ ] wifi
+      - [ ] IP
+      - [ ] port
+    - [ ] à la bonjour
+  -[ ] updates
 
 **Projects are dedicated to exercices types:**
 
@@ -148,9 +166,9 @@ Warning: after boot: launch Safari, and sound, quit safari (double click and dra
 
 
 Sensors:
-- [ ] calibrate senssors and audio
-- [ ] record users gestures with annotated video
-- [ ] prototype with user scripts
+- [x] calibrate sensors and audio
+- [x] record users gestures with annotated video
+- [x] prototype with user scripts
 
 - [x] long loading time on iOS (1 minute): pinned certificate? connected once to https://apps.cosima.ircam.fr and update local certificates
   - [ ] DNS problem, should have a local one without catch-all and a remote with catch-all to avoid iOS time-outs

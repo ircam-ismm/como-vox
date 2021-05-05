@@ -2,6 +2,8 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
+  const beatsToSeconds = conversion.beatsToSeconds;
+  const notesToBeats = conversion.notesToBeats;
 
   const parameters = {
     scenarioStatus: 'off',
@@ -9,6 +11,10 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start
     stillnessWaitingDurationMax: 2, // in seconds, for time-out
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
+    playbackStartAfterCount: {
+      bar: 1,
+      beat: 1, // one more for upbeat before start
+    },
   };
 
   let status = 'off'
@@ -88,6 +94,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       'gestureControlsPlaybackStart',
       'gestureControlsPlaybackStartStatus',
       'playbackStopSeek',
+      'playbackStartAfterCount',
       'scenarioStartStopWithBeating',
       'scenarioStatus',
     ].forEach( (event) => {
@@ -111,10 +118,13 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       const outputData = app.data;
 
       const {
+        lookAheadNotes,
         playback,
         playbackLatency,
         stillness,
+        tempo,
         time,
+        timeSignature,
       } = inputData;
 
       if(!parameters.scenarioStartStopWithBeating
@@ -158,10 +168,30 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
             beatGestureTriggered = true;
           }
 
+          // wait for 4 beats on 1/4 and 2/4 time signature
+          const barCount = (timeSignature.count >= 3
+                            ? timeSignature.count
+                            : 4);
+
+          // keep some beats for look-ahead
+          const lookAheadBeats =
+                notesToBeats(lookAheadNotes, {timeSignature});
+
+          // warning: this is a float
+          const stopAfterBeatsWithLookAhead
+                = parameters.playbackStartAfterCount.bar * barCount
+                + parameters.playbackStartAfterCount.beat
+                - lookAheadBeats;
+
+          const stopAfterDuration = beatsToSeconds(stopAfterBeatsWithLookAhead, {
+            tempo,
+            timeSignature,
+          });
+
           // wait until hearing playback: add playbackLatency
           if(!beatGestureTriggered
              && (time.local - timeoutTime - playbackLatency
-                 >= parameters.beatGestureWaitingDurationMax) ) {
+                 >= parameters.beatGestureWaitingDurationMax + stopAfterDuration) ) {
             // no start, cancel
             statusUpdate('cancel');
           } else if(playback) {

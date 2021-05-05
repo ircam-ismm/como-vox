@@ -187,7 +187,7 @@ export function player(data, listeners, {
           </button>
           `;
           }) }
-          Arrêt :
+          Reprise :
           ${['barStart', 'start', null].map( (seek) => {
           return html`
           <button class="set playbackStop mode ${data.playbackStopSeek === seek
@@ -204,12 +204,12 @@ export function player(data, listeners, {
         ${uiPreset === 'full' ? html`
         <button class="scenario ${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}"
                 @click="${e => voxPlayerState.set({scenarioStartStopWithBeating: true}) }"
-        >Suivre</button>
+        >Départ</button>
         <div class="onoff transport">
           <div class="count container">Départ :
             ${ [false, true].map( (onOff) => {
             return html`
-            <button class="set scoreControlsTempo ${data.gestureControlsPlaybackStart === onOff
+            <button class="set scoreControlsPlaybackStart ${data.gestureControlsPlaybackStart === onOff
                            ? 'selected' : ''}"
                     @click="${e => voxPlayerState.set({gestureControlsPlaybackStart: (onOff)})}">
               ${!onOff ? 'Libre' : 'Geste'}
@@ -241,7 +241,7 @@ export function player(data, listeners, {
           <div class="count container">Arrêt :
             ${ [false, true].map( (onOff) => {
             return html`
-            <button class="set scoreControlsTempo ${data.gestureControlsPlaybackStop === onOff
+            <button class="set scoreControlsPlaybackStop ${data.gestureControlsPlaybackStop === onOff
                            ? 'selected' : ''}"
                     @click="${e => voxPlayerState.set({gestureControlsPlaybackStop: (onOff)})}">
               ${!onOff ? 'Libre' : 'Geste'}
@@ -271,18 +271,24 @@ export function player(data, listeners, {
 
         </div>
         ` : html`
-        <div class="onoff transport">Suivant le geste :
-          <button class="scenario ${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}"
+        <div class="onoff transport">Lecture :
+            ${ [false, true].map( (onOff) => {
+            return html`
+            <button class="set scoreControlsPlaybackStart scoreControlsPlaybackStop ${data.gestureControlsPlaybackStart === onOff && data.gestureControlsPlaybackStop === onOff
+                           ? 'selected' : ''}"
+                    @click="${e => {
+                                voxPlayerState.set({gestureControlsPlaybackStart: (onOff)});
+                                voxPlayerState.set({gestureControlsPlaybackStop: (onOff)});
+                             } }">
+              ${!onOff ? 'Libre' : 'Geste'}
+            </button>
+            `;
+            }) }
+
+           <button class=" ${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}"
                   @click="${e => voxPlayerState.set({scenarioStartStopWithBeating: true}) }"
-          >Suivre</button>
-          <sc-toggle
-            .active="${data.gestureControlsPlaybackStart && data.gestureControlsPlaybackStop}"
-            @change="${e => {
-                     voxPlayerState.set({gestureControlsPlaybackStart: (e.detail.value)});
-                     voxPlayerState.set({gestureControlsPlaybackStop: (e.detail.value)});
-                     }
-                     }"
-          ></sc-toggle>
+           >Commencer</button>
+
         </div>
         `}
 

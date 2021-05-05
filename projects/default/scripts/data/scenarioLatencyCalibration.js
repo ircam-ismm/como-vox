@@ -120,6 +120,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     const eventsToRegister =
           // Use set for uniqueness
           [...new Set([
+            // register parameters to save and restore
             ...Object.keys(parametersScenario),
             // declare own parameters
             ...[

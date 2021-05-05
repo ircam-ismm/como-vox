@@ -106,6 +106,7 @@ export function player(data, listeners, {
 
       <div class="score container">
         <select class="${!data.scoreReady ? 'invalid' : ''}"
+                .value=${data.scoreFileName ? data.scoreFileName : 'none'}
                 @change="${e => {
                        const scoreFileName = (e.target.value === 'none' ? null : e.target.value);
                        voxPlayerState.set({scoreFileName});

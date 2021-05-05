@@ -17,6 +17,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     playbackStopSeek: 'start',
     scoreFileName: null,
     tempo: 60,
+    timeSignature: {count: 4, division: 4},
   };
 
   const parameters = {
@@ -116,20 +117,22 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
   ///// Events and data (defined only in browser)
   const registeredEvents = [];
   if(app.events && app.state) {
-    [
-      'audioLatency',
-      'metronomeSound',
-      'gestureControlsBeatOffset',
-      'gestureControlsIntensity',
-      'gestureControlsPlaybackStart',
-      'gestureControlsPlaybackStop',
-      'gestureControlsTempo',
-      'playback',
-      'playbackLatency',
-      'playbackStopSeek',
-      'scenarioLatencyCalibration',
-      'scenarioStatus',
-    ].forEach( (event) => {
+    const eventsToRegister =
+          // Use set for uniqueness
+          [...new Set([
+            ...Object.keys(parametersScenario),
+            // declare own parameters
+            ...[
+              'audioLatency',
+              'beatGestureWaitingDurationMax',
+              'playback',
+              'playbackLatency',
+              'scenarioLatencyCalibration',
+              'scenarioStatus',
+            ],
+          ])];
+
+    eventsToRegister.forEach( (event) => {
       const callback = (value) => {
         // compatibility with setGraphOption
         updateParams({[event]: value});
@@ -218,14 +221,15 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
           const beatGesture = inputData['beat'];
           if(beatGesture && beatGesture.trigger) {
             beatGestureTriggered = true;
+            statusUpdate('playing');
           }
 
           // wait until hearing playback: add playbackLatency
-          if(beatGestureTriggered
+          if(!beatGestureTriggered
              && (time.local - statusTime - playbackLatency
                  >= parameters.beatGestureWaitingDurationMax) ) {
             // no start, cancel
-            statusUpdate('playing');
+            statusUpdate('cancel');
           }
           break;
         }

@@ -465,10 +465,21 @@ class PlayerExperience extends AbstractExperience {
           const scoreData = midi.parse(request.response);
           // no duplicates in set
           const notes = new Set();
+          if(typeof scoreData.metas === 'undefined') {
+            scoreData.metas = {};
+          }
+          scoreData.metas.noteIntensityMin = 127;
+          scoreData.metas.noteIntensityMax = 0;
           scoreData.partSet.forEach( (part, p) => {
             part.events.forEach( (event) => {
               if(event.type === 'noteOn') {
                 notes.add(event.data.pitch);
+                scoreData.metas.noteIntensityMin
+                  = Math.min(scoreData.metas.noteIntensityMin,
+                             event.data.intensity);
+                scoreData.metas.noteIntensityMax
+                  = Math.max(scoreData.metas.noteIntensityMax,
+                             event.data.intensity);
               }
             });
           });

@@ -78,6 +78,10 @@ export default {
     default: true,
   },
 
+  intensityRange: {
+    type: 'float',
+    default: 40, // dB
+  },
 
   // minimum as a request, actual value may be more
   lookAheadNotesRequest: {

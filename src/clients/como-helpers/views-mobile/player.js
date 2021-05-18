@@ -1,44 +1,16 @@
-import { html } from 'lit-html';
+import {html} from 'lit-html';
 
-import {session} from '../shared/sessionTemplate.js';
+import {latency} from '../shared/latencyTemplate.js';
 import {clock} from '../shared/clockTemplate.js';
 import {handedness} from '../shared/handednessTemplate.js';
+import {session} from '../shared/sessionTemplate.js';
 
-
-function getTimeSignature (event) {
-  const parentElement = event.srcElement.parentElement;
-  const count = parseFloat(parentElement.querySelector('.count').value) || 4;
-  const division = parseFloat(parentElement.querySelector('.division').value) || 4;
-  return {count, division};
-}
-
-function getBarBeat (event) {
-  const parentElement = event.srcElement.parentElement;
-  const bar = parseFloat(parentElement.querySelector('.bar').value) || 0;
-  const beat = parseFloat(parentElement.querySelector('.beat').value) || 0;
-  return {bar, beat};
-}
-
-function getPosition (event) {
-  const parentElement = event.srcElement.parentElement;
-  let bar = parseFloat(parentElement.querySelector('.bar').value) || 1;
-  if(bar <= 0) {
-    bar += 1;
-  }
-  const beatElement = parentElement.querySelector('.beat');
-  const beat = (beatElement && parseFloat(beatElement.value) ) || 1;
-  return {bar, beat};
-}
-
-function selfSelect(event) {
-  const element = event.srcElement;
-  try {
-    // mainly for mobile
-    element.select();
-  } catch (error) {
-    // forget it
-  }
-}
+import {
+  getBarBeat,
+  getPosition,
+  getTimeSignature,
+  selfSelect,
+} from '../shared/templateHelpers.js';
 
 export function player(data, listeners, {
   verbose = false,
@@ -62,47 +34,8 @@ export function player(data, listeners, {
       ${session(data)}
       ${clock(data)}
       ${handedness(data)}
+      ${latency(data)}
       <!-- ^^^ (NEW) ^^^ -->
-
-      <div class="audioLatency container">Latence audio :
-        <input type="number"
-               min="0"
-               max="500"
-               step="10"
-               .value=${Math.round(data.audioLatency * 1e3)}
-               @click="${e => selfSelect(e)}"
-               @change="${e => {
-                     voxPlayerState.set({
-                     audioLatency: (parseFloat(e.srcElement.value * 1e-3) || 0),
-                     });
-                     } }">
-        ms
-        <button class="scenario ${data.scenarioCurrent === 'scenarioLatencyCalibration' ? 'selected' : ''}"
-                @click="${e => voxPlayerState.set({scenarioLatencyCalibration: true}) }"
-        >Calibrer</button>
-
-      </div>
-
-      ${uiPreset === 'full' ? html`
-      <div class="lookAhead container">Prévision minimale :
-        <input type="number"
-               min="0"
-               max="32"
-               step="1"
-               .value=${data.lookAheadNotesRequest * 8}
-               @click="${e => selfSelect(e)}"
-               @change="${e => {
-                     voxPlayerState.set({
-                     lookAheadNotesRequest: (parseFloat(e.srcElement.value / 8) || 0),
-                     });
-                     } }">
-        croche${data.lookAheadNotesRequest * 8 > 1 ? 's' : ''}
-        (courante : ${data.lookAheadNotes * 8}
-        croche${data.lookAheadNotes * 8 > 1 ? 's' : ''},
-        ${data.lookAheadBeats} temps,
-        ${Math.round(data.lookAheadSeconds * 1e3)} ms)
-      </div>
-      ` : '' }
 
       <div class="score container">
         <select class="${!data.scoreReady ? 'invalid' : ''}"
@@ -140,17 +73,19 @@ export function player(data, listeners, {
                      e.srcElement.value * 4 / data.timeSignature.division) || 60) }) } }">
 
         ${uiPreset === 'full' ? html`
-        ${ [false, true].map( (onOff) => {
-            return html`
-        <button class="set scoreControlsTempo ${data.scoreControlsTempo === onOff
-                       ? 'selected' : ''}"
-                @click="${e => voxPlayerState.set({scoreControlsTempo: (onOff)})}">
-          ${!onOff ? 'Libre' : 'Partition'}
-        </button>
-            `;
-        }) }
+        <div class="selection">
+          ${ [false, true].map( (onOff) => {
+              return html`
+          <button class="set scoreControlsTempo ${data.scoreControlsTempo === onOff
+                         ? 'selected' : ''}"
+                  @click="${e => voxPlayerState.set({scoreControlsTempo: (onOff)})}">
+            ${!onOff ? 'Libre' : 'Partition'}
+          </button>
+              `;
+          }) }
+        </div>
         ` : ''}
-        <button class="tempo"
+        <button class="trigger tempo"
                 @click="${e => voxPlayerState.set({tempoReset: true}) }"
         >Remettre</button>
 

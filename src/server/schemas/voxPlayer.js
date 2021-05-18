@@ -9,6 +9,11 @@ export default {
     },
   },
 
+  audioLatencyUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   beatGestureWaitingDurationMax: {
     type: 'float',
     default: 2, // in seconds, for time-out
@@ -87,6 +92,11 @@ export default {
   lookAheadNotesRequest: {
     type: 'float',
     default: 0.125, // 1 quarter-note
+  },
+
+  lookAheadNotesRequestUi: {
+    type: 'boolean',
+    default: false,
   },
 
   // actual value, depending on audio latency and maximum tempo
@@ -278,6 +288,11 @@ export default {
   timeSignature: {
     type: 'any',
     default: {count: 4, division: 4},
+  },
+
+  uiConfiguration: {
+    type: 'boolean',
+    default: true,
   },
 
   uiPreset: {

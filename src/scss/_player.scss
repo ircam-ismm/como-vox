@@ -1,7 +1,11 @@
 @use 'color';
 
 .player {
+  font-size: medium;
+
   button {
+    height: 36px;
+    margin: 0;
     background-color: color.$widget-background-color;
     color: color.$widget-color;
     width: fit-content;
@@ -25,9 +29,11 @@
   button,
   select,
   input {
-    height: 40px;
-    border: 1px solid color.$widget-border-color;
     border-radius: 3px;
+    border: 1px solid color.$widget-border-color;
+    font-size: large;
+    height: 3rem;
+    text-align: center;
 
     &:active {
       border-color: color.$active-border-color;
@@ -40,14 +46,59 @@
     }
   }
 
-  .container {
+  button.display {
+    align-self: center;
+  }
+
+  // .container {
+  //   margin: 0.2rem;
+  //   // border: 1px solid color.$widget-border-color;
+  //   // border-radius: 3px;
+  // }
+
+  .group,
+  .element {
+    width: 100%;
+    display: inline-block;
+
+    // & > * {
+    //   flex: auto;
+    //   flex-grow: 0;
+    //   flex-shrink: 0;
+    //   margin-left: 0.5rem;
+    //   margin-right: 0.5rem;
+    // }
+
+    // .text {
+    //   align-self: center;
+    //   flex-basis: auto;
+    //   flex-grow: 0;
+    //   flex-shrink: 0;
+    // }
+
+    .selection {
+      display: inline-flex;
+      flex-flow: row wrap;
+      align-items: baseline;
+      gap: 0;
+
+      .option {
+        flex: auto;
+        margin: 0;
+      }
+    }
+  }
+
+  .group {
     margin: 0.2rem;
     // border: 1px solid color.$widget-border-color;
     // border-radius: 3px;
   }
 
   .time {
-    font-size: 60px;
+    .text {
+      font-size: 60px;
+    }
   }
 
   .position {
@@ -61,8 +112,8 @@
 
     .bar,
     .beat {
-      font-size: 40px;
-      height: 40px;
+      font-size: 36px;
+      height: 36px;
       padding: 0;
     }
   }

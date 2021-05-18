@@ -1,15 +1,18 @@
 import { html } from 'lit-html';
 
+import {displayToggle} from './displayToggleTemplate.js';
+
 const e = {};
 
 export function clock(data) {
-  const groupUi = data.clockTimeUi;
+  const groupUi = data.uiConfiguration || data.clockTimeUi;
 
   return (groupUi ? html`
       <div class="group clock">
-        ${data.clockTimeUi ? html`
+        ${data.uiConfiguration || data.clockTimeUi ? html`
         <span class="element time">
-          ${data.syncTime.toFixed(3)}
+          <span class="text">${data.syncTime.toFixed(3)}</span>
+          ${data.uiConfiguration ? displayToggle(data, 'clockTimeUi') : ''}
         </span>
         `: ''}
       </div>

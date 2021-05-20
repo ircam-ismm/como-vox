@@ -1,16 +1,16 @@
 import {html} from 'lit-html';
 
-import {latency} from '../shared/latencyTemplate.js';
-import {clock} from '../shared/clockTemplate.js';
-import {handedness} from '../shared/handednessTemplate.js';
-import {session} from '../shared/sessionTemplate.js';
+import {clock} from '../templates/clock.js';
+import {handedness} from '../templates/handedness.js';
+import {latency} from '../templates/latency.js';
+import {session} from '../templates/session.js';
 
 import {
   getBarBeat,
   getPosition,
   getTimeSignature,
   selfSelect,
-} from '../shared/templateHelpers.js';
+} from '../templates/helpers.js';
 
 export function player(data, listeners, {
   verbose = false,

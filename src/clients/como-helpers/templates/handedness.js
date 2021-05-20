@@ -1,6 +1,6 @@
 import { html } from 'lit-html';
 
-import {displayToggle} from './displayToggleTemplate.js';
+import {displayToggle} from './displayToggle.js';
 
 const e = {};
 

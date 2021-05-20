@@ -28,7 +28,7 @@ export function getBarBeat (event) {
 Object.assign(e, {getBarBeat});
 
 export function getPosition (event) {
-  const parentElement = event.srcElement.parentElement;
+  const parentElement = event.srcElement.parentElement.parentElement;
   let bar = parseFloat(parentElement.querySelector('.bar').value) || 1;
   if(bar <= 0) {
     bar += 1;

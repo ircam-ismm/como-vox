@@ -49,6 +49,11 @@ export default {
     default: false,
   },
 
+  gestureControlsPlaybackStartUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   gestureControlsPlaybackStartStatus: {
     type: 'string',
     default: null,
@@ -59,6 +64,11 @@ export default {
   },
 
   gestureControlsPlaybackStop: {
+    type: 'boolean',
+    default: false,
+  },
+
+  gestureControlsPlaybackStopUi: {
     type: 'boolean',
     default: false,
   },
@@ -146,12 +156,22 @@ export default {
     default: false,
   },
 
+  playbackUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   playbackStartAfterCount: {
     type: 'any',
     default: {
       bar: 1,
       beat: 1, // one more for upbeat before start
     },
+  },
+
+  playbackStartAfterCountUi: {
+    type: 'boolean',
+    default: false,
   },
 
   playbackStopAfterCount: {
@@ -162,10 +182,20 @@ export default {
     },
   },
 
+  playbackStopAfterCountUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   playbackStopSeek: {
     type: 'string',
     default: 'start', // 'barStart', 'start', or null
     nullable: true,
+  },
+
+  playbackStopSeekUi: {
+    type: 'boolean',
+    default: false,
   },
 
   playerIdUi: {
@@ -263,6 +293,21 @@ export default {
   seekPosition: {
     type: 'any',
     event: true,
+  },
+
+  seekPositionBarUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  seekPositionBeatUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  seekPositionRestartUi: {
+    type: 'boolean',
+    default: false,
   },
 
   storageClear: {

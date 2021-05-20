@@ -18,13 +18,15 @@ export function handedness(data) {
         ${data.uiConfiguration || data.handednessUi ? html`
           <span class="${elementClasses(data, 'handedness')}">
           <span class="text">Main utilisée</span>
-          <span class="selection flexContainer">
-            ${ ['left', 'right'].map( (handedness) => {
+          <span class="selection">
+          ${ [ ['left', 'Gauche'],
+               ['right', 'Droite'],
+             ].map( ([handedness, display]) => {
               return html`
             <button class="option handedness ${data.handedness === handedness
                                             ? 'selected' : ''}"
                     @click="${e => voxPlayerState.set({handedness}) }">
-              ${handedness === 'left' ? 'Gauche' : 'Droite'}
+              ${display}
             </button>
               `;}) }
           </span>

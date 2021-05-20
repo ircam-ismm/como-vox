@@ -27,7 +27,7 @@ export function session(data) {
         <span class="${elementClasses(data, 'sessionSelection')}">
           <button class="trigger session"
                   @click="${async (e) => {
-               await data.player.set( {sessionId: null} );
+               await data.experience.coMoPlayer.player.set({sessionId: null});
             } }">
             Choisir session
           </button>

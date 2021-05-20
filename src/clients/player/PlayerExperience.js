@@ -394,6 +394,17 @@ class PlayerExperience extends AbstractExperience {
           break;
         }
 
+        case 'playbackStopSeek': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            // force stop again to seek
+            if(!this.playback) {
+              this.setPlayback(this.playback);
+            }
+          });
+          break;
+        }
+
         case 'tempo': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);

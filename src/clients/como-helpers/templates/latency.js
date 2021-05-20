@@ -33,7 +33,14 @@ export function latency(data) {
                        } }">
           <span class="text">ms</span>
           <button class="toggle scenario ${data.scenarioCurrent === 'scenarioLatencyCalibration' ? 'selected' : ''}"
-                  @click="${e => voxPlayerState.set({scenarioLatencyCalibration: true}) }"
+                  @click="${e => {
+                     if(data.scenarioCurrent !== 'scenarioLatencyCalibration') {
+                       voxPlayerState.set({scenarioLatencyCalibration: true});
+                     } else {
+                       voxPlayerState.set({playback: false});
+                       voxPlayerState.set({scenarioLatencyCalibration: false});
+                     }
+                  } }"
           >Calibrer</button>
 
           ${data.uiConfiguration ? displayToggle(data, 'audioLatencyUi') : ''}

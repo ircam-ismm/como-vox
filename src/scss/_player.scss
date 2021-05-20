@@ -2,12 +2,14 @@
 
 .player {
   font-size: medium;
+  line-height: normal;
 
+  .selection,
   .flexContainer {
     display: inline-flex;
     align-items: baseline;
-    flex-wrap: row wrap;
-    gap: 0; // no gap before Safari 12, use margin
+    flex-flow: row wrap;
+    // no gap before Safari 12, use margin
 
     * {
       flex: auto;
@@ -21,11 +23,14 @@
         margin: 0;
       }
     }
+
+    // group options
+    .option {
+      margin: 0;
+    }
   }
 
   button {
-    height: 36px;
-    margin: 0;
     background-color: color.$widget-background-color;
     color: color.$widget-color;
     width: fit-content;
@@ -96,17 +101,15 @@
 
     .bar,
     .beat {
-      font-size: 36px;
-      height: 36px;
-      padding: 0;
+      font-size: 3rem;
+      height: 3rem;
     }
   }
 
-  .count {
-    .bar,
-    .beat {
-      width: 2.5em;
-    }
+  button.playback {
+    font-size: 3rem;
+    height: 4rem;
+    line-height: 3rem;
   }
 
   .sensorsLatency {

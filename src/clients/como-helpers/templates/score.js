@@ -1,36 +1,48 @@
 import { html } from 'lit-html';
 
 import {displayToggle} from './displayToggle.js';
+import {
+  elementClasses,
+  groupClasses,
+} from './helpers.js';
 
 const e = {};
 
-export function handedness(data) {
-  const groupUi = data.uiConfiguration || data.handednessUi;
+export function score(data) {
+  const groupUi = data.scoreUi;
+  const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
 
-  return (groupUi ? html`
-      <div class="group handedness">
+  return (data.uiConfiguration || groupUi ? html`
+      <div class="${groupClasses(data, 'score', groupUi)}">
 
-        ${data.uiConfiguration || data.handednessUi ? html`
-          <span class="element handedness">
-          <span class="text">Main utilisée</span>
-          <span class="selection">
-            ${ ['left', 'right'].map( (handedness) => {
-              return html`
-            <button class="option handedness ${data.handedness === handedness
-                                            ? 'selected' : ''}"
-                    @click="${e => voxPlayerState.set({handedness}) }">
-              ${handedness === 'left' ? 'Gauche' : 'Droite'}
-            </button>
-              `;}) }
-          </span>
-          ${data.uiConfiguration ? displayToggle(data, 'handednessUi') : ''}
+        ${data.uiConfiguration || data.scoreUi ? html`
+        <span class="${elementClasses(data, 'score')}">
+          <span class="text">Partition</span>
+          <select class="${!data.scoreReady ? 'invalid' : ''}"
+                  .value=${data.scoreFileName ? data.scoreFileName : 'none'}
+                  @change="${e => {
+                         const scoreFileName = (e.target.value === 'none' ? null : e.target.value);
+                         voxPlayerState.set({scoreFileName});
+                         }}"
+          >
+            ${['none', ...voxApplicationState.get('scores')].map( (scoreFileName) => {
+            return html`
+            <option
+              .value=${scoreFileName}
+              ?selected="${data.scoreFileName
+                     === (scoreFileName === 'none' ? null : scoreFileName)}"
+            >${scoreFileName === 'none' ? 'aucune' : scoreFileName}</option>
+            `;
+            })}
+          </select>
+          ${data.uiConfiguration ? displayToggle(data, 'scoreUi') : ''}
         </span>
         ` : ''}
 
       </div>
       ` : '');
 }
-Object.assign(e, {handedness});
+Object.assign(e, {score});
 
 export default e;

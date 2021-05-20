@@ -3,7 +3,10 @@ import {html} from 'lit-html';
 import {clock} from '../templates/clock.js';
 import {handedness} from '../templates/handedness.js';
 import {latency} from '../templates/latency.js';
+import {score} from '../templates/score.js';
 import {session} from '../templates/session.js';
+import {tempo} from '../templates/tempo.js';
+import {timeSignature} from '../templates/timeSignature.js';
 
 import {
   getBarBeat,
@@ -26,90 +29,19 @@ export function player(data, listeners, {
   return html`
     <div class="mobile player">
       <!-- LOADER -->
-      ${data.player.loading ?
-      html`<div class="loadingBanner">Chargement...</div>` : ''
-      }
+      ${data.player.loading
+        ? html`<div class="loadingBanner">Chargement...</div>`
+        : ''}
 
       <!-- vvv NEW vvv -->
       ${session(data)}
       ${clock(data)}
       ${handedness(data)}
       ${latency(data)}
+      ${score(data)}
+      ${timeSignature(data)}
+      ${tempo(data)}
       <!-- ^^^ (NEW) ^^^ -->
-
-      <div class="score container">
-        <select class="${!data.scoreReady ? 'invalid' : ''}"
-                .value=${data.scoreFileName ? data.scoreFileName : 'none'}
-                @change="${e => {
-                       const scoreFileName = (e.target.value === 'none' ? null : e.target.value);
-                       voxPlayerState.set({scoreFileName});
-                       }}"
-        >
-          ${['none', ...voxApplicationState.get('scores')].map( (scoreFileName) => {
-          return html`
-          <option
-            .value=${scoreFileName}
-            ?selected="${data.scoreFileName
-                   === (scoreFileName === 'none' ? null : scoreFileName)}"
-          >${scoreFileName === 'none' ? 'aucune' : scoreFileName}</option>
-          `;
-          })}
-        </select>
-      </div>
-
-      <div class="tempo container">Tempo :
-        <input type="number"
-               min="10"
-               max="300"
-               step="10"
-               .value=${
-               // tempo for quarter-note
-               Math.round(data.tempo * data.timeSignature.division / 4)}
-               @click="${e => selfSelect(e)}"
-               @change="${e => {
-                     // tempo for quarter-note
-                     voxPlayerState.set({
-                     tempo: (parseFloat(
-                     e.srcElement.value * 4 / data.timeSignature.division) || 60) }) } }">
-
-        ${uiPreset === 'full' ? html`
-        <div class="selection">
-          ${ [false, true].map( (onOff) => {
-              return html`
-          <button class="set scoreControlsTempo ${data.scoreControlsTempo === onOff
-                         ? 'selected' : ''}"
-                  @click="${e => voxPlayerState.set({scoreControlsTempo: (onOff)})}">
-            ${!onOff ? 'Libre' : 'Partition'}
-          </button>
-              `;
-          }) }
-        </div>
-        ` : ''}
-        <button class="trigger tempo"
-                @click="${e => voxPlayerState.set({tempoReset: true}) }"
-        >Remettre</button>
-
-      </div>
-
-      <div class="timeSignature container">Métrique :
-        <input class="count"
-               type="number"
-               min="1"
-               max="32"
-               step="1"
-               .value=${data.timeSignature.count}
-               @click="${e => selfSelect(e)}"
-               @change="${e => voxPlayerState.set({timeSignature: (getTimeSignature(e) )}) }">
-        /
-        <input class="division"
-               type="number"
-               min="1"
-               max="32"
-               step="1"
-               .value=${data.timeSignature.division}
-               @click="${e => selfSelect(e)}"
-               @change="${e => voxPlayerState.set({timeSignature: (getTimeSignature(e) )}) }">
-      </div>
 
       <div class="controls container">
         <div class="onoff transport">

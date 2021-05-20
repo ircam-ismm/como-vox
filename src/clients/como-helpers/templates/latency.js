@@ -1,21 +1,24 @@
 import {html} from 'lit-html';
 
 import {displayToggle} from './displayToggle.js';
-import {selfSelect} from './helpers.js';
+import {
+  elementClasses,
+  groupClasses,
+  selfSelect,
+} from './helpers.js';
 
 const e = {};
 
 export function latency(data) {
-  const groupUi = data.uiConfiguration
-        || data.audioLatencyUi
+  const groupUi = data.audioLatencyUi
         || data.lookAheadNotesRequestUi;
   const voxPlayerState = data.voxPlayerState;
 
-  return (groupUi ? html`
-      <div class="group latency">
+  return (data.uiConfiguration || groupUi ? html`
+      <div class="${groupClasses(data, 'latency', groupUi)}">
 
         ${data.uiConfiguration || data.audioLatencyUi ? html`
-        <span class="element audioLatency">
+        <span class="${elementClasses(data, 'audioLatency')}">
           <span class="text">Latence audio</span>
           <input type="number"
                  min="0"
@@ -38,7 +41,7 @@ export function latency(data) {
         ` : ''}
 
         ${data.uiConfiguration || data.lookAheadNotesRequestUi ? html`
-        <span class="element lookAhead">
+        <span class="${elementClasses(data, 'lookAheadNotesRequest')}">
           <span class="text">Prévision minimale</span>
           <input type="number"
                  min="0"

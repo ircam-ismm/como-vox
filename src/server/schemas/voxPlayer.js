@@ -211,6 +211,11 @@ export default {
     default: true,
   },
 
+  scoreControlsTempoUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   scoreControlsTimeSignature: {
     type: 'boolean',
     default: true,
@@ -238,6 +243,11 @@ export default {
     metas: {
       exported: false,
     },
+  },
+
+  scoreUi: {
+    type: 'boolean',
+    default: true,
   },
 
   sessionNameUi: {
@@ -285,9 +295,19 @@ export default {
     event: true,
   },
 
+  tempoUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   timeSignature: {
     type: 'any',
     default: {count: 4, division: 4},
+  },
+
+  timeSignatureUi: {
+    type: 'boolean',
+    default: true,
   },
 
   uiConfiguration: {

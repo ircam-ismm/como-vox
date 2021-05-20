@@ -1,5 +1,16 @@
 const e = {};
 
+export function elementClasses(data, element) {
+  const uiSelected = data.uiConfiguration && data[`${element}Ui`];
+  return `element ${element} ${uiSelected ? 'uiSelected' : ''}`;
+}
+Object.assign(e, {elementClasses});
+
+export function groupClasses(data, group, uiSelected) {
+  return `group ${group} ${uiSelected ? 'uiSelected' : ''} ${data.uiConfiguration ? 'uiConfiguration' : ''}`;
+}
+Object.assign(e, {groupClasses});
+
 export function getTimeSignature (event) {
   const parentElement = event.srcElement.parentElement;
   const count = parseFloat(parentElement.querySelector('.count').value) || 4;

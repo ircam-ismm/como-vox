@@ -6,7 +6,7 @@ export function displayToggle(data, element) {
   const voxPlayerState = data.voxPlayerState;
 
   return html`
-        <button class="toggle display ${data[element] ? 'selected' : ''}"
+        <button class="toggle uiSelector ${data[element] ? 'selected' : ''}"
                 @click="${e => voxPlayerState.set({[element]: !data[element]}) }">
           Affichage
         </button>

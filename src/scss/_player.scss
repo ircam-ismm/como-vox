@@ -3,6 +3,26 @@
 .player {
   font-size: medium;
 
+  .flexContainer {
+    display: inline-flex;
+    align-items: baseline;
+    flex-wrap: row wrap;
+    gap: 0; // no gap before Safari 12, use margin
+
+    * {
+      flex: auto;
+      margin: 0.5rem;
+    }
+
+    &:is(.selection), // group options
+    &:is(.nogap),
+    &:is(.nomargin) {
+      * {
+        margin: 0;
+      }
+    }
+  }
+
   button {
     height: 36px;
     margin: 0;
@@ -12,7 +32,6 @@
   }
 
   select {
-    width: auto;
     max-width: 100%;
   }
 
@@ -50,52 +69,17 @@
     align-self: center;
   }
 
-  // .container {
-  //   margin: 0.2rem;
-  //   // border: 1px solid color.$widget-border-color;
-  //   // border-radius: 3px;
-  // }
-
   .group,
   .element {
-    width: 100%;
     display: inline-block;
-
-    // & > * {
-    //   flex: auto;
-    //   flex-grow: 0;
-    //   flex-shrink: 0;
-    //   margin-left: 0.5rem;
-    //   margin-right: 0.5rem;
-    // }
-
-    // .text {
-    //   align-self: center;
-    //   flex-basis: auto;
-    //   flex-grow: 0;
-    //   flex-shrink: 0;
-    // }
-
-    .selection {
-      display: inline-flex;
-      flex-flow: row wrap;
-      align-items: baseline;
-      gap: 0;
-
-      .option {
-        flex: auto;
-        margin: 0;
-      }
-    }
   }
 
   .group {
+    width: 100%;
     margin: 0.2rem;
-    // border: 1px solid color.$widget-border-color;
-    // border-radius: 3px;
   }
 
-  .time {
+  .clockTime {
     .text {
       font-size: 60px;
     }
@@ -129,11 +113,32 @@
     display: none;
   }
 
-  // .controls.container {
-  //   display: inline-flex;
-  // }
-
   .invalid {
     background-color: color.$invalid-background-color;
+  }
+
+  .uiConfiguration {
+    .element {
+      background-color: color.$ui-not-selected-background-color;
+      border-radius: 3px;
+
+      &:is(.uiSelected) {
+        background-color: color.$background-color;
+        border: thin;
+        border-color: color.$ui-selected;
+        border-style: dotted;
+      }
+
+      button.uiSelector {
+        background-color: color.$ui-selector-background-color;
+        border-color: color.$ui-selector-border-color;
+        color: color.$ui-selector-color;
+
+        &.selected {
+          background-color: color.$ui-selector-color;
+          color: color.$ui-selector-background-color;
+        }
+      }
+    }
   }
 }

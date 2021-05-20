@@ -23,13 +23,13 @@ Bugs:
 - [ ] score
   - [x] BUG: first note is very short
   - [x] apply tempo and time-signature on load, even when playback is paused
-  - [ ] normalise
+  - [x] normalise
   - [ ] apply time-signature changes
   - [ ] transposition: advanced settings
   - [ ] choose bar (number or slider): advanced settings
   - [ ] start end, loop: advanced settings
 - [ ] beating
-  - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings
+  - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings. In `transport.js`, adapt  `timeSignature.count`, `tempo` and `position.beat`. Should be transparent at output, except maybe for beat change.
 - [ ] intensity
   - [x] lookahead: float 1/2 beat NO: better 1 quarter note
   - [x] smooth, specially on diminuendo

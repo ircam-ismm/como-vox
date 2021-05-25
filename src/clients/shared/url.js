@@ -6,8 +6,7 @@ const codec = jsonURL('lzstring');
 import schema from '../../shared/schema.js';
 
 const compressedKey = 'z';
-const searchSplitExpression = '?';
-const parametersSplitExpression = /[\?#&]/;
+const parametersSplitExpression = /[\?#&]+/;
 
 let origin = window.location.origin;
 if(!origin || origin === 'null') {
@@ -35,18 +34,29 @@ export function paramGet(name, defaultValue) {
 Object.assign(e, {paramGet});
 
 export async function parse(clientSchema) {
-  const URI = window.location.href;
-
-  let parametersString = '';
-  // split on first '?'
-  const URIArray = URI.split(searchSplitExpression);
-  if(URIArray.length > 1) {
-    parametersString = URIArray[1];
-  }
-
   const data = {}
 
-  const parametersArray = parametersString.split(parametersSplitExpression);
+  // start with compressed values to allow for over-riding in the beginning of
+  // the URL
+  try {
+    const compressed = paramGet(compressedKey, undefined);
+    if(compressed) {
+      const decompressed = await codec.decompress(compressed);
+      Object.assign(data, decompressed);
+    }
+  } catch(error) {
+    console.error(`Error while parsing compressed URL parameter '${compressedKey}': ${error.message}`);
+  }
+
+  const URI = window.location.href;
+  let parametersArray = [];
+  // split on search: first special character (any one)
+  // remove URI: anything before
+  const URIArray = URI.split(parametersSplitExpression);
+  if(URIArray.length > 1) {
+    parametersArray = URIArray.slice(1);
+  }
+
   for(const parameterString of parametersArray) {
 
     // split on first '='
@@ -55,9 +65,8 @@ export async function parse(clientSchema) {
       const key = parameterArray[0];
       let value = parameterArray[1];
       try {
-        if(key === compressedKey && value.length > 0) {
-          const decompressed = await codec.decompress(value);
-          Object.assign(data, decompressed);
+        if(key === compressedKey) {
+          continue;
         } else {
           if(!clientSchema.hasOwnProperty(key)) {
             throw new Error(`Unkown parameter '${key}'`);

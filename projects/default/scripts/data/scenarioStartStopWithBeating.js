@@ -5,7 +5,19 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   const beatsToSeconds = conversion.beatsToSeconds;
   const notesToBeats = conversion.notesToBeats;
 
+  // to restore after calibration
+  const parametersBackup = {};
+  // initial values
+  const parametersScenario = {
+    gestureControlsBeatOffset: true,
+    gestureControlsPlaybackStart: false,
+    gestureControlsPlaybackStop: false,
+    gestureControlsTempo: true,
+    playbackStopSeek: app.state.playbackStopSeek,
+  };
+
   const parameters = {
+    ...parametersScenario,
     scenarioStatus: 'off',
     initialWaitingDuration: 1, // in seconds, before stillness
     stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start
@@ -15,6 +27,24 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       bar: 1,
       beat: 1, // one more for upbeat before start
     },
+  };
+
+  const parametersApply = () => {
+    for(const [key, value] of Object.entries(parametersScenario) ) {
+      app.events.emit(key, value);
+    }
+  };
+
+  const parametersSave = () => {
+    for(const p of Object.keys(parametersScenario) ) {
+      parametersBackup[p] = parameters[p];
+    }
+  };
+
+  const parametersRestore = () => {
+    for(const p of Object.keys(parametersBackup) ) {
+      app.events.emit(p, parametersBackup[p]);
+    }
   };
 
   let status = 'off'
@@ -54,11 +84,17 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     }
 
     if(typeof updates.scenarioStartStopWithBeating !== 'undefined') {
+      const activeChanged = updates.scenarioStartStopWithBeating
+            !== parameters.scenarioStartStopWithBeating;
       const active = updates.scenarioStartStopWithBeating;
       parameters.scenarioStartStopWithBeating = active;
       if(active) {
+        if(activeChanged) {
+          parametersSave();
+        }
         // may retrigger, even if already active
         statusUpdate('init');
+        parametersApply();
         app.events.emit('gestureControlsPlaybackStart', false);
         app.events.emit('gestureControlsPlaybackStop', true);
         // must start at the beginning of a bar (from start is fine, too)
@@ -69,7 +105,9 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         app.events.emit('playback', false);
         app.events.emit('tempoReset', true);
       } else {
-        // do not trigger anything on deactivation
+        if(activeChanged) {
+          parametersRestore();
+        }
       }
     }
 

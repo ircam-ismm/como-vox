@@ -33,8 +33,8 @@ Bugs:
 - [ ] intensity
   - [x] lookahead: float 1/2 beat NO: better 1 quarter note
   - [x] smooth, specially on diminuendo
-  - [ ] relative intensity
-  - [ ] normalise score
+  - [x] relative intensity
+  - [x] normalise score
   - [ ] hold when transport does not stop with beating
 - [ ] global volume
   - [?] compressor
@@ -43,6 +43,7 @@ Bugs:
 - [x] end
   - [?] quicker
 - [ ] UI
+  - [x] URL: load state `z` after specific to allow for easy overrides.
   - [ ] presets
     - [ ] UI
     - [ ] beating

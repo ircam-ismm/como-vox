@@ -24,6 +24,11 @@ export default {
     default: false,
   },
 
+  beatingSoundUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   clockTimeUi: {
     type: 'boolean',
     default: true,
@@ -39,9 +44,19 @@ export default {
     default: false,
   },
 
+  gestureControlsBeatOffsetUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   gestureControlsIntensity: {
     type: 'boolean',
     default: false,
+  },
+
+  gestureControlsIntensityUi: {
+    type: 'boolean',
+    default: true,
   },
 
   gestureControlsPlaybackStart: {
@@ -76,6 +91,11 @@ export default {
   gestureControlsTempo: {
     type: 'boolean',
     default: false,
+  },
+
+  gestureControlsTempoUi: {
+    type: 'boolean',
+    default: true,
   },
 
   handedness: {
@@ -140,6 +160,11 @@ export default {
   metronomeSound: {
     type: 'boolean',
     default: false,
+  },
+
+  metronomeSoundUi: {
+    type: 'boolean',
+    default: true,
   },
 
   mockSensors: {
@@ -220,6 +245,11 @@ export default {
   scenarioStartStopWithBeating: {
     type: 'boolean',
     event: true,
+  },
+
+  scenarioStartStopWithBeatingUi: {
+    type: 'boolean',
+    default: true,
   },
 
   scenarioLatencyCalibration: {
@@ -358,11 +388,6 @@ export default {
   uiConfiguration: {
     type: 'boolean',
     default: true,
-  },
-
-  uiPreset: {
-    type: 'string',
-    default: 'simple',
   },
 
 };

@@ -4,6 +4,64 @@
   font-size: medium;
   line-height: normal;
 
+  button {
+    background-color: color.$widget-background-color;
+    color: color.$widget-color;
+    width: fit-content;
+  }
+
+  select {
+    max-width: 100%;
+  }
+
+  input {
+    width: auto;
+  }
+
+  input,
+  select {
+    background-color: color.$widget-color;
+    color: invert(color.$widget-color);
+  }
+
+  button,
+  select,
+  input {
+    border-color: color.$widget-border-color;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 2px;
+    font-size: large;
+    height: 3rem;
+    text-align: center;
+
+    &:active {
+      border-color: color.$active-border-color;
+      color: color.$active-color;
+    }
+
+    &.selected {
+      background-color: color.$widget-selected-background-color;
+      color: color.$widget-selected-color;
+    }
+  }
+
+  button.display {
+    align-self: center;
+  }
+
+  .selection {
+    border-color: color.$widget-border-color;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+
+    button {
+      border-radius: 0;
+      border-width: 1px;
+    }
+  }
+
   .selection,
   .flexContainer {
     display: inline-flex;
@@ -28,50 +86,6 @@
     .option {
       margin: 0;
     }
-  }
-
-  button {
-    background-color: color.$widget-background-color;
-    color: color.$widget-color;
-    width: fit-content;
-  }
-
-  select {
-    max-width: 100%;
-  }
-
-  input {
-    width: auto;
-  }
-
-  input,
-  select {
-    background-color: color.$widget-color;
-    color: invert(color.$widget-color);
-  }
-
-  button,
-  select,
-  input {
-    border-radius: 3px;
-    border: 1px solid color.$widget-border-color;
-    font-size: large;
-    height: 3rem;
-    text-align: center;
-
-    &:active {
-      border-color: color.$active-border-color;
-      color: color.$active-color;
-    }
-
-    &.selected {
-      background-color: color.$widget-selected-background-color;
-      color: color.$widget-selected-color;
-    }
-  }
-
-  button.display {
-    align-self: center;
   }
 
   .group,
@@ -102,14 +116,14 @@
     .bar,
     .beat {
       font-size: 3rem;
-      height: 3rem;
+      height: 4rem;
     }
   }
 
   button.playback {
     font-size: 3rem;
     height: 4rem;
-    line-height: 3rem;
+    line-height: 4.5rem;
   }
 
   .sensorsLatency {
@@ -121,26 +135,27 @@
   }
 
   .uiConfiguration {
-    .element {
+    .element,
+    .extra {
       background-color: color.$ui-not-selected-background-color;
       border-radius: 3px;
+    }
 
-      &:is(.uiSelected) {
-        background-color: color.$background-color;
-        border: thin;
-        border-color: color.$ui-selected;
-        border-style: dotted;
-      }
+    .uiSelected {
+      background-color: color.$background-color;
+      border: thin;
+      border-color: color.$ui-selected;
+      border-style: dotted;
+    }
 
-      button.uiSelector {
-        background-color: color.$ui-selector-background-color;
-        border-color: color.$ui-selector-border-color;
-        color: color.$ui-selector-color;
+    button.uiSelector {
+      background-color: color.$ui-selector-background-color;
+      border-color: color.$ui-selector-border-color;
+      color: color.$ui-selector-color;
 
-        &.selected {
-          background-color: color.$ui-selector-color;
-          color: color.$ui-selector-background-color;
-        }
+      &.selected {
+        background-color: color.$ui-selector-color;
+        color: color.$ui-selector-background-color;
       }
     }
   }

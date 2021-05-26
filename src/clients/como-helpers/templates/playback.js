@@ -27,8 +27,8 @@ export function playback(data) {
         ${data.uiConfiguration || data.playbackUi ? html`
           <span class="${elementClasses(data, 'playback')}">
           <span class="selection">
-          ${ [ [false, 'Stop'],
-               [true, 'Jouer'],
+          ${ [ [false, '◼'],
+               [true, '▶'],
              ].map( ([onOff, display]) => {
             return html`
             <button class="option playback ${data.playback === onOff
@@ -109,8 +109,8 @@ export function playback(data) {
                    .value=${data.playbackStartAfterCount.beat}
                    @click="${e => selfSelect(e)}"
                    @change="${e => voxPlayerState.set({playbackStartAfterCount: (getBarBeat(e) )}) }">
+            <span class="text">temps</span>
           </span>
-          <span class="text">temps</span>
           ${data.uiConfiguration ? displayToggle(data, 'playbackStartAfterCountUi') : ''}
         </span>
         ` : ''}
@@ -158,8 +158,8 @@ export function playback(data) {
                    .value=${data.playbackStopAfterCount.beat}
                    @click="${e => selfSelect(e)}"
                    @change="${e => voxPlayerState.set({playbackStopAfterCount: (getBarBeat(e) )}) }">
+            <span class="text">temps</span>
           </span>
-          <span class="text">temps</span>
           ${data.uiConfiguration ? displayToggle(data, 'playbackStopAfterCountUi') : ''}
         </span>
         ` : ''}

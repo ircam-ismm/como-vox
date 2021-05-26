@@ -1,15 +1,20 @@
 const e = {};
 
+export function groupClasses(data, group, uiSelected) {
+  return `group ${group} ${uiSelected ? 'uiSelected' : ''} ${data.uiConfiguration ? 'uiConfiguration' : ''}`;
+}
+Object.assign(e, {groupClasses});
+
 export function elementClasses(data, element) {
   const uiSelected = data.uiConfiguration && data[`${element}Ui`];
   return `element ${element} ${uiSelected ? 'uiSelected' : ''}`;
 }
 Object.assign(e, {elementClasses});
 
-export function groupClasses(data, group, uiSelected) {
-  return `group ${group} ${uiSelected ? 'uiSelected' : ''} ${data.uiConfiguration ? 'uiConfiguration' : ''}`;
+export function extraClasses(uiSelected) {
+  return `extra ${uiSelected ? 'uiSelected' : ''}`;
 }
-Object.assign(e, {groupClasses});
+Object.assign(e, {extraClasses});
 
 export function getTimeSignature (event) {
   const parentElement = event.srcElement.parentElement;

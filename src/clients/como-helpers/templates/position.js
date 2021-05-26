@@ -58,7 +58,7 @@ export function position(data) {
 
         ${data.uiConfiguration || data.seekPositionRestartUi ? html`
         <span class="${elementClasses(data, 'seekPositionRestart')}">
-          <button class="seek"
+          <button class="trigger seek"
                   @click="${e => voxPlayerState.set({seekPosition: {bar: 1, beat: 1}}) }"
           >Recommencer</button>
           ${data.uiConfiguration ? displayToggle(data, 'seekPositionRestartUi') : ''}

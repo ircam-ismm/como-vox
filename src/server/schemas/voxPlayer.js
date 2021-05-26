@@ -385,9 +385,9 @@ export default {
     default: true,
   },
 
-  uiConfiguration: {
+  uiOptions: {
     type: 'boolean',
-    default: true,
+    default: false,
   },
 
 };

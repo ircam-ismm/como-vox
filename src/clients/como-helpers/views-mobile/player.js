@@ -1,6 +1,7 @@
 import {html} from 'lit-html';
 
 import {player as playerTemplate} from '../templates/player.js';
+import {options} from '../templates/options.js';
 
 export function player(data, listeners, {
 } = {}) {
@@ -18,7 +19,12 @@ export function player(data, listeners, {
         ? html`<div class="loadingBanner">Chargement...</div>`
         : ''}
 
-      ${playerTemplate(data)}
+
+     ${options(data)}
+
+      ${!data.uiOptions
+        ? html`${playerTemplate(data)}`
+        : ''}
 
     </div>  `;
 }

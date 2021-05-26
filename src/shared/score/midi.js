@@ -43,7 +43,9 @@ export function parse(data) {
   } else if(data.constructor === ArrayBuffer) {
     // jzz needs a string of bytes (8 bits characters)
     const byteArray = new Uint8Array(data);
-    byteString = String.fromCharCode(...byteArray);
+    byteString = byteArray.reduce( (tmpString, character) => {
+      return tmpString + String.fromCharCode(character);
+    }, '')
   } else {
     throw new Error(`Incompatible data type for midi.parse function: \
 ${typeof data}, ${data.constructor}`);

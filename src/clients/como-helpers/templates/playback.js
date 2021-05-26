@@ -27,8 +27,8 @@ export function playback(data) {
         ${data.uiConfiguration || data.playbackUi ? html`
           <span class="${elementClasses(data, 'playback')}">
           <span class="selection">
-          ${ [ [false, '◼'],
-               [true, '▶'],
+          ${ [ [false, 'Stop'],
+               [true, 'Lecture'],
              ].map( ([onOff, display]) => {
             return html`
             <button class="option playback ${data.playback === onOff

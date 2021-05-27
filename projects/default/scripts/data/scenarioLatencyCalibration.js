@@ -29,7 +29,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     beatingStandardDeviationMax: 0.25, // in seconds
     initialWaitingDuration: 1, // in seconds, before stillness
     listeningDuration: {bar: 1, beat: 0}, // before beating
-    playback: 0,
+    playback: false,
     playbackLatency: 0,
     scenarioStatus: 'off',
     stillnessWaitingDurationMax: 2, // in seconds, for time-out

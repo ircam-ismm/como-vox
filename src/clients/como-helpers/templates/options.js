@@ -33,7 +33,7 @@ export function options(data) {
 
       ${data.uiOptions ? html`
       <span class="options">
-        ${player(dataOptions)};
+        ${player(dataOptions)}
       </span>
     ` : '' }
 

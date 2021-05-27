@@ -20,18 +20,20 @@ export function latency(data) {
         ${data.uiConfiguration || data.audioLatencyUi ? html`
         <span class="${elementClasses(data, 'audioLatency')}">
           <span class="text">Latence audio</span>
-          <input type="number"
-                 min="0"
-                 max="500"
-                 step="10"
-                 .value=${Math.round(data.audioLatency * 1e3)}
-                 @click="${e => selfSelect(e)}"
-                 @change="${e => {
-                       voxPlayerState.set({
-                       audioLatency: (parseFloat(e.srcElement.value * 1e-3) || 0),
-                       });
-                       } }">
-          <span class="text">ms</span>
+          <span class="valueUnit">
+            <input type="number"
+                   min="0"
+                   max="500"
+                   step="10"
+                   .value=${Math.round(data.audioLatency * 1e3)}
+                   @click="${e => selfSelect(e)}"
+                   @change="${e => {
+                         voxPlayerState.set({
+                         audioLatency: (parseFloat(e.srcElement.value * 1e-3) || 0),
+                         });
+                         } }">
+            <span class="text">ms</span>
+          </span>
           <button class="toggle scenario ${data.scenarioCurrent === 'scenarioLatencyCalibration' ? 'selected' : ''}"
                   @click="${e => {
                      if(data.scenarioCurrent !== 'scenarioLatencyCalibration') {
@@ -50,24 +52,28 @@ export function latency(data) {
         ${data.uiConfiguration || data.lookAheadNotesRequestUi ? html`
         <span class="${elementClasses(data, 'lookAheadNotesRequest')}">
           <span class="text">Prévision minimale</span>
-          <input type="number"
-                 min="0"
-                 max="32"
-                 step="1"
-                 .value=${data.lookAheadNotesRequest * 8}
-                 @click="${e => selfSelect(e)}"
-                 @change="${e => {
-                       voxPlayerState.set({
-                       lookAheadNotesRequest: (parseFloat(e.srcElement.value / 8) || 0),
-                       });
+          <span class="valueUnit">
+            <input type="number"
+                   min="0"
+                   max="32"
+                   step="1"
+                   .value=${data.lookAheadNotesRequest * 8}
+                   @click="${e => selfSelect(e)}"
+                   @change="${e => {
+                         voxPlayerState.set({
+                         lookAheadNotesRequest: (parseFloat(e.srcElement.value / 8) || 0),
+                         });
                        } }">
-          <span class="text">
-            croche${data.lookAheadNotesRequest * 8 > 1 ? 's' : ''}
-            (courante : ${data.lookAheadNotes * 8}
-            croche${data.lookAheadNotes * 8 > 1 ? 's' : ''},
-            ${data.lookAheadBeats} temps,
-            ${Math.round(data.lookAheadSeconds * 1e3)} ms)
+            <span class="text">
+              croche${data.lookAheadNotesRequest * 8 > 1 ? 's' : ''}
+            </span>
           </span>
+          <span class="text">
+            (courante :
+            ${data.lookAheadNotes * 8} croche${data.lookAheadNotes * 8 > 1 ? 's' : ''},
+            ${data.lookAheadBeats} temps,
+            ${Math.round(data.lookAheadSeconds * 1e3)} ms)
+            </span>
           ${data.uiConfiguration
             ? displayToggle(data, 'lookAheadNotesRequestUi')
             : ''}

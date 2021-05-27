@@ -31,10 +31,15 @@ export default {
 
   clockTimeUi: {
     type: 'boolean',
-    default: true,
+    default: false,
   },
 
   debugAudio: {
+    type: 'boolean',
+    default: false,
+  },
+
+  debugAudioUi: {
     type: 'boolean',
     default: false,
   },
@@ -225,7 +230,7 @@ export default {
 
   playerIdUi: {
     type: 'boolean',
-    default: true,
+    default: false,
   },
 
   record: {

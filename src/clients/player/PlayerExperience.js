@@ -77,7 +77,6 @@ if(typeof app.state === 'undefined') {
 // for simple debugging in browser...
 console.info('> to mock sensors for debugging purpose, append "&mockSensors=1" to URL');
 console.info('> to use audio for debugging purpose, append "&debugAudio=1" to URI');
-console.info('> for full interface, append "&uiPreset=full" to URI');
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -361,6 +360,7 @@ class PlayerExperience extends AbstractExperience {
               scoreURI = null;
             } else {
               scoreURI = encodeURI(url.base
+                                   + '/'
                                    + this.voxApplicationState.get('scoresPath')
                                    + '/'
                                    + scoreURIbase);

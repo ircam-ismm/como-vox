@@ -23,8 +23,7 @@ export function handedness(data) {
                ['right', 'Droite'],
              ].map( ([handedness, display]) => {
               return html`
-            <button class="option handedness ${data.handedness === handedness
-                                            ? 'selected' : ''}"
+            <button class="option handedness ${data.handedness === handedness ? 'selected' : ''} ${data.handedness ? '' : 'invalid'}"
                     @click="${e => voxPlayerState.set({handedness}) }">
               ${display}
             </button>

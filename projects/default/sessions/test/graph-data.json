@@ -33,6 +33,48 @@
       },
     },
     {
+      id: 'stillness',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'stillness',
+      },
+    },
+    {
+      id: 'measures',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'measures',
+      },
+    },
+    {
+      id: 'scenarioManager',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioManager',
+      },
+    },
+    {
+      id: 'scenarioLatencyCalibration',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioLatencyCalibration',
+      },
+    },
+    {
+      id: 'scenarioStartStopWithBeating',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioStartStopWithBeating',
+      },
+    },
+    {
+      id: 'scenarioSonification',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioSonification',
+      },
+    },
+    {
       id: 'transport',
       type: 'ScriptData',
       options: {
@@ -47,9 +89,6 @@
       type: 'ScriptData',
       options: {
         scriptName: 'clickGenerator',
-        scriptParams: {
-          onOff: false,
-        },
       },
     },
     {
@@ -57,9 +96,6 @@
       type: 'ScriptData',
       options: {
         scriptName: 'score',
-        scriptParams: {
-          onOff: false,
-        },
       },
     },
     {
@@ -81,9 +117,6 @@
       type: 'ScriptData',
       options: {
         scriptName: 'clackFromBeat',
-        scriptParams: {
-          onOff: true,
-        },
       },
     },
     {
@@ -138,6 +171,30 @@
     [
       'timeTag',
       'beatTriggerFromGesture',
+    ],
+    [
+      'timeTag',
+      'scenarioManager',
+    ],
+    [
+      'timeTag',
+      'measures',
+    ],
+    [
+      'timeTag',
+      'stillness',
+    ],
+    [
+      'stillness',
+      'scenarioStartStopWithBeating',
+    ],
+    [
+      'stillness',
+      'scenarioLatencyCalibration',
+    ],
+    [
+      'scenarioManager',
+      'scenarioSonification',
     ],
     [
       'beatTriggerFromGesture',

@@ -6,58 +6,77 @@ Bugs:
  - [ ] intensity drops
    - [?] device compresses audio output when clipping?
  - [x] NaN in position
- - [ ] no tempo adaptation on start
+ - [x] no tempo adaptation on start
 
 - [ ] calibrate latency
-  - [ ] tap tempo on metronome
+  - [x] tap tempo on metronome
+  - [x] adapt look-ahead with latency and maximum tempo
   - [ ] clip with audio context values
 - [x] beatTriggerFromGesturePeakAdapt: adapt inhibition to tempo and
       time-signature ++++++
-- [ ] data: bypass graph
+- [x] data: bypass graph
   - [x] injection
-  - [ ] no mode shared states via setGraphOptions
-  - [ ] graph simplification and optimisation
-- [ ] transport
-  - [?] apply beat phase and tempo on beat change
+  - [x] no more shared states via setGraphOptions
+  - [x] graph simplification and optimisation
+- [x] transport
+  - [x] apply beat phase and tempo on beat change
 - [ ] score
   - [x] BUG: first note is very short
   - [x] apply tempo and time-signature on load, even when playback is paused
-  - [ ] normalise
+  - [x] normalise
   - [ ] apply time-signature changes
   - [ ] transposition: advanced settings
   - [ ] choose bar (number or slider): advanced settings
   - [ ] start end, loop: advanced settings
 - [ ] beating
-  - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings
+  - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings. In `transport.js`, adapt  `timeSignature.count`, `tempo` and `position.beat`. Should be transparent at output, except maybe for beat change.
 - [ ] intensity
   - [x] lookahead: float 1/2 beat NO: better 1 quarter note
   - [x] smooth, specially on diminuendo
-  - [ ] relative intensity
-  - [ ] normalise score
+  - [x] relative intensity
+  - [x] normalise score
   - [ ] hold when transport does not stop with beating
 - [ ] global volume
   - [?] compressor
   - [?] reverb
 - [x] start
 - [x] end
-  - [ ] quicker
+  - [?] quicker
 - [ ] UI
+  - [x] URL: load state `z` after specific to allow for easy overrides.
   - [ ] presets
     - [ ] UI
     - [ ] beating
     - [ ] generalisation
   - [ ] CSS
-    - [ ] no more in templates
-    - [ ] SCSS
+    - [x] no more in templates
+    - [x] SCSS
   - [ ] users
   - [ ] debug
   - [ ] controller
 - [ ] log
+  - [ ] plugin logger
   - [ ] errors and log from clients
   - [ ] currents settings as meta-data
   - [ ] user-agent
   - [ ] audio settings
 
+
+- [ ] application
+  - [ ] nativ, (React, Flutter)
+  - [ ] format: JSON or flat
+  - [ ] transport: WebSocket or OSC over UDP
+  - [ ] updates (via stores)
+
+
+- [ ] server / host application 
+  - connection
+    - [ ] QR code: separate module
+      - [ ] wifi
+      - [ ] IP
+      - [ ] port
+    - [ ] à la bonjour
+  -[ ] updates
 
 **Projects are dedicated to exercices types:**
 
@@ -148,9 +167,9 @@ Warning: after boot: launch Safari, and sound, quit safari (double click and dra
 
 
 Sensors:
-- [ ] calibrate senssors and audio
-- [ ] record users gestures with annotated video
-- [ ] prototype with user scripts
+- [x] calibrate sensors and audio
+- [x] record users gestures with annotated video
+- [x] prototype with user scripts
 
 - [x] long loading time on iOS (1 minute): pinned certificate? connected once to https://apps.cosima.ircam.fr and update local certificates
   - [ ] DNS problem, should have a local one without catch-all and a remote with catch-all to avoid iOS time-outs

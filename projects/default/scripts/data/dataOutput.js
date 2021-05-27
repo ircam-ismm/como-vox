@@ -9,6 +9,7 @@ function dataOutput(graph, helpers, outputFrame) {
       const inputData = app.data;
       const outputData = outputFrame.data; // to graph
 
+      // stream after state, to possibly override
       for(const key of Object.keys(inputData) ) {
         outputData[key] = inputData[key];
       }

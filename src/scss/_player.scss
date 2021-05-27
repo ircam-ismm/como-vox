@@ -1,0 +1,170 @@
+@use 'color';
+
+.player {
+  font-size: medium;
+  line-height: normal;
+
+  button {
+    background-color: color.$widget-background-color;
+    color: color.$widget-color;
+    width: fit-content;
+  }
+
+  select {
+    max-width: 100%;
+  }
+
+  input {
+    width: auto;
+  }
+
+  input,
+  select {
+    background-color: color.$widget-color;
+    color: invert(color.$widget-color);
+  }
+
+  button,
+  select,
+  input {
+    border-color: color.$widget-border-color;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 2px;
+    font-size: large;
+    height: 3rem;
+    text-align: center;
+
+    &:active {
+      border-color: color.$active-border-color;
+      color: color.$active-color;
+    }
+
+    &.selected {
+      background-color: color.$widget-selected-background-color;
+      color: color.$widget-selected-color;
+    }
+  }
+
+  button.display {
+    align-self: center;
+  }
+
+  .selection {
+    border-color: color.$widget-border-color;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+
+    button {
+      border-radius: 0;
+      border-width: 1px;
+    }
+  }
+
+  .selection,
+  .valueUnit,
+  .flexContainer {
+    display: inline-flex;
+    align-items: baseline;
+    flex-flow: row wrap;
+    // no gap before Safari 12, use margin
+
+    * {
+      flex: auto;
+      margin: 0.5rem;
+    }
+
+    &:is(.selection), // group options
+    &:is(.nogap),
+    &:is(.nomargin) {
+      * {
+        margin: 0;
+      }
+    }
+
+    // group options
+    .option {
+      margin: 0;
+    }
+  }
+
+  .navigation {
+    float: right;
+  }
+
+  .group,
+  .element {
+    display: inline-block;
+  }
+
+  .group {
+    width: 100%;
+    margin: 0.2rem;
+  }
+
+  .clockTime {
+    .text {
+      font-size: 60px;
+    }
+  }
+
+  .position {
+    .bar {
+      width: 2.5em;
+    }
+
+    .beat {
+      width: 1.5em;
+    }
+
+    .bar,
+    .beat {
+      font-size: 3rem;
+      height: 4rem;
+    }
+  }
+
+  button.playback {
+    font-size: 3rem;
+    height: 4rem;
+    line-height: 4rem;
+  }
+
+  .group.scenario {
+    button.scenario {
+      font-size: 3rem;
+      height: 4rem;
+    }
+  }
+
+  .invalid {
+    background-color: color.$invalid-background-color;
+  }
+
+  .uiConfiguration {
+    .element,
+    .extra {
+      background-color: color.$ui-not-selected-background-color;
+      border-radius: 3px;
+    }
+
+    .uiSelected {
+      background-color: color.$background-color;
+      border: thin;
+      border-color: color.$ui-selected;
+      border-style: dotted;
+    }
+
+    button.uiSelector {
+      background-color: color.$ui-selector-background-color;
+      border-color: color.$ui-selector-border-color;
+      color: color.$ui-selector-color;
+
+      &.selected {
+        background-color: color.$ui-selector-color;
+        color: color.$ui-selector-background-color;
+      }
+    }
+  }
+}

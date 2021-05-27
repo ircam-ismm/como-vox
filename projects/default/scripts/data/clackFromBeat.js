@@ -15,17 +15,36 @@ function clackFromBeat(graph, helpers, outputFrame) {
   const duration = 0.25; // in beats
 
   const parameters = {
-    onOff: true,
+    beatingSound: true,
   };
 
-  return {
-    updateParams(updates) {
-      for(const p of Object.keys(updates) ) {
-        if(parameters.hasOwnProperty(p) ) {
-          parameters[p] = updates[p];
-        }
+  const updateParams = (updates) => {
+    for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
       }
-    },
+    }
+  };
+
+  ///// Events and data (defined only in browser)
+  const registeredEvents = [];
+  if(app.events && app.state) {
+    [
+      'beatingSound',
+    ].forEach( (event) => {
+      const callback = (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
+      updateParams({[event]: app.state[event]});
+    });
+  }
+
+  return {
+    updateParams,
 
     // called on each sensor frame
     process(inputFrame, outputFrame) {
@@ -38,7 +57,7 @@ function clackFromBeat(graph, helpers, outputFrame) {
       const now = inputData['time'];
 
       const beat = inputData['beat'];
-      const trigger = parameters.onOff && beat.trigger;
+      const trigger = parameters.beatingSound && beat.trigger;
 
       const notes = [];
       // reset own channel
@@ -102,7 +121,10 @@ function clackFromBeat(graph, helpers, outputFrame) {
     },
 
     destroy() {
-
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
-  }
+
+  };
 }

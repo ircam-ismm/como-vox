@@ -68,6 +68,9 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
   const intensityRangeMediumDefault = 1;
   const intensityRangeHighDefault = 2;
 
+  const noteIntensityCompressedMinDefault = 50;
+  const noteIntensityCompressedMaxDefault = 80;
+
   const gestureToIntensityLow = new Scaler({
     inputStart: gestureIntensityMin,
     inputEnd: gestureIntensityMedium,
@@ -109,6 +112,16 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
     }),
   });
 
+  // when gesture controls intensity, limit intensity range of score
+  const noteIntensityCompressor = new Scaler({
+    inputStart: noteIntensityCompressedMinDefault,
+    inputEnd: noteIntensityCompressedMaxDefault,
+    outputStart: noteIntensityCompressedMinDefault,
+    outputEnd: noteIntensityCompressedMaxDefault,
+    type: 'linear',
+    clip: true,
+  });
+
   // conform to MIDI intensity
   const noteIntensityClipper = new Clipper({
     min: 0,
@@ -121,26 +134,65 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
     scaleRangeHigh: intensityRangeHighDefault, // normalised intensity
   };
 
+  const updateParams = (updates) => {
+    if(typeof updates.scaleRangeLow !== 'undefined') {
+      gestureToIntensityLow.set({
+        outputStart: dBToAmplitude(updates.scaleRangeLow),
+      });
+    }
+
+    if(typeof updates.scaleRangeHigh !== 'undefined') {
+      gestureToIntensityHigh.set({
+        outputEnd: dBToAmplitude(updates.scaleRangeHigh),
+      });
+    }
+
+    if(typeof updates.scoreData !== 'undefined') {
+      let noteIntensityMin = (updates.scoreData
+                              && updates.scoreData.metas
+                              && updates.scoreData.metas.noteIntensityMin
+                              ? updates.scoreData.metas.noteIntensityMin
+                              : noteIntensityCompressedMinDefault);
+
+      let noteIntensityMax = (updates.scoreData
+                              && updates.scoreData.metas
+                              && updates.scoreData.metas.noteIntensityMax
+                              ? updates.scoreData.metas.noteIntensityMax
+                              : noteIntensityCompressedMaxDefault);
+
+      noteIntensityCompressor.set({
+        inputStart: noteIntensityMin,
+        inputEnd: noteIntensityMax,
+      });
+    }
+
+    for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
+      }
+    }
+  };
+
+  ///// Events and data (defined only in browser)
+  const registeredEvents = [];
+  if(app.events && app.state) {
+    [
+      'gestureControlsIntensity',
+      'scoreData',
+    ].forEach( (event) => {
+      const callback = (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
+      updateParams({[event]: app.state[event]});
+    });
+  }
+
   return {
-    updateParams(updates) {
-      if(typeof updates.scaleRangeLow !== 'undefined') {
-        gestureToIntensityLow.set({
-          outputStart: dBToAmplitude(updates.scaleRangeLow),
-        });
-      }
-
-      if(typeof updates.scaleRangeHigh !== 'undefined') {
-        gestureToIntensityHigh.set({
-          outputEnd: dBToAmplitude(updates.scaleRangeHigh),
-        });
-      }
-
-      for(const p of Object.keys(updates) ) {
-        if(parameters.hasOwnProperty(p) ) {
-          parameters[p] = updates[p];
-        }
-      }
-    },
+    updateParams,
 
     process(inputFrame, outputFrame) {
       const inputData = app.data;
@@ -152,9 +204,10 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       const tempo = inputData['tempo'];
       const position = inputData['position'];
 
+      const sensorsIntensity = inputData['intensity'].compressed;
       // clip before hysteresis for better reactivity on saturation
-      const gestureIntensity = gestureIntensityClipper.process(
-        inputData['intensity'].compressed);
+      const gestureIntensity
+            = gestureIntensityClipper.process(sensorsIntensity);
 
       if(inputSamplePeriod !== inputData.metas.period) {
         inputSamplePeriod = input.metas.period;
@@ -197,8 +250,11 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
         for(const [part, events] of Object.entries(eventsContainer) ) {
           events.forEach( (event) => {
             if(event.type === 'noteOn') {
+              const intensityCompressed
+                    = noteIntensityCompressor.process(event.data.intensity);
+
               event.data.intensity = noteIntensityClipper.process(
-                event.data.intensity * intensityScale);
+                intensityCompressed * intensityScale);
             }
           });
         };
@@ -225,6 +281,9 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
     },
 
     destroy() {
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
 
   };

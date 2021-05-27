@@ -8,12 +8,17 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   // to restore after calibration
   const parametersBackup = {};
   // initial values
+  const playbackStopSeek = (app.state
+                            && typeof app.state.playbackStopSeek !== 'undefined'
+                            ? app.state.playbackStopSeek
+                            : 'barStart');
+
   const parametersScenario = {
     gestureControlsBeatOffset: true,
     gestureControlsPlaybackStart: false,
-    gestureControlsPlaybackStop: false,
+    gestureControlsPlaybackStop: true,
     gestureControlsTempo: true,
-    playbackStopSeek: app.state.playbackStopSeek,
+    playbackStopSeek,
   };
 
   const parameters = {
@@ -23,6 +28,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start
     stillnessWaitingDurationMax: 2, // in seconds, for time-out
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
+    playback: false,
     playbackStartAfterCount: {
       bar: 1,
       beat: 1, // one more for upbeat before start
@@ -69,6 +75,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   };
 
   const updateParams = (updates) => {
+    console.log("updates = ", updates);
     // propagate error from beating
     if(parameters.scenarioStartStopWithBeating
        && !statusIsError(status)
@@ -78,8 +85,6 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
 
     if(parameters.scenarioStartStopWithBeating
        && statusIsError(updates.scenarioStatus) ) {
-      app.events.emit('gestureControlsPlaybackStart', false);
-      app.events.emit('gestureControlsPlaybackStop', false);
       app.events.emit('scenarioStartStopWithBeating', false);
     }
 
@@ -111,7 +116,16 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       }
     }
 
-    if(typeof updates.gestureControlsPlaybackStart !== 'undefined'
+    if(parameters.scenarioStartStopWithBeating
+       && parameters.playback === true
+       && updates.playback === false
+       && status !== 'done') {
+      statusUpdate('off');
+      app.events.emit('scenarioStartStopWithBeating', false);
+    }
+
+    if(parameters.scenarioStartStopWithBeating
+       && typeof updates.gestureControlsPlaybackStart !== 'undefined'
        && !updates.gestureControlsPlaybackStart
        && status === 'ready') {
       statusUpdate('cancel');
@@ -127,15 +141,25 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   ///// Events and data (defined only in browser)
   const registeredEvents = [];
   if(app.events && app.state) {
-    [
-      'beatGestureWaitingDurationMax',
-      'gestureControlsPlaybackStart',
-      'gestureControlsPlaybackStartStatus',
-      'playbackStopSeek',
-      'playbackStartAfterCount',
-      'scenarioStartStopWithBeating',
-      'scenarioStatus',
-    ].forEach( (event) => {
+        const eventsToRegister =
+          // Use set for uniqueness
+          [...new Set([
+            // register parameters to save and restore
+            ...Object.keys(parametersScenario),
+            // declare own parameters
+            ...[
+              'beatGestureWaitingDurationMax',
+              'gestureControlsPlaybackStart',
+              'gestureControlsPlaybackStartStatus',
+              'playback',
+              'playbackStopSeek',
+              'playbackStartAfterCount',
+              'scenarioStartStopWithBeating',
+              'scenarioStatus',
+            ],
+          ])];
+
+    eventsToRegister.forEach( (event) => {
       const callback = (value) => {
         // compatibility with setGraphOption
         updateParams({[event]: value});

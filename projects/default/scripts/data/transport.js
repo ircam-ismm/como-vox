@@ -54,8 +54,8 @@ function transport(graph, helpers, outputFrame) {
     tempoLimits: {
       absoluteMin: 40,
       absoluteMax: 160,
-      relativeMin: 0.51,
-      relativeMax: 1.49,
+      relativeMin: 0.76,
+      relativeMax: 1.24,
     },
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
   };

@@ -13,10 +13,9 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
   const Hysteresis = app.imports.helpers.Hysteresis;
   const Scaler = app.imports.helpers.Scaler;
 
-  // do not change dynamics for these channels
-  const bypassChannels = new Set([
-    'metronome',
-    'beating',
+  // change dynamics for these channels only
+  const activeChannels = new Set([
+    'score',
   ]);
 
   // debug
@@ -270,7 +269,7 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
       const notesContainer = inputData['notes'];
       if(parameters.gestureControlsIntensity && notesContainer) {
         for(const channel of Object.keys(notesContainer) ) {
-          if(bypassChannels.has(channel) ) {
+          if(!activeChannels.has(channel) ) {
             continue;
           }
           const notes = notesContainer[channel];

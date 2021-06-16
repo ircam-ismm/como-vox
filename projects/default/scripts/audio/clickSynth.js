@@ -14,6 +14,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const activeChannels = new Set([
     'metronome',
     'beating',
+    'scenario',
   ]);
 
   const parameters = {

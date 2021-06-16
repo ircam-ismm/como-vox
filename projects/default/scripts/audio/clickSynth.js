@@ -11,6 +11,11 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const audioContext = graph.como.audioContext;
 
+  const activeChannels = new Set([
+    'metronome',
+    'beating',
+  ]);
+
   const parameters = {
     intensityRange: 30, // in dB
   };
@@ -40,7 +45,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
       for(const channel of Object.keys(notesContainer) ) {
         // do not play 'score' channel
-        if(channel === 'score') {
+        if(!activeChannels.has(channel) ) {
           continue;
         }
 

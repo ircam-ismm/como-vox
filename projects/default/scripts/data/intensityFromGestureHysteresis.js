@@ -1,4 +1,4 @@
-function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
+function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
@@ -12,6 +12,12 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
   const Clipper = app.imports.helpers.Clipper;
   const Hysteresis = app.imports.helpers.Hysteresis;
   const Scaler = app.imports.helpers.Scaler;
+
+  // do not change dynamics for these channels
+  const bypassChannels = new Set([
+    'metronome',
+    'beating',
+  ]);
 
   // debug
   const barGraph = (value, {
@@ -264,6 +270,9 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       const notesContainer = inputData['notes'];
       if(parameters.gestureControlsIntensity && notesContainer) {
         for(const channel of Object.keys(notesContainer) ) {
+          if(bypassChannels.has(channel) ) {
+            continue;
+          }
           const notes = notesContainer[channel];
           notes.forEach( (note) => {
             note.intensity = noteIntensityClipper.process(

@@ -85,10 +85,10 @@
       },
     },
     {
-      id: 'clickGenerator',
+      id: 'metronomeNotes',
       type: 'ScriptData',
       options: {
-        scriptName: 'clickGenerator',
+        scriptName: 'metronomeNotes',
       },
     },
     {
@@ -113,10 +113,10 @@
       },
     },
     {
-      id: 'clackFromBeat',
+      id: 'beatingNotes',
       type: 'ScriptData',
       options: {
-        scriptName: 'clackFromBeat',
+        scriptName: 'beatingNotes',
       },
     },
     {
@@ -202,7 +202,7 @@
     ],
     [
       'transport',
-      'clickGenerator',
+      'metronomeNotes',
     ],
     [
       'transport',
@@ -210,7 +210,7 @@
     ],
     [
       'transport',
-      'clackFromBeat',
+      'beatingNotes',
     ],
     [
       'score',

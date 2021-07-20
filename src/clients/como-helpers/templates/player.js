@@ -2,7 +2,6 @@ import {html} from 'lit-html';
 
 import {clock} from './clock.js';
 import {gestureControl} from './gestureControl.js';
-import {handedness} from './handedness.js';
 import {latency} from './latency.js';
 import {playback} from './playback.js';
 import {position} from './position.js';
@@ -19,7 +18,6 @@ export function player(data) {
   return html`
     ${session(data)}
     ${clock(data)}
-    ${handedness(data)}
     ${latency(data)}
     ${scenario(data)}
     ${score(data)}

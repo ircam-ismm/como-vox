@@ -103,21 +103,6 @@ export default {
     default: true,
   },
 
-  handedness: {
-    type: 'string',
-    default: null,
-    nullable: true,
-    metas: {
-      exported: false,
-      stored: true,
-    },
-  },
-
-  handednessUi: {
-    type: 'boolean',
-    default: true,
-  },
-
   intensityRange: {
     type: 'float',
     default: 40, // dB

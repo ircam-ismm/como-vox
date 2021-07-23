@@ -65,16 +65,16 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
   let intensityScale = 1;
 
   const gestureIntensityMin = 0;
-  const gestureIntensityMedium = 0.250;
-  const gestureIntensityMax = 0.5;
+  const gestureIntensityMedium = 0.15;
+  const gestureIntensityMax = 0.3;
 
   // normalised intensity
   const intensityRangeLowDefault = 0;
-  const intensityRangeMediumDefault = 1;
-  const intensityRangeHighDefault = 2;
+  const intensityRangeMediumDefault = 0.85;
+  const intensityRangeHighDefault = 1;
 
-  const noteIntensityCompressedMinDefault = 50;
-  const noteIntensityCompressedMaxDefault = 80;
+  const noteIntensityCompressedMinDefault = 120;
+  const noteIntensityCompressedMaxDefault = 120;
 
   const gestureToIntensityLow = new Scaler({
     inputStart: gestureIntensityMin,
@@ -101,13 +101,13 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
   });
 
   const lowpassPositionDeltaDown = {
-    bar: 1,
+    bar: 0.5,
     beat: 0,
   }; // 1 bar to go down
 
   const gestureIntensitySmoother = new Hysteresis({
     sampleRate: 1 / inputSamplePeriod, // update later
-    lowpassFrequencyUp: 10, // Hz: 180 bpm
+    lowpassFrequencyUp: 100, // Hz: 180 bpm
     lowpassFrequencyDown: 1 / positionDeltaToSeconds(lowpassPositionDeltaDown, {
       tempo: 60, // bpm, will update later
       timeSignature: {

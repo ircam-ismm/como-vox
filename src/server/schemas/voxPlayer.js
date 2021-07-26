@@ -355,6 +355,11 @@ export default {
     },
   },
 
+  tempoLimitsUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   tempoReset: {
     type: 'any',
     event: true,

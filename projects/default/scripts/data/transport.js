@@ -559,12 +559,16 @@ function transport(graph, helpers, outputFrame) {
         for(let g = beatGestures.length - 1; g > 0; --g) {
           const timeDelta = beatGestures[g].time - beatGestures[g - 1].time;
           const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
+          const beatDeltaRounded = (beatDelta >=1
+                                    ? Math.round(beatDelta)
+                                    : (beatDelta > 0
+                                       ? 1/Math.round(1/beatDelta)
+                                       : 1) );
 
-          if(beatDelta > 0.5 && beatDelta < 2.5) {
-            const beatDeltaRounded = Math.round(beatDelta);
+          if(beatDeltaRounded >= relativeMin && beatDeltaRounded < relativeMax) {
             const tempoFromGesture = timeDeltaToTempo(timeDelta,
-                                                  beatDeltaRounded,
-                                                  {timeSignature});
+                                                      beatDeltaRounded,
+                                                      {timeSignature});
             if(tempoFromGesture > absoluteMin
                && tempoFromGesture < absoluteMax
                && tempoFromGesture > relativeMin * tempo
@@ -590,7 +594,15 @@ function transport(graph, helpers, outputFrame) {
           // - use median(beatDeltas) to halve tempo
           //   (with transition with mean on middle values)
 
-          const tempoNew = median(tempos) / Math.floor(median(beatDeltas) );
+          const beatDeltasMedian = median(beatDeltas);
+          const temposMedian = median(tempos);
+          let tempoMultiplier = 1;
+          if(beatDeltasMedian >= 1) {
+            tempoMultiplier = 1 / Math.floor(beatDeltasMedian);
+          } else if(beatDeltasMedian > 0) {
+            tempoMultiplier = Math.floor(1 / beatDeltasMedian);
+          }
+          const tempoNew = temposMedian * tempoMultiplier;
 
           tempoSmoother.set({
             inputStart: now.audio,

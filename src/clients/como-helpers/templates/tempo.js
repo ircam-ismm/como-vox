@@ -63,7 +63,7 @@ export function tempo(data) {
 
         ${data.uiConfiguration || data.tempoLimitsUi ? html`
           <span class="${elementClasses(data, 'tempoLimits')}">
-            <span class="text">Limite de variation :</span>
+            <span class="text">Limite de variation</span>
             <span class="valueUnit">
               <input class="tempoLimit relative"
                      type="number"

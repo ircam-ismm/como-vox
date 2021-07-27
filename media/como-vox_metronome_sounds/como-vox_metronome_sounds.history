@@ -21,8 +21,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="259"/>
           <Add id="268"/>
+          <Add id="259"/>
           <Remove id="235"/>
         </Regions>
       </Changes>
@@ -32,8 +32,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="290"/>
           <Add id="299"/>
+          <Add id="290"/>
           <Remove id="268"/>
         </Regions>
       </Changes>
@@ -81,8 +81,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="669"/>
           <Add id="660"/>
+          <Add id="669"/>
           <Remove id="299"/>
         </Regions>
       </Changes>
@@ -92,8 +92,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="700"/>
           <Add id="691"/>
+          <Add id="700"/>
           <Remove id="660"/>
         </Regions>
       </Changes>
@@ -114,7 +114,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625132602" tv-usec="635134" name="replace tempo mark">
-    <MementoCommand obj-id="60" type-name="ARDOUR::TempoMap">
+    <MementoCommand obj-id="61" type-name="ARDOUR::TempoMap">
       <TempoMap>
         <Tempo pulse="0" frame="0" movable="0" lock-style="AudioTime" beats-per-minute="120" note-type="4" clamped="0" end-beats-per-minute="120" active="1" locked-to-meter="1"/>
         <Meter pulse="0" frame="0" movable="0" lock-style="AudioTime" bbt="1|1|0" beat="0" note-type="4" divisions-per-bar="4"/>
@@ -197,8 +197,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="801"/>
           <Add id="810"/>
+          <Add id="801"/>
           <Remove id="669"/>
         </Regions>
       </Changes>
@@ -215,8 +215,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="838"/>
           <Add id="847"/>
+          <Add id="838"/>
           <Remove id="810"/>
         </Regions>
       </Changes>
@@ -233,8 +233,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="875"/>
           <Add id="884"/>
+          <Add id="875"/>
           <Remove id="847"/>
         </Regions>
       </Changes>
@@ -251,8 +251,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="912"/>
           <Add id="921"/>
+          <Add id="912"/>
           <Remove id="884"/>
         </Regions>
       </Changes>
@@ -269,8 +269,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="949"/>
           <Add id="958"/>
+          <Add id="949"/>
           <Remove id="921"/>
         </Regions>
       </Changes>
@@ -287,8 +287,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="986"/>
           <Add id="995"/>
+          <Add id="986"/>
           <Remove id="958"/>
         </Regions>
       </Changes>
@@ -305,8 +305,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="1023"/>
           <Add id="1032"/>
+          <Add id="1023"/>
           <Remove id="995"/>
         </Regions>
       </Changes>
@@ -323,8 +323,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="1060"/>
           <Add id="1069"/>
+          <Add id="1060"/>
           <Remove id="1032"/>
         </Regions>
       </Changes>
@@ -341,8 +341,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="1097"/>
           <Add id="1106"/>
+          <Add id="1097"/>
           <Remove id="1069"/>
         </Regions>
       </Changes>
@@ -366,8 +366,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="1173"/>
           <Add id="1182"/>
+          <Add id="1173"/>
           <Remove id="1106"/>
         </Regions>
       </Changes>
@@ -385,8 +385,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="1219"/>
           <Add id="1210"/>
+          <Add id="1219"/>
           <Remove id="1182"/>
         </Regions>
       </Changes>
@@ -422,8 +422,8 @@
     <StatefulDiffCommand obj-id="223" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="1345"/>
           <Add id="1336"/>
+          <Add id="1345"/>
           <Remove id="1210"/>
         </Regions>
       </Changes>
@@ -627,8 +627,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2423"/>
           <Add id="2432"/>
+          <Add id="2423"/>
           <Remove id="2404"/>
         </Regions>
       </Changes>
@@ -683,8 +683,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2490"/>
           <Add id="2499"/>
+          <Add id="2490"/>
           <Remove id="2432"/>
         </Regions>
       </Changes>
@@ -694,8 +694,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2530"/>
           <Add id="2521"/>
+          <Add id="2530"/>
           <Remove id="2499"/>
         </Regions>
       </Changes>
@@ -726,8 +726,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2570"/>
           <Add id="2579"/>
+          <Add id="2570"/>
           <Remove id="2530"/>
         </Regions>
       </Changes>
@@ -737,8 +737,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2610"/>
           <Add id="2601"/>
+          <Add id="2610"/>
           <Remove id="2579"/>
         </Regions>
       </Changes>
@@ -769,8 +769,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2652"/>
           <Add id="2661"/>
+          <Add id="2652"/>
           <Remove id="2610"/>
         </Regions>
       </Changes>
@@ -780,8 +780,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2692"/>
           <Add id="2683"/>
+          <Add id="2692"/>
           <Remove id="2661"/>
         </Regions>
       </Changes>
@@ -812,8 +812,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2736"/>
           <Add id="2745"/>
+          <Add id="2736"/>
           <Remove id="2692"/>
         </Regions>
       </Changes>
@@ -848,8 +848,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2816"/>
           <Add id="2825"/>
+          <Add id="2816"/>
           <Remove id="2776"/>
         </Regions>
       </Changes>
@@ -898,8 +898,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="2910"/>
           <Add id="2919"/>
+          <Add id="2910"/>
           <Remove id="2856"/>
         </Regions>
       </Changes>
@@ -941,8 +941,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3000"/>
           <Add id="3009"/>
+          <Add id="3000"/>
           <Remove id="2950"/>
         </Regions>
       </Changes>
@@ -952,8 +952,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3040"/>
           <Add id="3031"/>
+          <Add id="3040"/>
           <Remove id="3009"/>
         </Regions>
       </Changes>
@@ -984,8 +984,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3092"/>
           <Add id="3101"/>
+          <Add id="3092"/>
           <Remove id="3040"/>
         </Regions>
       </Changes>
@@ -995,8 +995,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3132"/>
           <Add id="3123"/>
+          <Add id="3132"/>
           <Remove id="3101"/>
         </Regions>
       </Changes>
@@ -1028,8 +1028,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3208"/>
           <Add id="3217"/>
+          <Add id="3208"/>
           <Remove id="3132"/>
         </Regions>
       </Changes>
@@ -1039,8 +1039,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3248"/>
           <Add id="3239"/>
+          <Add id="3248"/>
           <Remove id="3217"/>
         </Regions>
       </Changes>
@@ -1071,8 +1071,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3304"/>
           <Add id="3313"/>
+          <Add id="3304"/>
           <Remove id="3248"/>
         </Regions>
       </Changes>
@@ -1082,8 +1082,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3344"/>
           <Add id="3335"/>
+          <Add id="3344"/>
           <Remove id="3313"/>
         </Regions>
       </Changes>
@@ -1114,8 +1114,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3402"/>
           <Add id="3411"/>
+          <Add id="3402"/>
           <Remove id="3344"/>
         </Regions>
       </Changes>
@@ -1125,8 +1125,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3442"/>
           <Add id="3433"/>
+          <Add id="3442"/>
           <Remove id="3411"/>
         </Regions>
       </Changes>
@@ -1157,8 +1157,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3502"/>
           <Add id="3511"/>
+          <Add id="3502"/>
           <Remove id="3442"/>
         </Regions>
       </Changes>
@@ -1168,8 +1168,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3542"/>
           <Add id="3533"/>
+          <Add id="3542"/>
           <Remove id="3511"/>
         </Regions>
       </Changes>
@@ -1200,8 +1200,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3604"/>
           <Add id="3613"/>
+          <Add id="3604"/>
           <Remove id="3542"/>
         </Regions>
       </Changes>
@@ -1211,8 +1211,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3644"/>
           <Add id="3635"/>
+          <Add id="3644"/>
           <Remove id="3613"/>
         </Regions>
       </Changes>
@@ -1243,8 +1243,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3708"/>
           <Add id="3717"/>
+          <Add id="3708"/>
           <Remove id="3644"/>
         </Regions>
       </Changes>
@@ -1254,8 +1254,8 @@
     <StatefulDiffCommand obj-id="2392" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="3748"/>
           <Add id="3739"/>
+          <Add id="3748"/>
           <Remove id="3717"/>
         </Regions>
       </Changes>
@@ -1552,7 +1552,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133370" tv-usec="843401" name="add markers">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
       </Locations>
@@ -1578,7 +1578,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133635" tv-usec="197951" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4148" name="Audrey_01" start="0" end="18479" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1619,7 +1619,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133635" tv-usec="755585" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1658,7 +1658,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133636" tv-usec="68820" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1695,7 +1695,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133636" tv-usec="223923" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1730,7 +1730,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133636" tv-usec="384376" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1763,7 +1763,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133637" tv-usec="183356" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1794,7 +1794,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133637" tv-usec="349859" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1823,7 +1823,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133638" tv-usec="952217" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1850,7 +1850,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133639" tv-usec="101480" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1875,7 +1875,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133639" tv-usec="246411" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1898,7 +1898,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133639" tv-usec="391438" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1919,7 +1919,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133639" tv-usec="536985" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1938,7 +1938,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133639" tv-usec="682442" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1955,7 +1955,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133639" tv-usec="828831" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1970,7 +1970,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133639" tv-usec="981272" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4149" name="compte_audrey.33" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1983,7 +1983,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133640" tv-usec="132111" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4150" name="compte_audrey.31" start="661500" end="693195" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133370"/>
@@ -1994,7 +1994,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133649" tv-usec="417055" name="add markers">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
       </Locations>
@@ -2020,7 +2020,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133684" tv-usec="119810" name="add markers">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4265" name="Audrey_01" start="0" end="18479" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2075,7 +2075,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133710" tv-usec="345566" name="add markers">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4265" name="Audrey_01" start="0" end="18479" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2387,7 +2387,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133884" tv-usec="579544" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4265" name="Audrey_01" start="0" end="18479" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2460,7 +2460,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133884" tv-usec="801866" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2531,7 +2531,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133885" tv-usec="6786" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2600,7 +2600,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133885" tv-usec="7128" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2668,7 +2668,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133885" tv-usec="216738" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2735,7 +2735,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133885" tv-usec="404191" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2800,7 +2800,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133885" tv-usec="598540" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2863,7 +2863,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133885" tv-usec="783509" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2924,7 +2924,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133886" tv-usec="14214" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -2983,7 +2983,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133886" tv-usec="165068" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -3040,7 +3040,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133886" tv-usec="317606" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -3095,7 +3095,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133886" tv-usec="459795" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -3148,7 +3148,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133886" tv-usec="618111" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -3199,7 +3199,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133886" tv-usec="753907" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -3248,7 +3248,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133886" tv-usec="900595" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -3295,7 +3295,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133887" tv-usec="42544" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4266" name="Audrey_15" start="617400" end="648007" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -3340,7 +3340,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133887" tv-usec="189860" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4267" name="Audrey_16" start="661500" end="693195" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133649"/>
@@ -3383,7 +3383,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133887" tv-usec="351350" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4293" name="Aurelie_04" start="837900" end="862991" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133683"/>
@@ -3424,7 +3424,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133887" tv-usec="503066" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4293" name="Aurelie_04" start="837900" end="862991" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133683"/>
@@ -3463,7 +3463,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133887" tv-usec="656801" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4293" name="Aurelie_04" start="837900" end="862991" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133683"/>
@@ -3500,7 +3500,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133887" tv-usec="818072" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4293" name="Aurelie_04" start="837900" end="862991" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133683"/>
@@ -3535,7 +3535,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133887" tv-usec="968843" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3568,7 +3568,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133888" tv-usec="124833" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3599,7 +3599,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133888" tv-usec="276951" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3628,7 +3628,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133888" tv-usec="430302" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3655,7 +3655,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133888" tv-usec="591918" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3680,7 +3680,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133888" tv-usec="743400" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3703,7 +3703,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133888" tv-usec="894219" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3724,7 +3724,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133889" tv-usec="49876" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3743,7 +3743,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133889" tv-usec="210428" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3760,7 +3760,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133889" tv-usec="354049" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3775,7 +3775,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133889" tv-usec="508683" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -3788,7 +3788,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625133889" tv-usec="654146" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="4294" name="Aurelie_16" start="1367100" end="1395497" flags="IsRangeMarker" locked="0" position-lock-style="AudioTime" timestamp="1625133684"/>
@@ -4219,7 +4219,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134526" tv-usec="630328" name="add marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
       </Locations>
@@ -4230,7 +4230,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134532" tv-usec="455710" name="rename marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="mark1" start="7056" end="7056" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4242,7 +4242,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134533" tv-usec="609850" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="7056" end="7056" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4254,7 +4254,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134551" tv-usec="684851" name="add marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4267,7 +4267,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134555" tv-usec="474379" name="rename marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4281,7 +4281,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134557" tv-usec="1075" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4373,7 +4373,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134675" tv-usec="28368" name="add markers">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4428,7 +4428,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134961" tv-usec="721841" name="add marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4507,7 +4507,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134964" tv-usec="411712" name="rename marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4587,7 +4587,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134967" tv-usec="21001" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4667,7 +4667,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625134970" tv-usec="579208" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="1401130" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -4758,8 +4758,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="12963"/>
           <Add id="12972"/>
+          <Add id="12963"/>
           <Remove id="12923"/>
         </Regions>
       </Changes>
@@ -4769,8 +4769,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13003"/>
           <Add id="12994"/>
+          <Add id="13003"/>
           <Remove id="12972"/>
         </Regions>
       </Changes>
@@ -4802,8 +4802,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13041"/>
           <Add id="13050"/>
+          <Add id="13041"/>
           <Remove id="13003"/>
         </Regions>
       </Changes>
@@ -4813,8 +4813,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13081"/>
           <Add id="13072"/>
+          <Add id="13081"/>
           <Remove id="13050"/>
         </Regions>
       </Changes>
@@ -4845,8 +4845,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13130"/>
           <Add id="13121"/>
+          <Add id="13130"/>
           <Remove id="13081"/>
         </Regions>
       </Changes>
@@ -4856,8 +4856,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13161"/>
           <Add id="13152"/>
+          <Add id="13161"/>
           <Remove id="13130"/>
         </Regions>
       </Changes>
@@ -4881,8 +4881,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13206"/>
           <Add id="13197"/>
+          <Add id="13206"/>
           <Remove id="13121"/>
         </Regions>
       </Changes>
@@ -4924,8 +4924,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13255"/>
           <Add id="13264"/>
+          <Add id="13255"/>
           <Remove id="13161"/>
         </Regions>
       </Changes>
@@ -4935,8 +4935,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13295"/>
           <Add id="13286"/>
+          <Add id="13295"/>
           <Remove id="13264"/>
         </Regions>
       </Changes>
@@ -4975,8 +4975,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13345"/>
           <Add id="13354"/>
+          <Add id="13345"/>
           <Remove id="13295"/>
         </Regions>
       </Changes>
@@ -4986,8 +4986,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13385"/>
           <Add id="13376"/>
+          <Add id="13385"/>
           <Remove id="13354"/>
         </Regions>
       </Changes>
@@ -5029,8 +5029,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13471"/>
           <Add id="13462"/>
+          <Add id="13471"/>
           <Remove id="13440"/>
         </Regions>
       </Changes>
@@ -5072,8 +5072,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13559"/>
           <Add id="13550"/>
+          <Add id="13559"/>
           <Remove id="13528"/>
         </Regions>
       </Changes>
@@ -5115,8 +5115,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13651"/>
           <Add id="13642"/>
+          <Add id="13651"/>
           <Remove id="13620"/>
         </Regions>
       </Changes>
@@ -5158,8 +5158,8 @@
     <StatefulDiffCommand obj-id="12911" type-name="ARDOUR::AudioPlaylist">
       <Changes>
         <Regions>
-          <Add id="13743"/>
           <Add id="13734"/>
+          <Add id="13743"/>
           <Remove id="13712"/>
         </Regions>
       </Changes>
@@ -6110,7 +6110,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625135461" tv-usec="985" name="add markers">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -6206,7 +6206,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625137381" tv-usec="966574" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -6317,7 +6317,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625137387" tv-usec="621058" name="add marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -6428,7 +6428,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625137875" tv-usec="861505" name="remove marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -6633,7 +6633,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625137895" tv-usec="548207" name="add marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -6838,7 +6838,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625137913" tv-usec="897302" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -6968,7 +6968,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625137927" tv-usec="152040" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -7098,7 +7098,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625137956" tv-usec="895792" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -7304,7 +7304,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625137991" tv-usec="824435" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -7510,7 +7510,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625138005" tv-usec="974239" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -7648,7 +7648,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625138040" tv-usec="294642" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -7862,7 +7862,7 @@
     </StatefulDiffCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625138970" tv-usec="923154" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -7974,7 +7974,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625138972" tv-usec="131597" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -8086,7 +8086,7 @@
     </MementoCommand>
   </UndoTransaction>
   <UndoTransaction tv-sec="1625138973" tv-usec="84735" name="move marker">
-    <MementoCommand obj-id="50" type-name="ARDOUR::Locations">
+    <MementoCommand obj-id="51" type-name="ARDOUR::Locations">
       <Locations>
         <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
         <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Session version="6000" name="como-vox_metronome_sounds" sample-rate="44100" end-is-free="1" session-range-is-free="1" id-counter="34990" name-counter="2" event-counter="0" vca-counter="1">
+<Session version="6000" name="como-vox_metronome_sounds" sample-rate="44100" end-is-free="1" session-range-is-free="1" id-counter="38822" name-counter="2" event-counter="0" vca-counter="1">
   <ProgramVersion created-with="Ardour 6.7" modified-with="Ardour 6.7"/>
   <EngineHints backend="CoreAudio" input-device="Built-in Microphone" output-device="Built-in Output"/>
   <MIDIPorts>
@@ -182,9 +182,7 @@
     <Region name="compte_thomas.61" muted="0" opaque="1" locked="0" video-locked="0" automatic="0" whole-file="0" import="0" external="1" sync-marked="0" left-of-split="0" right-of-split="0" hidden="0" position-locked="0" valid-transients="0" start="486864" length="45404" position="2050720" beat="47" sync-position="486864" ancestral-start="0" ancestral-length="0" stretch="1" shift="1" positional-lock-style="AudioTime" layering-index="15" tags="" contents="0" envelope-active="0" default-fade-in="0" default-fade-out="0" fade-in-active="1" fade-out-active="1" scale-amplitude="1" id="14306" type="audio" first-edit="nothing" source-0="12854" master-source-0="12854" channels="1"/>
     <Region name="compte_thomas.62" muted="0" opaque="1" locked="0" video-locked="0" automatic="0" whole-file="0" import="0" external="1" sync-marked="0" left-of-split="0" right-of-split="0" hidden="0" position-locked="0" valid-transients="0" start="486864" length="8288" position="2050720" beat="47" sync-position="486864" ancestral-start="0" ancestral-length="0" stretch="1" shift="1" positional-lock-style="AudioTime" layering-index="15" tags="" contents="0" envelope-active="0" default-fade-in="0" default-fade-out="0" fade-in-active="1" fade-out-active="1" scale-amplitude="1" id="14328" type="audio" first-edit="nothing" source-0="12854" master-source-0="12854" channels="1"/>
   </Regions>
-  <Selection>
-    <StripableAutomationControl stripable="62" control="0" order="0"/>
-  </Selection>
+  <Selection/>
   <Locations>
     <Location id="249" name="session" start="0" end="2109816" flags="IsSessionRange" locked="0" position-lock-style="AudioTime" timestamp="1625132380"/>
     <Location id="6505" name="Audrey" start="0" end="0" flags="IsMark" locked="0" position-lock-style="AudioTime" timestamp="1625134526"/>
@@ -341,13 +339,13 @@
             <Port type="audio" name="SC Master/ACE Compressor (stereo) 1/audio_in 1"/>
           </IO>
         </Processor>
-        <lv2 last-preset-uri="urn:ardour:a-comp#preset003" last-preset-label="VocalLeveller" parameter-changed-since-last-preset="1">
+        <lv2 last-preset-uri="urn:ardour:a-comp#preset003" last-preset-label="VocalLeveller" parameter-changed-since-last-preset="0">
           <Port symbol="att" value="50"/>
           <Port symbol="rel" value="400"/>
           <Port symbol="kn" value="8"/>
           <Port symbol="rat" value="5"/>
           <Port symbol="thr" value="-16"/>
-          <Port symbol="mak" value="7.0199975967407227"/>
+          <Port symbol="mak" value="9"/>
           <Port symbol="sidech" value="0"/>
           <Port symbol="enable" value="1"/>
         </lv2>
@@ -356,7 +354,7 @@
         <Controllable name="Knee" id="34967" flags="" value="8" parameter="2" symbol="kn"/>
         <Controllable name="Ratio" id="34969" flags="" value="5" parameter="3" symbol="rat"/>
         <Controllable name="Threshold" id="34971" flags="" value="-16" parameter="4" symbol="thr"/>
-        <Controllable name="Makeup" id="34973" flags="" value="7.0199975967407227" parameter="5" symbol="mak"/>
+        <Controllable name="Makeup" id="34973" flags="" value="9" parameter="5" symbol="mak"/>
         <Controllable name="Sidechain" id="34975" flags="Toggle" value="0" parameter="9" symbol="sidech"/>
         <Controllable name="Enable" id="34977" flags="Toggle" value="1" parameter="10" symbol="enable"/>
       </Processor>
@@ -384,7 +382,7 @@
           <Channelmap type="audio" from="1" to="1"/>
         </OutputMap-0>
         <ThruMap/>
-        <audiounit last-preset-uri="" last-preset-label="" parameter-changed-since-last-preset="0">
+        <audiounit last-preset-uri="" last-preset-label="" parameter-changed-since-last-preset="1">
           <plist version="1.0">
             <dict>
               <key>data</key>
@@ -8506,9 +8504,9 @@
       <Window name="RPM-178" visible="0" x-off="-1" y-off="-1" x-size="-1" y-size="-1"/>
       <Window name="RPM-2347" visible="0" x-off="-1" y-off="-1" x-size="-1" y-size="-1"/>
       <Window name="RPM-12866" visible="0" x-off="-1" y-off="-1" x-size="-1" y-size="-1"/>
-      <Window name="P-62-34961" visible="1" x-off="420" y-off="180" x-size="616" y-size="481" custom-ui="1"/>
+      <Window name="P-62-34961" visible="0" x-off="420" y-off="180" x-size="616" y-size="481" custom-ui="1"/>
+      <Window name="P-62-34983" visible="1" x-off="620" y-off="560" x-size="-1" y-size="-1" custom-ui="1"/>
       <Window name="PM-62-34961" visible="0" x-off="-1" y-off="-1" x-size="-1" y-size="-1"/>
-      <Window name="P-62-34983" visible="1" x-off="610" y-off="604" x-size="-1" y-size="-1" custom-ui="1"/>
       <Window name="PM-62-34983" visible="0" x-off="-1" y-off="-1" x-size="-1" y-size="-1"/>
       <GUIObjectState>
         <Object id="rtav 62" height="64" visible="1"/>

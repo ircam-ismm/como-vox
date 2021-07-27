@@ -108,9 +108,9 @@ export function playback(data) {
                      step="1"
                      .value=${data.playbackStartAfterCount.bar}
                      @click="${e => selfSelect(e)}"
-                     @change="${e => voxPlayerState.set({playbackStartAfterCount: (getBarBeat(e) )}) }">
-              <span class="text">
-                mesure${data.playbackStartAfterCount.bar > 1 ? 's' : ''}
+                     @change="${e => voxPlayerState.set({playbackStartAfterCount: (getBarBeat(e) )}) }"
+              >
+              <span class="text">mesure${data.playbackStartAfterCount.bar > 1 ? 's' : ''}
               </span>
             </span>
             <span class="playbackStartAfterCount valueUnit">
@@ -121,8 +121,10 @@ export function playback(data) {
                      step="1"
                      .value=${data.playbackStartAfterCount.beat}
                      @click="${e => selfSelect(e)}"
-                     @change="${e => voxPlayerState.set({playbackStartAfterCount: (getBarBeat(e) )}) }">
-              <span class="text">temps</span>
+                     @change="${e => voxPlayerState.set({playbackStartAfterCount: (getBarBeat(e) )}) }"
+              >
+              <span class="text">temps
+              </span>
             </span>
             ${data.uiConfiguration ? displayToggle(data, 'playbackStartAfterCountUi') : ''}
           </span>
@@ -169,8 +171,7 @@ export function playback(data) {
                      .value=${data.playbackStopAfterCount.bar}
                      @click="${e => selfSelect(e)}"
                      @change="${e => voxPlayerState.set({playbackStopAfterCount: (getBarBeat(e) )}) }">
-              <span class="text">
-                mesure${data.playbackStopAfterCount.bar > 1 ? 's' : ''}
+              <span class="text">mesure${data.playbackStopAfterCount.bar > 1 ? 's' : ''}
               </span>
             </span>
             <span class="playbackStopAfterCount valueUnit">

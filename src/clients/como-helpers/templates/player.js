@@ -2,6 +2,7 @@ import {html} from 'lit-html';
 
 import {clock} from './clock.js';
 import {gestureControl} from './gestureControl.js';
+import {intensity} from './intensity.js';
 import {latency} from './latency.js';
 import {playback} from './playback.js';
 import {position} from './position.js';
@@ -21,8 +22,9 @@ export function player(data) {
     ${latency(data)}
     ${scenario(data)}
     ${score(data)}
-    ${timeSignature(data)}
     ${tempo(data)}
+    ${intensity(data)}
+    ${timeSignature(data)}
     ${position(data)}
     ${playback(data)}
     ${intensity(data)}

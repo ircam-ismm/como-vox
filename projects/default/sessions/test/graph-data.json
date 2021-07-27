@@ -106,10 +106,10 @@
       },
     },
     {
-      id: 'intensityFromGesture',
+      id: 'intensity',
       type: 'ScriptData',
       options: {
-        scriptName: 'intensityFromGestureHysteresis',
+        scriptName: 'intensity',
       },
     },
     {
@@ -214,10 +214,10 @@
     ],
     [
       'score',
-      'intensityFromGesture',
+      'intensity',
     ],
     [
-      'intensityFromGesture',
+      'intensity',
       'dataOutput',
     ],
     [

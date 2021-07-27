@@ -287,6 +287,44 @@ export default {
     nullable: true,
   },
 
+  scoreIntensityCompressionMax: {
+    type: 'float',
+    default: 120, // keep some headroom
+  },
+
+  scoreIntensityCompressionMinFixed: {
+    type: 'float',
+    default: 80, // keep some dynamics
+  },
+
+  scoreIntensityCompressionMinGesture: {
+    type: 'float',
+    default: 110, // flatter than fixed
+  },
+
+  scoreIntensityCompressionMinMaxUi : {
+    type: 'boolean',
+    default: false,
+  },
+
+  scoreIntensityCompressionMode: {
+    type: 'string',
+    // 'auto' uses 'gesture' when 'gestureControlsIntensity' is true, or 'fixed'
+    // 'gesture' uses compression only when 'gestureControlsIntensity' is true
+    // 'fixed' always uses compression
+    default: 'auto', // 'off', 'fixed', 'gesture'
+  },
+
+  scoreIntensityCompressionModeUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  scoreIntensityInputRangeDisplayUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   scoreReady: {
     type: 'boolean',
     default: false,

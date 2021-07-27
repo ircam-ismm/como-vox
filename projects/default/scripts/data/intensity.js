@@ -64,40 +64,40 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
 
   let intensityScale = 1;
 
-  const gestureIntensityMin = 0;
-  const gestureIntensityMedium = 0.15;
-  const gestureIntensityMax = 0.3;
+  const gestureIntensityInputMin = 0;
+  const gestureIntensityInputMedium = 0.15;
+  const gestureIntensityInputMax = 0.3;
 
   // normalised intensity
-  const intensityRangeLowDefault = 0;
-  const intensityRangeMediumDefault = 0.85;
-  const intensityRangeHighDefault = 1;
+  const gestureIntensityNormalisedLowDefault = 0;
+  const gestureIntensityNormalisedMediumDefault = 0.85;
+  const gestureIntensityNormalisedHighDefault = 1;
 
   const noteIntensityCompressedMinDefault = 120;
   const noteIntensityCompressedMaxDefault = 120;
 
-  const gestureToIntensityLow = new Scaler({
-    inputStart: gestureIntensityMin,
-    inputEnd: gestureIntensityMedium,
-    outputStart: intensityRangeLowDefault,
-    outputEnd: intensityRangeMediumDefault,
+  const gestureIntensityToNormalisedLow = new Scaler({
+    inputStart: gestureIntensityInputMin,
+    inputEnd: gestureIntensityInputMedium,
+    outputStart: gestureIntensityNormalisedLowDefault,
+    outputEnd: gestureIntensityNormalisedMediumDefault,
     type: 'linear',
     clip: true,
   });
 
-  const gestureToIntensityHigh = new Scaler({
-    inputStart: gestureIntensityMedium,
-    inputEnd: gestureIntensityMax,
-    outputStart: intensityRangeMediumDefault,
-    outputEnd: intensityRangeHighDefault,
+  const gestureIntensityToNormalisedHigh = new Scaler({
+    inputStart: gestureIntensityInputMedium,
+    inputEnd: gestureIntensityInputMax,
+    outputStart: gestureIntensityNormalisedMediumDefault,
+    outputEnd: gestureIntensityNormalisedHighDefault,
     type: 'linear',
     clip: true,
   });
 
   // clip before hysteresis for better reactivity on saturation
   const gestureIntensityClipper = new Clipper({
-    min: gestureIntensityMin,
-    max: gestureIntensityMax,
+    min: gestureIntensityInputMin,
+    max: gestureIntensityInputMax,
   });
 
   const lowpassPositionDeltaDown = {
@@ -133,25 +133,20 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
     max: 127,
   });
 
-  const parameters = {
+  const parametersPublic = {
     gestureControlsIntensity: false,
-    scaleRangeLow: intensityRangeLowDefault, // normalised intensity
-    scaleRangeHigh: intensityRangeHighDefault, // normalised intensity
+    scoreIntensityCompressionMax: 120, // keep some headroom
+    scoreIntensityCompressionMinFixed: 90,
+    scoreIntensityCompressionMinGesture: 110, // flatter
+    // 'auto' uses 'gesture' when 'gestureControlsIntensity' is true, or 'default'
+    scoreIntensityCompressionMode:'auto', // 'off', 'fixed', 'gesture'
+  };
+
+  const parameters = {
+    ...parametersPublic,
   };
 
   const updateParams = (updates) => {
-    if(typeof updates.scaleRangeLow !== 'undefined') {
-      gestureToIntensityLow.set({
-        outputStart: dBToAmplitude(updates.scaleRangeLow),
-      });
-    }
-
-    if(typeof updates.scaleRangeHigh !== 'undefined') {
-      gestureToIntensityHigh.set({
-        outputEnd: dBToAmplitude(updates.scaleRangeHigh),
-      });
-    }
-
     if(typeof updates.scoreData !== 'undefined') {
       let noteIntensityMin = (updates.scoreData
                               && updates.scoreData.metas
@@ -171,18 +166,40 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
       });
     }
 
+    const noteIntensityCompressorOutputUpdate
+          = typeof updates.scoreIntensityCompressionMode !== 'undefined'
+          || typeof updates.gestureControlsIntensity !== 'undefined'
+          || typeof updates.scoreIntensityCompressionMax !== 'undefined'
+          || typeof updates.scoreIntensityCompressionMinFixed !== 'undefined'
+          || typeof updates.scoreIntensityCompressionMinGesture !== 'undefined';
+
     for(const p of Object.keys(updates) ) {
       if(parameters.hasOwnProperty(p) ) {
         parameters[p] = updates[p];
       }
     }
+
+    if(noteIntensityCompressorOutputUpdate) {
+      let outputStart;
+      if(parameters.gestureControlsIntensity
+         && (parameters.scoreIntensityCompressionMode === 'auto'
+             || parameters.scoreIntensityCompressionMode === 'gesture') ) {
+        outputStart = parameters.scoreIntensityCompressionMinGesture;
+      } else {
+        outputStart = parameters.scoreIntensityCompressionMinFixed;
+      }
+
+      const outputEnd = parameters.scoreIntensityCompressionMax;
+      noteIntensityCompressor.set({outputStart, outputEnd});
+    }
+
   };
 
   ///// Events and data (defined only in browser)
   const registeredEvents = [];
   if(app.events && app.state) {
     [
-      'gestureControlsIntensity',
+      ...Object.keys(parametersPublic),
       'scoreData',
     ].forEach( (event) => {
       const callback = (value) => {
@@ -233,12 +250,12 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
       const gestureIntensitySmoothed
             = gestureIntensitySmoother.process(gestureIntensity);
 
-      if(gestureIntensitySmoothed < gestureIntensityMedium) {
+      if(gestureIntensitySmoothed < gestureIntensityInputMedium) {
         intensityScale
-          = gestureToIntensityLow.process(gestureIntensitySmoothed);
+          = gestureIntensityToNormalisedLow.process(gestureIntensitySmoothed);
       } else {
         intensityScale
-          = gestureToIntensityHigh.process(gestureIntensitySmoothed);
+          = gestureIntensityToNormalisedHigh.process(gestureIntensitySmoothed);
       }
 
       // console.log('sensorsIntensity',
@@ -249,39 +266,49 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
       //               valueMax: gestureIntensityMax,
       //               segmentCharacter: '-'}) );
 
-      // change intensity of noteOn event from score
+
       const eventsContainer = inputData['events'];
-      if(parameters.gestureControlsIntensity && eventsContainer) {
+
+      // compress note intensity
+      const noteIntensityCompression =
+            parameters.scoreIntensityCompressionMode === 'auto'
+            || parameters.scoreIntensityCompressionMode === 'fixed'
+            || (parameters.scoreIntensityCompressionMode === 'gesture'
+                && parameters.gestureControlsIntensity);
+      if(noteIntensityCompression && eventsContainer) {
         for(const [part, events] of Object.entries(eventsContainer) ) {
           events.forEach( (event) => {
             if(event.type === 'noteOn') {
-              const intensityCompressed
-                    = noteIntensityCompressor.process(event.data.intensity);
-
-              event.data.intensity = noteIntensityClipper.process(
-                intensityCompressed * intensityScale);
+              event.data.intensity = noteIntensityCompressor.process(event.data.intensity);
             }
           });
         };
       }
 
-      // notes for clickSynth from clickGenerator clackFromBeat
-      const notesContainer = inputData['notes'];
-      if(parameters.gestureControlsIntensity && notesContainer) {
-        for(const channel of Object.keys(notesContainer) ) {
-          if(!activeChannels.has(channel) ) {
-            continue;
-          }
-          const notes = notesContainer[channel];
-          notes.forEach( (note) => {
-            note.intensity = noteIntensityClipper.process(
-              note.intensity * intensityScale);
+      // apply gesture intensity
+      if(parameters.gestureControlsIntensity && eventsContainer) {
+        for(const [part, events] of Object.entries(eventsContainer) ) {
+          events.forEach( (event) => {
+            if(event.type === 'noteOn') {
+              event.data.intensity *= intensityScale;
+            }
           });
         };
       }
 
+      // clip
+      if(eventsContainer) {
+        for(const [part, events] of Object.entries(eventsContainer) ) {
+          events.forEach( (event) => {
+            if(event.type === 'noteOn') {
+              event.data.intensity = noteIntensityClipper.process(event.data.intensity);
+            }
+         });
+        };
+      }
+
       // be sure to replicate the output of score, as this node is a filter
-      outputData['notes'] = notesContainer;
+      outputData['notes'] = inputData['notes'];
       outputData['events'] = eventsContainer;
       outputData['score'] = inputData['score']; // not needed any more
 

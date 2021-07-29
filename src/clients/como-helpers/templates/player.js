@@ -25,6 +25,7 @@ export function player(data) {
     ${tempo(data)}
     ${position(data)}
     ${playback(data)}
+    ${intensity(data)}
     ${gestureControl(data)}
     ${sound(data)}
 `;

@@ -1,5 +1,10 @@
 export default {
 
+  audioIntensityRange: {
+    type: 'float',
+    default: 40, // dB
+  },
+
   audioLatency: {
     type: 'float',
     default: 10e-3,
@@ -101,11 +106,6 @@ export default {
   gestureControlsTempoUi: {
     type: 'boolean',
     default: true,
-  },
-
-  intensityRange: {
-    type: 'float',
-    default: 40, // dB
   },
 
   // minimum as a request, actual value may be more

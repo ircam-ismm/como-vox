@@ -30,7 +30,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const fadeOutDuration = 0.1; // in seconds
 
   const parameters = {
-    intensityRange: 40, // in dB
+    audioIntensityRange: 40, // in dB
   };
 
   const noteOn = ({
@@ -49,7 +49,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       const envelope = audioContext.createGain();
       source.connect(envelope);
       envelope.gain.value = midiIntensityToAmplitude(intensity, {
-        range: parameters.intensityRange,
+        range: parameters.audioIntensityRange,
       });
 
       envelope.connect(audioOutNode);

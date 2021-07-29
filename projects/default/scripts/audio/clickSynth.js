@@ -18,7 +18,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   ]);
 
   const parameters = {
-    intensityRange: 30, // in dB
+    audioIntensityRange: 30, // in dB
   };
 
   return {
@@ -92,7 +92,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
           // env.gain.value = 0; // bug in Chrome? no sound when set
           env.gain.setValueAtTime(midiIntensityToAmplitude(note.intensity, {
-            range: parameters.intensityRange,
+            range: parameters.audioIntensityRange,
           }),
                                   noteTime);
           env.gain.exponentialRampToValueAtTime(dBToAmplitude(-80), noteTime + noteDuration);

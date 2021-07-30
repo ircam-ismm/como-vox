@@ -16,7 +16,7 @@ export function scenario(data) {
   return (data.uiConfiguration || groupUi ? html`
       <div class="${groupClasses(data, 'scenario', groupUi)}">
         ${data.uiConfiguration || groupUi ? html`
-          <span class="text ${extraClasses(groupUi)}">Scénario</span>
+          <span class="title text ${extraClasses(groupUi)}">Scénario</span>
           ` : ''}
 
           ${data.uiConfiguration || data.scenarioStartStopWithBeatingUi ? html`

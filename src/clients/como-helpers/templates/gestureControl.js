@@ -19,7 +19,7 @@ export function gestureControl(data) {
   return (data.uiConfiguration || groupUi ? html`
       <div class="${groupClasses(data, 'gestureControl', groupUi)}">
         ${data.uiConfiguration || groupUi ? html`
-          <span class="text ${extraClasses(groupUi)}">Contrôle</span>
+          <span class="title text ${extraClasses(groupUi)}">Contrôle</span>
           ` : ''}
 
           ${data.uiConfiguration || data.gestureControlsIntensityUi ? html`

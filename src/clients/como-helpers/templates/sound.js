@@ -19,7 +19,7 @@ export function sound(data) {
   return (data.uiConfiguration || groupUi ? html`
       <div class="${groupClasses(data, 'sound', groupUi)}">
         ${data.uiConfiguration || groupUi ? html`
-          <span class="text ${extraClasses(groupUi)}">Écoute</span>
+          <span class="title text ${extraClasses(groupUi)}">Écoute</span>
           ` : ''}
 
           ${data.uiConfiguration || data.metronomeSoundUi ? html`

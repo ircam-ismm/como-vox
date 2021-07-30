@@ -108,6 +108,37 @@ export default {
     default: true,
   },
 
+  gestureIntensityInputMax: {
+    type: 'float',
+    default: 0.3, // 0.4 for more energy
+  },
+
+  gestureIntensityInputMaxUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  // relative to gestureIntensityInputMax
+  gestureIntensityInputMediumRelative: {
+    type: 'float',
+    default: 0.5, // compression starts in the middle range
+  },
+
+  gestureIntensityInputMediumRelativeUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  gestureIntensityNormalisedMedium: {
+    type: 'float',
+    default: 0.75, // gentle compression
+  },
+
+  gestureIntensityNormalisedMediumUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   // minimum as a request, actual value may be more
   lookAheadNotesRequest: {
     type: 'float',

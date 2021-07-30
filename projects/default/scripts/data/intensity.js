@@ -18,7 +18,97 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
     'score',
   ]);
 
-  // debug
+  // declare with default values
+  const parametersPublic = {
+    gestureControlsIntensity: false,
+
+    gestureIntensityInputMediumRelative: 0.5, // relative to inputMax
+    gestureIntensityInputMax: 0.3, // 0.4 for more energy
+    gestureIntensityNormalisedMedium: 0.75, // gentle compression
+
+    scoreIntensityCompressionMax: 120, // keep some headroom
+    scoreIntensityCompressionMinFixed: 90,
+    scoreIntensityCompressionMinGesture: 110, // flatter
+    // 'auto' uses 'gesture' when 'gestureControlsIntensity' is true, or 'default'
+    scoreIntensityCompressionMode:'auto', // 'off', 'fixed', 'gesture'
+  };
+
+  const parametersPrivate = {
+    gestureIntensityInputMin: 0,
+    gestureIntensityInputMedium: parametersPublic.gestureIntensityInputMediumRelative
+      * parametersPublic.gestureIntensityInputMediumMax,
+
+    gestureIntensityNormalisedLow: 0,
+    gestureIntensityNormalisedHigh: 1,
+  };
+
+  const parameters = {
+    ...parametersPublic,
+    ...parametersPrivate,
+  };
+
+  let inputSamplePeriod = 0.02; // seconds
+
+  let intensityScale = 1;
+
+  const gestureIntensityToNormalisedLow = new Scaler({
+    inputStart: parameters.gestureIntensityInputMin,
+    inputEnd: parameters.gestureIntensityInputMedium,
+    outputStart: parameters.gestureIntensityNormalisedLow,
+    outputEnd: parameters.gestureIntensityNormalisedMedium,
+    type: 'linear',
+    clip: true,
+  });
+
+  const gestureIntensityToNormalisedHigh = new Scaler({
+    inputStart: parameters.gestureIntensityInputMedium,
+    inputEnd: parameters.gestureIntensityInputMax,
+    outputStart: parameters.gestureIntensityNormalisedMedium,
+    outputEnd: parameters.gestureIntensityNormalisedHigh,
+    type: 'linear',
+    clip: true,
+  });
+
+  // clip before hysteresis for better reactivity on saturation
+  const gestureIntensityClipper = new Clipper({
+    min: parameters.gestureIntensityInputMin,
+    max: parameters.gestureIntensityInputMax,
+  });
+
+  const lowpassPositionDeltaDown = {
+    bar: 0.5,
+    beat: 0,
+  }; // 1 bar to go down
+
+  const gestureIntensitySmoother = new Hysteresis({
+    sampleRate: 1 / inputSamplePeriod, // update later
+    lowpassFrequencyUp: 100, // Hz: 180 bpm
+    lowpassFrequencyDown: 1 / positionDeltaToSeconds(lowpassPositionDeltaDown, {
+      tempo: 60, // bpm, will update later
+      timeSignature: {
+        count: 4,
+        division: 4,
+      },
+    }),
+  });
+
+  // when gesture controls intensity, limit intensity range of score
+  const noteIntensityCompressor = new Scaler({
+    inputStart: parameters.noteIntensityCompressedMin,
+    inputEnd: parameters.noteIntensityCompressedMax,
+    outputStart: parameters.noteIntensityCompressedMin,
+    outputEnd: parameters.noteIntensityCompressedMax,
+    type: 'linear',
+    clip: true,
+  });
+
+  // conform to MIDI intensity
+  const noteIntensityClipper = new Clipper({
+    min: 0,
+    max: 127,
+  });
+
+  ////// debug
   const barGraph = (value, {
     peak = undefined,
     valueMin = 0,
@@ -60,109 +150,56 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
     return segments.join('');
   };
 
-  let inputSamplePeriod = 0.02; // seconds
-
-  let intensityScale = 1;
-
-  const gestureIntensityInputMin = 0;
-  const gestureIntensityInputMedium = 0.15;
-  const gestureIntensityInputMax = 0.3;
-
-  // normalised intensity
-  const gestureIntensityNormalisedLowDefault = 0;
-  const gestureIntensityNormalisedMediumDefault = 0.85;
-  const gestureIntensityNormalisedHighDefault = 1;
-
-  const noteIntensityCompressedMinDefault = 120;
-  const noteIntensityCompressedMaxDefault = 120;
-
-  const gestureIntensityToNormalisedLow = new Scaler({
-    inputStart: gestureIntensityInputMin,
-    inputEnd: gestureIntensityInputMedium,
-    outputStart: gestureIntensityNormalisedLowDefault,
-    outputEnd: gestureIntensityNormalisedMediumDefault,
-    type: 'linear',
-    clip: true,
-  });
-
-  const gestureIntensityToNormalisedHigh = new Scaler({
-    inputStart: gestureIntensityInputMedium,
-    inputEnd: gestureIntensityInputMax,
-    outputStart: gestureIntensityNormalisedMediumDefault,
-    outputEnd: gestureIntensityNormalisedHighDefault,
-    type: 'linear',
-    clip: true,
-  });
-
-  // clip before hysteresis for better reactivity on saturation
-  const gestureIntensityClipper = new Clipper({
-    min: gestureIntensityInputMin,
-    max: gestureIntensityInputMax,
-  });
-
-  const lowpassPositionDeltaDown = {
-    bar: 0.5,
-    beat: 0,
-  }; // 1 bar to go down
-
-  const gestureIntensitySmoother = new Hysteresis({
-    sampleRate: 1 / inputSamplePeriod, // update later
-    lowpassFrequencyUp: 100, // Hz: 180 bpm
-    lowpassFrequencyDown: 1 / positionDeltaToSeconds(lowpassPositionDeltaDown, {
-      tempo: 60, // bpm, will update later
-      timeSignature: {
-        count: 4,
-        division: 4,
-      },
-    }),
-  });
-
-  // when gesture controls intensity, limit intensity range of score
-  const noteIntensityCompressor = new Scaler({
-    inputStart: noteIntensityCompressedMinDefault,
-    inputEnd: noteIntensityCompressedMaxDefault,
-    outputStart: noteIntensityCompressedMinDefault,
-    outputEnd: noteIntensityCompressedMaxDefault,
-    type: 'linear',
-    clip: true,
-  });
-
-  // conform to MIDI intensity
-  const noteIntensityClipper = new Clipper({
-    min: 0,
-    max: 127,
-  });
-
-  const parametersPublic = {
-    gestureControlsIntensity: false,
-    scoreIntensityCompressionMax: 120, // keep some headroom
-    scoreIntensityCompressionMinFixed: 90,
-    scoreIntensityCompressionMinGesture: 110, // flatter
-    // 'auto' uses 'gesture' when 'gestureControlsIntensity' is true, or 'default'
-    scoreIntensityCompressionMode:'auto', // 'off', 'fixed', 'gesture'
-  };
-
-  const parameters = {
-    ...parametersPublic,
-  };
-
   const updateParams = (updates) => {
     if(typeof updates.scoreData !== 'undefined') {
       let noteIntensityMin = (updates.scoreData
                               && updates.scoreData.metas
                               && updates.scoreData.metas.noteIntensityMin
                               ? updates.scoreData.metas.noteIntensityMin
-                              : noteIntensityCompressedMinDefault);
+                              : parameters.noteIntensityCompressedMin);
 
       let noteIntensityMax = (updates.scoreData
                               && updates.scoreData.metas
                               && updates.scoreData.metas.noteIntensityMax
                               ? updates.scoreData.metas.noteIntensityMax
-                              : noteIntensityCompressedMaxDefault);
+                              : parameters.noteIntensityCompressedMax);
 
       noteIntensityCompressor.set({
         inputStart: noteIntensityMin,
         inputEnd: noteIntensityMax,
+      });
+    }
+
+    for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
+      }
+    }
+
+    if(typeof updates.gestureIntensityInputMediumRelative !== 'undefined') {
+      parameters.gestureIntensityInputMedium
+        = parameters.gestureIntensityInputMax * parameters.gestureIntensityInputMediumRelative;
+    }
+
+    const gestureIntensityToNormalisedLowUpdate
+          = typeof updates.gestureIntensityInputMediumRelative !== 'undefined'
+          || typeof updates.gestureIntensityNormalisedMedium !== 'undefined';
+    if(gestureIntensityToNormalisedLowUpdate) {
+      gestureIntensityToNormalisedLow.set({
+        inputEnd: parameters.gestureIntensityInputMedium,
+        outputEnd: parameters.gestureIntensityNormalisedMedium,
+      });
+    }
+
+    const gestureIntensityToNormalisedHighUpdate
+          = typeof updates.gestureIntensityInputMediumRelative !== 'undefined'
+          || typeof updates.gestureIntensityInputMax !== 'undefined'
+          || typeof updates.gestureIntensityNormalisedMedium !== 'undefined';
+    if(gestureIntensityToNormalisedLowUpdate) {
+      gestureIntensityToNormalisedHigh.set({
+        inputStart: parameters.gestureIntensityInputMedium,
+        inputEnd: parameters.gestureIntensityInputMax,
+        outputStart: parameters.gestureIntensityNormalisedMedium,
       });
     }
 
@@ -172,13 +209,6 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
           || typeof updates.scoreIntensityCompressionMax !== 'undefined'
           || typeof updates.scoreIntensityCompressionMinFixed !== 'undefined'
           || typeof updates.scoreIntensityCompressionMinGesture !== 'undefined';
-
-    for(const p of Object.keys(updates) ) {
-      if(parameters.hasOwnProperty(p) ) {
-        parameters[p] = updates[p];
-      }
-    }
-
     if(noteIntensityCompressorOutputUpdate) {
       let outputStart;
       if(parameters.gestureControlsIntensity
@@ -250,7 +280,7 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
       const gestureIntensitySmoothed
             = gestureIntensitySmoother.process(gestureIntensity);
 
-      if(gestureIntensitySmoothed < gestureIntensityInputMedium) {
+      if(gestureIntensitySmoothed < parameters.gestureIntensityInputMedium) {
         intensityScale
           = gestureIntensityToNormalisedLow.process(gestureIntensitySmoothed);
       } else {
@@ -259,12 +289,24 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
       }
 
       // console.log('sensorsIntensity',
-      //             (Math.round(100 * sensorsIntensity) * 0.01).toFixed(3),
-      //             barGraph(sensorsIntensity, {
-      //               peak: gestureIntensitySmoothed,
+      //             (Math.round(100 * gestureIntensitySmoothed) * 0.01).toFixed(3),
+      //             barGraph(gestureIntensitySmoothed, {
+      //               peak: sensorsIntensity,
       //               valueMin: 0,
-      //               valueMax: gestureIntensityMax,
-      //               segmentCharacter: '-'}) );
+      //               valueMax: parameters.gestureIntensityInputMax,
+      //               segmentCharacter: '-',
+      //               segmentCharacterPeak: 'X',
+      //             }) );
+
+      // console.log('  intensityScale',
+      //             (Math.round(100 * intensityScale) * 0.01).toFixed(3),
+      //             barGraph(gestureIntensitySmoothed / parameters.gestureIntensityInputMax, {
+      //               peak: intensityScale,
+      //               valueMin: 0,
+      //               valueMax: 1,
+      //               segmentCharacter: '.',
+      //               segmentCharacterPeak: '|',
+      //             }) );
 
 
       const eventsContainer = inputData['events'];

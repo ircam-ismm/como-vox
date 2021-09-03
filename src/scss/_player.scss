@@ -4,6 +4,17 @@
   font-size: medium;
   line-height: normal;
 
+  .separator {
+    content: "";
+    width: 100%;
+    display: block;
+    overflow: hidden;
+  }
+
+  .title {
+    font-weight: bold;
+  }
+
   button {
     background-color: color.$widget-background-color;
     color: color.$widget-color;
@@ -101,6 +112,7 @@
   .group {
     width: 100%;
     margin: 0.2rem;
+    background-color: color.$group-background-color;
   }
 
   .clockTime {
@@ -122,6 +134,19 @@
     .beat {
       font-size: 3rem;
       height: 4rem;
+    }
+  }
+
+  .tempoLimit.relative {
+    width: 3.5em;
+  }
+
+  .scoreIntensityCompressionMinMax {
+    display: inline-flex;
+    flex-flow: row wrap;
+
+    * {
+      margin-right: 0.5rem;
     }
   }
 

@@ -2,7 +2,7 @@ function clickGenerator(graph, helpers, outputFrame) {
   const pitchHigh = 91; // G6
   const pitchLow = 86; // D6
 
-  const channel = 'click';
+  const channel = 'metronome';
   let pitch = pitchLow;
   const intensity = 60;
   const duration = 0.5; // in beats

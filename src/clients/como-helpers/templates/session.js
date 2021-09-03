@@ -9,9 +9,10 @@ import {
 const e = {};
 
 export function session(data) {
-  const groupUi = data.sessionIdUi
+  const groupUi = data.sessionNameUi
+        || data.sessionSelectionUi
         || data.playerIdUi
-        || data.sessionNameUi;
+
 
   return (data.uiConfiguration || groupUi ? html`
       <div class="${groupClasses(data, 'session', groupUi)}">
@@ -34,6 +35,7 @@ export function session(data) {
           ${data.uiConfiguration ? displayToggle(data, 'sessionSelectionUi') : ''}
         </span>
         `: ''}
+
         ${data.uiConfiguration || data.playerIdUi ? html`
         <span class="${elementClasses(data, 'playerId')}">
           <span class="text">Identifiant : ${data.player.id}</span>

@@ -9,7 +9,7 @@ function clackFromBeat(graph, helpers, outputFrame) {
 
   const pitch = 82; // Bb5
 
-  const channel = 'clack';
+  const channel = 'beating';
 
   const intensity = 80;
   const duration = 0.25; // in beats

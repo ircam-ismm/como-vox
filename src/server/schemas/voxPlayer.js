@@ -1,5 +1,10 @@
 export default {
 
+  audioIntensityRange: {
+    type: 'float',
+    default: 40, // dB
+  },
+
   audioLatency: {
     type: 'float',
     default: 10e-3,
@@ -103,24 +108,35 @@ export default {
     default: true,
   },
 
-  handedness: {
-    type: 'string',
-    default: null,
-    nullable: true,
-    metas: {
-      exported: false,
-      stored: true,
-    },
-  },
-
-  handednessUi: {
-    type: 'boolean',
-    default: true,
-  },
-
-  intensityRange: {
+  gestureIntensityInputMax: {
     type: 'float',
-    default: 40, // dB
+    default: 0.3, // 0.4 for more energy
+  },
+
+  gestureIntensityInputMaxUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  // relative to gestureIntensityInputMax
+  gestureIntensityInputMediumRelative: {
+    type: 'float',
+    default: 0.5, // compression starts in the middle range
+  },
+
+  gestureIntensityInputMediumRelativeUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  gestureIntensityNormalisedMedium: {
+    type: 'float',
+    default: 0.75, // gentle compression
+  },
+
+  gestureIntensityNormalisedMediumUi: {
+    type: 'boolean',
+    default: false,
   },
 
   // minimum as a request, actual value may be more
@@ -302,6 +318,44 @@ export default {
     nullable: true,
   },
 
+  scoreIntensityCompressionMax: {
+    type: 'float',
+    default: 120, // keep some headroom
+  },
+
+  scoreIntensityCompressionMinFixed: {
+    type: 'float',
+    default: 80, // keep some dynamics
+  },
+
+  scoreIntensityCompressionMinGesture: {
+    type: 'float',
+    default: 110, // flatter than fixed
+  },
+
+  scoreIntensityCompressionMinMaxUi : {
+    type: 'boolean',
+    default: false,
+  },
+
+  scoreIntensityCompressionMode: {
+    type: 'string',
+    // 'auto' uses 'gesture' when 'gestureControlsIntensity' is true, or 'fixed'
+    // 'gesture' uses compression only when 'gestureControlsIntensity' is true
+    // 'fixed' always uses compression
+    default: 'auto', // 'off', 'fixed', 'gesture'
+  },
+
+  scoreIntensityCompressionModeUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  scoreIntensityInputRangeDisplayUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   scoreReady: {
     type: 'boolean',
     default: false,
@@ -365,9 +419,14 @@ export default {
     default: {
       absoluteMin: 40,
       absoluteMax: 160,
-      relativeMin: 0.51,
-      relativeMax: 1.49,
+      relativeMin: 0.76,
+      relativeMax: 1.24,
     },
+  },
+
+  tempoLimitsUi: {
+    type: 'boolean',
+    default: false,
   },
 
   tempoReset: {

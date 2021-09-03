@@ -11,6 +11,10 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
   const Scaler = app.imports.helpers.Scaler;
   const Clipper = app.imports.helpers.Clipper;
 
+  // change dynamics for these channels only
+  const activeChannels = new Set([
+    'score',
+  ]);
 
   // debug
   const barGraph = (value, {
@@ -270,6 +274,9 @@ function intensityFromGestureNextBeat(graph, helpers, outputFrame) {
       const notesContainer = inputData['notes'];
       if(parameters.gestureControlsIntensity && notesContainer) {
         for(const channel of Object.keys(notesContainer) ) {
+          if(!activeChannels.has(channel) ) {
+            continue;
+          }
           const notes = notesContainer[channel];
           notes.forEach( (note) => {
             note.intensity = noteIntensityClipper.process(

@@ -31,7 +31,8 @@ export function latency(data) {
                          voxPlayerState.set({
                          audioLatency: (parseFloat(e.srcElement.value * 1e-3) || 0),
                          });
-                         } }">
+                         } }"
+            >
             <span class="text">ms</span>
           </span>
           <button class="toggle scenario ${data.scenarioCurrent === 'scenarioLatencyCalibration' ? 'selected' : ''}"
@@ -63,9 +64,8 @@ export function latency(data) {
                          voxPlayerState.set({
                          lookAheadNotesRequest: (parseFloat(e.srcElement.value / 8) || 0),
                          });
-                       } }">
-            <span class="text">
-              croche${data.lookAheadNotesRequest * 8 > 1 ? 's' : ''}
+                       } }"
+            ><span class="text">croche${data.lookAheadNotesRequest * 8 > 1 ? 's' : ''}
             </span>
           </span>
           <span class="text">

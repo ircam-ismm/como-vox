@@ -18,7 +18,7 @@ export function score(data) {
 
         ${data.uiConfiguration || data.scoreUi ? html`
         <span class="${elementClasses(data, 'score')}">
-          <span class="text">Partition</span>
+          <span class="title text">Partition</span>
           <select class="${!data.scoreReady ? 'invalid' : ''}"
                   .value=${data.scoreFileName ? data.scoreFileName : 'none'}
                   @change="${e => {

@@ -298,7 +298,14 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       // const intensityRotation = rotationMovingAverage.process(intensityRotationUnfiltered);
 
       // computing intensity using only one axis
-      const acceleration = inputData['accelerationIncludingGravity'].x;
+      const acceleration = Math.sqrt(
+        inputData['accelerationIncludingGravity'].x
+          * inputData['accelerationIncludingGravity'].x
+          + inputData['accelerationIncludingGravity'].y
+          * inputData['accelerationIncludingGravity'].y
+          + inputData['accelerationIncludingGravity'].z
+          * inputData['accelerationIncludingGravity'].z);
+
 
       // compute 1D acceleration intensity
       const accelerationFiltered = movingAverage.process(

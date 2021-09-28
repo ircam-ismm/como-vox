@@ -65,8 +65,16 @@ User data
 # folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-03-29-morgan'
 # filename = '20210329-*'
 
-folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-04-14-fred'
-filename = '20210414-*'
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-04-14-fred'
+# filename = '20210414-*'
+
+
+
+ifolder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-06-11-celia'
+filename = '20210611-103409-player-2-celia-tempo'
+
+# folder_path = '/Users/bevilacq/Documents/Projects/eduup2020/data/mesures/2021-05-10-Anne-Isabelle'
+# filename = '*'
 
 
 
@@ -97,7 +105,7 @@ y_limits = {'acceleration':(-5,20),'rotation':(-150,150),
 y_limits = 0
 
 #acceleeration
-axis_weights_accel = [1,0,0]
+axis_weights_accel = [0,0,1]
 integration_parameter = -0.8
 acceleration_average_order = 2
 compression = 1

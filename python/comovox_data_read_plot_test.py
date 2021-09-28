@@ -49,9 +49,15 @@ def accel_intensity(accelerometers_data, orientation, time, axis_weights,
     # g = -9.81
     g = 0
 
-    acc_x = accelerometers_data['acc.x'] - (orientation['orientation.x'] * g)
-    acc_y = accelerometers_data['acc.y'] - (orientation['orientation.y'] * g)
-    acc_z = accelerometers_data['acc.z'] - (orientation['orientation.z'] * g)
+    # acc_x = accelerometers_data['acc.x'] - (orientation['orientation.x'] * g)
+    # acc_y = accelerometers_data['acc.y'] - (orientation['orientation.y'] * g)
+    # acc_z = accelerometers_data['acc.z'] - (orientation['orientation.z'] * g)
+    
+    acc_x = accelerometers_data['acc.x']
+    acc_y = accelerometers_data['acc.y']
+    acc_z = -accelerometers_data['acc.z']
+    
+    acc_norm = pd.Series((acc_x**2 + acc_y**2+ acc_z**2)**0.5)
 
     acc_x_filterd = acc_x.rolling(
         window = acceleration_average_order, min_periods = 1).mean()
@@ -59,10 +65,13 @@ def accel_intensity(accelerometers_data, orientation, time, axis_weights,
         window = acceleration_average_order, min_periods = 1).mean()
     acc_z_filterd = acc_z.rolling(
         window = acceleration_average_order, min_periods = 1).mean()
+    acc_norm_filterd = acc_norm.rolling(
+        window = acceleration_average_order, min_periods = 1).mean()
 
     acc_x_derivate = delta(time, acc_x_filterd, delta_order)
     acc_y_derivate = delta(time, acc_y_filterd, delta_order)
     acc_z_derivate = delta(time, acc_z_filterd, delta_order)
+    acc_norm_derivate = delta(time, acc_norm_filterd, delta_order)
 
     # acc_x_derivate = delta(time, accelerometers_data['acc.x'], delta_order)
     # acc_y_derivate = delta(time, accelerometers_data['acc.y'], delta_order)
@@ -74,6 +83,8 @@ def accel_intensity(accelerometers_data, orientation, time, axis_weights,
                                 np.maximum(acc_y_derivate, 0))
     acc_z_int = signal.lfilter([1],[1, integration_parameter],
                                 np.maximum(acc_z_derivate, 0))
+    acc_norm_int = signal.lfilter([1],[1, integration_parameter],
+                                np.maximum(acc_norm_derivate, 0))
 
     # acc_x_int = signal.lfilter([1],[1, integration_parameter],
     #                             np.abs(acc_x_derivate)) #other option, take the square
@@ -81,15 +92,24 @@ def accel_intensity(accelerometers_data, orientation, time, axis_weights,
     #                             np.abs(acc_y_derivate))
     # acc_z_int = signal.lfilter([1],[1, integration_parameter],
     #                             np.abs(acc_z_derivate))
+    # acc_norm_int = signal.lfilter([1],[1, integration_parameter],
+    #                             np.abs(acc_norm_derivate))
 
 
-
+    # intensity = scaling * pd.Series(acc_z_int)
 
     intensity = scaling * pd.Series(((axis_weights[0]*(acc_x_int**2)
                                     + axis_weights[1]*(acc_y_int**2)
                                     + axis_weights[2]*(acc_z_int**2))
                                     /sum(axis_weights))
                                     **(0.5/compression))
+    
+       
+    # intensity = scaling * pd.Series(((axis_weights[0]*(acc_x**2)
+    #                                 + axis_weights[1]*(acc_y**2)
+    #                                 + axis_weights[2]*(acc_z**2))
+    #                                 /sum(axis_weights))
+    #                                 **(0.5/compression))
 
 
     # testing with max values between max
@@ -109,7 +129,7 @@ def accel_intensity(accelerometers_data, orientation, time, axis_weights,
     #         /sum(axis_weights))**(0.5/compression))\
     #         .rolling(window = acceleration_average_order, min_periods = 1).mean()
 
-    return intensity
+    return intensity, acc_norm_int
 
 def rotation_intensity(gyroscope_data, axis_weights,
                     rotation_average_order, scaling):
@@ -450,7 +470,7 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
     playback = sensors['playback']['playback']
 
 
-    acceleration['int.recomputed'] = accel_intensity(
+    acceleration['int.recomputed'], acceleration['acc_norm_int'] = accel_intensity(
                                                 acceleration, orientation, time,
                                                 axis_weights,
                                                 integration_parameter,
@@ -465,7 +485,8 @@ def acceleration_analysis(sensors,axis_weights,integration_parameter,
                              threshold_min, onset_order, inhibition_duration,
                              peak_search_window, detect_up)
 
-    acceleration_script = peak_as_script(sensors['beat']['beat.intensityNormalized'],
+    acceleration_script = peak_as_script(acceleration['acc_norm_int'],
+        # sensors['beat']['beat.intensityNormalized'],
                                          sensors['beat']['beat.acceleration'],
                             sensors['beat']['beat.delta'],
                             rotation['rot.int2'],
@@ -678,7 +699,13 @@ def sensors_plot(sensors, title, y_limits,
     acceleration = sensors['acceleration']
 
     # acceleration_x = pd.DataFrame(sensors['beat']['beat.acceleration'])
-    acceleration['acc_x'] = sensors['beat']['beat.acceleration']
+    # acceleration['acc_x'] = sensors['beat']['beat.acceleration']
+    # acceleration['acc_y'] = sensors['beat']['beat.acceleration']
+    # acceleration['acc_z'] = sensors['beat']['beat.acceleration']
+    
+    
+    
+    
     acceleration['derivate'] =  sensors['beat']['beat.derivate']
     acceleration['intensity'] =  sensors['beat']['beat.intensity']
     acceleration['intFilt'] = sensors['beat']['beat.intensityNormalized']
@@ -695,8 +722,9 @@ def sensors_plot(sensors, title, y_limits,
     acceleration['tempo'] = sensors['tempo']
 
 
-    acceleration_selected = acceleration[['acc_x',
+    acceleration_selected = acceleration[['acc.x','acc.y','acc.z',
                                           'intFilt', 'int.recomputed',
+                                          'acc_norm_int',
                                           'delta','intensityRotation',
                                           'tempo','tempo_estimated']]
 

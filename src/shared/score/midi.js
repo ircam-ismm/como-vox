@@ -55,7 +55,7 @@ ${typeof data}, ${data.constructor}`);
 
   const validation = smf.validate();
   if(validation) {
-    throw new Error(`MIDI parse error, invalid data: ${JSON.stringify(validation)}`);
+    console.error(`MIDI parse error, invalid data: ${JSON.stringify(validation)}`);
   }
 
   const ppqn = smf.ppqn || 96; // default resolution

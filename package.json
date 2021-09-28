@@ -29,7 +29,7 @@
     "@soundworks/core": "^3.0.0",
     "@soundworks/template-helpers": "^1.0.1",
     "@webcomponents/webcomponentsjs": "^2.4.3",
-    "como": "github:ircam-ismm/como#develop",
+    "como": "github:ircam-ismm/como#98bab40db4b793cf538d835296c72c7287ed0100",
     "core-js": "^3.6.5",
     "json-url": "^2.6.0",
     "json5": "^2.1.0",

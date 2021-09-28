@@ -48,6 +48,7 @@
     "@babel/plugin-transform-runtime": "^7.12.15",
     "@babel/preset-env": "^7.12.1",
     "@babel/register": "^7.12.1",
+    "@babel/runtime-corejs3": "^7.15.4",
     "@soundworks/template-build": "^3.0.1",
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",

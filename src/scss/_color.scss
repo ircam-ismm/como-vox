@@ -1,10 +1,12 @@
 $background-color: black;
 $color: white;
 
-$active-color: red;
+$active-color: #ff0000;
 $active-border-color: $active-color;
 
-$invalid-background-color: red;
+$invalid-background-color: #ff0000;
+
+$group-background-color: #222222;
 
 $widget-background-color: #333333;
 $widget-color: white;
@@ -12,3 +14,13 @@ $widget-border-color: #989898;
 
 $widget-selected-color: black;
 $widget-selected-background-color: white;
+
+$ui-selected: #00ff00;
+
+$ui-not-selected-background-color: #003300;
+$ui-not-selected-border-color: #009800;
+$ui-not-selected-color: #00ff00;
+
+$ui-selector-background-color: #003300;
+$ui-selector-border-color: #009800;
+$ui-selector-color: #00ff00;

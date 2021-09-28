@@ -31,10 +31,10 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   };
   let peakSearchLimits = {
     min: 0.25, // seconds
-    max: 0.4, // seconds
-    beats: 0.4,
+    max: 0.5, // seconds
+    beats: 0.5,
     // extension for 'max' and 'beats' when peak is still increasing at end of window
-    extensionFactor: 1.5,
+    extensionFactor: 1.2,
   };
 
   // other parameters
@@ -298,7 +298,14 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
       // const intensityRotation = rotationMovingAverage.process(intensityRotationUnfiltered);
 
       // computing intensity using only one axis
-      const acceleration = inputData['accelerationIncludingGravity'].x;
+      const acceleration = Math.sqrt(
+        inputData['accelerationIncludingGravity'].x
+          * inputData['accelerationIncludingGravity'].x
+          + inputData['accelerationIncludingGravity'].y
+          * inputData['accelerationIncludingGravity'].y
+          + inputData['accelerationIncludingGravity'].z
+          * inputData['accelerationIncludingGravity'].z);
+
 
       // compute 1D acceleration intensity
       const accelerationFiltered = movingAverage.process(

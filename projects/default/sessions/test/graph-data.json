@@ -85,10 +85,10 @@
       },
     },
     {
-      id: 'clickGenerator',
+      id: 'metronomeNotes',
       type: 'ScriptData',
       options: {
-        scriptName: 'clickGenerator',
+        scriptName: 'metronomeNotes',
       },
     },
     {
@@ -106,17 +106,17 @@
       },
     },
     {
-      id: 'intensityFromGesture',
+      id: 'intensity',
       type: 'ScriptData',
       options: {
-        scriptName: 'intensityFromGestureHysteresis',
+        scriptName: 'intensity',
       },
     },
     {
-      id: 'clackFromBeat',
+      id: 'beatingNotes',
       type: 'ScriptData',
       options: {
-        scriptName: 'clackFromBeat',
+        scriptName: 'beatingNotes',
       },
     },
     {
@@ -202,7 +202,7 @@
     ],
     [
       'transport',
-      'clickGenerator',
+      'metronomeNotes',
     ],
     [
       'transport',
@@ -210,14 +210,14 @@
     ],
     [
       'transport',
-      'clackFromBeat',
+      'beatingNotes',
     ],
     [
       'score',
-      'intensityFromGesture',
+      'intensity',
     ],
     [
-      'intensityFromGesture',
+      'intensity',
       'dataOutput',
     ],
     [

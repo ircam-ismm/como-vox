@@ -2,13 +2,55 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
+  const beatsToSeconds = conversion.beatsToSeconds;
+  const notesToBeats = conversion.notesToBeats;
+
+  // to restore after calibration
+  const parametersBackup = {};
+  // initial values
+  const playbackStopSeek = (app.state
+                            && typeof app.state.playbackStopSeek !== 'undefined'
+                            ? app.state.playbackStopSeek
+                            : 'barStart');
+
+  const parametersScenario = {
+    gestureControlsBeatOffset: true,
+    gestureControlsPlaybackStart: false,
+    gestureControlsPlaybackStop: true,
+    gestureControlsTempo: true,
+    playbackStopSeek,
+  };
 
   const parameters = {
+    ...parametersScenario,
     scenarioStatus: 'off',
     initialWaitingDuration: 1, // in seconds, before stillness
     stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start
     stillnessWaitingDurationMax: 2, // in seconds, for time-out
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
+    playback: false,
+    playbackStartAfterCount: {
+      bar: 1,
+      beat: 1, // one more for upbeat before start
+    },
+  };
+
+  const parametersApply = () => {
+    for(const [key, value] of Object.entries(parametersScenario) ) {
+      app.events.emit(key, value);
+    }
+  };
+
+  const parametersSave = () => {
+    for(const p of Object.keys(parametersScenario) ) {
+      parametersBackup[p] = parameters[p];
+    }
+  };
+
+  const parametersRestore = () => {
+    for(const p of Object.keys(parametersBackup) ) {
+      app.events.emit(p, parametersBackup[p]);
+    }
   };
 
   let status = 'off'
@@ -33,6 +75,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   };
 
   const updateParams = (updates) => {
+    console.log("updates = ", updates);
     // propagate error from beating
     if(parameters.scenarioStartStopWithBeating
        && !statusIsError(status)
@@ -42,17 +85,21 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
 
     if(parameters.scenarioStartStopWithBeating
        && statusIsError(updates.scenarioStatus) ) {
-      app.events.emit('gestureControlsPlaybackStart', false);
-      app.events.emit('gestureControlsPlaybackStop', false);
       app.events.emit('scenarioStartStopWithBeating', false);
     }
 
     if(typeof updates.scenarioStartStopWithBeating !== 'undefined') {
+      const activeChanged = updates.scenarioStartStopWithBeating
+            !== parameters.scenarioStartStopWithBeating;
       const active = updates.scenarioStartStopWithBeating;
       parameters.scenarioStartStopWithBeating = active;
       if(active) {
+        if(activeChanged) {
+          parametersSave();
+        }
         // may retrigger, even if already active
         statusUpdate('init');
+        parametersApply();
         app.events.emit('gestureControlsPlaybackStart', false);
         app.events.emit('gestureControlsPlaybackStop', true);
         // must start at the beginning of a bar (from start is fine, too)
@@ -63,11 +110,22 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         app.events.emit('playback', false);
         app.events.emit('tempoReset', true);
       } else {
-        // do not trigger anything on deactivation
+        if(activeChanged) {
+          parametersRestore();
+        }
       }
     }
 
-    if(typeof updates.gestureControlsPlaybackStart !== 'undefined'
+    if(parameters.scenarioStartStopWithBeating
+       && parameters.playback === true
+       && updates.playback === false
+       && status !== 'done') {
+      statusUpdate('off');
+      app.events.emit('scenarioStartStopWithBeating', false);
+    }
+
+    if(parameters.scenarioStartStopWithBeating
+       && typeof updates.gestureControlsPlaybackStart !== 'undefined'
        && !updates.gestureControlsPlaybackStart
        && status === 'ready') {
       statusUpdate('cancel');
@@ -83,14 +141,25 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
   ///// Events and data (defined only in browser)
   const registeredEvents = [];
   if(app.events && app.state) {
-    [
-      'beatGestureWaitingDurationMax',
-      'gestureControlsPlaybackStart',
-      'gestureControlsPlaybackStartStatus',
-      'playbackStopSeek',
-      'scenarioStartStopWithBeating',
-      'scenarioStatus',
-    ].forEach( (event) => {
+        const eventsToRegister =
+          // Use set for uniqueness
+          [...new Set([
+            // register parameters to save and restore
+            ...Object.keys(parametersScenario),
+            // declare own parameters
+            ...[
+              'beatGestureWaitingDurationMax',
+              'gestureControlsPlaybackStart',
+              'gestureControlsPlaybackStartStatus',
+              'playback',
+              'playbackStopSeek',
+              'playbackStartAfterCount',
+              'scenarioStartStopWithBeating',
+              'scenarioStatus',
+            ],
+          ])];
+
+    eventsToRegister.forEach( (event) => {
       const callback = (value) => {
         // compatibility with setGraphOption
         updateParams({[event]: value});
@@ -111,10 +180,13 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       const outputData = app.data;
 
       const {
+        lookAheadNotes,
         playback,
         playbackLatency,
         stillness,
+        tempo,
         time,
+        timeSignature,
       } = inputData;
 
       if(!parameters.scenarioStartStopWithBeating
@@ -158,10 +230,30 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
             beatGestureTriggered = true;
           }
 
+          // wait for 4 beats on 1/4 and 2/4 time signature
+          const barCount = (timeSignature.count >= 3
+                            ? timeSignature.count
+                            : 4);
+
+          // keep some beats for look-ahead
+          const lookAheadBeats =
+                notesToBeats(lookAheadNotes, {timeSignature});
+
+          // warning: this is a float
+          const stopAfterBeatsWithLookAhead
+                = parameters.playbackStartAfterCount.bar * barCount
+                + parameters.playbackStartAfterCount.beat
+                - lookAheadBeats;
+
+          const stopAfterDuration = beatsToSeconds(stopAfterBeatsWithLookAhead, {
+            tempo,
+            timeSignature,
+          });
+
           // wait until hearing playback: add playbackLatency
           if(!beatGestureTriggered
              && (time.local - timeoutTime - playbackLatency
-                 >= parameters.beatGestureWaitingDurationMax) ) {
+                 >= parameters.beatGestureWaitingDurationMax + stopAfterDuration) ) {
             // no start, cancel
             statusUpdate('cancel');
           } else if(playback) {

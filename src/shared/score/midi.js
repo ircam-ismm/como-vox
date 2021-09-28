@@ -43,7 +43,9 @@ export function parse(data) {
   } else if(data.constructor === ArrayBuffer) {
     // jzz needs a string of bytes (8 bits characters)
     const byteArray = new Uint8Array(data);
-    byteString = String.fromCharCode(...byteArray);
+    byteString = byteArray.reduce( (tmpString, character) => {
+      return tmpString + String.fromCharCode(character);
+    }, '')
   } else {
     throw new Error(`Incompatible data type for midi.parse function: \
 ${typeof data}, ${data.constructor}`);
@@ -51,10 +53,10 @@ ${typeof data}, ${data.constructor}`);
 
   const smf = new jzz.MIDI.SMF(byteString);
 
-  const validation = smf.validate();
-  if(validation) {
-    throw new Error(`MIDI parse error, invalid data: ${JSON.stringify(validation)}`);
-  }
+  // const validation = smf.validate();
+  // if(validation) {
+  //   console.error(`MIDI parse error, invalid data: ${JSON.stringify(validation)}`);
+  // }
 
   const ppqn = smf.ppqn || 96; // default resolution
 
@@ -362,8 +364,14 @@ ${typeof data}, ${data.constructor}`);
               case 3:
                 // sequence/track name
 
-                // Latin-1 to UTF-8 conversion
-                name = decodeURIComponent(escape(event.dd));
+                try {
+                  // Latin-1 to UTF-8 conversion
+                  name = decodeURIComponent(escape(event.dd));
+                } catch (error) {
+                  // already UTF-8? Ignore conversion in any case
+                  name = event.dd;
+                }
+
                 // remove control characters
                 name = name.replace(/[\t\r\n\v\f\0]/g, '');
                 part.name = name;

@@ -77,7 +77,6 @@ if(typeof app.state === 'undefined') {
 // for simple debugging in browser...
 console.info('> to mock sensors for debugging purpose, append "&mockSensors=1" to URL');
 console.info('> to use audio for debugging purpose, append "&debugAudio=1" to URI');
-console.info('> for full interface, append "&uiPreset=full" to URI');
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -352,6 +351,8 @@ class PlayerExperience extends AbstractExperience {
 
         case 'scoreFileName': {
           this.events.on(key, async (value) => {
+            const name = (value ? value : undefined);
+            document.title = `CoMo-Vo!x${name ? ` | ${name}` : ''}`;
             this.updateFromEvent(key, value);
             let scoreURI;
             const scoreURIbase = this.state[key];
@@ -359,6 +360,7 @@ class PlayerExperience extends AbstractExperience {
               scoreURI = null;
             } else {
               scoreURI = encodeURI(url.base
+                                   + '/'
                                    + this.voxApplicationState.get('scoresPath')
                                    + '/'
                                    + scoreURIbase);
@@ -390,6 +392,17 @@ class PlayerExperience extends AbstractExperience {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
             this.setPlayback(value);
+          });
+          break;
+        }
+
+        case 'playbackStopSeek': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            // force stop again to seek
+            if(!this.playback) {
+              this.setPlayback(this.playback);
+            }
           });
           break;
         }
@@ -465,10 +478,21 @@ class PlayerExperience extends AbstractExperience {
           const scoreData = midi.parse(request.response);
           // no duplicates in set
           const notes = new Set();
+          if(typeof scoreData.metas === 'undefined') {
+            scoreData.metas = {};
+          }
+          scoreData.metas.noteIntensityMin = 127;
+          scoreData.metas.noteIntensityMax = 0;
           scoreData.partSet.forEach( (part, p) => {
             part.events.forEach( (event) => {
               if(event.type === 'noteOn') {
                 notes.add(event.data.pitch);
+                scoreData.metas.noteIntensityMin
+                  = Math.min(scoreData.metas.noteIntensityMin,
+                             event.data.intensity);
+                scoreData.metas.noteIntensityMax
+                  = Math.max(scoreData.metas.noteIntensityMax,
+                             event.data.intensity);
               }
             });
           });

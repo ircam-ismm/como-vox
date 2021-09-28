@@ -448,7 +448,7 @@ def generate_audio(program)
   # ogg_js_file = open_js_file(program_key, "ogg")
   # mp3_js_file = open_js_file(program_key, "mp3")
 
-  note_to_int("A", 0).upto(note_to_int("C", 8)) do |note_value|
+  note_to_int("C", 0).upto(note_to_int("C", 8)) do |note_value|
     note = int_to_note(note_value)
     # output_name = "#{note[:key]}#{note[:octave]}"
     output_name = "#{note_value}"

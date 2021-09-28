@@ -30,7 +30,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const fadeOutDuration = 0.1; // in seconds
 
   const parameters = {
-    intensityRange: 30, // in dB
+    audioIntensityRange: 40, // in dB
   };
 
   const noteOn = ({
@@ -49,7 +49,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       const envelope = audioContext.createGain();
       source.connect(envelope);
       envelope.gain.value = midiIntensityToAmplitude(intensity, {
-        range: parameters.intensityRange,
+        range: parameters.audioIntensityRange,
       });
 
       envelope.connect(audioOutNode);
@@ -98,10 +98,33 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   };
 
+  const updateParams = (updates) => {
+    for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
+      }
+    }
+  };
+
+  ///// Events and data (defined only in browser)
+  const registeredEvents = [];
+  if(app.events && app.state) {
+    const eventsToRegister = Object.keys(parameters);
+
+    eventsToRegister.forEach( (event) => {
+      const callback = (value) => {
+        // compatibility with setGraphOption
+        updateParams({[event]: value});
+      };
+      registeredEvents.push([event, callback]);
+      app.events.on(event, callback);
+      // apply current state
+      updateParams({[event]: app.state[event]});
+    });
+  }
+
   return {
-    updateParams(updates) {
-      Object.assign(parameters, updates);
-    },
+    updateParams,
 
     process(inputFrame) {
       const inputData = app.data;
@@ -231,6 +254,9 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     },
 
     destroy() {
+      registeredEvents.forEach( ([event, callback]) => {
+        app.events.removeListener(event, callback);
+      });
     },
 
   }

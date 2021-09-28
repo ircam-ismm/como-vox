@@ -11,8 +11,14 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const audioContext = graph.como.audioContext;
 
+  const activeChannels = new Set([
+    'metronome',
+    'beating',
+    'scenario',
+  ]);
+
   const parameters = {
-    intensityRange: 30, // in dB
+    audioIntensityRange: 30, // in dB
   };
 
   return {
@@ -40,7 +46,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
       for(const channel of Object.keys(notesContainer) ) {
         // do not play 'score' channel
-        if(channel === 'score') {
+        if(!activeChannels.has(channel) ) {
           continue;
         }
 
@@ -86,7 +92,7 @@ function clickSynth(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
           // env.gain.value = 0; // bug in Chrome? no sound when set
           env.gain.setValueAtTime(midiIntensityToAmplitude(note.intensity, {
-            range: parameters.intensityRange,
+            range: parameters.audioIntensityRange,
           }),
                                   noteTime);
           env.gain.exponentialRampToValueAtTime(dBToAmplitude(-80), noteTime + noteDuration);

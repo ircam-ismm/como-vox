@@ -54,8 +54,8 @@ function transport(graph, helpers, outputFrame) {
     tempoLimits: {
       absoluteMin: 40,
       absoluteMax: 160,
-      relativeMin: 0.51,
-      relativeMax: 1.49,
+      relativeMin: 0.76,
+      relativeMax: 1.24,
     },
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
   };
@@ -543,23 +543,32 @@ function transport(graph, helpers, outputFrame) {
       if( (parameters.gestureControlsTempo
            || parameters.measures)
           && beatGesture && beatGesture.trigger) {
-        const {
+        let {
           absoluteMin,
           absoluteMax,
           relativeMin,
           relativeMax,
         } = parameters.tempoLimits;
+
+        // tempo is always for quarter-notes
+        absoluteMin *= 4 / timeSignature.division;
+        absoluteMax *= 4 / timeSignature.division;
+
         let tempos = [];
         let beatDeltas = [];
         for(let g = beatGestures.length - 1; g > 0; --g) {
           const timeDelta = beatGestures[g].time - beatGestures[g - 1].time;
           const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
+          const beatDeltaRounded = (beatDelta >=1
+                                    ? Math.round(beatDelta)
+                                    : (beatDelta > 0
+                                       ? 1/Math.round(1/beatDelta)
+                                       : 1) );
 
-          if(beatDelta > 0.5 && beatDelta < 2.5) {
-            const beatDeltaRounded = Math.round(beatDelta);
+          if(beatDeltaRounded >= relativeMin && beatDeltaRounded < relativeMax) {
             const tempoFromGesture = timeDeltaToTempo(timeDelta,
-                                                  beatDeltaRounded,
-                                                  {timeSignature});
+                                                      beatDeltaRounded,
+                                                      {timeSignature});
             if(tempoFromGesture > absoluteMin
                && tempoFromGesture < absoluteMax
                && tempoFromGesture > relativeMin * tempo
@@ -585,7 +594,15 @@ function transport(graph, helpers, outputFrame) {
           // - use median(beatDeltas) to halve tempo
           //   (with transition with mean on middle values)
 
-          const tempoNew = median(tempos) / Math.floor(median(beatDeltas) );
+          const beatDeltasMedian = median(beatDeltas);
+          const temposMedian = median(tempos);
+          let tempoMultiplier = 1;
+          if(beatDeltasMedian >= 1) {
+            tempoMultiplier = 1 / Math.floor(beatDeltasMedian);
+          } else if(beatDeltasMedian > 0) {
+            tempoMultiplier = Math.floor(1 / beatDeltasMedian);
+          }
+          const tempoNew = temposMedian * tempoMultiplier;
 
           tempoSmoother.set({
             inputStart: now.audio,
@@ -698,7 +715,7 @@ function transport(graph, helpers, outputFrame) {
       if(!playback && parameters.gestureControlsPlaybackStart
          && !playbackStartRequest) {
         // wait for 4 beats on 1/4 and 2/4 time signature
-        const barCount = (timeSignature.count > 3
+        const barCount = (timeSignature.count >= 3
                           ? timeSignature.count
                           : 4);
 
@@ -712,13 +729,15 @@ function transport(graph, helpers, outputFrame) {
               + parameters.playbackStartAfterCount.beat
               - startLookAheadBeats;
 
-        const {
+        let {
           absoluteMin: tempoAbsoluteMin,
           absoluteMax: tempoAbsoluteMax,
           relativeMin: tempoRelativeMin,
           relativeMax: tempoRelativeMax,
         } = parameters.tempoLimits;
-
+        // tempo is always for quarter-notes
+        tempoAbsoluteMin *= 4 / timeSignature.division;
+        tempoAbsoluteMax *= 4 / timeSignature.division;
 
         const beatGesturesStart = [];
         // keep gestures after stop, do not change ordering
@@ -926,7 +945,7 @@ function transport(graph, helpers, outputFrame) {
       //////////// auto stop
       if(playback && parameters.gestureControlsPlaybackStop) {
         // wait for 4 beats on 1/4 and 2/4 time signature
-        const barCount = (timeSignature.count > 3
+        const barCount = (timeSignature.count >= 3
                           ? timeSignature.count
                           : 4);
         const stopAfterBeats

@@ -5,6 +5,6 @@ module.exports = {
   plugins: [
     '@babel/plugin-transform-modules-commonjs',
     '@babel/plugin-proposal-export-default-from',
-    ['@babel/plugin-transform-runtime', {regenerator: true}],
+    ['@babel/plugin-transform-runtime', {regenerator: true, corejs: 3}],
   ]
 }

@@ -2,7 +2,12 @@ export default {
 
   audioIntensityRange: {
     type: 'float',
-    default: 40, // dB
+    default: 24, // dB
+  },
+
+  audioIntensityRangeUi: {
+    type: 'boolean',
+    default: false,
   },
 
   audioLatency: {

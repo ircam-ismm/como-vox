@@ -53,10 +53,10 @@ ${typeof data}, ${data.constructor}`);
 
   const smf = new jzz.MIDI.SMF(byteString);
 
-  const validation = smf.validate();
-  if(validation) {
-    console.error(`MIDI parse error, invalid data: ${JSON.stringify(validation)}`);
-  }
+  // const validation = smf.validate();
+  // if(validation) {
+  //   console.error(`MIDI parse error, invalid data: ${JSON.stringify(validation)}`);
+  // }
 
   const ppqn = smf.ppqn || 96; // default resolution
 

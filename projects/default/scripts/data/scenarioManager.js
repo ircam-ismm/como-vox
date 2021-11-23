@@ -3,6 +3,10 @@ function scenarioManager(graph, helpers, outputFrame) {
 
   const scenarioNames = [
     'scenarioLatencyCalibration',
+    'scenarioFull',
+    'scenarioIntensity',
+    'scenarioPlayback',
+    'scenarioTempo',
     'scenarioStartStopWithBeating',
   ];
 
@@ -16,7 +20,6 @@ function scenarioManager(graph, helpers, outputFrame) {
   });
 
   const updateParams = (updates) => {
-
     if(typeof updates.scenarioCurrent !== 'undefined') {
       // exclusive scenarioCurrent: disable others
       parameters.scenarioCurrent = updates.scenarioCurrent;

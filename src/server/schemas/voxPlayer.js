@@ -268,6 +268,46 @@ export default {
     nullable: true,
   },
 
+  scenarioFull: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioFullUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioIntensity: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioIntensityUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioPlayback: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioPlaybackUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioTempo: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioTempoUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   scenarioStartStopWithBeating: {
     type: 'boolean',
     event: true,

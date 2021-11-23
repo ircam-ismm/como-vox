@@ -47,6 +47,20 @@
       },
     },
     {
+      id: 'scenarioFull',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioFull',
+      },
+    },
+    {
+      id: 'scenarioIntensity',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioIntensity',
+      },
+    },
+    {
       id: 'scenarioManager',
       type: 'ScriptData',
       options: {
@@ -58,6 +72,20 @@
       type: 'ScriptData',
       options: {
         scriptName: 'scenarioLatencyCalibration',
+      },
+    },
+    {
+      id: 'scenarioPlayback',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioPlayback',
+      },
+    },
+    {
+      id: 'scenarioTempo',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioTempo',
       },
     },
     {
@@ -190,7 +218,23 @@
     ],
     [
       'stillness',
+      'scenarioFull',
+    ],
+    [
+      'stillness',
+      'scenarioIntensity',
+    ],
+    [
+      'stillness',
       'scenarioLatencyCalibration',
+    ],
+    [
+      'stillness',
+      'scenarioPlayback',
+    ],
+    [
+      'stillness',
+      'scenarioTempo',
     ],
     [
       'scenarioManager',

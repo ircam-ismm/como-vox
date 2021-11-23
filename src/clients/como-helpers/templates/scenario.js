@@ -10,7 +10,12 @@ import {
 const e = {};
 
 export function scenario(data) {
-  const groupUi = data.scenarioStartStopWithBeatingUi;
+  const groupUi = data.scenarioPalybackUi
+        || data.scenarioIntensity
+        || data.scenarioTempoUi
+        || data.scenarioStartStopWithBeatingUi
+        || data.scenarioFullUi;
+
   const voxPlayerState = data.voxPlayerState;
 
   return (data.uiConfiguration || groupUi ? html`
@@ -18,6 +23,69 @@ export function scenario(data) {
         ${data.uiConfiguration || groupUi ? html`
           <span class="title text ${extraClasses(groupUi)}">Scénario</span>
           ` : ''}
+
+          ${data.uiConfiguration || data.scenarioPlaybackUi ? html`
+          <span class="${elementClasses(data, 'scenarioPlayback')}">
+
+
+            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioPlayback' ? 'selected' : ''}"
+                  @click="${e => {
+                     if(data.scenarioCurrent !== 'scenarioPlayback') {
+                       voxPlayerState.set({scenarioPlayback: true});
+                     } else {
+                       voxPlayerState.set({playback: false});
+                       voxPlayerState.set({scenarioPlayback: false});
+                     }
+                  } }"
+            >Écoute</button>
+
+            ${data.uiConfiguration
+              ? displayToggle(data, 'scenarioPlaybackUi')
+              : ''}
+        </span>
+        ` : ''}
+
+          ${data.uiConfiguration || data.scenarioIntensityUi ? html`
+          <span class="${elementClasses(data, 'scenarioIntensity')}">
+
+
+            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioIntensity' ? 'selected' : ''}"
+                  @click="${e => {
+                     if(data.scenarioCurrent !== 'scenarioIntensity') {
+                       voxPlayerState.set({scenarioIntensity: true});
+                     } else {
+                       voxPlayerState.set({playback: false});
+                       voxPlayerState.set({scenarioIntensity: false});
+                     }
+                  } }"
+            >Nuance</button>
+
+            ${data.uiConfiguration
+              ? displayToggle(data, 'scenarioIntensityUi')
+              : ''}
+        </span>
+        ` : ''}
+
+          ${data.uiConfiguration || data.scenarioTempoUi ? html`
+          <span class="${elementClasses(data, 'scenarioTempo')}">
+
+
+            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}"
+                  @click="${e => {
+                     if(data.scenarioCurrent !== 'scenarioTempo') {
+                       voxPlayerState.set({scenarioTempo: true});
+                     } else {
+                       voxPlayerState.set({playback: false});
+                       voxPlayerState.set({scenarioTempo: false});
+                     }
+                  } }"
+            >Tempo</button>
+
+            ${data.uiConfiguration
+              ? displayToggle(data, 'scenarioTempoUi')
+              : ''}
+        </span>
+        ` : ''}
 
           ${data.uiConfiguration || data.scenarioStartStopWithBeatingUi ? html`
           <span class="${elementClasses(data, 'scenarioStartStopWithBeating')}">
@@ -39,6 +107,28 @@ export function scenario(data) {
               : ''}
         </span>
         ` : ''}
+
+          ${data.uiConfiguration || data.scenarioFullUi ? html`
+          <span class="${elementClasses(data, 'scenarioFull')}">
+
+
+            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioFull' ? 'selected' : ''}"
+                  @click="${e => {
+                     if(data.scenarioCurrent !== 'scenarioFull') {
+                       voxPlayerState.set({scenarioFull: true});
+                     } else {
+                       voxPlayerState.set({playback: false});
+                       voxPlayerState.set({scenarioFull: false});
+                     }
+                  } }"
+            >Complet</button>
+
+            ${data.uiConfiguration
+              ? displayToggle(data, 'scenarioFullUi')
+              : ''}
+        </span>
+        ` : ''}
+
 
       </div>
       ` : '');

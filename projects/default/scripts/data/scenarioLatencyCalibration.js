@@ -16,7 +16,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     metronomeSound: true,
     playbackStopSeek: 'start',
     scoreFileName: null,
-    tempo: 60,
+    tempo: 70,
     timeSignature: {count: 4, division: 4},
   };
 

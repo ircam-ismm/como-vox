@@ -1,4 +1,4 @@
-function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
+function scenarioFull(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
@@ -15,6 +15,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
 
   const parametersScenario = {
     gestureControlsBeatOffset: true,
+    gestureControlsIntensity: false,
     gestureControlsPlaybackStart: false,
     gestureControlsPlaybackStop: true,
     gestureControlsTempo: true,
@@ -76,22 +77,22 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
 
   const updateParams = (updates) => {
     // propagate error from beating
-    if(parameters.scenarioStartStopWithBeating
+    if(parameters.scenarioFull
        && !statusIsError(status)
        && statusIsError(updates.gestureControlsPlaybackStartStatus) ) {
       statusUpdate(updates.gestureControlsPlaybackStartStatus);
     }
 
-    if(parameters.scenarioStartStopWithBeating
+    if(parameters.scenarioFull
        && statusIsError(updates.scenarioStatus) ) {
-      app.events.emit('scenarioStartStopWithBeating', false);
+      app.events.emit('scenarioFull', false);
     }
 
-    if(typeof updates.scenarioStartStopWithBeating !== 'undefined') {
-      const activeChanged = updates.scenarioStartStopWithBeating
-            !== parameters.scenarioStartStopWithBeating;
-      const active = updates.scenarioStartStopWithBeating;
-      parameters.scenarioStartStopWithBeating = active;
+    if(typeof updates.scenarioFull !== 'undefined') {
+      const activeChanged = updates.scenarioFull
+            !== parameters.scenarioFull;
+      const active = updates.scenarioFull;
+      parameters.scenarioFull = active;
       if(active) {
         if(activeChanged) {
           parametersSave();
@@ -99,6 +100,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         // may retrigger, even if already active
         statusUpdate('init');
         parametersApply();
+        app.events.emit('tempoReset', true);
         app.events.emit('gestureControlsPlaybackStart', false);
         app.events.emit('gestureControlsPlaybackStop', true);
         // must start at the beginning of a bar (from start is fine, too)
@@ -115,15 +117,15 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       }
     }
 
-    if(parameters.scenarioStartStopWithBeating
+    if(parameters.scenarioFull
        && parameters.playback === true
        && updates.playback === false
        && status !== 'done') {
       statusUpdate('off');
-      app.events.emit('scenarioStartStopWithBeating', false);
+      app.events.emit('scenarioFull', false);
     }
 
-    if(parameters.scenarioStartStopWithBeating
+    if(parameters.scenarioFull
        && typeof updates.gestureControlsPlaybackStart !== 'undefined'
        && !updates.gestureControlsPlaybackStart
        && status === 'ready') {
@@ -153,7 +155,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
               'playback',
               'playbackStopSeek',
               'playbackStartAfterCount',
-              'scenarioStartStopWithBeating',
+              'scenarioFull',
               'scenarioStatus',
             ],
           ])];
@@ -188,15 +190,13 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         timeSignature,
       } = inputData;
 
-      if(!parameters.scenarioStartStopWithBeating
+      if(!parameters.scenarioFull
         || !stillness) {
         return outputFrame;
       }
 
       switch(status) {
         case 'init': {
-          app.events.emit('tempoReset', true);
-
           statusUpdate('waiting');
           break;
         }
@@ -258,6 +258,15 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
             // no start, cancel
             statusUpdate('cancel');
           } else if(playback) {
+
+            // intensity
+            app.events.emit('gestureControlsIntensity', true);
+
+            // tempo
+            app.events.emit('gestureControlsBeatOffset', true);
+            app.events.emit('gestureControlsTempo', true);
+
+
             statusUpdate('playing');
           }
           break;

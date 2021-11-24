@@ -99,7 +99,13 @@ function scenarioFull(graph, helpers, outputFrame) {
         }
         // may retrigger, even if already active
         statusUpdate('init');
+
+        // update to changes
+        parametersScenario.playbackStopSeek = app.state.playbackStopSeek;
+
         parametersApply();
+
+        // over-rides
         app.events.emit('tempoReset', true);
         app.events.emit('gestureControlsPlaybackStart', false);
         app.events.emit('gestureControlsPlaybackStop', true);
@@ -113,6 +119,7 @@ function scenarioFull(graph, helpers, outputFrame) {
       } else {
         if(activeChanged) {
           parametersRestore();
+          app.events.emit('playback', false);
         }
       }
     }

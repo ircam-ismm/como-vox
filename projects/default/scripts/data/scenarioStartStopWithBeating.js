@@ -15,6 +15,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
 
   const parametersScenario = {
     gestureControlsBeatOffset: true,
+    gestureControlsIntensity: false,
     gestureControlsPlaybackStart: false,
     gestureControlsPlaybackStop: true,
     gestureControlsTempo: true,
@@ -98,7 +99,13 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         }
         // may retrigger, even if already active
         statusUpdate('init');
+
+        // update to changes
+        parametersScenario.playbackStopSeek = app.state.playbackStopSeek;
+
         parametersApply();
+
+        // over-rides
         app.events.emit('gestureControlsPlaybackStart', false);
         app.events.emit('gestureControlsPlaybackStop', true);
         // must start at the beginning of a bar (from start is fine, too)
@@ -111,6 +118,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       } else {
         if(activeChanged) {
           parametersRestore();
+          app.events.emit('playback', false);
         }
       }
     }

@@ -33,7 +33,6 @@ export function scenario(data) {
                      if(data.scenarioCurrent !== 'scenarioPlayback') {
                        voxPlayerState.set({scenarioPlayback: true});
                      } else {
-                       voxPlayerState.set({playback: false});
                        voxPlayerState.set({scenarioPlayback: false});
                      }
                   } }"
@@ -54,7 +53,6 @@ export function scenario(data) {
                      if(data.scenarioCurrent !== 'scenarioIntensity') {
                        voxPlayerState.set({scenarioIntensity: true});
                      } else {
-                       voxPlayerState.set({playback: false});
                        voxPlayerState.set({scenarioIntensity: false});
                      }
                   } }"
@@ -75,7 +73,6 @@ export function scenario(data) {
                      if(data.scenarioCurrent !== 'scenarioTempo') {
                        voxPlayerState.set({scenarioTempo: true});
                      } else {
-                       voxPlayerState.set({playback: false});
                        voxPlayerState.set({scenarioTempo: false});
                      }
                   } }"
@@ -96,7 +93,6 @@ export function scenario(data) {
                      if(data.scenarioCurrent !== 'scenarioStartStopWithBeating') {
                        voxPlayerState.set({scenarioStartStopWithBeating: true});
                      } else {
-                       voxPlayerState.set({playback: false});
                        voxPlayerState.set({scenarioStartStopWithBeating: false});
                      }
                   } }"
@@ -117,7 +113,6 @@ export function scenario(data) {
                      if(data.scenarioCurrent !== 'scenarioFull') {
                        voxPlayerState.set({scenarioFull: true});
                      } else {
-                       voxPlayerState.set({playback: false});
                        voxPlayerState.set({scenarioFull: false});
                      }
                   } }"

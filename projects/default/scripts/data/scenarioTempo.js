@@ -162,22 +162,23 @@ function scenarioTempo(graph, helpers, outputFrame) {
 
           const startAfterBeats
                 = parameters.playbackStartAfterCount.bar * barCount
-                + parameters.playbackStartAfterCount.beat
+                + parameters.playbackStartAfterCount.beat;
 
           const seekPosition = positionAddBeats({bar: 1, beat: 1},
                                                 -startAfterBeats,
                                                 {timeSignature});
           app.events.emit('tempoReset', true);
 
-          // @TODO: bug on seek with quick events
           app.events.emit('seekPosition', seekPosition);
           app.events.emit('playback', true);
+          // @TODO: seek after playback for bug on seek (quick events?)
           app.events.emit('seekPosition', seekPosition);
           statusUpdate('precount');
           break;
         }
 
         case 'precount': {
+          // end metronome just after the last beat before start
           const precountEndPosition = positionAddBeats({bar: 1, beat: 1},
                                                        -1,
                                                        {timeSignature});

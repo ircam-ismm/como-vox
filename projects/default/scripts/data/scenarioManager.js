@@ -1,11 +1,15 @@
 function scenarioManager(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
-  const scenarioNames = [
+  const restoreAfter = [
     'scenarioLatencyCalibration',
+    'scenarioListen',
+  ];
+
+  const scenarioNames = [
+    ...restoreAfter,
     'scenarioFull',
     'scenarioIntensity',
-    'scenarioListen',
     'scenarioTempo',
     'scenarioStartStopWithBeating',
   ];
@@ -14,6 +18,7 @@ function scenarioManager(graph, helpers, outputFrame) {
 
   const parameters = {
     scenarioCurrent: null,
+    scenarioLast: null,
   };
   scenarioNames.forEach( (scenarioName) => {
     parameters[scenarioName] = false;
@@ -43,7 +48,8 @@ function scenarioManager(graph, helpers, outputFrame) {
           const scenarioActive = updates[p];
           if(scenarioActive) {
             if(parameters.scenarioCurrent !== scenarioName) {
-              // active is new current
+              // switch scenario: active is new current
+              parameters.scenarioLast = parameters.scenarioCurrent;
               parameters.scenarioCurrent = scenarioName;
               app.events.emit('scenarioCurrent', parameters.scenarioCurrent);
             } else {
@@ -51,8 +57,15 @@ function scenarioManager(graph, helpers, outputFrame) {
             }
           } else if(scenarioName === parameters.scenarioCurrent) {
             // currently active was disabled, no current any more
-            parameters.scenarioCurrent = null;
-            app.events.emit('scenarioCurrent', parameters.scenarioCurrent);
+            const restore = restoreAfter.find( (s) => s === scenarioName);
+            if(restore) {
+              parameters.scenarioCurrent = scenarioName;
+              app.events.emit('scenarioCurrent', parameters.scenarioLast);
+            } else {
+              parameters.scenarioCurrent = null;
+              app.events.emit('scenarioCurrent', null);
+            }
+
           }
         }
       }

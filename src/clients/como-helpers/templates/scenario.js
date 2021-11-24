@@ -10,7 +10,7 @@ import {
 const e = {};
 
 export function scenario(data) {
-  const groupUi = data.scenarioListenUi
+  const groupUi = data.scenarioListeningUi
         || data.scenarioIntensity
         || data.scenarioTempoUi
         || data.scenarioStartStopWithBeatingUi
@@ -25,22 +25,22 @@ export function scenario(data) {
           <span class="title text ${extraClasses(groupUi)}">Scénario</span>
           ` : ''}
 
-          ${data.uiConfiguration || data.scenarioListenUi ? html`
-          <span class="${elementClasses(data, 'scenarioListen')}">
+          ${data.uiConfiguration || data.scenarioListeningUi ? html`
+          <span class="${elementClasses(data, 'scenarioListening')}">
 
 
-            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioListen' ? 'selected' : ''}"
+            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioListening' ? 'selected' : ''}"
                   @click="${e => {
-                     if(data.scenarioCurrent !== 'scenarioListen') {
-                       voxPlayerState.set({scenarioListen: true});
+                     if(data.scenarioCurrent !== 'scenarioListening') {
+                       voxPlayerState.set({scenarioListening: true});
                      } else {
-                       voxPlayerState.set({scenarioListen: false});
+                       voxPlayerState.set({scenarioListening: false});
                      }
                   } }"
             >Écoute</button>
 
             ${data.uiConfiguration
-              ? displayToggle(data, 'scenarioListenUi')
+              ? displayToggle(data, 'scenarioListeningUi')
               : ''}
         </span>
         ` : ''}

@@ -288,12 +288,12 @@ export default {
     default: true,
   },
 
-  scenarioListen: {
+  scenarioListening: {
     type: 'boolean',
     event: true,
   },
 
-  scenarioListenUi: {
+  scenarioListeningUi: {
     type: 'boolean',
     default: true,
   },

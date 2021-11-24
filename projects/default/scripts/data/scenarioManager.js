@@ -3,7 +3,7 @@ function scenarioManager(graph, helpers, outputFrame) {
 
   const restoreAfter = [
     'scenarioLatencyCalibration',
-    'scenarioListen',
+    'scenarioListening',
   ];
 
   const scenarioNames = [

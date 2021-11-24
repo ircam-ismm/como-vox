@@ -2,7 +2,9 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
+  const positionAddBeats = conversion.positionAddBeats;
   const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
+  const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
 
   // to restore after calibration
   const parametersBackup = {};
@@ -157,7 +159,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
         beat: beatGesture,
         playback,
         playbackLatency,
-        positon,
+        position,
         tempo,
         time,
         timeSignature,
@@ -171,47 +173,28 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
 
       switch(status) {
         case 'init': {
-          statusUpdate('waiting');
-          break;
-        }
-
-        case 'waiting': {
-          if(time.local - statusTime >= parameters.initialWaitingDuration) {
-            timeoutTime = time.local;
-            statusUpdate('waitingForStillness');
-          }
-          break;
-        }
-
-        case 'waitingForStillness': {
-          if(time.local - timeoutTime >= parameters.stillnessWaitingDurationMax) {
-            statusUpdate('cancel');
-          } else if(!stillness.status) {
-            // not still, restart
-            statusUpdate('waitingForStillness');
-          } else if(time.local - statusTime >= parameters.stillnessWaitingDurationMin) {
-            timeoutTime = time.local;
-            beatGestureTriggered = false;
-            app.events.emit('seekPosition', {bar: 1, beat: 1});
-            app.events.emit('playback', true);
-            statusUpdate('listening');
-          }
+          beatGestureTriggered = false;
+          app.events.emit('seekPosition', {bar: 1, beat: 1});
+          app.events.emit('playback', true);
+          statusUpdate('listening');
           break;
         }
 
         case 'listening': {
-          if(beatGesture && beatGesture.trigger) {
-            beatGestureTriggered = true;
-            statusUpdate('cancel');
-          }
+          const barCount = (timeSignature.count >= 3
+                            ? timeSignature.count
+                            : 4);
 
-          const listeningDuration = positionDeltaToSeconds(parameters.listeningDuration, {
-               timeSignature,
-               tempo,
-          });
+          const startAfterBeats
+                = parameters.listeningDuration.bar * barCount
+                + parameters.listeningDuration.beat
 
-          if(!beatGestureTriggered
-             && time.local - statusTime >= listeningDuration) {
+          const listeningEndPosition = positionAddBeats({bar: 1, beat: 1},
+                                                        startAfterBeats,
+                                                        {timeSignature});
+
+          if(positionsToBeatsDelta(position, listeningEndPosition,
+                                   {timeSignature}) > 0) {
             app.events.emit('measuresClear', true);
             statusUpdate('ready');
           }
@@ -231,6 +214,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
                  >= parameters.beatGestureWaitingDurationMax) ) {
             // no start, cancel
             statusUpdate('cancel');
+            app.events.emit('playback', false);
           }
           break;
         }

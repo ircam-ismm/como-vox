@@ -4,11 +4,13 @@
 
 - [ ] mise en ligne d’une version pour s’entraîner (Morgan et Marie-Noëlle)
 - [ ] essayer la fonction de duplication de l’audio
-- [ ] simplification de la procédure de calibration
+- [x] simplification de la procédure de calibration
 - [x] calibrer avec un tempo à 70 ?
 - [ ] réglage de latence (faciliter l'accélération ou le ralenti) : [-] [neutre] [+]
 - [ ] réglage de la plage de dynamique [-] [neutre] [+]
 - [x] départ : possibilité d’écouter l’original
+
+- [ ] après une arrêt, reprise depuis la mesure courante
 
 - [ ] mise à jour de l'interface seulement aux changements
 - [ ] remise compresseur et réverbe

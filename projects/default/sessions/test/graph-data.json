@@ -75,10 +75,10 @@
       },
     },
     {
-      id: 'scenarioPlayback',
+      id: 'scenarioListen',
       type: 'ScriptData',
       options: {
-        scriptName: 'scenarioPlayback',
+        scriptName: 'scenarioListen',
       },
     },
     {
@@ -230,7 +230,7 @@
     ],
     [
       'stillness',
-      'scenarioPlayback',
+      'scenarioListen',
     ],
     [
       'stillness',

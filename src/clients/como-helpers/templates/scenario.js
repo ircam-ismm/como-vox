@@ -10,11 +10,12 @@ import {
 const e = {};
 
 export function scenario(data) {
-  const groupUi = data.scenarioPalybackUi
+  const groupUi = data.scenarioListenUi
         || data.scenarioIntensity
         || data.scenarioTempoUi
         || data.scenarioStartStopWithBeatingUi
-        || data.scenarioFullUi;
+        || data.scenarioFullUi
+        || data.scenarioPlaybackUi;
 
   const voxPlayerState = data.voxPlayerState;
 
@@ -24,22 +25,22 @@ export function scenario(data) {
           <span class="title text ${extraClasses(groupUi)}">Scénario</span>
           ` : ''}
 
-          ${data.uiConfiguration || data.scenarioPlaybackUi ? html`
-          <span class="${elementClasses(data, 'scenarioPlayback')}">
+          ${data.uiConfiguration || data.scenarioListenUi ? html`
+          <span class="${elementClasses(data, 'scenarioListen')}">
 
 
-            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioPlayback' ? 'selected' : ''}"
+            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioListen' ? 'selected' : ''}"
                   @click="${e => {
-                     if(data.scenarioCurrent !== 'scenarioPlayback') {
-                       voxPlayerState.set({scenarioPlayback: true});
+                     if(data.scenarioCurrent !== 'scenarioListen') {
+                       voxPlayerState.set({scenarioListen: true});
                      } else {
-                       voxPlayerState.set({scenarioPlayback: false});
+                       voxPlayerState.set({scenarioListen: false});
                      }
                   } }"
             >Écoute</button>
 
             ${data.uiConfiguration
-              ? displayToggle(data, 'scenarioPlaybackUi')
+              ? displayToggle(data, 'scenarioListenUi')
               : ''}
         </span>
         ` : ''}
@@ -121,6 +122,26 @@ export function scenario(data) {
             ${data.uiConfiguration
               ? displayToggle(data, 'scenarioFullUi')
               : ''}
+        </span>
+        ` : ''}
+
+
+        ${data.uiConfiguration || data.scenarioPlaybackUi ? html`
+          <span class="${elementClasses(data, 'scenarioPlayback')}">
+          <span class="selection">
+          ${ [ [false, 'Arrêt'],
+               [true, 'Jeu'],
+             ].map( ([onOff, display]) => {
+            return html`
+            <button class="option scenarioPlayback ${data.scenarioPlayback === onOff
+                           ? 'selected on' : 'off'}"
+                    @click="${e => voxPlayerState.set({scenarioPlayback: (onOff)})}">
+              ${display}
+            </button>
+            `;
+            }) }
+          </span>
+          ${data.uiConfiguration ? displayToggle(data, 'scenarioPlaybackUi') : ''}
         </span>
         ` : ''}
 

@@ -288,9 +288,19 @@ export default {
     default: true,
   },
 
-  scenarioPlayback: {
+  scenarioListen: {
     type: 'boolean',
     event: true,
+  },
+
+  scenarioListenUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioPlayback: {
+    type: 'boolean',
+    default: false,
   },
 
   scenarioPlaybackUi: {

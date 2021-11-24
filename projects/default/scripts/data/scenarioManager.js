@@ -5,7 +5,7 @@ function scenarioManager(graph, helpers, outputFrame) {
     'scenarioLatencyCalibration',
     'scenarioFull',
     'scenarioIntensity',
-    'scenarioPlayback',
+    'scenarioListen',
     'scenarioTempo',
     'scenarioStartStopWithBeating',
   ];

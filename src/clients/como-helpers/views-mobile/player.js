@@ -1,4 +1,4 @@
-import {html} from 'lit-html';
+import {html, nothing} from 'lit-html';
 
 import {player as playerTemplate} from '../templates/player.js';
 import {options} from '../templates/options.js';
@@ -17,14 +17,13 @@ export function player(data, listeners, {
       <!-- LOADER -->
       ${data.player.loading
         ? html`<div class="loadingBanner">Chargement...</div>`
-        : ''}
+        : nothing}
 
-
-     ${options(data)}
+      ${options(data)}
 
       ${!data.uiOptions
         ? html`${playerTemplate(data)}`
-        : ''}
+        : nothing}
 
     </div>  `;
 }

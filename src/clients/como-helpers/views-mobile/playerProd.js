@@ -1,14 +1,9 @@
 import { html, nothing } from 'lit-html';
 
-// for dev purposes, to be removed
-const localState = {
-  showAdvancedSettings: false,
-  showCalibrationScreen: false,
-  calibrationScreenIndex: 1,
-  showCreditsScreen: false,
-};
-
 export function playerProd(data) {
+  const guiState = data.guiState;
+  const exp = data.experience;
+
   return html`
     <header>
       <h1 class="title">
@@ -17,23 +12,23 @@ export function playerProd(data) {
       <button
         class="settings-btn"
         @click="${e => {
-          // console.log('show advanced options');
-          // localState.showAdvancedSettings = !localState.showAdvancedSettings;
-          // renderApp();
+          guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
+          exp.updateGuiState(guiState);
         }}"
       ></button>
     </header>
     <section id="main">
       <div >
       <!-- advanced options overlay -->
-      ${localState.showAdvancedSettings ?
+      ${guiState.showAdvancedSettings ?
         html`
           <div class="settings">
             <div class="adjust-param param-nuance">
-              <p>Ajuster la nuance</p>
+              <p>Sensibilité de la nuance</p>
               <div
                 class="col-3"
                 @click="${e => {
+                  // @note - the buttons should be activated from the state
                   const buttons = e.currentTarget.querySelectorAll('button');
                   Array.from(buttons).forEach(b => b.classList.remove('selected'));
                   e.target.classList.add('selected');
@@ -46,10 +41,11 @@ export function playerProd(data) {
             </div>
 
             <div class="adjust-param param-tempo">
-              <p>Ajuster le tempo</p>
+              <p>Réactivité du tempo</p>
               <div
                 class="col-3"
                 @click="${e => {
+                  // @note - the buttons should be activated from the state
                   const buttons = e.currentTarget.querySelectorAll('button');
                   Array.from(buttons).forEach(b => b.classList.remove('selected'));
                   e.target.classList.add('selected');
@@ -67,10 +63,10 @@ export function playerProd(data) {
               <div class="col-1">
                 <button
                   @click="${e => {
-                    // localState.showAdvancedSettings = false;
-                    // localState.showCalibrationScreen = true;
-                    // localState.calibrationScreenIndex = 0;
-                    // renderApp();
+                    guiState.showAdvancedSettings = false;
+                    guiState.showCalibrationScreen = true;
+                    guiState.calibrationScreenIndex = 0;
+                    exp.updateGuiState(guiState);
                   }}"
                 >Calibrer</button>
               </div>
@@ -80,11 +76,9 @@ export function playerProd(data) {
               <div class="col-2">
                 <p>Latence</p>
                 <input type="number" value="42"
-                  @click="${e => {
-                    // localState.showAdvancedSettings = false;
-                    // localState.showCalibrationScreen = true;
-                    // localState.calibrationScreenIndex = 0;
-                    // renderApp();
+                  @blur="${e => {
+                    const value = parseInt(e.currentTarget.value);
+                    // do something w/ value
                   }}"
                 />
               </div>
@@ -94,7 +88,7 @@ export function playerProd(data) {
       : nothing}
 
       <!-- advanced options overlay -->
-      ${localState.showCalibrationScreen ?
+      ${guiState.showCalibrationScreen ?
         html`
           <div class="calibration">
             <h2>Calibration</h2>
@@ -104,42 +98,42 @@ tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
 consequat.
             </p>
-            ${localState.calibrationScreenIndex === 0 ?
+            ${guiState.calibrationScreenIndex === 0 ?
               html`<div class="adjust-param param-calibration">
                 <div class="col-1">
                   <button
                     class="color-binary"
                     @click="${e => {
-                      // localState.calibrationScreenIndex = 1;
-                      // renderApp();
+                      guiState.calibrationScreenIndex = 1;
+                      exp.updateGuiState(guiState);
                     }}"
                   >Commencer</button>
                   <button
                     class="color-secondary"
                     @click="${e => {
-                      // localState.showCalibrationScreen = false;
-                      // renderApp();
+                      guiState.showCalibrationScreen = false;
+                      exp.updateGuiState(guiState);
                     }}"
                   >Annuler</button>
                 </div>
               </div>`
             : nothing}
-            ${localState.calibrationScreenIndex === 1 ?
+            ${guiState.calibrationScreenIndex === 1 ?
               html`
                 <div class="adjust-param param-calibration">
                 <div class="col-1">
                   <button
                     class="color-binary"
                     @click="${e => {
-                      // localState.showCalibrationScreen = false;
-                      // renderApp();
+                      guiState.showCalibrationScreen = false;
+                      exp.updateGuiState(guiState);
                     }}"
                   >Confirmer</button>
                   <button
                     class="color-secondary"
                     @click="${e => {
-                      // localState.calibrationScreenIndex = 0;
-                      // renderApp();
+                      guiState.calibrationScreenIndex = 0;
+                      exp.updateGuiState(guiState);
                     }}"
                   >Recommencer</button>
                 </div>
@@ -151,14 +145,14 @@ consequat.
       : nothing}
 
       <!-- credits screen overlay -->
-      ${localState.showCreditsScreen ?
+      ${guiState.showCreditsScreen ?
         html`
           <div class="credits">
             <button
               class="close"
               @click="${e => {
-                // localState.showCreditsScreen = false;
-                // renderApp();
+                guiState.showCreditsScreen = false;
+                exp.updateGuiState(guiState);
               }}"
             ></button>
             <p>
@@ -199,7 +193,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           viewbox="0 0 100 100"
           @click="${e => {
             e.currentTarget.classList.toggle('active');
-            // renderApp();
+            exp.updateGuiState(guiState);
           }}"
         >
           <polygon class="play-shape" points="20,15, 80,50, 20,85"></polygon>
@@ -213,6 +207,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
       <div class="exercise-type"
         @click="${e => {
+          // @note - the buttons should be activated from the state
           const buttons = e.currentTarget.querySelectorAll('button');
           Array.from(buttons).forEach(b => b.classList.remove('selected'));
           e.target.classList.add('selected');
@@ -230,7 +225,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           viewbox="0 0 100 100"
           @click="${e => {
             e.currentTarget.classList.toggle('active');
-            // renderApp();
+            exp.updateGuiState(guiState);
           }}"
         >
           <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
@@ -259,9 +254,8 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
     </section>
     <footer
       @click="${e => {
-        console.log('show credits screen');
-        // localState.showCreditsScreen = !localState.showCreditsScreen;
-        // renderApp();
+        guiState.showCreditsScreen = !guiState.showCreditsScreen;
+        exp.updateGuiState(guiState);
       }}"
     ></footer>
 `;

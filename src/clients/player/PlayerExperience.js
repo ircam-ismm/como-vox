@@ -193,12 +193,19 @@ class PlayerExperience extends AbstractExperience {
 
   async start() {
     await super.start();
-    // console.log('hasDeviceMotion', this.como.hasDeviceMotion);
+
+    // playerProd only
+    this.guiState = {
+      showAdvancedSettings: false,
+      showCalibrationScreen: false,
+      calibrationScreenIndex: 0,
+      showCreditsScreen: false,
+    };
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');
     this.voxApplicationState.subscribe( (updates) => {
       // ...
-    })
+    });
 
     // 1. create a como player instance w/ a unique id (we default to the nodeId)
     const player = await this.como.project.createPlayer(this.como.client.id);
@@ -326,12 +333,20 @@ class PlayerExperience extends AbstractExperience {
 
     window.addEventListener('resize', () => this.render());
 
-    const updateClock = () => {
-      this.render();
-      this.rafId = window.requestAnimationFrame(updateClock);
-    };
+    if (!PLAYER_PROD) {
+      const updateClock = () => {
+        this.render();
+        this.rafId = window.requestAnimationFrame(updateClock);
+      };
 
-    this.rafId = window.requestAnimationFrame(updateClock);
+      this.rafId = window.requestAnimationFrame(updateClock);
+    }
+  }
+
+  // playerProd only - might be removed later
+  updateGuiState(state) {
+    this.guiState = state;
+    this.render();
   }
 
   updateFromState(key, value) {
@@ -341,7 +356,6 @@ class PlayerExperience extends AbstractExperience {
     if(event || JSON.stringify(value) !== JSON.stringify(this.state[key] ) ) {
       app.events.emit(key, value);
     }
-
   }
 
   // immediate to data and asynchronously to voxPlayerState
@@ -358,7 +372,8 @@ class PlayerExperience extends AbstractExperience {
       }
 
       const stored = schema.isStored(voxPlayerSchema, key);
-      if(stored) {
+
+      if (stored) {
         storage.save(key, value);
       }
     }
@@ -764,7 +779,10 @@ class PlayerExperience extends AbstractExperience {
       tempo: this.tempo, // override state tempo which is reference tempo
       voxApplicationState: this.voxApplicationState,
       voxPlayerState: this.voxPlayerState,
-      PLAYER_PROD
+
+      // player prod only
+      PLAYER_PROD,
+      guiState: this.guiState,
     };
 
     const listeners = this.listeners;

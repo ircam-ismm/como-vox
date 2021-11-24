@@ -22,6 +22,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     timeSignature: {count: 4, division: 4},
   };
 
+  // default values to register
   const parameters = {
     ...parametersScenario,
     audioLatency: 0,
@@ -30,9 +31,9 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     beatingDuration: {bar: 4, beat: 0},
     beatingStandardDeviationMax: 0.25, // in seconds
     initialWaitingDuration: 1, // in seconds, before stillness
-    listeningDuration: {bar: 1, beat: 0}, // before beating
     playback: false,
     playbackLatency: 0,
+    playbackStartAfterCount: {bar: 1, beat: 1}, // upbeat and one bar
     scenarioStatus: 'off',
     stillnessWaitingDurationMax: 2, // in seconds, for time-out
     stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start
@@ -130,6 +131,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
               'beatGestureWaitingDurationMax',
               'playback',
               'playbackLatency',
+              'playbackStartAfterCount',
               'scenarioLatencyCalibration',
               'scenarioStatus',
             ],
@@ -174,26 +176,34 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
       switch(status) {
         case 'init': {
           beatGestureTriggered = false;
-          app.events.emit('seekPosition', {bar: 1, beat: 1});
-          app.events.emit('playback', true);
-          statusUpdate('listening');
-          break;
-        }
 
-        case 'listening': {
+          // wait for 4 beats on 1/4 and 2/4 time signature
           const barCount = (timeSignature.count >= 3
                             ? timeSignature.count
                             : 4);
 
           const startAfterBeats
-                = parameters.listeningDuration.bar * barCount
-                + parameters.listeningDuration.beat
+                = parameters.playbackStartAfterCount.bar * barCount
+                + parameters.playbackStartAfterCount.beat;
 
-          const listeningEndPosition = positionAddBeats({bar: 1, beat: 1},
-                                                        startAfterBeats,
-                                                        {timeSignature});
+          const seekPosition = positionAddBeats({bar: 1, beat: 1},
+                                                -startAfterBeats,
+                                                {timeSignature});
 
-          if(positionsToBeatsDelta(position, listeningEndPosition,
+          app.events.emit('tempoReset', true);
+
+          app.events.emit('seekPosition', seekPosition);
+          app.events.emit('playback', true);
+          // @TODO: seek after playback for bug on seek (quick events?)
+          app.events.emit('seekPosition', seekPosition);
+          statusUpdate('precount');
+          break;
+        }
+
+        case 'precount': {
+          // start with first beat
+          const precountEndPosition = {bar: 1, beat: 1};
+          if(positionsToBeatsDelta(position, precountEndPosition,
                                    {timeSignature}) > 0) {
             app.events.emit('measuresClear', true);
             statusUpdate('ready');

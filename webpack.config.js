@@ -10,10 +10,6 @@ const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 const scssInputPath = './src/scss';
 const cssOutputPath = './public/css';
 
-const scssEntries = glob.sync(`${scssInputPath}/*.scss`, {
-  ignore: `${scssInputPath}/_*`,
-});
-
 // returns an object, to get one output file per entry
 function scssEntriesGet() {
   return glob

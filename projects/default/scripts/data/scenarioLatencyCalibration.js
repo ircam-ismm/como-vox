@@ -19,7 +19,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     playbackStopSeek: 'start',
     scoreFileName: null,
     tempo: 70,
-    timeSignature: {count: 4, division: 4},
+    timeSignature: {count: 2, division: 4},
   };
 
   // default values to register

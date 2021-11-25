@@ -24,7 +24,7 @@ export function playerProd(data) {
         html`
           <div class="settings">
             <div class="adjust-param param-nuance">
-              <p>Sensibilité de la nuance</p>
+              <p>Réactivité de la nuance</p>
               <div
                 class="col-3"
                 @click="${e => {
@@ -98,48 +98,30 @@ tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
 consequat.
             </p>
-            ${guiState.calibrationScreenIndex === 0 ?
-              html`<div class="adjust-param param-calibration">
-                <div class="col-1">
-                  <button
-                    class="color-binary"
-                    @click="${e => {
-                      guiState.calibrationScreenIndex = 1;
-                      exp.updateGuiState(guiState);
-                    }}"
-                  >Commencer</button>
-                  <button
-                    class="color-secondary"
-                    @click="${e => {
+            <div class="adjust-param param-calibration">
+              <div class="col-1">
+                <button
+                  class="color-default"
+                  @click="${e => {
+                    e.target.classList.remove('color-default');
+                    e.target.classList.add('color-process');
+                    e.target.innerText = 'Calibration en cours...'
+
+                    setTimeout(() => {
                       guiState.showCalibrationScreen = false;
                       exp.updateGuiState(guiState);
-                    }}"
-                  >Annuler</button>
-                </div>
-              </div>`
-            : nothing}
-            ${guiState.calibrationScreenIndex === 1 ?
-              html`
-                <div class="adjust-param param-calibration">
-                <div class="col-1">
-                  <button
-                    class="color-binary"
-                    @click="${e => {
-                      guiState.showCalibrationScreen = false;
-                      exp.updateGuiState(guiState);
-                    }}"
-                  >Confirmer</button>
-                  <button
-                    class="color-secondary"
-                    @click="${e => {
-                      guiState.calibrationScreenIndex = 0;
-                      exp.updateGuiState(guiState);
-                    }}"
-                  >Recommencer</button>
-                </div>
+                    }, 3000);
+                  }}"
+                >Commencer</button>
+                <button
+                  class="color-white"
+                  @click="${e => {
+                    guiState.showCalibrationScreen = false;
+                    exp.updateGuiState(guiState);
+                  }}"
+                >Annuler</button>
               </div>
-              `
-            : nothing}
+            </div>
           </div>
         `
       : nothing}
@@ -215,8 +197,8 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       >
         <button>Nuance</button>
         <button>Tempo</button>
+        <button>Tempo & Nuance</button>
         <button>Départ</button>
-        <button class="all">Tutti !</button>
       </div>
 
       <div class="exercise-control">

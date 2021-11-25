@@ -58,7 +58,7 @@ footer {
     span {
       font-size: 1rem;
       display: block;
-      margin-top: 10px;
+      margin-top: 16px;
     }
   }
 }
@@ -158,8 +158,8 @@ section#main {
       width: 34px;
       height: 34px;
       padding: 5px;
-      background-color: $primary-color;
-      /*background-color: $secondary-color;*/
+      // background-color: $primary-color;
+      background-color: $secondary-color;
       border-radius: 4px;
       border: none;
       position: absolute;
@@ -171,8 +171,8 @@ section#main {
       .stop-shape { display: none; }
 
       &.active {
-        /*background-color: $primary-color;*/
-        background-color: $secondary-color;
+        background-color: $primary-color;
+        // background-color: $secondary-color;
 
         .play-shape { display: none; }
         .stop-shape { display: block; }
@@ -231,6 +231,7 @@ section#main {
       .play-shape { display: block; }
       .stop-shape { display: none; }
 
+      &.active { background-color: $primary-color; }
       &.active .play-shape { display: none; }
       &.active .stop-shape { display: block; }
     }
@@ -274,7 +275,7 @@ section#main {
   }
 
   .metronome .value.active {
-    background-color: $secondary-color;
+    background-color: white;
     background-image: url(../images/speaker-off.png);
     background-repeat: no-repeat;
     background-position: 50% 50%;
@@ -292,7 +293,7 @@ section#main {
   width: 100%;
   top: 0;
   left: 0;
-  background-color: #dedede;
+  background-color: #eee;
   z-index: 1;
   padding: 20px;
   box-shadow: 0px 2px 4px #909090;
@@ -325,7 +326,7 @@ section#main {
       height: 30px;
       border: 1px solid $border-color;
       border-radius: 4px;
-      background-color: #efefef;
+      background-color: #fff;
     }
 
     div button.selected {
@@ -387,16 +388,20 @@ section#main {
     width: 100%;
     margin-bottom: 10px;
 
-    &:active {
-      background-color: $secondary-color;
+    &.color-default {
+      background-color: $secondary-color !important;
     }
 
-    &.color-binary {
+    &.color-process {
       background-color: $primary-color !important;
     }
 
-    &.color-secondary {
-      background-color: $secondary-color !important;
+    &.color-white {
+      background-color: white !important;
+    }
+
+    &:active {
+      background-color: $secondary-color;
     }
   }
 }

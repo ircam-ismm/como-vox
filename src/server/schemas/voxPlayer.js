@@ -15,13 +15,31 @@ export default {
     default: 10e-3,
     metas: {
       exported: false,
+      stored: false,
+    },
+  },
+
+  audioLatencyMeasured: {
+    type: 'float',
+    default: 10e-3,
+    metas: {
+      exported: false,
       stored: true,
     },
   },
 
-  audioLatencyUi: {
+  audioLatencyMeasuredUi: {
     type: 'boolean',
     default: true,
+  },
+
+  audioLatencyAdaptation: {
+    type: 'float',
+    default: 0,
+    metas: {
+      exported: false,
+      stored: true,
+    },
   },
 
   beatGestureWaitingDurationMax: {
@@ -54,9 +72,32 @@ export default {
     default: false,
   },
 
-  editorGUI: {
+  gestureAdaptationIntensityMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+      stored: true,
+    },
+  },
+
+  gestureAdaptationIntensityModeUi: {
     type: 'boolean',
-    default: false,
+    default: true,
+  },
+
+  gestureAdaptationTempoMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+      stored: true,
+    },
+  },
+
+  gestureAdaptationTempoModeUi: {
+    type: 'boolean',
+    default: true,
   },
 
   gestureControlsBeatOffset: {
@@ -319,6 +360,16 @@ export default {
   },
 
   scenarioTempoUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioTempoIntensity: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioTempoIntensityUi: {
     type: 'boolean',
     default: true,
   },

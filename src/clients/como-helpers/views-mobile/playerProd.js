@@ -4,6 +4,15 @@ export function playerProd(data) {
   const guiState = data.guiState;
   const exp = data.experience;
 
+  const voxApplicationState = data.voxApplicationState;
+  const voxPlayerState = data.voxPlayerState;
+
+  // @TODO
+  // init?
+
+  // data.scoreFileName
+  const loading = data.scoreFileName && !data.scoreReady;
+
   return html`
     <header>
       <h1 class="title">
@@ -164,9 +173,22 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       <!-- choose track and preview -->
       <div class="track">
         <div class="select">
-          <select>
-            <option>my super track</option>
-            <option>my super track 2</option>
+          <select .value=${data.scoreFileName ? data.scoreFileName : 'none'}
+                  @change="${e => {
+
+                         const scoreFileName = (e.target.value === 'none' ? null : e.target.value);
+                         voxPlayerState.set({scoreFileName});
+                         }}"
+          >
+            ${['none', ...voxApplicationState.get('scores')].map( (scoreFileName) => {
+            return html`
+            <option
+              .value=${scoreFileName}
+              ?selected="${data.scoreFileName
+                     === (scoreFileName === 'none' ? null : scoreFileName)}"
+            >${scoreFileName === 'none' ? 'aucune' : scoreFileName}</option>
+            `;
+            })}
           </select>
           <div class="select-arrow"></div>
         </div>
@@ -183,7 +205,9 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </svg>
 
         <p class="track-infos">
-          4/4 - 80 à la noire
+          ${data.score
+            ? `${data.timeSignature.count}/${data.timeSignature.division} - ${data.score.metas.tempo} à la noire`
+            : ''}
         </p>
       </div>
 

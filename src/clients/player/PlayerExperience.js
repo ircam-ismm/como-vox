@@ -197,8 +197,8 @@ class PlayerExperience extends AbstractExperience {
 
     // playerProd only
     this.guiState = {
-      showAdvancedSettings: true,
-      showCalibrationScreen: false,
+      showAdvancedSettings: false,
+      showCalibrationScreen: true,
       showCreditsScreen: false,
     };
 
@@ -760,8 +760,6 @@ class PlayerExperience extends AbstractExperience {
   }
 
   render() {
-    console.log('render');
-
     const syncTime = this.sync.getSyncTime();
     // warning: syncTime is NOT compensated
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
@@ -800,10 +798,23 @@ class PlayerExperience extends AbstractExperience {
     if (!this.como.hasDeviceMotion && !this.state['mockSensors'] ) {
       screen = views.sorry(viewData, listeners);
     } else if (this.coMoPlayer.session === null) {
-      screen = views.manageSessions(viewData, listeners, {
-        enableCreation: false,
-        enableSelection: !PLAYER_PROD,
-      });
+      if (!PLAYER_PROD) {
+        screen = views.manageSessions(viewData, listeners, {
+          enableCreation: false,
+          enableSelection: !PLAYER_PROD,
+        });
+      } else {
+        screen = html`
+          <section id="home">
+            <img class="logo" src="./images/logo.png" alt="como vox" />
+            <svg class="button" viewbox="0 0 100 100">
+              <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
+            </svg>
+            <p>Chargement de l'application...</p>
+          </section>
+          <footer></footer>
+        `
+      }
     } else {
       if (!PLAYER_PROD) {
         screen = views[this.client.type](viewData, listeners, {

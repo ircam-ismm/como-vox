@@ -318,6 +318,16 @@ export default {
     default: true,
   },
 
+  scenarioTempoIntensity: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioTempoIntensityUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   scenarioStartStopWithBeating: {
     type: 'boolean',
     event: true,

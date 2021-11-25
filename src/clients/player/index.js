@@ -31,7 +31,7 @@ async function launch($container, index) {
 
     const como = new CoMo(client, audioContext);
     await como.init();
-    initQoS(client);
+    // initQoS(client);
 
     const experience = new PlayerExperience(como, config, $container);
     // store exprience for emulated clients

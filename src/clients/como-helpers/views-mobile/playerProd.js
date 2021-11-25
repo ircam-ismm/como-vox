@@ -7,9 +7,19 @@ export function playerProd(data) {
   const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
 
-  // console.log(voxPlayerState.get('scoreData'));
-  // data.scoreFileName
+  // calibration
+  // voxPlayerState.set({scenarioLatencyCalibration: true});
+
+  // @todo loading screen
   const loading = data.scoreFileName && !data.scoreReady;
+  // const isCalibrating
+  console.log('------------------------------------------');
+  // console.log(voxPlayerState.get('scenarioCurrent'));
+  // console.log(voxPlayerState.get('scenarioLatencyCalibration'));
+  // console.log(voxPlayerState.get('playback'));
+  console.log(data.scenarioCurrent);
+  // console.log(data.scenarioLatencyCalibration);
+  console.log(data.scenarioStatus); // 'init' 'precount' 'ready' 'playing' 'cancel'
 
   return html`
     <header>
@@ -20,10 +30,16 @@ export function playerProd(data) {
         class="settings-btn"
         @click="${e => {
           guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
+
+          if (guiState.showAdvancedSettings) {
+            data.voxPlayerState.set({ scenarioPlayback: false });
+          }
+
           exp.updateGuiState(guiState);
         }}"
       ></button>
     </header>
+
     <section id="main">
       <div >
       <!-- ---------------------------------- -->
@@ -127,21 +143,25 @@ consequat.
             <div class="adjust-param param-calibration">
               <div class="col-1">
                 <button
-                  class="color-default"
+                  class="${
+                    data.scenarioCurrent !== 'scenarioLatencyCalibration' ?
+                      'color-default' : 'color-process'
+                  }"
                   @click="${e => {
-                    e.target.classList.remove('color-default');
-                    e.target.classList.add('color-process');
-                    e.target.innerText = 'Calibration en cours...'
-
-                    setTimeout(() => {
-                      guiState.showCalibrationScreen = false;
-                      exp.updateGuiState(guiState);
-                    }, 3000);
+                    if (data.scenarioCurrent !== 'scenarioLatencyCalibration') {
+                      voxPlayerState.set({ scenarioLatencyCalibration: true });
+                    }
                   }}"
-                >Commencer</button>
+                >
+                  ${data.scenarioCurrent !== 'scenarioLatencyCalibration' ?
+                    'Commencer' : 'Calibration en cours...'}
+                </button>
                 <button
                   class="color-white"
                   @click="${e => {
+                    voxPlayerState.set({ playback: false });
+                    voxPlayerState.set({ scenarioLatencyCalibration: false });
+
                     guiState.showCalibrationScreen = false;
                     exp.updateGuiState(guiState);
                   }}"
@@ -239,7 +259,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           ? html`
               <p class="track-infos">
                 ${data.timeSignature.count}/${data.timeSignature.division} -
-                ${Math.floor(data.tempo)} à la noire
+                ${Math.floor(data.scoreData.masterTrack.tempo)} à la noire
               </p>
             `
           : html`<p class="track-infos"></p>`
@@ -257,52 +277,48 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         <button
           class="${voxPlayerState.get('scenarioIntensity') ? 'selected' : ''}"
           @click="${e => {
+            if (voxPlayerState.get('scenarioPlayback')) {
+              return;
+            }
+
             if (!voxPlayerState.get('scenarioIntensity')) {
-              voxPlayerState.set({
-                scenarioIntensity: true,
-                scenarioTempo: false,
-                scenarioFull: false,
-                scenarioStartStopWithBeating: false,
-              });
+              voxPlayerState.set({ scenarioIntensity: true });
             }
           }}"
         >Nuance</button>
         <button
           class="${voxPlayerState.get('scenarioTempo') ? 'selected' : ''}"
           @click="${e => {
+            if (voxPlayerState.get('scenarioPlayback')) {
+              return;
+            }
+
             if (!voxPlayerState.get('scenarioTempo')) {
-              voxPlayerState.set({
-                scenarioIntensity: false,
-                scenarioTempo: true,
-                scenarioFull: false,
-                scenarioStartStopWithBeating: false,
-              });
+              voxPlayerState.set({ scenarioTempo: true });
             }
           }}"
         >Tempo</button>
         <button
           class="${voxPlayerState.get('scenarioFull') ? 'selected' : ''}"
           @click="${e => {
+            if (voxPlayerState.get('scenarioPlayback')) {
+              return;
+            }
+
             if (!voxPlayerState.get('scenarioFull')) {
-              voxPlayerState.set({
-                scenarioIntensity: false,
-                scenarioTempo: false,
-                scenarioFull: true,
-                scenarioStartStopWithBeating: false,
-              });
+              voxPlayerState.set({ scenarioFull: true });
             }
           }}"
         >Tempo & Nuance</button>
         <button
           class="${voxPlayerState.get('scenarioStartStopWithBeating') ? 'selected' : ''}"
           @click="${e => {
+            if (voxPlayerState.get('scenarioPlayback')) {
+              return;
+            }
+
             if (!voxPlayerState.get('scenarioStartStopWithBeating')) {
-              voxPlayerState.set({
-                scenarioIntensity: false,
-                scenarioTempo: false,
-                scenarioFull: false,
-                scenarioStartStopWithBeating: true,
-              });
+              voxPlayerState.set({ scenarioStartStopWithBeating: true });
             }
           }}"
         >Départ</button>
@@ -334,11 +350,21 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
       <div class="tempo-current">
         <span class="label">Tempo courant</span>
-        <span class="value">${data}</span>
+        <span class="value">${Math.floor(data.tempo)}</span>
       </div>
+
       <div class="tempo-reference">
         <span class="label">Tempo de référence</span>
-        <input value="80" type="number" class="value" />
+        <input
+          value="80"
+          type="number"
+          class="value"
+          @blur="${e => {
+            const value = parseFloat(e.currentTarget.value);
+            const tempo = (value * 4 / data.timeSignature.division) || 60;
+            voxPlayerState.set({ tempo });
+          }}"
+        />
       </div>
 
       <div class="metronome">

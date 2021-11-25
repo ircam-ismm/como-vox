@@ -91,6 +91,7 @@ export default {
     default: 'normal',
     metas: {
       exported: false,
+      stored: true,
     },
   },
 

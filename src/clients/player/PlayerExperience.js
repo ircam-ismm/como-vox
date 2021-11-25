@@ -197,7 +197,7 @@ class PlayerExperience extends AbstractExperience {
     // playerProd only
     this.guiState = {
       showAdvancedSettings: false,
-      showCalibrationScreen: true,
+      showCalibrationScreen: false,
       showCreditsScreen: false,
     };
 

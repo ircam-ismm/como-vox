@@ -7,19 +7,7 @@ export function playerProd(data) {
   const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
 
-  // calibration
-  // voxPlayerState.set({scenarioLatencyCalibration: true});
-
-  // @todo loading screen
   const loading = data.scoreFileName && !data.scoreReady;
-  // const isCalibrating
-  console.log('------------------------------------------');
-  // console.log(voxPlayerState.get('scenarioCurrent'));
-  // console.log(voxPlayerState.get('scenarioLatencyCalibration'));
-  // console.log(voxPlayerState.get('playback'));
-  console.log(data.scenarioCurrent);
-  // console.log(data.scenarioLatencyCalibration);
-  console.log(data.scenarioStatus); // 'init' 'precount' 'ready' 'playing' 'cancel'
 
   return html`
     <header>
@@ -29,6 +17,10 @@ export function playerProd(data) {
       <button
         class="settings-btn"
         @click="${e => {
+          if (loading) {
+            return;
+          }
+
           guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
 
           if (guiState.showAdvancedSettings) {
@@ -42,6 +34,12 @@ export function playerProd(data) {
 
     <section id="main">
       <div >
+
+      ${loading
+        ? html`<div class="loading"><p>chargement...<p></div>`
+        : nothing
+      }
+
       <!-- ---------------------------------- -->
       <!-- ADVANCED SETTINGS MENU             -->
       <!-- ---------------------------------- -->
@@ -125,9 +123,13 @@ export function playerProd(data) {
             <p>
               Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat.
+quis nostrud exercitation ullamco.
             </p>
+            ${data.audioLatency !== 1e-3
+              ? html`<p>La latence estimée entre le geste et le son est de ${data.audioLatency * 1e3}ms</p>`
+              : html`<p>La latence estimée entre le geste et le son doit être estimée</p>`
+            }
+
             <div class="adjust-param param-calibration">
               <div class="col-1">
                 <button
@@ -147,13 +149,15 @@ consequat.
                 <button
                   class="color-white"
                   @click="${e => {
-                    voxPlayerState.set({ playback: false });
-                    voxPlayerState.set({ scenarioLatencyCalibration: false });
+                    if (data.scenarioCurrent !== 'scenarioLatencyCalibration') {
+                      voxPlayerState.set({ playback: false });
+                      voxPlayerState.set({ scenarioLatencyCalibration: false });
+                    }
 
                     guiState.showCalibrationScreen = false;
                     exp.updateGuiState(guiState);
                   }}"
-                >Annuler</button>
+                >Terminer</button>
               </div>
             </div>
           </div>
@@ -243,14 +247,14 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           <polygon class="stop-shape" points="20,20, 80,20, 80,80, 20,80"></polygon>
         </svg>
 
-        ${data.scoreFileName
+        ${data.scoreFileName && data.scoreData
           ? html`
               <p class="track-infos">
                 ${data.timeSignature.count}/${data.timeSignature.division} -
                 ${Math.floor(data.scoreData.masterTrack.tempo)} à la noire
               </p>
             `
-          : html`<p class="track-infos"></p>`
+          : html`<p class="track-infos">&nbsp;</p>`
         }
       </div>
 

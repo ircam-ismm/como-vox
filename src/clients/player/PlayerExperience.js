@@ -80,7 +80,8 @@ console.info('> to mock sensors for debugging purpose, append "&mockSensors=1" t
 console.info('> to use audio for debugging purpose, append "&debugAudio=1" to URI');
 console.info('> to use advanced graphical user interface for debugging purpose, append "&editorGUI=1" to URI');
 
-const PLAYER_PROD = (url.paramGet('editorGUI') !== '1');
+let PLAYER_PROD = !url.paramGet('editorGUI', null);
+console.log("load: PLAYER_PROD = ", PLAYER_PROD);
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -332,6 +333,9 @@ class PlayerExperience extends AbstractExperience {
     });
 
     window.addEventListener('resize', () => this.render());
+
+    PLAYER_PROD = !this.state.editorGUI;
+    console.log("start: PLAYER_PROD = ", PLAYER_PROD);
 
     if (!PLAYER_PROD) {
       const updateClock = () => {
@@ -760,6 +764,8 @@ class PlayerExperience extends AbstractExperience {
     // warning: syncTime is NOT compensated
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
                                                  {timeSignature: this.timeSignature});
+
+    PLAYER_PROD = !this.state.editorGUI;
 
     const viewData = {
       ...this.state,

@@ -54,6 +54,11 @@ export default {
     default: false,
   },
 
+  editorGUI: {
+    type: 'boolean',
+    default: false,
+  },
+
   gestureControlsBeatOffset: {
     type: 'boolean',
     default: false,

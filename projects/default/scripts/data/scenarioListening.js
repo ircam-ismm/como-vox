@@ -1,4 +1,4 @@
-function scenarioPlayback(graph, helpers, outputFrame) {
+function scenarioListening(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
@@ -61,11 +61,11 @@ function scenarioPlayback(graph, helpers, outputFrame) {
   };
 
   const updateParams = (updates) => {
-    if(typeof updates.scenarioPlayback !== 'undefined') {
-      const activeChanged = updates.scenarioPlayback
-            !== parameters.scenarioPlayback;
-      const active = updates.scenarioPlayback;
-      parameters.scenarioPlayback = active;
+    if(typeof updates.scenarioListening !== 'undefined') {
+      const activeChanged = updates.scenarioListening
+            !== parameters.scenarioListening;
+      const active = updates.scenarioListening;
+      parameters.scenarioListening = active;
       if(active) {
         if(activeChanged) {
           parametersSave();
@@ -80,17 +80,17 @@ function scenarioPlayback(graph, helpers, outputFrame) {
       }
     }
 
-    if(parameters.scenarioPlayback
+    if(parameters.scenarioListening
        && parameters.playback === true
        && updates.playback === false
        && status !== 'done') {
       statusUpdate('done');
     }
 
-    if(parameters.scenarioPlayback
+    if(parameters.scenarioListening
        && statusIsError(updates.scenarioStatus) ) {
       parametersRestore();
-      app.events.emit('scenarioPlayback', false);
+      app.events.emit('scenarioListening', false);
     }
 
     for(const p of Object.keys(updates) ) {
@@ -113,7 +113,7 @@ function scenarioPlayback(graph, helpers, outputFrame) {
               'audioLatency',
               'playback',
               'playbackStartAfterCount',
-              'scenarioPlayback',
+              'scenarioListening',
               'scenarioStatus',
             ],
           ])];
@@ -148,7 +148,7 @@ function scenarioPlayback(graph, helpers, outputFrame) {
         stillness
       } = inputData;
 
-      if(!parameters.scenarioPlayback) {
+      if(!parameters.scenarioListening) {
         return outputFrame;
       }
 

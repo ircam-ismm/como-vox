@@ -12,7 +12,8 @@
 
 - [ ] après une arrêt, reprise depuis la mesure courante
 
-- [ ] mise à jour de l'interface seulement aux changements
+- [x] mise à jour de l'interface seulement aux changements
+  - [ ] ajouter des `this.render()`
 - [ ] remise compresseur et réverbe
 
 Everywhere (see scenarios):

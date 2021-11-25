@@ -21,6 +21,7 @@ function scenarioTempo(graph, helpers, outputFrame) {
     ...parametersScenario,
     playback: false,
     playbackStartAfterCount: {bar: 1, beat: 1}, // upbeat and one bar
+    scenarioPlayback: false,
     scenarioStatus: 'off',
     timeSignature: {bar: 4, beat: 4},
   };
@@ -71,21 +72,31 @@ function scenarioTempo(graph, helpers, outputFrame) {
         if(activeChanged) {
           parametersSave();
         }
-        statusUpdate('init');
-        parametersApply();
       } else {
         if(activeChanged) {
+          app.events.emit('scenarioPlayback', false);
           app.events.emit('playback', false);
           parametersRestore();
         }
       }
     }
 
+    // start
     if(parameters.scenarioTempo
-       && parameters.playback === true
-       && updates.playback === false
-       && status !== 'done') {
-      statusUpdate('done');
+       && parameters.scenarioPlayback === false
+       && updates.scenarioPlayback === true
+       && status !== 'init') {
+      statusUpdate('init');
+      parametersApply();
+    }
+
+    // stop
+    if(parameters.scenarioTempo
+       && parameters.scenarioPlayback === true
+       && updates.scenarioPlayback === false
+       && status !== 'off') {
+      app.events.emit('playback', false);
+      statusUpdate('off');
     }
 
     if(parameters.scenarioTempo
@@ -114,6 +125,7 @@ function scenarioTempo(graph, helpers, outputFrame) {
               'audioLatency',
               'playback',
               'playbackStartAfterCount',
+              'scenarioPlayback',
               'scenarioTempo',
               'scenarioStatus',
             ],
@@ -167,12 +179,10 @@ function scenarioTempo(graph, helpers, outputFrame) {
           const seekPosition = positionAddBeats({bar: 1, beat: 1},
                                                 -startAfterBeats,
                                                 {timeSignature});
-          app.events.emit('tempoReset', true);
 
+          app.events.emit('tempoReset', true);
           app.events.emit('seekPosition', seekPosition);
           app.events.emit('playback', true);
-          // @TODO: seek after playback for bug on seek (quick events?)
-          app.events.emit('seekPosition', seekPosition);
           statusUpdate('precount');
           break;
         }

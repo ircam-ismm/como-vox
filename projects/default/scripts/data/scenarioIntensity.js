@@ -21,6 +21,7 @@ function scenarioIntensity(graph, helpers, outputFrame) {
     ...parametersScenario,
     playback: false,
     playbackStartAfterCount: {bar: 1, beat: 1}, // upbeat and one bar
+    scenarioPlayback: false,
     scenarioStatus: 'off',
     timeSignature: {bar: 4, beat: 4},
   };
@@ -71,21 +72,32 @@ function scenarioIntensity(graph, helpers, outputFrame) {
         if(activeChanged) {
           parametersSave();
         }
-        statusUpdate('init');
-        parametersApply();
       } else {
         if(activeChanged) {
+          app.events.emit('scenarioPlayback', false);
           app.events.emit('playback', false);
           parametersRestore();
         }
       }
     }
 
+    // start
     if(parameters.scenarioIntensity
-       && parameters.playback === true
-       && updates.playback === false
-       && status !== 'done') {
-      statusUpdate('done');
+       && parameters.scenarioPlayback === false
+       && updates.scenarioPlayback === true
+       && status !== 'init') {
+      parametersSave();
+      statusUpdate('init');
+      parametersApply();
+    }
+
+    // stop
+    if(parameters.scenarioIntensity
+       && parameters.scenarioPlayback === true
+       && updates.scenarioPlayback === false
+       && status !== 'off') {
+      app.events.emit('playback', false);
+      statusUpdate('off');
     }
 
     if(parameters.scenarioIntensity
@@ -115,6 +127,7 @@ function scenarioIntensity(graph, helpers, outputFrame) {
               'playback',
               'playbackStartAfterCount',
               'scenarioIntensity',
+              'scenarioPlayback',
               'scenarioStatus',
             ],
           ])];
@@ -169,11 +182,8 @@ function scenarioIntensity(graph, helpers, outputFrame) {
                                                 {timeSignature});
 
           app.events.emit('tempoReset', true);
-
           app.events.emit('seekPosition', seekPosition);
           app.events.emit('playback', true);
-          // @TODO: seek after playback for bug on seek (quick events?)
-          app.events.emit('seekPosition', seekPosition);
           statusUpdate('precount');
           break;
         }

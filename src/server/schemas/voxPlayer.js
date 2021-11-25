@@ -54,6 +54,11 @@ export default {
     default: false,
   },
 
+  editorGUI: {
+    type: 'boolean',
+    default: false,
+  },
+
   gestureControlsBeatOffset: {
     type: 'boolean',
     default: false,
@@ -288,9 +293,19 @@ export default {
     default: true,
   },
 
-  scenarioPlayback: {
+  scenarioListening: {
     type: 'boolean',
     event: true,
+  },
+
+  scenarioListeningUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioPlayback: {
+    type: 'boolean',
+    default: false,
   },
 
   scenarioPlaybackUi: {

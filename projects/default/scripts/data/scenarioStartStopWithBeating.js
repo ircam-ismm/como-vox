@@ -34,6 +34,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       bar: 1,
       beat: 1, // one more for upbeat before start
     },
+    scenarioPlayback: false,
   };
 
   const parametersApply = () => {
@@ -85,7 +86,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
 
     if(parameters.scenarioStartStopWithBeating
        && statusIsError(updates.scenarioStatus) ) {
-      app.events.emit('scenarioStartStopWithBeating', false);
+      app.events.emit('scenarioPlayback', false);
     }
 
     if(typeof updates.scenarioStartStopWithBeating !== 'undefined') {
@@ -97,38 +98,48 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
         if(activeChanged) {
           parametersSave();
         }
-        // may retrigger, even if already active
-        statusUpdate('init');
-
-        // update to changes
-        parametersScenario.playbackStopSeek = app.state.playbackStopSeek;
-
-        parametersApply();
-
-        // over-rides
-        app.events.emit('gestureControlsPlaybackStart', false);
-        app.events.emit('gestureControlsPlaybackStop', true);
-        // must start at the beginning of a bar (from start is fine, too)
-        if(app.state.playbackStopSeek !== 'start'
-           && app.state.playbackStopSeek !== 'barStart') {
-          app.events.emit('playbackStopSeek', 'barStart');
-        }
-        app.events.emit('playback', false);
-        app.events.emit('tempoReset', true);
       } else {
         if(activeChanged) {
-          parametersRestore();
+          app.events.emit('scenarioPlayback', false);
           app.events.emit('playback', false);
+          parametersRestore();
         }
       }
     }
 
+    // start
+    if(parameters.scenarioStartStopWithBeating
+       && parameters.scenarioPlayback === false
+       && updates.scenarioPlayback === true
+       && status !== 'init') {
+      // may retrigger, even if already active
+      statusUpdate('init');
+
+      // update to changes
+      parametersScenario.playbackStopSeek = app.state.playbackStopSeek;
+
+      parametersApply();
+
+      // over-rides
+      app.events.emit('gestureControlsPlaybackStart', false);
+      app.events.emit('gestureControlsPlaybackStop', true);
+      // must start at the beginning of a bar (from start is fine, too)
+      if(app.state.playbackStopSeek !== 'start'
+         && app.state.playbackStopSeek !== 'barStart') {
+        app.events.emit('playbackStopSeek', 'barStart');
+      }
+      app.events.emit('playback', false);
+      app.events.emit('tempoReset', true);
+    }
+
+    // stop
     if(parameters.scenarioStartStopWithBeating
        && parameters.playback === true
        && updates.playback === false
-       && status !== 'done') {
+       && status !== 'off') {
       statusUpdate('off');
-      app.events.emit('scenarioStartStopWithBeating', false);
+      app.events.emit('scenarioPlayback', false);
+      app.events.emit('playback', false);
     }
 
     if(parameters.scenarioStartStopWithBeating
@@ -161,6 +172,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
               'playback',
               'playbackStopSeek',
               'playbackStartAfterCount',
+              'scenarioPlayback',
               'scenarioStartStopWithBeating',
               'scenarioStatus',
             ],

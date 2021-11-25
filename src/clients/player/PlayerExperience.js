@@ -193,6 +193,7 @@ class PlayerExperience extends AbstractExperience {
     }
 
     const loadedState = await url.parse(voxPlayerSchema);
+    console.log("loadedState = ", loadedState);
     for( const [key, value] of Object.entries(loadedState) ) {
       this.events.emit(key, value);
     }
@@ -528,6 +529,7 @@ class PlayerExperience extends AbstractExperience {
 
   setAudioLatency(audioLatency) {
     this.audioLatency = audioLatency;
+    this.events.emit('audioLatency', audioLatency);
     this.updateLookAhead();
   }
 

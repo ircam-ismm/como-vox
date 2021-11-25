@@ -7,9 +7,7 @@ export function playerProd(data) {
   const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
 
-  // @TODO
-  // init?
-
+  // console.log(voxPlayerState.get('scoreData'));
   // data.scoreFileName
   const loading = data.scoreFileName && !data.scoreReady;
 
@@ -28,7 +26,9 @@ export function playerProd(data) {
     </header>
     <section id="main">
       <div >
-      <!-- advanced options overlay -->
+      <!-- ---------------------------------- -->
+      <!-- ADVANCED SETTINGS MENU             -->
+      <!-- ---------------------------------- -->
       ${guiState.showAdvancedSettings ?
         html`
           <div class="settings">
@@ -74,7 +74,6 @@ export function playerProd(data) {
                   @click="${e => {
                     guiState.showAdvancedSettings = false;
                     guiState.showCalibrationScreen = true;
-                    guiState.calibrationScreenIndex = 0;
                     exp.updateGuiState(guiState);
                   }}"
                 >Calibrer</button>
@@ -84,10 +83,14 @@ export function playerProd(data) {
             <div class="adjust-param param-latency">
               <div class="col-2">
                 <p>Latence</p>
-                <input type="number" value="42"
+                <input
+                  type="number"
+                  value="${voxPlayerState.get('audioLatency') * 1e3}"
                   @blur="${e => {
-                    const value = parseInt(e.currentTarget.value);
-                    // do something w/ value
+                    const value = parseFloat(e.currentTarget.value);
+                    if (!Number.isNaN(value)) {
+                      voxPlayerState.set({ audioLatency: value * 1e-3 });
+                    }
                   }}"
                 />
               </div>
@@ -96,7 +99,9 @@ export function playerProd(data) {
         `
       : nothing}
 
-      <!-- advanced options overlay -->
+      <!-- ---------------------------------- -->
+      <!-- CALIBRATION OVERLAY                -->
+      <!-- ---------------------------------- -->
       ${guiState.showCalibrationScreen ?
         html`
           <div class="calibration">
@@ -135,7 +140,9 @@ consequat.
         `
       : nothing}
 
-      <!-- credits screen overlay -->
+      <!-- ---------------------------------- -->
+      <!-- CREDITS OVERLAY                    -->
+      <!-- ---------------------------------- -->
       ${guiState.showCreditsScreen ?
         html`
           <div class="credits">
@@ -173,42 +180,58 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       <!-- choose track and preview -->
       <div class="track">
         <div class="select">
-          <select .value=${data.scoreFileName ? data.scoreFileName : 'none'}
-                  @change="${e => {
-
-                         const scoreFileName = (e.target.value === 'none' ? null : e.target.value);
-                         voxPlayerState.set({scoreFileName});
-                         }}"
+          <select
+            .value=${data.scoreFileName ? data.scoreFileName : 'none'}
+            @change="${e => {
+              const scoreFileName = (e.target.value === 'none' ? null : e.target.value);
+              voxPlayerState.set({scoreFileName});
+           }}"
           >
-            ${['none', ...voxApplicationState.get('scores')].map( (scoreFileName) => {
-            return html`
-            <option
-              .value=${scoreFileName}
-              ?selected="${data.scoreFileName
-                     === (scoreFileName === 'none' ? null : scoreFileName)}"
-            >${scoreFileName === 'none' ? 'aucune' : scoreFileName}</option>
-            `;
+            ${['none', ...voxApplicationState.get('scores')].map(scoreFileName => {
+              const selected = data.scoreFileName === (scoreFileName === 'none' ? null : scoreFileName);
+              const label = (scoreFileName === 'none' ? 'Sélectionner une partition' : scoreFileName);
+
+              return html`
+                <option
+                  .value=${scoreFileName}
+                  ?selected="${selected}"
+                >${label}</option>
+              `;
             })}
           </select>
           <div class="select-arrow"></div>
         </div>
         <svg
-          class="listen-track"
+          class="listen-track
+            ${data.scenarioCurrent === 'scenarioListening' ? ' active' : ''}
+            ${voxPlayerState.get('scenarioPlayback') ? ' disabled' : ''}
+          "
           viewbox="0 0 100 100"
           @click="${e => {
-            e.currentTarget.classList.toggle('active');
-            exp.updateGuiState(guiState);
+            if (voxPlayerState.get('scenarioPlayback')) {
+              return;
+            }
+
+            if (data.scenarioCurrent !== 'scenarioListening') {
+              data.voxPlayerState.set({ scenarioListening: true });
+            } else {
+              data.voxPlayerState.set({ scenarioListening: false });
+            }
           }}"
         >
           <polygon class="play-shape" points="20,15, 80,50, 20,85"></polygon>
           <polygon class="stop-shape" points="20,20, 80,20, 80,80, 20,80"></polygon>
         </svg>
 
-        <p class="track-infos">
-          ${data.score
-            ? `${data.timeSignature.count}/${data.timeSignature.division} - ${data.score.metas.tempo} à la noire`
-            : ''}
-        </p>
+        ${data.scoreFileName
+          ? html`
+              <p class="track-infos">
+                ${data.timeSignature.count}/${data.timeSignature.division} -
+                ${Math.floor(data.tempo)} à la noire
+              </p>
+            `
+          : html`<p class="track-infos"></p>`
+        }
       </div>
 
       <div class="exercise-type"
@@ -219,19 +242,77 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           e.target.classList.add('selected');
         }}"
       >
-        <button>Nuance</button>
-        <button>Tempo</button>
-        <button>Tempo & Nuance</button>
-        <button>Départ</button>
+        <button
+          class="${voxPlayerState.get('scenarioIntensity') ? 'selected' : ''}"
+          @click="${e => {
+            if (!voxPlayerState.get('scenarioIntensity')) {
+              voxPlayerState.set({
+                scenarioIntensity: true,
+                scenarioTempo: false,
+                scenarioFull: false,
+                scenarioStartStopWithBeating: false,
+              });
+            }
+          }}"
+        >Nuance</button>
+        <button
+          class="${voxPlayerState.get('scenarioTempo') ? 'selected' : ''}"
+          @click="${e => {
+            if (!voxPlayerState.get('scenarioTempo')) {
+              voxPlayerState.set({
+                scenarioIntensity: false,
+                scenarioTempo: true,
+                scenarioFull: false,
+                scenarioStartStopWithBeating: false,
+              });
+            }
+          }}"
+        >Tempo</button>
+        <button
+          class="${voxPlayerState.get('scenarioFull') ? 'selected' : ''}"
+          @click="${e => {
+            if (!voxPlayerState.get('scenarioFull')) {
+              voxPlayerState.set({
+                scenarioIntensity: false,
+                scenarioTempo: false,
+                scenarioFull: true,
+                scenarioStartStopWithBeating: false,
+              });
+            }
+          }}"
+        >Tempo & Nuance</button>
+        <button
+          class="${voxPlayerState.get('scenarioStartStopWithBeating') ? 'selected' : ''}"
+          @click="${e => {
+            if (!voxPlayerState.get('scenarioStartStopWithBeating')) {
+              voxPlayerState.set({
+                scenarioIntensity: false,
+                scenarioTempo: false,
+                scenarioFull: false,
+                scenarioStartStopWithBeating: true,
+              });
+            }
+          }}"
+        >Départ</button>
       </div>
 
       <div class="exercise-control">
         <svg
-          class="button"
+          class="button
+            ${voxPlayerState.get('scenarioPlayback') ? ' active' : ''}
+            ${data.scenarioCurrent === null || data.scenarioCurrent === 'scenarioListening' ? ' disabled' : ''}
+          "
           viewbox="0 0 100 100"
           @click="${e => {
-            e.currentTarget.classList.toggle('active');
-            exp.updateGuiState(guiState);
+            if (data.scenarioCurrent === null || data.scenarioCurrent === 'scenarioListening') {
+              return;
+            }
+
+            if (!voxPlayerState.get('scenarioPlayback')) {
+              data.voxPlayerState.set({ scenarioPlayback: true });
+            } else {
+              data.voxPlayerState.set({ scenarioPlayback: false });
+            }
           }}"
         >
           <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
@@ -241,7 +322,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
       <div class="tempo-current">
         <span class="label">Tempo courant</span>
-        <span class="value">64</span>
+        <span class="value">${data}</span>
       </div>
       <div class="tempo-reference">
         <span class="label">Tempo de référence</span>
@@ -251,10 +332,14 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       <div class="metronome">
         <span class="label">Metronome</span>
         <button
+          class="value ${voxPlayerState.get('metronomeSound') ? 'active' : ''}"
           @click="${e => {
-            e.currentTarget.classList.toggle('active')
+            if (voxPlayerState.get('metronomeSound')) {
+              voxPlayerState.set({ metronomeSound: false });
+            } else {
+              voxPlayerState.set({ metronomeSound: true });
+            }
           }}"
-          class="value"
         ></button>
       </div>
     </section>

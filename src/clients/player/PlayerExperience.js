@@ -197,7 +197,7 @@ class PlayerExperience extends AbstractExperience {
 
     // playerProd only
     this.guiState = {
-      showAdvancedSettings: false,
+      showAdvancedSettings: true,
       showCalibrationScreen: false,
       showCreditsScreen: false,
     };
@@ -760,8 +760,9 @@ class PlayerExperience extends AbstractExperience {
   }
 
   render() {
-    const syncTime = this.sync.getSyncTime();
+    console.log('render');
 
+    const syncTime = this.sync.getSyncTime();
     // warning: syncTime is NOT compensated
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
                                                  {timeSignature: this.timeSignature});
@@ -796,7 +797,6 @@ class PlayerExperience extends AbstractExperience {
 
     let screen = ``;
 
-    console.log(this.state);
     if (!this.como.hasDeviceMotion && !this.state['mockSensors'] ) {
       screen = views.sorry(viewData, listeners);
     } else if (this.coMoPlayer.session === null) {

@@ -117,7 +117,7 @@ section#main {
     .select {
       border: 1px solid $border-color;
       border-radius: 4px;
-      font-size: 1.25rem;
+      // font-size: 1.25rem;
       cursor: pointer;
       background-color: #fff;
       width: calc(100% - 45px);
@@ -172,11 +172,12 @@ section#main {
 
       &.active {
         background-color: $primary-color;
-        // background-color: $secondary-color;
 
         .play-shape { display: none; }
         .stop-shape { display: block; }
       }
+
+      &.disabled { opacity: 0.5 }
     }
 
     .track-infos {
@@ -228,10 +229,12 @@ section#main {
 
       polygon { fill: white }
 
+      &.disabled { opacity: 0.5 }
+      &.active { background-color: $primary-color; }
+
       .play-shape { display: block; }
       .stop-shape { display: none; }
 
-      &.active { background-color: $primary-color; }
       &.active .play-shape { display: none; }
       &.active .stop-shape { display: block; }
     }
@@ -264,22 +267,20 @@ section#main {
     border-radius: 4px;
   }
 
+
   .metronome .value {
-    background-color: $primary-color;
     border: 1px solid $border-color;
     border-radius: 4px;
-    background-image: url(../images/speaker-on.png);
+    background-color: white;
+    background-image: url(../images/speaker-off.png);
     background-repeat: no-repeat;
     background-position: 50% 50%;
     background-size: contain;
   }
 
   .metronome .value.active {
-    background-color: white;
-    background-image: url(../images/speaker-off.png);
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    background-size: contain;
+    background-color: $primary-color;
+    background-image: url(../images/speaker-on.png);
   }
 }
 

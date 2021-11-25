@@ -6,7 +6,6 @@ export function playerProd(data) {
 
   const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
-
   const loading = data.scoreFileName && !data.scoreReady;
 
   return html`
@@ -137,9 +136,9 @@ export function playerProd(data) {
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 quis nostrud exercitation ullamco.
             </p>
-            ${data.audioLatency !== 1e-3
+            ${voxPlayerState.get('audioLatencyMeasured') !== null
               ? html`<p>La latence estimée entre le geste et le son est de ${data.audioLatency * 1e3}ms</p>`
-              : html`<p>La latence estimée entre le geste et le son doit être estimée</p>`
+              : html`<p>La latence entre le geste et le son doit être estimée</p>`
             }
 
             <div class="adjust-param param-calibration">
@@ -263,7 +262,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           ? html`
               <p class="track-infos">
                 ${data.timeSignature.count}/${data.timeSignature.division} -
-                ${Math.floor(data.scoreData.masterTrack.tempo)} à la noire
+                ${Math.round(data.scoreData.masterTrack.tempo)} à la noire
               </p>
             `
           : html`<p class="track-infos">&nbsp;</p>`
@@ -300,6 +299,11 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             if (!voxPlayerState.get('scenarioTempo')) {
               voxPlayerState.set({ scenarioTempo: true });
             }
+
+            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+              guiState.showCalibrationScreen = true;
+              exp.updateGuiState(guiState);
+            }
           }}"
         >Tempo</button>
         <button
@@ -312,6 +316,11 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             if (!voxPlayerState.get('scenarioFull')) {
               voxPlayerState.set({ scenarioFull: true });
             }
+
+            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+              guiState.showCalibrationScreen = true;
+              exp.updateGuiState(guiState);
+            }
           }}"
         >Tempo & Nuance</button>
         <button
@@ -323,6 +332,11 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
             if (!voxPlayerState.get('scenarioStartStopWithBeating')) {
               voxPlayerState.set({ scenarioStartStopWithBeating: true });
+            }
+
+            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+              guiState.showCalibrationScreen = true;
+              exp.updateGuiState(guiState);
             }
           }}"
         >Départ</button>
@@ -354,13 +368,13 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
       <div class="tempo-current">
         <span class="label">Tempo courant</span>
-        <span class="value">${Math.floor(data.tempo)}</span>
+        <span class="value">${Math.round(data.tempo)}</span>
       </div>
 
       <div class="tempo-reference">
         <span class="label">Tempo de référence</span>
         <input
-          value="80"
+          value="${data.scoreData ? Math.round(data.scoreData.masterTrack.tempo) : 0}"
           type="number"
           class="value"
           @blur="${e => {

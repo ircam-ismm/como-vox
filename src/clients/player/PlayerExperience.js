@@ -150,7 +150,7 @@ class PlayerExperience extends AbstractExperience {
             } else if (pluginState.authorized === null) {
               msg = 'Autorisations...';
             } else if (pluginState.initializing === null) {
-              msg = `Cliquez pour commencer<span>Merci d'accepter l'utilisation des capteurs de mouvement</span>`;
+              msg = `Cliquez pour commencer<span>Merci d'accepter l'utilisation<br />des capteurs de mouvement</span>`;
               blink = true;
 
               bindListener = (e) => {
@@ -197,8 +197,7 @@ class PlayerExperience extends AbstractExperience {
     // playerProd only
     this.guiState = {
       showAdvancedSettings: false,
-      showCalibrationScreen: false,
-      calibrationScreenIndex: 0,
+      showCalibrationScreen: true,
       showCreditsScreen: false,
     };
 

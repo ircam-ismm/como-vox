@@ -313,7 +313,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
               return;
             }
 
-            if (!voxPlayerState.get('scenarioFull')) {
+            if (!voxPlayerState.get('scenarioTempoIntensity')) {
               voxPlayerState.set({ scenarioFull: true });
             }
 

@@ -7,3 +7,16 @@
 
 // specific types of mobile clients
 @import 'player';
+
+
+.player-prod {
+  &#__soundworks-container {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    color: black;
+  }
+
+  @import 'player-prod';
+}

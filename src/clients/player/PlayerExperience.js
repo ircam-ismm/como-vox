@@ -1,5 +1,6 @@
 import { AbstractExperience } from '@soundworks/core/client';
 import { render, html } from 'lit-html';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 
 import {EventEmitter} from 'events'; // node.js or babel
@@ -75,8 +76,11 @@ if(typeof app.state === 'undefined') {
 }
 
 // for simple debugging in browser...
-console.info('> to mock sensors for debugging purpose, append "&mockSensors=1" to URL');
+console.info('> to mock sensors for debugging purpose, append "&mockSensors=1" to URI');
 console.info('> to use audio for debugging purpose, append "&debugAudio=1" to URI');
+console.info('> to use advanced graphical user interface for debugging purpose, append "&editorGUI=1" to URI');
+
+const PLAYER_PROD = (url.paramGet('editorGUI') !== '1');
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -128,17 +132,80 @@ class PlayerExperience extends AbstractExperience {
     // configure como w/ the given experience
     this.como.configureExperience(this);
     // default initialization views
-    renderInitializationScreens(como.client, config, $container);
+
+    if (!PLAYER_PROD) {
+      renderInitializationScreens(como.client, config, $container);
+    } else {
+      renderInitializationScreens(como.client, config, $container, {
+        screens: {
+          platform: (platform, config, containerInfos) => {
+            const pluginState = platform.state.getValues();
+
+            let msg;
+            let bindListener = undefined;
+            let blink = false;
+
+            if (pluginState.available === null) {
+              msg = 'Vérification...';
+            } else if (pluginState.authorized === null) {
+              msg = 'Autorisations...';
+            } else if (pluginState.initializing === null) {
+              msg = `Cliquez pour commencer<span>Merci d'accepter l'utilisation des capteurs de mouvement</span>`;
+              blink = true;
+
+              bindListener = (e) => {
+                e.preventDefault();
+                platform.onUserGesture(e);
+              }
+            } else if (pluginState.initialized === null) {
+              msg = 'Initialisation...'
+            } else if (pluginState.finalized === null) {
+              msg = 'Finalisation...'
+            }
+
+            return html`
+              <section id="home" @click="${bindListener}">
+                <img class="logo" src="./images/logo.png" alt="como vox" />
+                <svg class="button" viewbox="0 0 100 100">
+                  <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
+                </svg>
+                <p>${unsafeHTML(msg)}</p>
+              </section>
+              <footer></footer>
+            `;
+          },
+          default: (plugin, config, containerInfos) => {
+            return html`
+              <section id="home">
+                <img class="logo" src="./images/logo.png" alt="como vox" />
+                <svg class="button" viewbox="0 0 100 100">
+                  <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
+                </svg>
+                <p>Chargement de l'application...</p>
+              </section>
+              <footer></footer>
+            `;
+          }
+        },
+      });
+    }
   }
 
   async start() {
     await super.start();
-    // console.log('hasDeviceMotion', this.como.hasDeviceMotion);
+
+    // playerProd only
+    this.guiState = {
+      showAdvancedSettings: false,
+      showCalibrationScreen: false,
+      calibrationScreenIndex: 0,
+      showCreditsScreen: false,
+    };
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');
     this.voxApplicationState.subscribe( (updates) => {
       // ...
-    })
+    });
 
     // 1. create a como player instance w/ a unique id (we default to the nodeId)
     const player = await this.como.project.createPlayer(this.como.client.id);
@@ -266,12 +333,20 @@ class PlayerExperience extends AbstractExperience {
 
     window.addEventListener('resize', () => this.render());
 
-    const updateClock = () => {
-      this.render();
-      this.rafId = window.requestAnimationFrame(updateClock);
-    };
+    if (!PLAYER_PROD) {
+      const updateClock = () => {
+        this.render();
+        this.rafId = window.requestAnimationFrame(updateClock);
+      };
 
-    this.rafId = window.requestAnimationFrame(updateClock);
+      this.rafId = window.requestAnimationFrame(updateClock);
+    }
+  }
+
+  // playerProd only - might be removed later
+  updateGuiState(state) {
+    this.guiState = state;
+    this.render();
   }
 
   updateFromState(key, value) {
@@ -281,7 +356,6 @@ class PlayerExperience extends AbstractExperience {
     if(event || JSON.stringify(value) !== JSON.stringify(this.state[key] ) ) {
       app.events.emit(key, value);
     }
-
   }
 
   // immediate to data and asynchronously to voxPlayerState
@@ -298,7 +372,8 @@ class PlayerExperience extends AbstractExperience {
       }
 
       const stored = schema.isStored(voxPlayerSchema, key);
-      if(stored) {
+
+      if (stored) {
         storage.save(key, value);
       }
     }
@@ -704,6 +779,10 @@ class PlayerExperience extends AbstractExperience {
       tempo: this.tempo, // override state tempo which is reference tempo
       voxApplicationState: this.voxApplicationState,
       voxPlayerState: this.voxPlayerState,
+
+      // player prod only
+      PLAYER_PROD,
+      guiState: this.guiState,
     };
 
     const listeners = this.listeners;
@@ -715,25 +794,33 @@ class PlayerExperience extends AbstractExperience {
     } else if (this.coMoPlayer.session === null) {
       screen = views.manageSessions(viewData, listeners, {
         enableCreation: false,
-        enableSelection: true,
+        enableSelection: !PLAYER_PROD,
       });
     } else {
-      screen = views[this.client.type](viewData, listeners, {
-        verbose: false,
-        enableSelection: false,
-      });
+      if (!PLAYER_PROD) {
+        screen = views[this.client.type](viewData, listeners, {
+          verbose: false,
+          enableSelection: false,
+        });
+      } else {
+        screen = views.playerProd(viewData, listeners);
+      }
     }
 
-    render(html`
-      <div style="
-        box-sizing: border-box;
-        width: 100%;
-        min-height: 100%;
-        padding: 20px;
-      ">
-        ${screen}
-      </div>
-    `, this.$container);
+    if (!PLAYER_PROD) {
+      render(html`
+        <div style="
+          box-sizing: border-box;
+          width: 100%;
+          min-height: 100%;
+          padding: 20px;
+        ">
+          ${screen}
+        </div>
+      `, this.$container);
+    } else {
+      render(screen, this.$container);
+    }
   }
 }
 

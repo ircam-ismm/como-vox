@@ -321,8 +321,7 @@ class PlayerExperience extends AbstractExperience {
         case 'audioLatencyMeasured': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
-            this.setAudioLatency(this.state.audioLatencyMeasured
-                                 + this.state.audioLatencyAdaptation);
+            this.setAudioLatency();
           });
           break;
         }
@@ -330,8 +329,7 @@ class PlayerExperience extends AbstractExperience {
         case 'audioLatencyAdaptation': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
-            this.setAudioLatency(this.state.audioLatencyMeasured
-                                 + this.state.audioLatencyAdaptation);
+            this.setAudioLatency();
           });
 
           break;
@@ -527,7 +525,13 @@ class PlayerExperience extends AbstractExperience {
     return promise;
   }
 
-  setAudioLatency(audioLatency) {
+  setAudioLatency() {
+    // 10 ms is no so bad as a default value
+    const audioLatency = (this.state.audioLatencyMeasured
+                          ? this.state.audioLatencyMeasured
+                          : 10e-3)
+          + this.state.audioLatencyAdaptation;
+
     this.audioLatency = audioLatency;
     this.events.emit('audioLatency', audioLatency);
     this.updateLookAhead();

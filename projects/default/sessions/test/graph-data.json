@@ -89,6 +89,13 @@
       },
     },
     {
+      id: 'scenarioTempoIntensity',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioTempoIntensity',
+      },
+    },
+    {
       id: 'scenarioStartStopWithBeating',
       type: 'ScriptData',
       options: {
@@ -235,6 +242,10 @@
     [
       'stillness',
       'scenarioTempo',
+    ],
+    [
+      'stillness',
+      'scenarioTempoIntensity',
     ],
     [
       'scenarioManager',

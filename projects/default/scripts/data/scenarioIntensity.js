@@ -86,7 +86,6 @@ function scenarioIntensity(graph, helpers, outputFrame) {
        && parameters.scenarioPlayback === false
        && updates.scenarioPlayback === true
        && status !== 'init') {
-      parametersSave();
       statusUpdate('init');
       parametersApply();
     }

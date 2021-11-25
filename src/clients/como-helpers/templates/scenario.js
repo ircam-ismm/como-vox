@@ -13,6 +13,7 @@ export function scenario(data) {
   const groupUi = data.scenarioListeningUi
         || data.scenarioIntensity
         || data.scenarioTempoUi
+        || data.scenarioTempoIntensityUi
         || data.scenarioStartStopWithBeatingUi
         || data.scenarioFullUi
         || data.scenarioPlaybackUi;
@@ -85,6 +86,26 @@ export function scenario(data) {
         </span>
         ` : ''}
 
+          ${data.uiConfiguration || data.scenarioTempoIntensityUi ? html`
+          <span class="${elementClasses(data, 'scenarioTempoIntensity')}">
+
+
+            <button class="toggle scenario ${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}"
+                  @click="${e => {
+                     if(data.scenarioCurrent !== 'scenarioTempoIntensity') {
+                       voxPlayerState.set({scenarioTempoIntensity: true});
+                     } else {
+                       voxPlayerState.set({scenarioTempoIntensity: false});
+                     }
+                  } }"
+            >Tempo et nuance</button>
+
+            ${data.uiConfiguration
+              ? displayToggle(data, 'scenarioTempoIntensityUi')
+              : ''}
+        </span>
+        ` : ''}
+
           ${data.uiConfiguration || data.scenarioStartStopWithBeatingUi ? html`
           <span class="${elementClasses(data, 'scenarioStartStopWithBeating')}">
 
@@ -117,7 +138,7 @@ export function scenario(data) {
                        voxPlayerState.set({scenarioFull: false});
                      }
                   } }"
-            >Complet</button>
+            >Tout</button>
 
             ${data.uiConfiguration
               ? displayToggle(data, 'scenarioFullUi')

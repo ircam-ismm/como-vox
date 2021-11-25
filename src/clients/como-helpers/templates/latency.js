@@ -10,26 +10,26 @@ import {
 const e = {};
 
 export function latency(data) {
-  const groupUi = data.audioLatencyUi
+  const groupUi = data.audioLatencyMeasuredUi
         || data.lookAheadNotesRequestUi;
   const voxPlayerState = data.voxPlayerState;
 
   return (data.uiConfiguration || groupUi ? html`
       <div class="${groupClasses(data, 'latency', groupUi)}">
 
-        ${data.uiConfiguration || data.audioLatencyUi ? html`
-        <span class="${elementClasses(data, 'audioLatency')}">
+        ${data.uiConfiguration || data.audioLatencyMeasuredUi ? html`
+        <span class="${elementClasses(data, 'audioLatencyMeasured')}">
           <span class="text">Latence audio</span>
           <span class="valueUnit">
             <input type="number"
                    min="0"
                    max="500"
                    step="10"
-                   .value=${Math.round(data.audioLatency * 1e3)}
+                   .value=${Math.round(data.audioLatencyMeasured * 1e3)}
                    @click="${e => selfSelect(e)}"
                    @change="${e => {
                          voxPlayerState.set({
-                         audioLatency: (parseFloat(e.srcElement.value * 1e-3) || 0),
+                         audioLatencyMeasured: (parseFloat(e.srcElement.value * 1e-3) || 0),
                          });
                          } }"
             >
@@ -46,7 +46,7 @@ export function latency(data) {
                   } }"
           >Calibrer</button>
 
-          ${data.uiConfiguration ? displayToggle(data, 'audioLatencyUi') : ''}
+          ${data.uiConfiguration ? displayToggle(data, 'audioLatencyMeasuredUi') : ''}
         </span>
         ` : ''}
 

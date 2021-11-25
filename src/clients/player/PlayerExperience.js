@@ -380,6 +380,7 @@ class PlayerExperience extends AbstractExperience {
         storage.save(key, value);
       }
     }
+    this.render();
   }
 
   // declare everything if voxPlayerSchema
@@ -444,7 +445,8 @@ class PlayerExperience extends AbstractExperience {
                                    + scoreURIbase);
             }
             try {
-              await this.setScore(scoreURI)
+              await this.setScore(scoreURI);
+              this.render();
             } catch (error) {
               console.error('Error while loading score: ' + error.message);
             }

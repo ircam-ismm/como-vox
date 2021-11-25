@@ -117,7 +117,6 @@ class PlayerExperience extends AbstractExperience {
     this.lookAheadSecondsMin = app.data.lookAheadSecondsMin;
 
     // in seconds
-    // @TODO discover and store in localStorage
     this.audioLatency = 0;
 
     this.metronomeSound = undefined;
@@ -318,11 +317,22 @@ class PlayerExperience extends AbstractExperience {
           break;
         }
 
-        case 'audioLatency': {
+        case 'audioLatencyMeasured': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
-            this.setAudioLatency(value);
+            this.setAudioLatency(this.state.audioLatencyMeasured
+                                 + this.state.audioLatencyAdaptation);
           });
+          break;
+        }
+
+        case 'audioLatencyAdaptation': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.setAudioLatency(this.state.audioLatencyMeasured
+                                 + this.state.audioLatencyAdaptation);
+          });
+
           break;
         }
 

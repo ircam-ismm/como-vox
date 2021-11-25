@@ -15,13 +15,31 @@ export default {
     default: 10e-3,
     metas: {
       exported: false,
+      stored: false,
+    },
+  },
+
+  audioLatencyMeasured: {
+    type: 'float',
+    default: 10e-3,
+    metas: {
+      exported: false,
       stored: true,
     },
   },
 
-  audioLatencyUi: {
+  audioLatencyMeasuredUi: {
     type: 'boolean',
     default: true,
+  },
+
+  audioLatencyAdaptation: {
+    type: 'float',
+    default: 0,
+    metas: {
+      exported: false,
+      stored: true,
+    },
   },
 
   beatGestureWaitingDurationMax: {
@@ -52,6 +70,33 @@ export default {
   debugAudioUi: {
     type: 'boolean',
     default: false,
+  },
+
+  gestureAdaptationIntensityMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+      stored: true,
+    },
+  },
+
+  gestureAdaptationIntensityModeUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  gestureAdaptationTempoMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+    },
+  },
+
+  gestureAdaptationTempoModeUi: {
+    type: 'boolean',
+    default: true,
   },
 
   gestureControlsBeatOffset: {

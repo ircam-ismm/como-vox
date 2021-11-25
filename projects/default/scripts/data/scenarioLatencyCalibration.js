@@ -25,7 +25,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
   // default values to register
   const parameters = {
     ...parametersScenario,
-    audioLatency: 0,
+    audioLatencyMeasured: 0,
     // @TODO: use playbackStartAfterCount
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
     beatingDuration: {bar: 4, beat: 0},
@@ -127,7 +127,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
             ...Object.keys(parametersScenario),
             // declare own parameters
             ...[
-              'audioLatency',
+              'audioLatencyMeasured',
               'beatGestureWaitingDurationMax',
               'playback',
               'playbackLatency',
@@ -254,8 +254,8 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
           } else if(standardDeviation >= parameters.beatingStandardDeviationMax) {
             statusUpdate('tooMuchJitter');
           } else {
-            const audioLatency = Math.max(0, parameters.audioLatency - median);
-            app.events.emit('audioLatency', audioLatency);
+            const audioLatencyMeasured = Math.max(0, parameters.audioLatencyMeasured - median);
+            app.events.emit('audioLatencyMeasured', audioLatencyMeasured);
             app.events.emit('scenarioLatencyCalibration', false);
           }
           break;

@@ -12,7 +12,7 @@ export default {
 
   audioLatency: {
     type: 'float',
-    default: 10e-3,
+    default: 0,
     metas: {
       exported: false,
       stored: false,
@@ -21,7 +21,8 @@ export default {
 
   audioLatencyMeasured: {
     type: 'float',
-    default: 10e-3,
+    default: null,
+    nullable: true,
     metas: {
       exported: false,
       stored: true,
@@ -161,7 +162,7 @@ export default {
 
   gestureIntensityInputMax: {
     type: 'float',
-    default: 0.3, // 0.4 for more energy
+    default: 0.5, // 0.4 for more energy
   },
 
   gestureIntensityInputMaxUi: {

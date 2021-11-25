@@ -57,9 +57,15 @@ export function playerProd(data) {
                   e.target.classList.add('selected');
                 }}"
               >
-                <button>-</button>
-                <button>normal</button>
-                <button>+</button>
+                ${Object.entries(voxApplicationState.get('gestureAdaptationIntensityModes') ).map( ([name, value]) => {
+                return html`
+              <button class="option gestureAdaptation ${data.gestureIntensityInputMax === value
+                         ? 'selected' : ''}"
+                      @click="${e => voxPlayerState.set({gestureIntensityInputMax: (value)})}">
+              ${name}
+              </button>
+              `;
+              }) }
               </div>
             </div>
 
@@ -74,9 +80,15 @@ export function playerProd(data) {
                   e.target.classList.add('selected');
                 }}"
               >
-                <button>-</button>
-                <button>normal</button>
-                <button>+</button>
+                ${Object.entries(voxApplicationState.get('gestureAdaptationTempoModes') ).map( ([name, value]) => {
+                return html`
+              <button class="option gestureAdaptation ${data.audioLatencyAdaptation === value
+                         ? 'selected' : ''}"
+                      @click="${e => voxPlayerState.set({audioLatencyAdaptation: (value)})}">
+              ${name}
+              </button>
+              `;
+              }) }
               </div>
             </div>
 
@@ -99,11 +111,11 @@ export function playerProd(data) {
                 <p>Latence</p>
                 <input
                   type="number"
-                  value="${voxPlayerState.get('audioLatency') * 1e3}"
+                  value="${voxPlayerState.get('audioLatencyMeasured') * 1e3}"
                   @blur="${e => {
                     const value = parseFloat(e.currentTarget.value);
                     if (!Number.isNaN(value)) {
-                      voxPlayerState.set({ audioLatency: value * 1e-3 });
+                      voxPlayerState.set({ audioLatencyMeasured: value * 1e-3 });
                     }
                   }}"
                 />

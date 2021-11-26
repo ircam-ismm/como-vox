@@ -232,7 +232,7 @@ export default {
 
   metronomeSound: {
     type: 'boolean',
-    default: false,
+    default: true,
   },
 
   metronomeSoundUi: {

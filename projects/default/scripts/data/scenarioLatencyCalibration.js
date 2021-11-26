@@ -254,6 +254,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
           } else if(standardDeviation >= parameters.beatingStandardDeviationMax) {
             statusUpdate('tooMuchJitter');
           } else {
+            statusUpdate('complete');
             const audioLatencyMeasured = Math.max(0, parameters.audioLatencyMeasured - median);
             app.events.emit('audioLatencyMeasured', audioLatencyMeasured);
             app.events.emit('scenarioLatencyCalibration', false);

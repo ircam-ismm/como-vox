@@ -11,10 +11,12 @@ function scenarioManager(graph, helpers, outputFrame) {
     'scenarioFull',
     'scenarioIntensity',
     'scenarioTempo',
+    'scenarioTempoIntensity',
     'scenarioStartStopWithBeating',
   ];
 
   const noteChannel = 'scenario';
+  const speechChannel = 'scenario';
 
   const parameters = {
     scenarioCurrent: null,
@@ -109,6 +111,12 @@ function scenarioManager(graph, helpers, outputFrame) {
       const notesContainer = inputData['notes'] || {};
       notesContainer[noteChannel] = notes;
       outputData['notes'] = notesContainer;
+
+      const speech = [];
+      // reset own channel
+      const speechContainer = inputData['speech'] || {};
+      speechContainer[speechChannel] = speech;
+      outputData['speech'] = speechContainer;
 
       return outputFrame;
     },

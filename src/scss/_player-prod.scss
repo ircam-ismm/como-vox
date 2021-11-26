@@ -211,6 +211,8 @@ header {
       background-color: white;
       border: 1px solid $border-color;
       border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.9rem;
 
       &:nth-child(odd) {
         margin-right: 2px;
@@ -266,7 +268,6 @@ header {
   .tempo-current, .tempo-reference, .metronome {
     height: 30px;
     line-height: 30px;
-    font-weight: bold;
     display: flex;
     flex-direction: row;
     justify-content: space-between;

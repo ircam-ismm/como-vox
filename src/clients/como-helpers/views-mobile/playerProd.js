@@ -56,7 +56,7 @@ export function playerProd(data) {
       <!-- LOADING OVERLAY                    -->
       <!-- ---------------------------------- -->
       ${loading
-        ? html`<div class="loading"><p>chargement...<p></div>`
+        ? html`<div class="loading"></div>`
         : nothing
       }
 

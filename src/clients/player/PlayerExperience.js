@@ -800,6 +800,7 @@ class PlayerExperience extends AbstractExperience {
 
     PLAYER_PROD = !this.state.editorGUI;
 
+
     const viewData = {
       ...this.state,
       boundingClientRect: this.$container.getBoundingClientRect(),

@@ -31,7 +31,7 @@ async function launch($container, index) {
 
     const como = new CoMo(client, audioContext);
     await como.init();
-    // initQoS(client);
+    initQoS(client);
 
     const experience = new PlayerExperience(como, config, $container);
     // store exprience for emulated clients
@@ -63,6 +63,7 @@ const numEmulatedClients = parseInt(searchParams.get('emulate')) || 1;
 // switch to light mode for regular users
 if (url.paramGet('editorGUI') !== '1') {
   $container.classList.add('player-prod');
+  document.body.classList.add('light');
 }
 
 // special logic for emulated clients (1 click to rule them all)

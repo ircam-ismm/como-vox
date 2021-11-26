@@ -8,6 +8,31 @@ export function playerProd(data) {
   const voxPlayerState = data.voxPlayerState;
   const loading = data.scoreFileName && !data.scoreReady;
 
+  const scoreTempo = (data.scoreData
+                      ? Math.round(data.scoreData.masterTrack.tempo
+                                   * data.scoreData.masterTrack.timeSignature.division / 4)
+                      : 0);
+  let scoreDivisionName = 'noire';
+  if(data.scoreData) {
+    switch(data.scoreData.masterTrack.timeSignature.division) {
+      case 1:
+        scoreDivisionName = 'ronde';
+        break;
+      case 2:
+        scoreDivisionName = 'blanche';
+        break;
+      case 4:
+        scoreDivisionName = 'noire';
+        break;
+      case 8:
+        scoreDivisionName = 'croche';
+        break;
+      case 16:
+        scoreDivisionName = 'double-croche';
+        break;
+    }
+  }
+
   return html`
     <header>
       <h1 class="title">
@@ -261,8 +286,8 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         ${data.scoreFileName && data.scoreData
           ? html`
               <p class="track-infos">
-                ${data.timeSignature.count}/${data.timeSignature.division} -
-                ${Math.round(data.scoreData.masterTrack.tempo)} à la noire
+                ${data.timeSignature.count}/${data.timeSignature.division}
+                - tempo ${scoreTempo} à la ${scoreDivisionName}
               </p>
             `
           : html`<p class="track-infos">&nbsp;</p>`
@@ -368,13 +393,13 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
       <div class="tempo-current">
         <span class="label">Tempo courant</span>
-        <span class="value">${Math.round(data.tempo)}</span>
+        <span class="value">${Math.round(data.tempo * data.timeSignature.division / 4)}</span>
       </div>
 
       <div class="tempo-reference">
         <span class="label">Tempo de référence</span>
         <input
-          value="${data.scoreData ? Math.round(data.scoreData.masterTrack.tempo) : 0}"
+          value="${data.scoreData ? scoreTempo : 0}"
           type="number"
           class="value"
           @blur="${e => {

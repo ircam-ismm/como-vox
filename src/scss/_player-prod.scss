@@ -2,6 +2,15 @@ $primary-color: #ffc20a;
 $secondary-color: #0c7bdc;
 $border-color: #777;
 
+// @font-face {
+//   font-family: 'Inconsolata';
+//   src: url('../font/inconsolata-variable.ttf') format('truetype');
+// }
+
+// * {
+//   font-family: Inconsolata, Consolas, monaco, monospace;
+// }
+
 /* ------------------------------------------ */
 /* LAYOUT */
 /* ------------------------------------------ */
@@ -113,6 +122,10 @@ header {
     border: 1px solid #cdcdcd;
     border-radius: 4px;
     box-shadow: 0px 0px 2px #dddddd;
+
+    &.active {
+      background-color: $primary-color;
+    }
   }
 }
 
@@ -157,12 +170,15 @@ header {
         background-image: url(../images/triangle-down.png);
         background-repeat: no-repeat;
         background-position: 50% 50%;
-        background-size: contain;
-        width: 12px;
-        height: 12px;
+        background-size: 30%;
+        width: 24px;
+        height: 32px;
         position: absolute;
-        right: 10px;
-        top: 10px;
+        right: 0px;
+        top: 0px;
+        background-color: #eee;
+        border-radius: 3px;
+        pointer-events: none;
       }
     }
 

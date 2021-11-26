@@ -40,7 +40,7 @@ export function playerProd(data) {
         <img src="./images/logo.png" alt="como vox" />
       </h1>
       <button
-        class="settings-btn"
+        class="settings-btn${guiState.showAdvancedSettings ? ' active' : ''}"
         @click="${e => {
           if (loading || guiState.showCalibrationScreen) {
             return;
@@ -133,7 +133,7 @@ export function playerProd(data) {
                 <p>Latence</p>
                 <input
                   type="number"
-                  value="${parseInt(data.audioLatency * 1e3)}"
+                  value="${parseInt(data.audioLatencyMeasured * 1e3)}"
                   @blur="${e => {
                     const value = parseFloat(e.currentTarget.value);
                     if (!Number.isNaN(value)) {
@@ -176,7 +176,7 @@ export function playerProd(data) {
                 </p>` :
               data.audioLatencyMeasured !== null ?
                 html`<p class="info success">
-                  La latence estimée entre votre geste et le son est de ${parseInt(data.audioLatency * 1e3)} ms.
+                  La latence estimée entre votre geste et le son est de ${parseInt(data.audioLatencyMeasured * 1e3)} ms.
                 </p>` :
                 html`<p class="info">
                   &nbsp;<br />&nbsp;
@@ -416,7 +416,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </div>
 
         <div class="metronome">
-          <span class="label">Metronome</span>
+          <span class="label">Métronome</span>
           <button
             class="value ${data.metronomeSound ? 'active' : ''}"
             @click="${e => {

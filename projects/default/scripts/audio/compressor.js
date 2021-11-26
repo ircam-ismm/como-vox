@@ -7,7 +7,7 @@ function compressor(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const parameters = {
     attack:
     10e-3, // seconds, quick
-    release: 250e-3, // seconds, slow
+    release: 500e-3, // seconds, slow
     threshold: -3, // dB
     ratio: 20, // ratio, hard limiter
     knee: 3, // dB

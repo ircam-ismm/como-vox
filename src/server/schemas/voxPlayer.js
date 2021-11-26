@@ -2,7 +2,7 @@ export default {
 
   audioIntensityRange: {
     type: 'float',
-    default: 24, // dB
+    default: 32, // dB
   },
 
   audioIntensityRangeUi: {
@@ -162,7 +162,7 @@ export default {
 
   gestureIntensityInputMax: {
     type: 'float',
-    default: 0.4, // 0.3 for less energy
+    default: 0.5, // 0.3 for less energy
   },
 
   gestureIntensityInputMaxUi: {

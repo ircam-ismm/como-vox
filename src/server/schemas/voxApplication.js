@@ -4,8 +4,8 @@ export default {
   gestureAdaptationIntensityModes: {
     type: 'any',
     default: {
-      '-': 0.6,
-      'normal': 0.4,
+      '-': 0.7,
+      'normal': 0.5,
       '+': 0.3,
     },
   },

@@ -374,6 +374,7 @@ class PlayerExperience extends AbstractExperience {
     if(event || JSON.stringify(value) !== JSON.stringify(this.state[key] ) ) {
       app.events.emit(key, value);
     }
+    this.render();
   }
 
   // immediate to data and asynchronously to voxPlayerState
@@ -496,6 +497,7 @@ class PlayerExperience extends AbstractExperience {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
             this.setPlayback(value);
+            this.render();
           });
           break;
         }

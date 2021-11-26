@@ -11,6 +11,7 @@ function scenarioManager(graph, helpers, outputFrame) {
     'scenarioFull',
     'scenarioIntensity',
     'scenarioTempo',
+    'scenarioTempoIntensity',
     'scenarioStartStopWithBeating',
   ];
 

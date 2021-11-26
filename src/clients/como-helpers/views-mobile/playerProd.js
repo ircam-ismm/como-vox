@@ -133,7 +133,7 @@ export function playerProd(data) {
                 <p>Latence</p>
                 <input
                   type="number"
-                  value="${data.audioLatencyMeasured * 1e3}"
+                  value="${parseInt(data.audioLatency * 1e3)}"
                   @blur="${e => {
                     const value = parseFloat(e.currentTarget.value);
                     if (!Number.isNaN(value)) {
@@ -153,13 +153,13 @@ export function playerProd(data) {
       ${guiState.showCalibrationScreen ?
         html`
           <div class="calibration">
-            <h2>Calibration</h2>
+            <h2>Adaptation au geste</h2>
             <p>
-              La calibration permet d'adapter l'application à vous, votre téléphone et votre geste.
-              Cette étape est nécéssaire pour accéder aux modes "Tempo", "Départ" et "Tempo & Nuance".
+              Cette étape permet d'adapter l'application entre votre téléphone et votre geste.
+              Elle est nécéssaire pour accéder aux modes "Tempo", "Départ" et "Tempo & Nuance".
             </p>
             <p>
-              Cliquez sur « Commencer » et après 4 bips, c’est à vous. Faites un geste simple et précis à chaque temps.
+              Cliquez sur « Calibrer » et après 4 bips, c’est à vous. Faites un geste simple et précis à chaque temps.
             </p>
             <p>
               Le processus peut être un peu long, continuez régulièrement jusqu'à l'arrêt.
@@ -195,7 +195,7 @@ export function playerProd(data) {
               }}"
             >
               ${data.scenarioCurrent !== 'scenarioLatencyCalibration' ?
-                'Commencer la calibration' : 'Calibration en cours...'}
+                'Calibrer' : 'Calibration en cours...'}
             </button>
 
             <button
@@ -341,7 +341,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             }}"
           >Tempo</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioFull' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}"
+            class="${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 

@@ -112,11 +112,11 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
        && parameters.scenarioPlayback === false
        && updates.scenarioPlayback === true
        && status !== 'init') {
+      // update to changes
+      parametersBackup.playbackStopSeek = app.state.playbackStopSeek;
+
       // may retrigger, even if already active
       statusUpdate('init');
-
-      // update to changes
-      parametersScenario.playbackStopSeek = app.state.playbackStopSeek;
 
       parametersApply();
 

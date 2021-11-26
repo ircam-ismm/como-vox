@@ -162,7 +162,7 @@ export default {
 
   gestureIntensityInputMax: {
     type: 'float',
-    default: 0.5, // 0.4 for more energy
+    default: 0.4, // 0.3 for less energy
   },
 
   gestureIntensityInputMaxUi: {

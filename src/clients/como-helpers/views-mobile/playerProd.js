@@ -21,11 +21,6 @@ export function playerProd(data) {
           }
 
           guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
-
-          if (guiState.showAdvancedSettings) {
-            data.voxPlayerState.set({ scenarioPlayback: false });
-          }
-
           exp.updateGuiState(guiState);
         }}"
       ></button>
@@ -56,14 +51,14 @@ export function playerProd(data) {
                   e.target.classList.add('selected');
                 }}"
               >
-                ${Object.entries(voxApplicationState.get('gestureAdaptationIntensityModes') ).map( ([name, value]) => {
+                ${Object.entries(voxApplicationState.get('gestureAdaptationIntensityModes') ).map(([name, value]) => {
                 return html`
-              <button class="option gestureAdaptation ${data.gestureIntensityInputMax === value
-                         ? 'selected' : ''}"
-                      @click="${e => voxPlayerState.set({gestureIntensityInputMax: (value)})}">
-              ${name}
-              </button>
-              `;
+                  <button class="option gestureAdaptation ${data.gestureIntensityInputMax === value
+                             ? 'selected' : ''}"
+                          @click="${e => voxPlayerState.set({ gestureIntensityInputMax: (value) })}">
+                    ${name}
+                  </button>
+                  `;
               }) }
               </div>
             </div>
@@ -83,7 +78,7 @@ export function playerProd(data) {
                 return html`
               <button class="option gestureAdaptation ${data.audioLatencyAdaptation === value
                          ? 'selected' : ''}"
-                      @click="${e => voxPlayerState.set({audioLatencyAdaptation: (value)})}">
+                      @click="${e => voxPlayerState.set({ audioLatencyAdaptation: (value) })}">
               ${name}
               </button>
               `;
@@ -97,6 +92,10 @@ export function playerProd(data) {
               <div class="col-1">
                 <button
                   @click="${e => {
+                    if (guiState.showAdvancedSettings) {
+                      data.voxPlayerState.set({ scenarioPlayback: false });
+                    }
+
                     guiState.showAdvancedSettings = false;
                     guiState.showCalibrationScreen = true;
                     exp.updateGuiState(guiState);

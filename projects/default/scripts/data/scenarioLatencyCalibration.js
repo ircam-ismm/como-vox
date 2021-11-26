@@ -33,7 +33,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     initialWaitingDuration: 1, // in seconds, before stillness
     playback: false,
     playbackLatency: 0,
-    playbackStartAfterCount: {bar: 1, beat: 1}, // upbeat and one bar
+    playbackStartAfterCount: {bar: 1, beat: 0}, // upbeat and one bar
     scenarioStatus: 'off',
     stillnessWaitingDurationMax: 2, // in seconds, for time-out
     stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start

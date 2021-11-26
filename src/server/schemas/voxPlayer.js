@@ -263,7 +263,7 @@ export default {
     type: 'any',
     default: {
       bar: 1,
-      beat: 1, // one more for upbeat before start
+      beat: 0,
     },
   },
 

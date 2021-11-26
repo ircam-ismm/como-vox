@@ -54,22 +54,22 @@
   connections: [
     [
       'clickSynth',
-      'compressor',
+      'reverberator',
     ],
     [
       'samplePlayer',
-      'compressor',
+      'reverberator',
     ],
     [
       'speechPlayer',
       'compressor',
     ],
     [
-      'compressor',
       'reverberator',
+      'compressor',
     ],
     [
-      'reverberator',
+      'compressor',
       'audio-destination',
     ],
   ],

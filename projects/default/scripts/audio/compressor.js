@@ -12,7 +12,7 @@ function compressor(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     ratio: 20, // ratio, hard limiter
     knee: 3, // dB
     preGain: 6,
-    postGain: -1, // dB, little headroom
+    postGain: -2, // dB, little headroom
   };
 
   const compressorNode = new CompressorNode({

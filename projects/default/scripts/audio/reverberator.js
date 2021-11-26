@@ -6,7 +6,7 @@ function reverberator(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const parameters = {
     attackTime: 50e-3, // seconds
-    decayTime: 1, // seconds
+    decayTime: 2, // seconds
     lowpassFrequencyStart: 15000, // Hertz
     lowpassFrequencyEnd: 1000, // Hertz
     wetGain: -3, // dB, dryGain is automatic

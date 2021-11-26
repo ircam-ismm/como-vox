@@ -201,7 +201,7 @@ export function playerProd(data) {
             <button
               class="back color-light-grey"
               @click="${e => {
-                if (data.scenarioCurrent !== 'scenarioLatencyCalibration') {
+                if (data.scenarioCurrent === 'scenarioLatencyCalibration') {
                   voxPlayerState.set({ playback: false });
                   voxPlayerState.set({ scenarioLatencyCalibration: false });
                 }

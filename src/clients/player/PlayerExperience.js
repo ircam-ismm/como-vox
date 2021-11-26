@@ -265,15 +265,30 @@ class PlayerExperience extends AbstractExperience {
       this.events.emit(key, value);
     }
 
-    const baseUrl = url.base
-          + '/soundfonts/acoustic_grand_piano';
-    // + '/soundfonts/bright_acoustic_piano';
-
+    // soundfonts/bright_acoustic_piano
     this.pianoSampleManager = new SampleManager({
       audioContext: this.audioContext,
-      baseUrl,
+      baseUrl: `${url.base}/soundfonts/acoustic_grand_piano`,
     });
     app.instruments.pianoSampleManager = this.pianoSampleManager;
+
+    this.speechSampleManager = new SampleManager({
+      audioContext: this.audioContext,
+      baseUrl: `${url.base}/speech/aurelie`,
+    });
+    app.instruments.speechSampleManager = this.speechSampleManager;
+
+    await this.speechSampleManager.update({
+      notes: [
+        'annule',
+        'c_est_a_vous',
+        'erreur',
+        'merci',
+        'pas_assez_regulier',
+        'trop_lent',
+        'trop_rapide',
+      ],
+    });
 
     // 4. react to gui controls.
     this.listeners = {
@@ -359,6 +374,7 @@ class PlayerExperience extends AbstractExperience {
     if(event || JSON.stringify(value) !== JSON.stringify(this.state[key] ) ) {
       app.events.emit(key, value);
     }
+    this.render();
   }
 
   // immediate to data and asynchronously to voxPlayerState
@@ -481,6 +497,7 @@ class PlayerExperience extends AbstractExperience {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
             this.setPlayback(value);
+            this.render();
           });
           break;
         }

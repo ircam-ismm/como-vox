@@ -86,6 +86,9 @@ function scenarioTempoIntensity(graph, helpers, outputFrame) {
        && parameters.scenarioPlayback === false
        && updates.scenarioPlayback === true
        && status !== 'init') {
+      // update to changes since scenario is active
+      parametersBackup.metronomeSound = app.state.metronomeSound;
+
       statusUpdate('init');
       parametersApply();
     }

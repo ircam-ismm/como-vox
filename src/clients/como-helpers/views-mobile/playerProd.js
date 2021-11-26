@@ -8,6 +8,31 @@ export function playerProd(data) {
   const voxPlayerState = data.voxPlayerState;
   const loading = data.scoreFileName && !data.scoreReady;
 
+  const scoreTempo = (data.scoreData
+                      ? Math.round(data.scoreData.masterTrack.tempo
+                                   * data.scoreData.masterTrack.timeSignature.division / 4)
+                      : 0);
+  let scoreDivisionName = 'noire';
+  if(data.scoreData) {
+    switch(data.scoreData.masterTrack.timeSignature.division) {
+      case 1:
+        scoreDivisionName = 'ronde';
+        break;
+      case 2:
+        scoreDivisionName = 'blanche';
+        break;
+      case 4:
+        scoreDivisionName = 'noire';
+        break;
+      case 8:
+        scoreDivisionName = 'croche';
+        break;
+      case 16:
+        scoreDivisionName = 'double-croche';
+        break;
+    }
+  }
+
   return html`
     <header>
       <h1 class="title">
@@ -16,10 +41,7 @@ export function playerProd(data) {
       <button
         class="settings-btn"
         @click="${e => {
-          if (loading) {
-            return;
-          }
-
+          if (loading) { return; } // lock button on load
           guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
           exp.updateGuiState(guiState);
         }}"
@@ -51,15 +73,14 @@ export function playerProd(data) {
                   e.target.classList.add('selected');
                 }}"
               >
-                ${Object.entries(voxApplicationState.get('gestureAdaptationIntensityModes') ).map(([name, value]) => {
-                return html`
-                  <button class="option gestureAdaptation ${data.gestureIntensityInputMax === value
-                             ? 'selected' : ''}"
-                          @click="${e => voxPlayerState.set({ gestureIntensityInputMax: (value) })}">
-                    ${name}
-                  </button>
+                ${Object.entries(voxApplicationState.get('gestureAdaptationIntensityModes')).map(([name, value]) => {
+                  return html`
+                    <button
+                      class="option ${data.gestureIntensityInputMax === value ? 'selected' : ''}"
+                      @click="${e => voxPlayerState.set({ gestureIntensityInputMax: (value) })}"
+                    >${name}</button>
                   `;
-              }) }
+                })}
               </div>
             </div>
 
@@ -74,15 +95,14 @@ export function playerProd(data) {
                   e.target.classList.add('selected');
                 }}"
               >
-                ${Object.entries(voxApplicationState.get('gestureAdaptationTempoModes') ).map( ([name, value]) => {
+                ${Object.entries(voxApplicationState.get('gestureAdaptationTempoModes') ).map(([name, value]) => {
                 return html`
-              <button class="option gestureAdaptation ${data.audioLatencyAdaptation === value
-                         ? 'selected' : ''}"
-                      @click="${e => voxPlayerState.set({ audioLatencyAdaptation: (value) })}">
-              ${name}
-              </button>
-              `;
-              }) }
+                  <button
+                    class="option ${data.audioLatencyAdaptation === value ? 'selected' : ''}"
+                    @click="${e => voxPlayerState.set({ audioLatencyAdaptation: (value) })}"
+                  >${name}</button>
+                  `;
+                })}
               </div>
             </div>
 
@@ -109,7 +129,7 @@ export function playerProd(data) {
                 <p>Latence</p>
                 <input
                   type="number"
-                  value="${voxPlayerState.get('audioLatencyMeasured') * 1e3}"
+                  value="${data.audioLatencyMeasured * 1e3}"
                   @blur="${e => {
                     const value = parseFloat(e.currentTarget.value);
                     if (!Number.isNaN(value)) {
@@ -135,7 +155,7 @@ export function playerProd(data) {
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 quis nostrud exercitation ullamco.
             </p>
-            ${voxPlayerState.get('audioLatencyMeasured') !== null
+            ${data.audioLatencyMeasured !== null
               ? html`<p>La latence estimée entre le geste et le son est de ${data.audioLatency * 1e3}ms</p>`
               : html`<p>La latence entre le geste et le son doit être estimée</p>`
             }
@@ -238,18 +258,18 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         <svg
           class="listen-track
             ${data.scenarioCurrent === 'scenarioListening' ? ' active' : ''}
-            ${voxPlayerState.get('scenarioPlayback') ? ' disabled' : ''}
+            ${data.scenarioPlayback ? ' disabled' : ''}
           "
           viewbox="0 0 100 100"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
             if (data.scenarioCurrent !== 'scenarioListening') {
-              data.voxPlayerState.set({ scenarioListening: true });
+              voxPlayerState.set({ scenarioListening: true });
             } else {
-              data.voxPlayerState.set({ scenarioListening: false });
+              voxPlayerState.set({ scenarioListening: false });
             }
           }}"
         >
@@ -260,8 +280,8 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         ${data.scoreFileName && data.scoreData
           ? html`
               <p class="track-infos">
-                ${data.timeSignature.count}/${data.timeSignature.division} -
-                ${Math.round(data.scoreData.masterTrack.tempo)} à la noire
+                ${data.timeSignature.count}/${data.timeSignature.division}
+                - tempo ${scoreTempo} à la ${scoreDivisionName}
               </p>
             `
           : html`<p class="track-infos">&nbsp;</p>`
@@ -277,63 +297,63 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         }}"
       >
         <button
-          class="${voxPlayerState.get('scenarioIntensity') ? 'selected' : ''}"
+          class="${data.scenarioIntensity ? 'selected' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioIntensity')) {
+            if (!data.scenarioIntensity) {
               voxPlayerState.set({ scenarioIntensity: true });
             }
           }}"
         >Nuance</button>
         <button
-          class="${voxPlayerState.get('scenarioTempo') ? 'selected' : ''}"
+          class="${data.scenarioTempo ? 'selected' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioTempo')) {
+            if (!data.scenarioTempo) {
               voxPlayerState.set({ scenarioTempo: true });
             }
 
-            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+            if (data.audioLatencyMeasured === null) {
               guiState.showCalibrationScreen = true;
               exp.updateGuiState(guiState);
             }
           }}"
         >Tempo</button>
         <button
-          class="${voxPlayerState.get('scenarioFull') ? 'selected' : ''}"
+          class="${data.scenarioFull ? 'selected' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioFull')) {
-              voxPlayerState.set({ scenarioFull: true });
+            if (!data.scenarioTempoIntensity) {
+              voxPlayerState.set({ scenarioTempoIntensity: true });
             }
 
-            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+            if (data.audioLatencyMeasured === null) {
               guiState.showCalibrationScreen = true;
               exp.updateGuiState(guiState);
             }
           }}"
         >Tempo & Nuance</button>
         <button
-          class="${voxPlayerState.get('scenarioStartStopWithBeating') ? 'selected' : ''}"
+          class="${data.scenarioStartStopWithBeating ? 'selected' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioStartStopWithBeating')) {
+            if (!data.scenarioStartStopWithBeating) {
               voxPlayerState.set({ scenarioStartStopWithBeating: true });
             }
 
-            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+            if (data.audioLatencyMeasured === null) {
               guiState.showCalibrationScreen = true;
               exp.updateGuiState(guiState);
             }
@@ -344,19 +364,19 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       <div class="exercise-control">
         <svg
           class="button
-            ${voxPlayerState.get('scenarioPlayback') ? ' active' : ''}
+            ${data.scenarioPlayback ? ' active' : ''}
             ${data.scenarioCurrent === null || data.scenarioCurrent === 'scenarioListening' ? ' disabled' : ''}
           "
           viewbox="0 0 100 100"
           @click="${e => {
-            if (data.scenarioCurrent === null || data.scenarioCurrent === 'scenarioListening') {
+            if (data.scenarioCurrent === null || data.scenarioCurrent === 'scenarioListening' || data.scenarioCurrent === 'scenarioCalibration') {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioPlayback')) {
-              data.voxPlayerState.set({ scenarioPlayback: true });
+            if (!data.scenarioPlayback) {
+              voxPlayerState.set({ scenarioPlayback: true });
             } else {
-              data.voxPlayerState.set({ scenarioPlayback: false });
+              voxPlayerState.set({ scenarioPlayback: false });
             }
           }}"
         >
@@ -367,13 +387,13 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
       <div class="tempo-current">
         <span class="label">Tempo courant</span>
-        <span class="value">${Math.round(data.tempo)}</span>
+        <span class="value">${Math.round(data.tempo * data.timeSignature.division / 4)}</span>
       </div>
 
       <div class="tempo-reference">
         <span class="label">Tempo de référence</span>
         <input
-          value="${data.scoreData ? Math.round(data.scoreData.masterTrack.tempo) : 0}"
+          value="${data.scoreData ? scoreTempo : 0}"
           type="number"
           class="value"
           @blur="${e => {
@@ -387,9 +407,9 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       <div class="metronome">
         <span class="label">Metronome</span>
         <button
-          class="value ${voxPlayerState.get('metronomeSound') ? 'active' : ''}"
+          class="value ${data.metronomeSound ? 'active' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('metronomeSound')) {
+            if (data.metronomeSound) {
               voxPlayerState.set({ metronomeSound: false });
             } else {
               voxPlayerState.set({ metronomeSound: true });

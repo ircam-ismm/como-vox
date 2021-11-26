@@ -176,7 +176,7 @@ export function playerProd(data) {
                 </p>` :
               data.audioLatencyMeasured !== null ?
                 html`<p class="info success">
-                  La latence estimée entre votre geste et le son est de ${parseInt(data.audioLatency * 1e3)} ms.
+                  La latence estimée entre votre geste et le son est de ${parseInt(data.audioLatencyMeasured * 1e3)} ms.
                 </p>` :
                 html`<p class="info">
                   &nbsp;<br />&nbsp;

@@ -1,0 +1,533 @@
+$primary-color: #ffc20a;
+$secondary-color: #0c7bdc;
+$border-color: #777;
+
+// @font-face {
+//   font-family: 'Inconsolata';
+//   src: url('../font/inconsolata-variable.ttf') format('truetype');
+// }
+
+// * {
+//   font-family: Inconsolata, Consolas, monaco, monospace;
+// }
+
+/* ------------------------------------------ */
+/* LAYOUT */
+/* ------------------------------------------ */
+
+&#__soundworks-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  color: black;
+}
+
+
+header {
+  height: 56px;
+  display: block;
+}
+
+section {
+  display: block;
+  position: relative;
+}
+
+footer {
+  height: 40px;
+  display: block;
+  margin-top: auto;
+  background-image: url(../images/credits.png);
+  background-position: 50% 50%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  border-top: 1px solid #efefef;
+}
+
+
+/* ------------------------------------------ */
+/* HOME
+/* ------------------------------------------ */
+
+#home {
+  .logo {
+    width: 80%;
+    max-width: 300px;
+    display: block;
+    margin: 10px auto;
+  }
+
+  .button {
+    width: 40%;
+    max-width: 128px;
+    display: block;
+    background-color: $primary-color;
+    border-radius: 50%;
+    margin: 60px auto;
+
+    polygon {
+      fill: #ffffff;
+    }
+  }
+
+  p {
+    font-size: 1.2rem;
+    line-height: 1.6rem;
+    text-align: center;
+
+    span {
+      font-size: 1rem;
+      display: block;
+      margin-top: 16px;
+    }
+  }
+}
+
+/* ------------------------------------------ */
+/* HEADER
+/* ------------------------------------------ */
+
+
+header {
+  position: relative;
+  margin-top: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ccc;
+  box-shadow: 0px 1px 1px #cdcdcd;
+
+  .title {
+    width: 100%;
+    height: 49px;
+    margin: 0;
+  }
+
+  .title img {
+    height: 100%;
+    position: relative;
+    left: 20px;
+  }
+
+  .settings-btn {
+    position: absolute;
+    right: 20px;
+    top: 5px;
+    width: 70px;
+    height: 40px;
+    background-color: white;
+    background-image: url(../images/settings-icon.png);
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    border: 1px solid #cdcdcd;
+    border-radius: 4px;
+    box-shadow: 0px 0px 2px #dddddd;
+
+    &.active {
+      background-color: $primary-color;
+    }
+  }
+}
+
+/* ------------------------------------------ */
+/* MAIN PAGE
+/* ------------------------------------------ */
+
+.main {
+  position: relative;
+  padding: 20px;
+
+  .track {
+    position: relative;
+
+    .select {
+      border: 1px solid $border-color;
+      border-radius: 4px;
+      // font-size: 1.25rem;
+      cursor: pointer;
+      background-color: #fff;
+      width: calc(100% - 45px);
+      height: 34px;
+      line-height: 34px;
+      position: relative;
+
+      select {
+        appearance: none;
+        background-color: transparent;
+        border: none;
+        display: block;
+        width: 100%;
+        text-indent: 12px;
+        line-height: inherit;
+        font-family: inherit;
+        font-size: inherit;
+        cursor: inherit;
+        z-index: 1;
+        outline: none;
+      }
+
+      .select-arrow {
+        background-image: url(../images/triangle-down.png);
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        background-size: 30%;
+        width: 24px;
+        height: 32px;
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        background-color: #eee;
+        border-radius: 3px;
+        pointer-events: none;
+      }
+    }
+
+    .listen-track {
+      display: block;
+      width: 34px;
+      height: 34px;
+      padding: 5px;
+      // background-color: $primary-color;
+      background-color: $secondary-color;
+      border-radius: 4px;
+      border: none;
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      polygon { fill: white }
+      .play-shape { display: block; }
+      .stop-shape { display: none; }
+
+      &.active {
+        background-color: $primary-color;
+
+        .play-shape { display: none; }
+        .stop-shape { display: block; }
+      }
+
+      &.disabled { opacity: 0.5 }
+    }
+
+    .track-infos {
+      margin: 10px;
+      font-size: 1rem;
+      font-style: italic;
+    }
+  }
+
+  .exercise-type {
+    position: relative;
+    margin-top: 20px;
+
+    button {
+      width: calc(50% - 6px);
+      height: 30px;
+      margin-bottom: 4px;
+      background-color: white;
+      border: 1px solid $border-color;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.9rem;
+
+      &:nth-child(odd) {
+        margin-right: 2px;
+      }
+      &:nth-child(even) {
+        margin-left: 2px;
+      }
+      &.selected {
+        background-color: $primary-color;
+      }
+
+      &.all {
+        font-style: italic;
+        font-weight: bold;
+      }
+
+      &.locked {
+        background-color: #efefef;
+        background-image: url(../images/locked.png);
+        background-size: contain;
+        background-position: 100% 50%;
+        background-repeat: no-repeat;
+        font-style: italic;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .exercise-control {
+    /*background-color: #eee;*/
+    margin: 20px 0;
+    text-align:  center;
+
+    .button {
+      width: 100px;
+      height: 100px;
+      background-color: $secondary-color;
+      border-radius: 50%;
+
+      polygon { fill: white }
+
+      &.disabled { opacity: 0.5 }
+      &.active { background-color: $primary-color; }
+
+      .play-shape { display: block; }
+      .stop-shape { display: none; }
+
+      &.active .play-shape { display: none; }
+      &.active .stop-shape { display: block; }
+    }
+  }
+
+  .tempo-current, .tempo-reference, .metronome {
+    height: 30px;
+    line-height: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 4px;
+
+    .label {
+      display: inline-block;
+      width: 60%;
+      font-size: 1rem;
+    }
+
+    .value {
+      display: inline-block;
+      width: 38%;
+      text-align: center;
+    }
+  }
+
+  .tempo-reference .value {
+    border: 1px solid $border-color;
+    border-radius: 4px;
+  }
+
+
+  .metronome .value {
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    background-color: white;
+    background-image: url(../images/speaker-off.png);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: contain;
+  }
+
+  .metronome .value.active {
+    background-color: $primary-color;
+    background-image: url(../images/speaker-on.png);
+  }
+}
+
+
+/* ------------------------------------------ */
+/* ADVANCED OPTIONS
+/* ------------------------------------------ */
+
+.settings {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: #eee;
+  z-index: 1;
+  padding: 20px;
+  box-shadow: 0px 2px 4px #909090;
+
+  // separator
+  hr {
+    height: 0;
+    border-bottom: 1px solid $border-color;
+    margin-bottom: 20px;
+  }
+
+  .adjust-param {
+    margin-bottom: 20px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+    }
+
+    div {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+    }
+
+    div button {
+      height: 30px;
+      border: 1px solid $border-color;
+      border-radius: 4px;
+      background-color: #fff;
+    }
+
+    div button.selected {
+      background-color: $primary-color;
+      /*background-color: $secondary-color;*/
+    }
+
+    div.col-1 button {
+      width: 100%;
+    }
+
+    div.col-2 button {
+      width: 48%;
+    }
+
+    div.col-3 button {
+      width: 30%;
+    }
+
+    &.param-calibration button {
+      /*background-color: $primary-color;*/
+      background-color: $secondary-color;
+    }
+
+    &.param-latency {
+      p, input {
+        margin: 0;
+        height: 30px;
+        line-height: 30px;
+      }
+
+      input {
+        background-color: transparent;
+        border: none;
+        text-align: center;
+      }
+    }
+  }
+}
+
+/* ------------------------------------------ */
+/* Calibration
+/* ------------------------------------------ */
+
+.calibration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  min-height: calc(100vh - 56px - 40px);
+  padding: 20px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    margin: 0 0 10px 0;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.2rem;
+    margin: 0 0 6px 0;
+
+    &.info {
+      font-style: italic;
+      margin-top: 20px;
+      margin-bottom: 10px;
+
+      // &.todo { color: #007bff } // blue
+      &.todo { color: #d78e05 }    // orange
+      &.success { color: #28a745 } // green
+      &.failure { color: #dc3545 } // red
+    }
+  }
+
+  button {
+    height: 30px;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    background-color: white;
+    width: 100%;
+    margin-bottom: 10px;
+    display: block;
+
+    &.color-default {
+      background-color: $secondary-color !important;
+    }
+
+    &.color-process {
+      background-color: $primary-color !important;
+    }
+
+    &.color-white {
+      background-color: white !important;
+    }
+
+    &.color-light-grey {
+      background-color: #efefef !important;
+    }
+
+
+    &:active {
+      background-color: $secondary-color;
+    }
+
+    &.back {
+      // margin-top: auto;
+    }
+  }
+}
+
+
+/* ------------------------------------------ */
+/* Credits
+/* ------------------------------------------ */
+
+.credits {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+  padding: 40px 20px 20px 20px;
+  background-color: #ffffff;
+  overflow-y: auto;
+
+  .close {
+    display: block;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    background-color: transparent;
+    border: none;
+    background-image: url(../images/close.png);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: contain;
+  }
+
+}
+
+/* ------------------------------------------ */
+/* Calibration
+/* ------------------------------------------ */
+
+.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10; // above everything else
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+  background-color: #ffffff;
+  background-image: url(../images/loader.gif);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+

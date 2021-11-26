@@ -2,6 +2,45 @@
 
 ## Todo
 
+- [ ] mise en ligne d’une version pour s’entraîner (Morgan et Marie-Noëlle)
+- [ ] essayer la fonction de duplication de l’audio
+- [x] simplification de la procédure de calibration
+- [x] calibrer avec un tempo à 70 ?
+- [x] réglage de latence (faciliter l'accélération ou le ralenti) : [-] [neutre] [+]
+- [x] réglage de la plage de dynamique [-] [neutre] [+]
+- [x] départ : possibilité d’écouter l’original
+
+- [ ] après une arrêt, reprise depuis la mesure courante
+
+- [x] mise à jour de l'interface seulement aux changements
+  - [ ] ajouter des `this.render()`
+- [x] remise compresseur et réverbe
+
+Everywhere (see scenarios):
+- [ ] speech for feedback
+
+  - [x] "c'est à vous"
+  - [x] "trop tôt"
+  - [x] "trop rapide"
+  
+  Indications :
+  - [ ] tempo reached
+  - [ ] too fast / too slow (10%)
+  
+  Calibration:
+  - [x] start on silence
+  - [x] do not stop on gesture before start
+
+Metronome:
+- rename to 'beep' ou 'click'
+
+Quality of Service
+- do not disconnect (fine with local-only)
+
+Load MIDI
+- [ ] from file
+- [ ] from URL
+
 Bugs:
  - [ ] intensity drops
    - [?] device compresses audio output when clipping?
@@ -37,13 +76,14 @@ Bugs:
   - [x] normalise score
   - [ ] hold when transport does not stop with beating
 - [ ] global volume
-  - [?] compressor
-  - [?] reverb
+  - [x] compressor
+  - [x] reverb
 - [x] start
 - [x] end
   - [?] quicker
 - [ ] UI
   - [x] URL: load state `z` after specific to allow for easy overrides.
+  - [ ] do not update on `requestnimationFrame`
   - [ ] presets
     - [ ] UI
     - [ ] beating

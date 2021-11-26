@@ -1,9 +1,8 @@
-function scenarioLatencyCalibration(graph, helpers, outputFrame) {
+function scenarioListening(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
   const positionAddBeats = conversion.positionAddBeats;
-  const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
   const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
 
   // to restore after calibration
@@ -14,29 +13,15 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     gestureControlsPlaybackStart: false,
     gestureControlsPlaybackStop: false,
     gestureControlsTempo: false,
-    measures: true,
     metronomeSound: true,
-    playbackStopSeek: 'start',
-    scoreFileName: null,
-    tempo: 70,
-    timeSignature: {count: 2, division: 4},
   };
 
-  // default values to register
   const parameters = {
     ...parametersScenario,
-    audioLatencyMeasured: 0,
-    // @TODO: use playbackStartAfterCount
-    beatGestureWaitingDurationMax: 2, // in seconds, for time-out
-    beatingDuration: {bar: 4, beat: 0},
-    beatingStandardDeviationMax: 0.25, // in seconds
-    initialWaitingDuration: 1, // in seconds, before stillness
     playback: false,
-    playbackLatency: 0,
-    playbackStartAfterCount: {bar: 1, beat: 0}, // upbeat and one bar
+    playbackStartAfterCount: {bar: 1, beat: 0},
     scenarioStatus: 'off',
-    stillnessWaitingDurationMax: 2, // in seconds, for time-out
-    stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start
+    timeSignature: {bar: 4, beat: 4},
   };
 
   const parametersApply = () => {
@@ -72,42 +57,40 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
 
   const statusIsError = (status) => {
     return status === 'cancel'
-      || status === 'tooMuchJitter'
       || status === 'error'
   };
 
   const updateParams = (updates) => {
-    if(typeof updates.scenarioLatencyCalibration !== 'undefined') {
-      const activeChanged = updates.scenarioLatencyCalibration
-            !== parameters.scenarioLatencyCalibration;
-      const active = updates.scenarioLatencyCalibration;
-      parameters.scenarioLatencyCalibration = active;
+    if(typeof updates.scenarioListening !== 'undefined') {
+      const activeChanged = updates.scenarioListening
+            !== parameters.scenarioListening;
+      const active = updates.scenarioListening;
+      parameters.scenarioListening = active;
       if(active) {
         if(activeChanged) {
           parametersSave();
         }
         statusUpdate('init');
         parametersApply();
-        app.events.emit('seekPosition', {bar: 1, beat: 1});
-        app.events.emit('playback', false);
       } else {
         if(activeChanged) {
+          app.events.emit('playback', false);
           parametersRestore();
         }
       }
     }
 
-    if(parameters.scenarioLatencyCalibration
+    if(parameters.scenarioListening
        && parameters.playback === true
        && updates.playback === false
        && status !== 'done') {
-      statusUpdate('cancel');
+      statusUpdate('done');
     }
 
-    if(parameters.scenarioLatencyCalibration
+    if(parameters.scenarioListening
        && statusIsError(updates.scenarioStatus) ) {
       parametersRestore();
-      app.events.emit('scenarioLatencyCalibration', false);
+      app.events.emit('scenarioListening', false);
     }
 
     for(const p of Object.keys(updates) ) {
@@ -127,12 +110,10 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
             ...Object.keys(parametersScenario),
             // declare own parameters
             ...[
-              'audioLatencyMeasured',
-              'beatGestureWaitingDurationMax',
+              'audioLatency',
               'playback',
-              'playbackLatency',
               'playbackStartAfterCount',
-              'scenarioLatencyCalibration',
+              'scenarioListening',
               'scenarioStatus',
             ],
           ])];
@@ -160,7 +141,6 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
       const {
         beat: beatGesture,
         playback,
-        playbackLatency,
         position,
         tempo,
         time,
@@ -168,15 +148,12 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
         stillness
       } = inputData;
 
-      if(!parameters.scenarioLatencyCalibration
-        || !stillness) {
+      if(!parameters.scenarioListening) {
         return outputFrame;
       }
 
       switch(status) {
         case 'init': {
-          beatGestureTriggered = false;
-
           // wait for 4 beats on 1/4 and 2/4 time signature
           const barCount = (timeSignature.count >= 3
                             ? timeSignature.count
@@ -184,7 +161,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
 
           const startAfterBeats
                 = parameters.playbackStartAfterCount.bar * barCount
-                + parameters.playbackStartAfterCount.beat;
+                + parameters.playbackStartAfterCount.beat
 
           const seekPosition = positionAddBeats({bar: 1, beat: 1},
                                                 -startAfterBeats,
@@ -192,79 +169,30 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
 
           app.events.emit('tempoReset', true);
 
+          // @TODO: bug on seek with quick events
           app.events.emit('seekPosition', seekPosition);
           app.events.emit('playback', true);
-          // @TODO: seek after playback for bug on seek (quick events?)
           app.events.emit('seekPosition', seekPosition);
           statusUpdate('precount');
           break;
         }
 
         case 'precount': {
-          // start with first beat
-          const precountEndPosition = {bar: 1, beat: 1};
+          const precountEndPosition = positionAddBeats({bar: 1, beat: 1},
+                                                       -1,
+                                                       {timeSignature});
           if(positionsToBeatsDelta(position, precountEndPosition,
                                    {timeSignature}) > 0) {
-            app.events.emit('measuresClear', true);
-            statusUpdate('ready');
-          }
-          break;
-        }
-
-        case 'ready': {
-          const beatGesture = inputData['beat'];
-          if(beatGesture && beatGesture.trigger) {
-            beatGestureTriggered = true;
+            app.events.emit('metronomeSound',
+                            parametersBackup['metronomeSound']);
             statusUpdate('playing');
           }
 
-          // wait until hearing playback: add playbackLatency
-          if(!beatGestureTriggered
-             && (time.local - statusTime - playbackLatency
-                 >= parameters.beatGestureWaitingDurationMax) ) {
-            // no start, cancel
-            statusUpdate('cancel');
-            app.events.emit('playback', false);
-          }
           break;
         }
 
-        case 'playing': {
-          const beatingDuration = positionDeltaToSeconds(parameters.beatingDuration, {
-            timeSignature,
-            tempo,
-          });
-
-          if(time.local - statusTime >= beatingDuration) {
-            statusUpdate('done');
-            app.events.emit('playback', false);
-          }
+        default:
           break;
-        }
-
-        case 'done': {
-          const {
-            mean,
-            median,
-            standardDeviation,
-          } = app.measures.beatOffsetsSecondsStatistics;
-
-          if(typeof mean === 'undefined') {
-            statusUpdate('error');
-          } else if(standardDeviation >= parameters.beatingStandardDeviationMax) {
-            statusUpdate('tooMuchJitter');
-          } else {
-            statusUpdate('complete');
-            const audioLatencyMeasured = Math.max(0, parameters.audioLatencyMeasured - median);
-            app.events.emit('audioLatencyMeasured', audioLatencyMeasured);
-            app.events.emit('scenarioLatencyCalibration', false);
-          }
-          break;
-        }
-
-        default: {
-          break;
-        }
       }
 
       return outputFrame;

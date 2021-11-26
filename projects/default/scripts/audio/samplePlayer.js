@@ -41,7 +41,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     samplesPlaying,
   } = {}) => {
 
-    const buffer = pianoSampleManager.get(pitch);
+    const buffer = sampleManager.get(pitch);
     if(buffer) {
       const source = audioContext.createBufferSource();
       source.buffer = buffer;

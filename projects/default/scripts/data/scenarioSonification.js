@@ -20,6 +20,8 @@ function scenarioSonification(graph, helpers, outputFrame) {
   const cancelNoteRepetition = 3;
   const cancelNoteRepetitionInterval = 1 / 32; // in whole notes
 
+  let completeRequest = false;
+
   let errorRequest = false;
   const errorNotePitch = 81; // Eb6
   const errorNoteIntensity = 80;
@@ -49,6 +51,9 @@ function scenarioSonification(graph, helpers, outputFrame) {
     {pitch: 77, intensity: 80, duration: 1/4, delay: 1/7},
   ];
 
+  const speechChannel = 'scenario';
+  const speechIntensity = 127;
+
   const parameters = {
     scenarioCurrent: null,
     scenarioStatus: null,
@@ -64,6 +69,11 @@ function scenarioSonification(graph, helpers, outputFrame) {
 
         case 'cancel': {
           cancelRequest = true;
+          break;
+        }
+
+        case 'complete': {
+          completeRequest = true;
           break;
         }
 
@@ -134,10 +144,18 @@ function scenarioSonification(graph, helpers, outputFrame) {
       const notesContainer = inputData['notes'] || {
         [noteChannel]: [],
       };
+
+      const speechContainer = inputData['speech'] || {
+        [speechChannel]: [],
+      };
+
       const notes = notesContainer[noteChannel];
+      const speech = speechContainer[speechChannel];
 
       if(readyRequest) {
         readyRequest = false;
+
+        // use note for ready, as repeated speech is annoying
         const note = {
           channel: noteChannel,
           time: time.audio,
@@ -146,85 +164,148 @@ function scenarioSonification(graph, helpers, outputFrame) {
           duration: readyNoteDuration,
         };
         notes.push(note);
+
+        // speech.push({
+        //   channel: speechChannel,
+        //   time: time.audio,
+        //   sample: 'c_est_a_vous',
+        //   intensity: speechIntensity,
+        // });
       }
 
       if(cancelRequest) {
         cancelRequest = false;
-        for(let n = 0; n < cancelNoteRepetition; ++n) {
-          const note = {
-            channel: noteChannel,
-            time: time.audio + n * notesToSeconds(cancelNoteRepetitionInterval,
-                                                  {tempo, timeSignature}),
-            pitch: cancelNotePitch,
-            intensity: cancelNoteIntensity,
-            duration: cancelNoteDuration,
-          };
-          notes.push(note);
-        }
+
+        // for(let n = 0; n < cancelNoteRepetition; ++n) {
+        //   const note = {
+        //     channel: noteChannel,
+        //     time: time.audio + n * notesToSeconds(cancelNoteRepetitionInterval,
+        //                                           {tempo, timeSignature}),
+        //     pitch: cancelNotePitch,
+        //     intensity: cancelNoteIntensity,
+        //     duration: cancelNoteDuration,
+        //   };
+        //   notes.push(note);
+        // }
+
+        speech.push({
+          channel: speechChannel,
+          time: time.audio,
+          sample: 'annule',
+          intensity: speechIntensity,
+        });
+      }
+
+      if(completeRequest) {
+        completeRequest = false;
+
+        speech.push({
+          channel: speechChannel,
+          time: time.audio,
+          sample: 'merci',
+          intensity: speechIntensity,
+        });
+
       }
 
       if(errorRequest) {
         errorRequest = false;
-        for(let n = 0; n < errorNoteRepetition; ++n) {
-          const note = {
-            channel: noteChannel,
-            time: time.audio + n * notesToSeconds(errorNoteRepetitionInterval,
-                                                  {tempo, timeSignature}),
-            pitch: errorNotePitch,
-            intensity: errorNoteIntensity,
-            duration: errorNoteDuration,
-          };
-          notes.push(note);
-        }
+
+        // for(let n = 0; n < errorNoteRepetition; ++n) {
+        //   const note = {
+        //     channel: noteChannel,
+        //     time: time.audio + n * notesToSeconds(errorNoteRepetitionInterval,
+        //                                           {tempo, timeSignature}),
+        //     pitch: errorNotePitch,
+        //     intensity: errorNoteIntensity,
+        //     duration: errorNoteDuration,
+        //   };
+        //   notes.push(note);
+        // }
+
+        speech.push({
+          channel: speechChannel,
+          time: time.audio,
+          sample: 'erreur',
+          intensity: speechIntensity,
+        });
       }
 
       if(tooSlowRequest) {
         tooSlowRequest = false;
-        for(let n = 0; n < tooSlowNoteRepetition; ++n) {
-          const note = {
-            channel: noteChannel,
-            time: time.audio + n * notesToSeconds(tooSlowNoteRepetitionInterval,
-                                                  {tempo, timeSignature}),
-            pitch: tooSlowNotePitch,
-            intensity: tooSlowNoteIntensity,
-            duration: tooSlowNoteDuration,
-          };
-          notes.push(note);
-        }
+
+        // for(let n = 0; n < tooSlowNoteRepetition; ++n) {
+        //   const note = {
+        //     channel: noteChannel,
+        //     time: time.audio + n * notesToSeconds(tooSlowNoteRepetitionInterval,
+        //                                           {tempo, timeSignature}),
+        //     pitch: tooSlowNotePitch,
+        //     intensity: tooSlowNoteIntensity,
+        //     duration: tooSlowNoteDuration,
+        //   };
+        //   notes.push(note);
+        // }
+
+        speech.push({
+          channel: speechChannel,
+          time: time.audio,
+          sample: 'trop_lent',
+          intensity: speechIntensity,
+        });
+
       }
 
       if(tooFastRequest) {
         tooFastRequest = false;
-        for(let n = 0; n < tooFastNoteRepetition; ++n) {
-          const note = {
-            channel: noteChannel,
-            time: time.audio + n * notesToSeconds(tooFastNoteRepetitionInterval,
-                                                  {tempo, timeSignature}),
-            pitch: tooFastNotePitch,
-            intensity: tooFastNoteIntensity,
-            duration: tooFastNoteDuration,
-          };
-          notes.push(note);
-        }
+
+        // for(let n = 0; n < tooFastNoteRepetition; ++n) {
+        //   const note = {
+        //     channel: noteChannel,
+        //     time: time.audio + n * notesToSeconds(tooFastNoteRepetitionInterval,
+        //                                           {tempo, timeSignature}),
+        //     pitch: tooFastNotePitch,
+        //     intensity: tooFastNoteIntensity,
+        //     duration: tooFastNoteDuration,
+        //   };
+        //   notes.push(note);
+        // }
+
+        speech.push({
+          channel: speechChannel,
+          time: time.audio,
+          sample: 'trop_rapide',
+          intensity: speechIntensity,
+        });
+
       }
 
       if(tooMuchJitterRequest) {
         tooMuchJitterRequest = false;
-        let timeCurrent = time.audio;
-        tooMuchJitterNotes.forEach( (note) => {
-          timeCurrent += notesToSeconds(note.delay, {tempo, timeSignature});
-          const {pitch, intensity, duration} = note;
-          notes.push({
-            channel: noteChannel,
-            time: timeCurrent,
-            pitch,
-            intensity,
-            duration,
-          });
+
+        // let timeCurrent = time.audio;
+        // tooMuchJitterNotes.forEach( (note) => {
+        //   timeCurrent += notesToSeconds(note.delay, {tempo, timeSignature});
+        //   const {pitch, intensity, duration} = note;
+        //   notes.push({
+        //     channel: noteChannel,
+        //     time: timeCurrent,
+        //     pitch,
+        //     intensity,
+        //     duration,
+        //   });
+        // });
+
+        speech.push({
+          channel: speechChannel,
+          time: time.audio,
+          sample: 'pas_assez_regulier',
+          intensity: speechIntensity,
         });
+
       }
 
       outputData['notes'] = notesContainer;
+      outputData['speech'] = speechContainer;
       return outputFrame;
     },
 

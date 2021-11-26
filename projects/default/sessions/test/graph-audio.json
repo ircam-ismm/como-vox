@@ -19,10 +19,34 @@
       },
     },
     {
+      id: 'speechPlayer',
+      type: 'ScriptAudio',
+      options: {
+        scriptName: 'speechPlayer',
+        bypass: false,
+      },
+    },
+    {
+      id: 'reverberator',
+      type: 'ScriptAudio',
+      options: {
+        scriptName: 'reverberator',
+        bypass: false,
+      },
+    },
+    {
+      id: 'compressor',
+      type: 'ScriptAudio',
+      options: {
+        scriptName: 'compressor',
+        bypass: false,
+      },
+    },
+    {
       id: 'audio-destination',
       type: 'AudioDestination',
       options: {
-        volume: -5,
+        volume: 0,
         mute: false,
       },
     },
@@ -30,10 +54,22 @@
   connections: [
     [
       'clickSynth',
-      'audio-destination',
+      'reverberator',
     ],
     [
       'samplePlayer',
+      'reverberator',
+    ],
+    [
+      'speechPlayer',
+      'compressor',
+    ],
+    [
+      'reverberator',
+      'compressor',
+    ],
+    [
+      'compressor',
       'audio-destination',
     ],
   ],

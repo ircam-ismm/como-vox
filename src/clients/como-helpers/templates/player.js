@@ -4,6 +4,7 @@ import {audioIntensity} from './audioIntensity.js';
 import {clock} from './clock.js';
 import {gestureControl} from './gestureControl.js';
 import {gestureIntensity} from './gestureIntensity.js';
+import {gestureAdaptation} from './gestureAdaptation.js';
 import {latency} from './latency.js';
 import {playback} from './playback.js';
 import {position} from './position.js';
@@ -22,6 +23,7 @@ export function player(data) {
     ${session(data)}
     ${clock(data)}
     ${latency(data)}
+    ${gestureAdaptation(data)}
     ${scenario(data)}
     ${score(data)}
     ${tempo(data)}

@@ -54,7 +54,6 @@ function scoreData(graph, helpers, outputFrame) {
     resetPartsRequest();
 
     scoreData = scoreRequest;
-    console.log("score = ", scoreData);
     eventsNext.length = (scoreData
                          ? scoreData.partSet.parts.length
                          : 0);

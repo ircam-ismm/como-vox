@@ -149,17 +149,22 @@ export function playerProd(data) {
       ${guiState.showCalibrationScreen ?
         html`
           <div class="calibration">
-            <h2>Calibration</h2>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco.
-            </p>
-            ${data.audioLatencyMeasured !== null
-              ? html`<p>La latence estimée entre le geste et le son est de ${data.audioLatency * 1e3}ms</p>`
-              : html`<p>La latence entre le geste et le son doit être estimée</p>`
-            }
+            ${data.audioLatencyMeasured === null
+              ? html`<p>La latence entre le geste et le son doit être estimée/</p>`
+              : nothing}
 
+            <h2>Calibration</h2>
+
+            <p>
+              La calibration adapte l'application à vous, votre téléphone et votre geste.
+            </p>
+
+            <p>Cliquez sur « Commencer » et après 4 bips, c’est à vous. Faites un geste simple et précis à chaque temps.
+            </p>
+
+            <p>
+              C'est un peu long, continuez régulièrement jusqu'à l'arrêt.
+            </p>
             <div class="adjust-param param-calibration">
               <div class="col-1">
                 <button
@@ -176,6 +181,13 @@ quis nostrud exercitation ullamco.
                   ${data.scenarioCurrent !== 'scenarioLatencyCalibration' ?
                     'Commencer' : 'Calibration en cours...'}
                 </button>
+
+                ${data.audioLatencyMeasured !== null
+                  ? html`<p>La latence estimée entre le geste et le son est de ${data.audioLatency * 1e3} ms.</p>`
+                  : nothing}
+
+
+
                 <button
                   class="color-white"
                   @click="${e => {

@@ -314,7 +314,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             }
 
             if (!voxPlayerState.get('scenarioTempoIntensity')) {
-              voxPlayerState.set({ scenarioFull: true });
+              voxPlayerState.set({ scenarioTempoIntensity: true });
             }
 
             if (voxPlayerState.get('audioLatencyMeasured') === null) {
@@ -350,7 +350,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           "
           viewbox="0 0 100 100"
           @click="${e => {
-            if (data.scenarioCurrent === null || data.scenarioCurrent === 'scenarioListening') {
+            if (data.scenarioCurrent === null || data.scenarioCurrent === 'scenarioListening' || data.scenarioCurrent === 'scenarioCalibration') {
               return;
             }
 

@@ -133,7 +133,7 @@ export function playerProd(data) {
                 <p>Latence</p>
                 <input
                   type="number"
-                  value="${parseInt(data.audioLatencyMeasured * 1e3)}"
+                  value="${parseInt((data.audioLatencyMeasured ? data.audioLatencyMeasured : 0) * 1e3)}"
                   @blur="${e => {
                     const value = parseFloat(e.currentTarget.value);
                     if (!Number.isNaN(value)) {
@@ -201,7 +201,7 @@ export function playerProd(data) {
             <button
               class="back color-light-grey"
               @click="${e => {
-                if (data.scenarioCurrent !== 'scenarioLatencyCalibration') {
+                if (data.scenarioCurrent === 'scenarioLatencyCalibration') {
                   voxPlayerState.set({ playback: false });
                   voxPlayerState.set({ scenarioLatencyCalibration: false });
                 }

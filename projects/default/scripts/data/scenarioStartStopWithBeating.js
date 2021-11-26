@@ -32,7 +32,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     playback: false,
     playbackStartAfterCount: {
       bar: 1,
-      beat: 1, // one more for upbeat before start
+      beat: 0,
     },
     scenarioPlayback: false,
   };
@@ -264,6 +264,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
           const stopAfterBeatsWithLookAhead
                 = parameters.playbackStartAfterCount.bar * barCount
                 + parameters.playbackStartAfterCount.beat
+                + 1 // one more for upbeat before start
                 - lookAheadBeats;
 
           const stopAfterDuration = beatsToSeconds(stopAfterBeatsWithLookAhead, {

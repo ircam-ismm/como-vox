@@ -19,7 +19,7 @@ function scenarioListening(graph, helpers, outputFrame) {
   const parameters = {
     ...parametersScenario,
     playback: false,
-    playbackStartAfterCount: {bar: 1, beat: 1}, // upbeat and one bar
+    playbackStartAfterCount: {bar: 1, beat: 0},
     scenarioStatus: 'off',
     timeSignature: {bar: 4, beat: 4},
   };

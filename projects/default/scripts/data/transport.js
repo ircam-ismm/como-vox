@@ -34,7 +34,7 @@ function transport(graph, helpers, outputFrame) {
     playback: true,
     playbackStartAfterCount: {
       bar: 1,
-      beat: 1, // one more for upbeat before start
+      beat: 0,
     },
     playbackStopAfterCount: {
       bar: 1,
@@ -727,6 +727,7 @@ function transport(graph, helpers, outputFrame) {
         const startAfterBeatsWithLookAhead
               = parameters.playbackStartAfterCount.bar * barCount
               + parameters.playbackStartAfterCount.beat
+              + 1 // one more for upbeat before start
               - startLookAheadBeats;
 
         let {

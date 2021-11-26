@@ -48,7 +48,7 @@ export function playerProd(data) {
           guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
 
           if (guiState.showAdvancedSettings) {
-            data.voxPlayerState.set({ scenarioPlayback: false });
+            voxPlayerState.set({ scenarioPlayback: false });
           }
 
           exp.updateGuiState(guiState);
@@ -135,7 +135,7 @@ export function playerProd(data) {
                 <p>Latence</p>
                 <input
                   type="number"
-                  value="${voxPlayerState.get('audioLatencyMeasured') * 1e3}"
+                  value="${data.audioLatencyMeasured * 1e3}"
                   @blur="${e => {
                     const value = parseFloat(e.currentTarget.value);
                     if (!Number.isNaN(value)) {
@@ -161,7 +161,7 @@ export function playerProd(data) {
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 quis nostrud exercitation ullamco.
             </p>
-            ${voxPlayerState.get('audioLatencyMeasured') !== null
+            ${data.audioLatencyMeasured !== null
               ? html`<p>La latence estimée entre le geste et le son est de ${data.audioLatency * 1e3}ms</p>`
               : html`<p>La latence entre le geste et le son doit être estimée</p>`
             }
@@ -264,18 +264,18 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         <svg
           class="listen-track
             ${data.scenarioCurrent === 'scenarioListening' ? ' active' : ''}
-            ${voxPlayerState.get('scenarioPlayback') ? ' disabled' : ''}
+            ${data.scenarioPlayback ? ' disabled' : ''}
           "
           viewbox="0 0 100 100"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
             if (data.scenarioCurrent !== 'scenarioListening') {
-              data.voxPlayerState.set({ scenarioListening: true });
+              voxPlayerState.set({ scenarioListening: true });
             } else {
-              data.voxPlayerState.set({ scenarioListening: false });
+              voxPlayerState.set({ scenarioListening: false });
             }
           }}"
         >
@@ -303,63 +303,63 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         }}"
       >
         <button
-          class="${voxPlayerState.get('scenarioIntensity') ? 'selected' : ''}"
+          class="${data.scenarioIntensity ? 'selected' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioIntensity')) {
+            if (!data.scenarioIntensity) {
               voxPlayerState.set({ scenarioIntensity: true });
             }
           }}"
         >Nuance</button>
         <button
-          class="${voxPlayerState.get('scenarioTempo') ? 'selected' : ''}"
+          class="${data.scenarioTempo ? 'selected' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioTempo')) {
+            if (!data.scenarioTempo) {
               voxPlayerState.set({ scenarioTempo: true });
             }
 
-            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+            if (data.audioLatencyMeasured === null) {
               guiState.showCalibrationScreen = true;
               exp.updateGuiState(guiState);
             }
           }}"
         >Tempo</button>
         <button
-          class="${voxPlayerState.get('scenarioFull') ? 'selected' : ''}"
+          class="${data.scenarioFull ? 'selected' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioTempoIntensity')) {
+            if (!data.scenarioTempoIntensity) {
               voxPlayerState.set({ scenarioTempoIntensity: true });
             }
 
-            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+            if (data.audioLatencyMeasured === null) {
               guiState.showCalibrationScreen = true;
               exp.updateGuiState(guiState);
             }
           }}"
         >Tempo & Nuance</button>
         <button
-          class="${voxPlayerState.get('scenarioStartStopWithBeating') ? 'selected' : ''}"
+          class="${data.scenarioStartStopWithBeating ? 'selected' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('scenarioPlayback')) {
+            if (data.scenarioPlayback) {
               return;
             }
 
-            if (!voxPlayerState.get('scenarioStartStopWithBeating')) {
+            if (!data.scenarioStartStopWithBeating) {
               voxPlayerState.set({ scenarioStartStopWithBeating: true });
             }
 
-            if (voxPlayerState.get('audioLatencyMeasured') === null) {
+            if (data.audioLatencyMeasured === null) {
               guiState.showCalibrationScreen = true;
               exp.updateGuiState(guiState);
             }
@@ -370,7 +370,7 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       <div class="exercise-control">
         <svg
           class="button
-            ${voxPlayerState.get('scenarioPlayback') ? ' active' : ''}
+            ${data.scenarioPlayback ? ' active' : ''}
             ${data.scenarioCurrent === null || data.scenarioCurrent === 'scenarioListening' ? ' disabled' : ''}
           "
           viewbox="0 0 100 100"
@@ -379,10 +379,10 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
               return;
             }
 
-            if (!voxPlayerState.get('scenarioPlayback')) {
-              data.voxPlayerState.set({ scenarioPlayback: true });
+            if (!data.scenarioPlayback) {
+              voxPlayerState.set({ scenarioPlayback: true });
             } else {
-              data.voxPlayerState.set({ scenarioPlayback: false });
+              voxPlayerState.set({ scenarioPlayback: false });
             }
           }}"
         >
@@ -413,9 +413,9 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       <div class="metronome">
         <span class="label">Metronome</span>
         <button
-          class="value ${voxPlayerState.get('metronomeSound') ? 'active' : ''}"
+          class="value ${data.metronomeSound ? 'active' : ''}"
           @click="${e => {
-            if (voxPlayerState.get('metronomeSound')) {
+            if (data.metronomeSound) {
               voxPlayerState.set({ metronomeSound: false });
             } else {
               voxPlayerState.set({ metronomeSound: true });

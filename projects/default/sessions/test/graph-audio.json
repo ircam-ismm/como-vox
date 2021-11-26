@@ -19,10 +19,18 @@
       },
     },
     {
+      id: 'speechPlayer',
+      type: 'ScriptAudio',
+      options: {
+        scriptName: 'speechPlayer',
+        bypass: false,
+      },
+    },
+    {
       id: 'audio-destination',
       type: 'AudioDestination',
       options: {
-        volume: -5,
+        volume: 0,
         mute: false,
       },
     },
@@ -34,6 +42,10 @@
     ],
     [
       'samplePlayer',
+      'audio-destination',
+    ],
+    [
+      'speechPlayer',
       'audio-destination',
     ],
   ],

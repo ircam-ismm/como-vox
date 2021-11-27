@@ -4,6 +4,7 @@
 
 - [ ] restaurer le scénario courant à partir de l'URL
 - [ ] forcer le rechargement si l'onglet était en pause (QoS ?)
+- [ ] traduire la page s'il n'y a pas d'accès aux capteurs
 - [x] erreur au chargement de la réverbération
 
 - [x] mise en ligne d’une version pour s’entraîner (Morgan et Marie-Noëlle)

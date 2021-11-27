@@ -2,7 +2,11 @@
 
 ## Todo
 
-- [ ] mise en ligne d’une version pour s’entraîner (Morgan et Marie-Noëlle)
+- [ ] restaurer le scénario courant à partir de l'URL
+- [ ] forcer le rechargement si l'onglet était en pause (QoS ?)
+- [x] erreur au chargement de la réverbération
+
+- [x] mise en ligne d’une version pour s’entraîner (Morgan et Marie-Noëlle)
 - [ ] essayer la fonction de duplication de l’audio
 - [x] simplification de la procédure de calibration
 - [x] calibrer avec un tempo à 70 ?

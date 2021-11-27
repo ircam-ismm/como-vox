@@ -173,7 +173,7 @@ export class ReverberatorNode {
 
       const filterFrequencyStart = Math.min(this.lowpassFrequencyStart, buffer.sampleRate / 2);
       const filterFrequencyEnd = Math.min(this.lowpassFrequencyEnd, buffer.sampleRate / 2);
-      const filterTimeEnd = (buffer.length - 1) * buffer.sampleRate;
+      const filterTimeEnd = (buffer.length - 1) / buffer.sampleRate;
 
       filter.type = 'lowpass';
       filter.Q.value = 0.0001; // almost zero, no resonance

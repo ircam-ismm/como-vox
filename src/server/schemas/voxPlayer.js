@@ -396,6 +396,7 @@ export default {
     default: null,
     metas: {
       exported: false,
+      shared: false,
     },
   },
 

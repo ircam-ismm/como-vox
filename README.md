@@ -2,26 +2,37 @@
 
 ## Todo
 
+Jean-Philippe :
+- [ ] parfois le “merci" de la calibration est à double
+- [ ] sur Tempo, parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant (réinitialisation de l'offset dans le transport ?, du lissage ?)
+- [ ] sur l’android, il tourne parfois en rond après la calibration (comme s’il n’arrivait pas à enregistrer)
+- [ ] Sur iphone: le metronome est super fort dans les nuances faible (en mode nuance) au point d’être "gênant". Mais c’est bien sur android (on filmera avec l’android, ou sans metronome). J’imagine que c’est lié à la compression. Je me demande s’il ne faudrait pas que le métronome suive aussi (un peu) l’intensité. (Bonne idée)
 - [ ] restaurer le scénario courant à partir de l'URL
-- [ ] forcer le rechargement si l'onglet était en pause (QoS ?)
+- [ ] restaurer le tempo et la partition à partir de l'URL (forcer pour le prochain chargement au décodage de l'URL)
 - [x] erreur au chargement de la réverbération
+- [ ] après un arrêt, reprise depuis la mesure courante
+
+Benjamin :
+- [ ] le tempo courant ne suit pas (c’est ce que l’on voulait finalement ?); C’est pas si mal de pouvoir jeter un oeil de temps en temps. en mode le départ: le tempo du départ s’affiche se met à jour, puis ne bouge plus jusqu’au stop. Cette mise à jour “à moitié” est troublante. (ajouter un `this.render() de temps en temps ?)
+- [ ] mot de passe pour les autres clients (script-editor, controller)  : faire une configuration prod ? (bien aussi si tout le temps)
+- [ ] forcer le rechargement si l'onglet était en pause (QoS ?)
+- [ ] traduire la page s'il n'y a pas d'accès aux capteurs
+
+- [ ] essayer la fonction de duplication de l’audio (semble cassé)
 
 - [x] mise en ligne d’une version pour s’entraîner (Morgan et Marie-Noëlle)
-- [ ] essayer la fonction de duplication de l’audio
 - [x] simplification de la procédure de calibration
 - [x] calibrer avec un tempo à 70 ?
 - [x] réglage de latence (faciliter l'accélération ou le ralenti) : [-] [neutre] [+]
 - [x] réglage de la plage de dynamique [-] [neutre] [+]
 - [x] départ : possibilité d’écouter l’original
 
-- [ ] après une arrêt, reprise depuis la mesure courante
-
 - [x] mise à jour de l'interface seulement aux changements
-  - [ ] ajouter des `this.render()`
+  - [x] ajouter des `this.render()`
 - [x] remise compresseur et réverbe
 
 Everywhere (see scenarios):
-- [ ] speech for feedback
+- [x] speech for feedback
 
   - [x] "c'est à vous"
   - [x] "trop tôt"
@@ -46,8 +57,8 @@ Load MIDI
 - [ ] from URL
 
 Bugs:
- - [ ] intensity drops
-   - [?] device compresses audio output when clipping?
+ - [x] intensity drops
+   - [x] device compresses audio output when clipping?
  - [x] NaN in position
  - [x] no tempo adaptation on start
 
@@ -69,7 +80,7 @@ Bugs:
   - [x] normalise
   - [ ] apply time-signature changes
   - [ ] transposition: advanced settings
-  - [ ] choose bar (number or slider): advanced settings
+  - [x] choose bar (number or slider): advanced settings
   - [ ] start end, loop: advanced settings
 - [ ] beating
   - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings. In `transport.js`, adapt  `timeSignature.count`, `tempo` and `position.beat`. Should be transparent at output, except maybe for beat change.
@@ -87,12 +98,12 @@ Bugs:
   - [?] quicker
 - [ ] UI
   - [x] URL: load state `z` after specific to allow for easy overrides.
-  - [ ] do not update on `requestnimationFrame`
+  - [prod, todo develop-editor-config] do not update on `requestnimationFrame`
   - [ ] presets
     - [ ] UI
     - [ ] beating
     - [ ] generalisation
-  - [ ] CSS
+  - [x] CSS
     - [x] no more in templates
     - [x] SCSS
   - [ ] users
@@ -103,11 +114,11 @@ Bugs:
   - [ ] errors and log from clients
   - [ ] currents settings as meta-data
   - [ ] user-agent
-  - [ ] audio settings
+  - [ ] audio settings (latency)
 
 
 - [ ] application
-  - [ ] nativ, (React, Flutter)
+  - [ ] native, (React, Flutter)
   - [ ] format: JSON or flat
   - [ ] transport: WebSocket or OSC over UDP
   - [ ] updates (via stores)
@@ -217,18 +228,5 @@ Sensors:
 
 - [x] long loading time on iOS (1 minute): pinned certificate? connected once to https://apps.cosima.ircam.fr and update local certificates
   - [ ] DNS problem, should have a local one without catch-all and a remote with catch-all to avoid iOS time-outs
-
-
-### Fabrice 
-
-Tout d'abord levée et détente
-
-Maintenant tu vas diriger
-
-2/4 difficile, même endroit pour la levée et le temps.
-
-4/4 ou 3/4
-
-Huawei P8 Lite 2017
 
 

@@ -97,6 +97,7 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
       if(active) {
         if(activeChanged) {
           parametersSave();
+          statusUpdate('on');
         }
       } else {
         if(activeChanged) {

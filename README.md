@@ -3,7 +3,9 @@
 ## Todo
 
 Jean-Philippe :
-- [ ] parfois le “merci" de la calibration est à double
+- [x] parfois le “merci" de la calibration est à double
+  - doublage des messages sur le réseau, `scenarioStatus` plus exporté dans le schéma
+  - mise du statut à `on` lors de l'activation d'un scénario
 - [ ] sur Tempo, parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant (réinitialisation de l'offset dans le transport ?, du lissage ?)
 - [ ] sur l’android, il tourne parfois en rond après la calibration (comme s’il n’arrivait pas à enregistrer)
 - [ ] Sur iphone: le metronome est super fort dans les nuances faible (en mode nuance) au point d’être "gênant". Mais c’est bien sur android (on filmera avec l’android, ou sans metronome). J’imagine que c’est lié à la compression. Je me demande s’il ne faudrait pas que le métronome suive aussi (un peu) l’intensité. (Bonne idée)

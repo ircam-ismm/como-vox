@@ -2,26 +2,24 @@
 
 ## Todo
 
+### V1
+
 Jean-Philippe :
-- [x] parfois le “merci" de la calibration est à double
+
+- [ ] messages locaux dans l'interface (1 à 2 secondes pour attendre la mise en route ou l'arrêt c'est trop long, ne coupe pas si déconnecté)
+  - [ ] vérifier les messages qui transitent par le réseau en continu (ralentissement de pire en pire au fur et à mesure de l'utilisation)
+- [x] parfois le “merci" de la calibration est double
   - doublage des messages sur le réseau, `scenarioStatus` plus exporté dans le schéma
   - mise du statut à `on` lors de l'activation d'un scénario
-- [ ] sur Tempo, parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant (réinitialisation de l'offset dans le transport ?, du lissage ?)
+- [ ] sur Tempo, parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant ; on peut aussi avoir le départ avec trop peu de pré-compte (réinitialisation de l'offset dans le transport ?, du lissage ?)
 - [ ] sur l’android, il tourne parfois en rond après la calibration (comme s’il n’arrivait pas à enregistrer)
-- [ ] Sur iphone: le metronome est super fort dans les nuances faible (en mode nuance) au point d’être "gênant". Mais c’est bien sur android (on filmera avec l’android, ou sans metronome). J’imagine que c’est lié à la compression. Je me demande s’il ne faudrait pas que le métronome suive aussi (un peu) l’intensité. (Bonne idée)
+- [ ] Sur iphone: le metronome est super fort dans les nuances faible (en mode nuance) au point d’être "gênant". Mais c’est bien sur android (on filmera avec l’android, ou sans metronome). J’imagine que c’est lié à la compression. 
+  - [ ] Je me demande s’il ne faudrait pas que le métronome suive aussi (un peu) l’intensité. (Bonne idée)
 - [ ] restaurer le scénario courant à partir de l'URL
 - [ ] restaurer le tempo et la partition à partir de l'URL (forcer pour le prochain chargement au décodage de l'URL)
+  - [ ] le tempo est remplacé par celui de la partition après le chargement complet
 - [x] erreur au chargement de la réverbération
-- [ ] après un arrêt, reprise depuis la mesure courante
-
-Benjamin :
-- [ ] le tempo courant ne suit pas (c’est ce que l’on voulait finalement ?); C’est pas si mal de pouvoir jeter un oeil de temps en temps. en mode le départ: le tempo du départ s’affiche se met à jour, puis ne bouge plus jusqu’au stop. Cette mise à jour “à moitié” est troublante. (ajouter un `this.render() de temps en temps ?)
-- [ ] mot de passe pour les autres clients (script-editor, controller)  : faire une configuration prod ? (bien aussi si tout le temps)
-- [ ] forcer le rechargement si l'onglet était en pause (QoS ?)
-- [ ] traduire la page s'il n'y a pas d'accès aux capteurs
-
-- [ ] essayer la fonction de duplication de l’audio (semble cassé)
-
+- [x] remise compresseur et réverbe
 - [x] mise en ligne d’une version pour s’entraîner (Morgan et Marie-Noëlle)
 - [x] simplification de la procédure de calibration
 - [x] calibrer avec un tempo à 70 ?
@@ -29,9 +27,33 @@ Benjamin :
 - [x] réglage de la plage de dynamique [-] [neutre] [+]
 - [x] départ : possibilité d’écouter l’original
 
+Benjamin :
+
+- [ ] ajouter les logs
+  - [ ] général
+  - [ ] latence et user-agent
+- [?] enlever la sélection du texte sur l'interface
+- [ ] sélectionner le texte des `input` en édition (pour remplacer facilement le chiffre)
+- [ ] le tempo courant ne suit pas (c’est ce que l’on voulait finalement ?); C’est pas si mal de pouvoir jeter un oeil de temps en temps. en mode le départ: le tempo du départ s’affiche se met à jour, puis ne bouge plus jusqu’au stop. Cette mise à jour “à moitié” est troublante. (ajouter un `this.render() de temps en temps ?)
+- [ ] mot de passe pour les autres clients (script-editor, controller)  : faire une configuration prod ? (bien aussi si tout le temps)
+- [ ] forcer le rechargement si l'onglet était en pause (QoS ?)
+- [ ] traduire la page s'il n'y a pas d'accès aux capteurs
+- [ ] des fois, il n'y a pas accès au capteurs (revient après quitter et relancer Chrome)
+
 - [x] mise à jour de l'interface seulement aux changements
   - [x] ajouter des `this.render()`
-- [x] remise compresseur et réverbe
+
+### V2
+
+Jean-Philippe :
+
+- [ ] après un arrêt, reprise depuis la mesure courante
+
+Benjamin :
+
+- [ ] essayer la fonction de duplication de l’audio (semble cassé)
+
+### Dev
 
 Everywhere (see scenarios):
 - [x] speech for feedback

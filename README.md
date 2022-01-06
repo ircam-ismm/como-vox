@@ -5,19 +5,38 @@
 ### V1
 
 Jean-Philippe :
-
+- [ ] info : dire « trop tôt » et « trop tard » plutôt qu'annulé pour la calibration et la latence
+- [ ] mise à jour des morceaux
+  - [ ] Haendel à 74 à la blanche
+  - [ ] Mozart à 82
+  - [ ] enlever les morceaux inutiles ou de mauvaise qualité
 - [ ] messages locaux dans l'interface (1 à 2 secondes pour attendre la mise en route ou l'arrêt c'est trop long, ne coupe pas si déconnecté)
   - [ ] vérifier les messages qui transitent par le réseau en continu (ralentissement de pire en pire au fur et à mesure de l'utilisation)
+    - [ ] sur le serveur
+    - [ ] en retour dans le client
 - [x] parfois le “merci" de la calibration est double
   - doublage des messages sur le réseau, `scenarioStatus` plus exporté dans le schéma
   - mise du statut à `on` lors de l'activation d'un scénario
-- [ ] sur Tempo, parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant ; on peut aussi avoir le départ avec trop peu de pré-compte (réinitialisation de l'offset dans le transport ?, du lissage ?)
+- [ ] parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant ; on peut aussi avoir le départ avec trop peu de pré-compte (réinitialisation de l'offset dans le transport ?, du lissage ?)
+  - [ ] lorsqu'on contrôle le tempo
+  - [ ] aussi lorsqu'on a contrôlé le tempo (mode tempo puis nuance), aussi en écoute
+  - [ ] en général ?
+    - [ ] vérifier le transport
+      - [ ] vérifier les **2** versions
+      - [ ] réinitialisation
+        - [ ] d'une version à l'autre
+        - [ ] offset
+        - [ ] vitesse
 - [ ] sur l’android, il tourne parfois en rond après la calibration (comme s’il n’arrivait pas à enregistrer)
 - [ ] Sur iphone: le metronome est super fort dans les nuances faible (en mode nuance) au point d’être "gênant". Mais c’est bien sur android (on filmera avec l’android, ou sans metronome). J’imagine que c’est lié à la compression. 
   - [ ] Je me demande s’il ne faudrait pas que le métronome suive aussi (un peu) l’intensité. (Bonne idée)
 - [ ] restaurer le scénario courant à partir de l'URL
 - [ ] restaurer le tempo et la partition à partir de l'URL (forcer pour le prochain chargement au décodage de l'URL)
   - [ ] le tempo est remplacé par celui de la partition après le chargement complet
+- [ ] Pas de battue possible avec Firefox
+  - [ ] au moins un message d'erreur
+  - [ ] vérifier une foix que les en-têtes de serveur de sécurité sont à jour (CORS, COOP, COEP)
+
 - [x] erreur au chargement de la réverbération
 - [x] remise compresseur et réverbe
 - [x] mise en ligne d’une version pour s’entraîner (Morgan et Marie-Noëlle)
@@ -29,19 +48,29 @@ Jean-Philippe :
 
 Benjamin :
 
+- [ ] éviter le rechargement de la page à la mise à jour de l'URL. (À cause de la qualité de service ?)
+- [ ] le tempo de référence n'est pas mis à jour au chargement d'un nouveau morceau
 - [ ] ajouter les logs
-  - [ ] général
+  - [ ] général, pour l'utilisation
+  - [ ] erreurs
   - [ ] latence et user-agent
 - [?] enlever la sélection du texte sur l'interface
 - [ ] sélectionner le texte des `input` en édition (pour remplacer facilement le chiffre)
-- [ ] le tempo courant ne suit pas (c’est ce que l’on voulait finalement ?); C’est pas si mal de pouvoir jeter un oeil de temps en temps. en mode le départ: le tempo du départ s’affiche se met à jour, puis ne bouge plus jusqu’au stop. Cette mise à jour “à moitié” est troublante. (ajouter un `this.render() de temps en temps ?)
+- [ ] l'affichage du tempo courant ne suit pas (c’est ce que l’on voulait finalement ?); C’est pas si mal de pouvoir jeter un oeil de temps en temps. en mode le départ: le tempo du départ s’affiche se met à jour, puis ne bouge plus jusqu’au stop. Cette mise à jour “à moitié” est troublante. (ajouter un `this.render() de temps en temps ?)
 - [ ] mot de passe pour les autres clients (script-editor, controller)  : faire une configuration prod ? (bien aussi si tout le temps)
 - [ ] forcer le rechargement si l'onglet était en pause (QoS ?)
 - [ ] traduire la page s'il n'y a pas d'accès aux capteurs
 - [ ] des fois, il n'y a pas accès au capteurs (revient après quitter et relancer Chrome)
 
+- [ ] vérifier CORS, COOP, COEP
+
 - [x] mise à jour de l'interface seulement aux changements
   - [x] ajouter des `this.render()`
+
+Questions courantes :
+- [ ] ajustement du tempo
+  - [ ] "+" si battue en avance
+  - [ ] "-" si difficile d'accélérer
 
 ### V2
 

@@ -17,16 +17,16 @@ Jean-Philippe :
 - [x] parfois le “merci" de la calibration est double
   - doublage des messages sur le réseau, `scenarioStatus` plus exporté dans le schéma
   - mise du statut à `on` lors de l'activation d'un scénario
-- [ ] parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant ; on peut aussi avoir le départ avec trop peu de pré-compte (réinitialisation de l'offset dans le transport ?, du lissage ?)
-  - [ ] lorsqu'on contrôle le tempo
-  - [ ] aussi lorsqu'on a contrôlé le tempo (mode tempo puis nuance), aussi en écoute
-  - [ ] en général ?
-    - [ ] vérifier le transport
-      - [ ] vérifier les **2** versions
-      - [ ] réinitialisation
-        - [ ] d'une version à l'autre
-        - [ ] offset
-        - [ ] vitesse
+- [x] parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant ; on peut aussi avoir le départ avec trop peu de pré-compte (réinitialisation de l'offset dans le transport ?, du lissage ?)
+  - [x] lorsqu'on contrôle le tempo
+  - [x] aussi lorsqu'on a contrôlé le tempo (mode tempo puis nuance), aussi en écoute
+  - [x] en général ?
+    - [x] vérifier le transport
+      - [x] vérifier les **2** versions
+      - [x] réinitialisation
+        - [x] d'une version à l'autre
+        - [x] offset
+        - [x] vitesse
 - [ ] sur l’android, il tourne parfois en rond après la calibration (comme s’il n’arrivait pas à enregistrer)
 - [ ] Sur iphone: le metronome est super fort dans les nuances faible (en mode nuance) au point d’être "gênant". Mais c’est bien sur android (on filmera avec l’android, ou sans metronome). J’imagine que c’est lié à la compression. 
   - [ ] Je me demande s’il ne faudrait pas que le métronome suive aussi (un peu) l’intensité. (Bonne idée)
@@ -36,6 +36,7 @@ Jean-Philippe :
 - [ ] Pas de battue possible avec Firefox
   - [ ] au moins un message d'erreur
   - [ ] vérifier une foix que les en-têtes de serveur de sécurité sont à jour (CORS, COOP, COEP)
+  - [x] échantillonnage des capteurs
 
 - [x] erreur au chargement de la réverbération
 - [x] remise compresseur et réverbe

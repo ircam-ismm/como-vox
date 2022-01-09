@@ -134,8 +134,8 @@ function scenarioFull(graph, helpers, outputFrame) {
 
     // stop
     if(parameters.scenarioFull
-       && parameters.playback === true
-       && (updates.playback === false || updates.scenarioPlayback === false)
+       && (parameters.playback === true && updates.playback === false
+           || parameters.scenarioPlayback && updates.scenarioPlayback === false)
        && status !== 'off') {
       statusUpdate('off');
       app.events.emit('scenarioPlayback', false);

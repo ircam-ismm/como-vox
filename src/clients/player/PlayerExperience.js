@@ -194,6 +194,12 @@ class PlayerExperience extends AbstractExperience {
 
     const loadedState = await url.parse(voxPlayerSchema);
     console.log("loadedState = ", loadedState);
+    if(typeof loadedState.tempo !== 'undefined') {
+      this.setScoreCallback = () => {
+        this.events.emit('tempo', loadedState.tempo);
+        delete this.setScoreCallback;
+      }
+    }
     for( const [key, value] of Object.entries(loadedState) ) {
       this.events.emit(key, value);
     }
@@ -390,7 +396,10 @@ class PlayerExperience extends AbstractExperience {
                                    + scoreURIbase);
             }
             try {
-              await this.setScore(scoreURI)
+              await this.setScore(scoreURI);
+              if(typeof this.setScoreCallback === 'function') {
+                this.setScoreCallback();
+              }
             } catch (error) {
               console.error('Error while loading score: ' + error.message);
             }

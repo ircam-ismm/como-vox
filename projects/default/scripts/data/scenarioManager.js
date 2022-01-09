@@ -93,6 +93,13 @@ function scenarioManager(graph, helpers, outputFrame) {
       };
       registeredEvents.push([event, callback]);
       app.events.on(event, callback);
+    });
+
+    // apply current state after registering all events
+    // scenarioNames are pure events (no states)
+    [
+      'scenarioCurrent',
+    ].forEach( (event) => {
       // apply current state
       updateParams({[event]: app.state[event]});
     });

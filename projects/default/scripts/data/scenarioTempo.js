@@ -143,7 +143,9 @@ function scenarioTempo(graph, helpers, outputFrame) {
       registeredEvents.push([event, callback]);
       app.events.on(event, callback);
       // apply current state
-      updateParams({[event]: app.state[event]});
+      if(event !== 'scenarioTempo') {
+        updateParams({[event]: app.state[event]});
+      }
     });
   }
 

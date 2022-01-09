@@ -26,6 +26,9 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
     gestureIntensityInputMax: 0.3, // 0.4 for more energy
     gestureIntensityNormalisedMedium: 0.75, // gentle compression
 
+    metronomeDynamicBoostMin: -40, // MIDI intensity
+    metronomeDynamicBoostMax: 20, // MIDI intensity
+
     scoreIntensityCompressionMax: 120, // keep some headroom
     scoreIntensityCompressionMinFixed: 90,
     scoreIntensityCompressionMinGesture: 110, // flatter
@@ -56,6 +59,17 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
     inputEnd: parameters.gestureIntensityInputMedium,
     outputStart: parameters.gestureIntensityNormalisedLow,
     outputEnd: parameters.gestureIntensityNormalisedMedium,
+    type: 'linear',
+    clip: true,
+  });
+
+  // input: use intensityScale for hysteresis smoother
+  // output: MIDI intensity boost in [0,127]
+  const intensityScaleToMetronomeDynamicBoost = new Scaler({
+    inputStart: parameters.gestureIntensityNormalisedLow,
+    inputEnd: parameters.gestureIntensityNormalisedHigh,
+    outputStart: parameters.metronomeDynamicBoostMin,
+    outputEnd: parameters.metronomeDynamicBoostMax,
     type: 'linear',
     clip: true,
   });
@@ -350,7 +364,20 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
       }
 
       // be sure to replicate the output of score, as this node is a filter
-      outputData['notes'] = inputData['notes'];
+
+      const notesContainer = inputData['notes'];
+      if(notesContainer && notesContainer['metronome']) {
+        const metronomeNotes = notesContainer['metronome'];
+        metronomeNotes.forEach( (note) => {
+          const intensityBoost = intensityScaleToMetronomeDynamicBoost.process(
+            intensityScale);
+          note.intensity = noteIntensityClipper.process(
+            note.intensity + intensityBoost);
+        });
+      }
+      outputData['notes'] = notesContainer;
+
+      // console.log("inputData['notes'] = ", inputData['notes']);
       outputData['events'] = eventsContainer;
       outputData['score'] = inputData['score']; // not needed any more
 

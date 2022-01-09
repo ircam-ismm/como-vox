@@ -73,12 +73,11 @@ export class SampleManager {
         };
 
         const cancel = () => {
-          if(!this.samplesLoading.get(pitch) ) {
-            return;
+          // abort if still here
+          if(this.samplesLoading.delete(pitch)) {
+            request.abort();
           }
-
-          request.abort();
-          this.samplesLoading.delete(pitch);
+          // resolve any way
           resolve();
         };
 

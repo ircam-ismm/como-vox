@@ -28,8 +28,8 @@ Jean-Philippe :
         - [x] offset
         - [x] vitesse
 - [ ] sur l’android, il tourne parfois en rond après la calibration (comme s’il n’arrivait pas à enregistrer)
-- [ ] Sur iphone: le metronome est super fort dans les nuances faible (en mode nuance) au point d’être "gênant". Mais c’est bien sur android (on filmera avec l’android, ou sans metronome). J’imagine que c’est lié à la compression. 
-  - [ ] Je me demande s’il ne faudrait pas que le métronome suive aussi (un peu) l’intensité. (Bonne idée)
+- [à vérifier] Sur iphone: le metronome est super fort dans les nuances faible (en mode nuance) au point d’être "gênant". Mais c’est bien sur android (on filmera avec l’android, ou sans metronome). J’imagine que c’est lié à la compression. 
+  - [x] Je me demande s’il ne faudrait pas que le métronome suive aussi (un peu) l’intensité. (Bonne idée)
 - [x] restaurer le scénario courant à partir de l'URL
 - [x] restaurer le tempo et la partition à partir de l'URL (forcer pour le prochain chargement au décodage de l'URL)
   - [x] le tempo est remplacé par celui de la partition après le chargement complet

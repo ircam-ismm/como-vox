@@ -61,13 +61,6 @@
       },
     },
     {
-      id: 'scenarioManager',
-      type: 'ScriptData',
-      options: {
-        scriptName: 'scenarioManager',
-      },
-    },
-    {
       id: 'scenarioLatencyCalibration',
       type: 'ScriptData',
       options: {
@@ -107,6 +100,16 @@
       type: 'ScriptData',
       options: {
         scriptName: 'scenarioSonification',
+      },
+    },
+    // WARNING: the manager must come after all scenarios
+    // (they must be instantiated before, for
+    // the manager to communicate with hem)
+    {
+      id: 'scenarioManager',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioManager',
       },
     },
     {

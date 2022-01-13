@@ -2,18 +2,26 @@ $primary-color: #ffc20a;
 $secondary-color: #0c7bdc;
 $border-color: #777;
 
-// @font-face {
-//   font-family: 'Inconsolata';
-//   src: url('../font/inconsolata-variable.ttf') format('truetype');
-// }
+@mixin font-face($family, $weight, $file) {
+  $filepath: "../fonts/" + $file;
+  @font-face {
+    font-family: "#{$family}";
+    font-weight: $weight;
+    src: url($filepath + ".ttf") format('truetype');
+  }
+}
 
-// * {
-//   font-family: Inconsolata, Consolas, monaco, monospace;
-// }
+@include font-face('Quicksand', 100, 'Quicksand-Light');
+@include font-face('Quicksand', 400, 'Quicksand-Regular');
+@include font-face('Quicksand', 700, 'Quicksand-Bold');
 
 /* ------------------------------------------ */
 /* LAYOUT */
 /* ------------------------------------------ */
+
+* {
+  font-family: Quicksand, arial, sans-serif;
+}
 
 &#__soundworks-container {
   min-height: 100vh;

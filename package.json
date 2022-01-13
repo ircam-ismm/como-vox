@@ -26,8 +26,8 @@
   "dependencies": {
     "@ircam/blocked": "^1.1.2",
     "@ircam/simple-components": "^1.1.4",
-    "@soundworks/core": "^3.1.0-beta.2",
-    "@soundworks/template-helpers": "^1.0.1",
+    "@soundworks/core": "^3.1.0-beta.5",
+    "@soundworks/template-helpers": "^1.2.3",
     "@webcomponents/webcomponentsjs": "^2.4.3",
     "como": "github:ircam-ismm/como#98bab40db4b793cf538d835296c72c7287ed0100",
     "core-js": "^3.6.5",

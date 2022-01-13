@@ -4,8 +4,9 @@
 
 ### V1
 
-Jean-Philippe :
-- [ ] info : dire « trop tôt » et « trop tard » plutôt qu'annulé pour la calibration et la latence
+Jean-Philippe :
+- [ ] latence min / max
+- [ ] info : dire « trop tôt » et « trop tard » plutôt qu'annulé pour la calibration et la latence
 - [ ] mise à jour des morceaux
   - [ ] Haendel à 74 à la blanche
   - [ ] Mozart à 82
@@ -17,10 +18,10 @@ Jean-Philippe :
 - [x] parfois le “merci" de la calibration est double
   - doublage des messages sur le réseau, `scenarioStatus` plus exporté dans le schéma
   - mise du statut à `on` lors de l'activation d'un scénario
-- [x] parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant ; on peut aussi avoir le départ avec trop peu de pré-compte (réinitialisation de l'offset dans le transport ?, du lissage ?)
+- [x] parfois il y a un intervalle de temps trop grand entre le premier bip (aigu) et les suivants, comme s’il freezait un instant ; on peut aussi avoir le départ avec trop peu de pré-compte (réinitialisation de l'offset dans le transport ?, du lissage ?)
   - [x] lorsqu'on contrôle le tempo
   - [x] aussi lorsqu'on a contrôlé le tempo (mode tempo puis nuance), aussi en écoute
-  - [x] en général ?
+  - [x] en général ?
     - [x] vérifier le transport
       - [x] vérifier les **2** versions
       - [x] réinitialisation
@@ -33,9 +34,6 @@ Jean-Philippe :
 - [x] restaurer le scénario courant à partir de l'URL
 - [x] restaurer le tempo et la partition à partir de l'URL (forcer pour le prochain chargement au décodage de l'URL)
   - [x] le tempo est remplacé par celui de la partition après le chargement complet
-- [ ] Pas de battue possible avec Firefox
-  - [ ] au moins un message d'erreur
-  - [ ] vérifier une foix que les en-têtes de serveur de sécurité sont à jour (CORS, COOP, COEP)
   - [x] échantillonnage des capteurs
 
 - [x] erreur au chargement de la réverbération
@@ -47,41 +45,87 @@ Jean-Philippe :
 - [x] réglage de la plage de dynamique [-] [neutre] [+]
 - [x] départ : possibilité d’écouter l’original
 
-Benjamin :
+- [ ] define logs
+  - [ ] plugin logger
+  - [ ] errors and log from clients
+  - [ ] currents settings as meta-data
+  - [ ] user-agent
+  - [ ] audio settings (latency)
 
-- [ ] éviter le rechargement de la page à la mise à jour de l'URL. (À cause de la qualité de service ?)
-- [ ] le tempo de référence n'est pas mis à jour au chargement d'un nouveau morceau
-- [ ] ajouter les logs
+
+Benjamin (deadline 17/01) :
+
+- [x] @soundworks/template-helpers
+  + [x] éviter le rechargement de la page à la mise à jour de l'URL. (À cause de la qualité de service ?) - 
+  + [x] forcer le rechargement si l'onglet était en pause (QoS ?)
+  
+  -> update to `@soundworks/template-helpers#v1.2.3`
+
+- [x] soundworks
+  + [x] mot de passe pour les autres clients (script-editor, controller)  : faire une configuration prod ? (bien aussi si tout le temps)
+    -> cf. config/env/default.json - on peut effectivement faire une config par environnement.  
+  + [x] vérifier une foix que les en-têtes de serveur de sécurité sont à jour (CORS, COOP, COEP)
+
+  -> update to `@soundworks/core#v3.1.0-beta.5` 
+
+- [ ] `render()`
+  + [x] ajouter des `this.render()`
+  + [ ] le tempo de référence n'est pas mis à jour au chargement d'un nouveau morceau - à checker (affichage) manque un `render()`
+  + [ ] l'affichage du tempo courant ne suit pas (c’est ce que l’on voulait finalement ?); C’est pas si mal de pouvoir jeter un oeil de temps en temps. en mode le départ: le tempo du départ s’affiche se met à jour, puis ne bouge plus jusqu’au stop. Cette mise à jour “à moitié” est troublante. (ajouter un `this.render()` de temps en temps ?)
+  
+- [x] fonts... (cf. old soundworks)
+
+- [ ] ajouter les logs (1 fichier par client) - install service
   - [ ] général, pour l'utilisation
-  - [ ] erreurs
-  - [ ] latence et user-agent
+  - [ ] erreurs, à test `window.addEventListener('error', err => {});``
+  - [ ] latence et user-agent 
+
+- [ ] Pas de battue possible avec Firefox
+  - [ ] au moins un message d'erreur
+
+- [ ] traduire la page s'il n'y a pas d'accès aux capteurs (`sorry, this applications...`);
+
+- [ ] "/" dans l'adresse
+  + [ ] hotfix - logo image
+  + [ ] server - review url rewrite rules (check with system)
+
+- [ ] maquette logo + credits (cf. texte videos google.doc)
+  + [ ] cf. texte https://docs.google.com/document/d/1lqyqzASAxUw7EB59kRg7J7bpDhu88fW9/edit
+  
 - [?] enlever la sélection du texte sur l'interface
-- [ ] sélectionner le texte des `input` en édition (pour remplacer facilement le chiffre)
-- [ ] l'affichage du tempo courant ne suit pas (c’est ce que l’on voulait finalement ?); C’est pas si mal de pouvoir jeter un oeil de temps en temps. en mode le départ: le tempo du départ s’affiche se met à jour, puis ne bouge plus jusqu’au stop. Cette mise à jour “à moitié” est troublante. (ajouter un `this.render() de temps en temps ?)
-- [ ] mot de passe pour les autres clients (script-editor, controller)  : faire une configuration prod ? (bien aussi si tout le temps)
-- [ ] forcer le rechargement si l'onglet était en pause (QoS ?)
-- [ ] traduire la page s'il n'y a pas d'accès aux capteurs
-- [ ] des fois, il n'y a pas accès au capteurs (revient après quitter et relancer Chrome)
+- [?] sélectionner le texte des `input` en édition (pour remplacer facilement le chiffre)
 
-- [ ] vérifier CORS, COOP, COEP
+Fred :
+- [ ] texte crédits
+- [ ] définir où on met les logos
 
-- [x] mise à jour de l'interface seulement aux changements
-  - [x] ajouter des `this.render()`
+### Questions courantes (FAQ)
 
-Questions courantes :
 - [ ] ajustement du tempo
   - [ ] "+" si battue en avance
   - [ ] "-" si difficile d'accélérer
+- [ ] ajustement d la dynamique
+  - [ ] "+" si battue en avance
+  - [ ] "-" si difficile d'accélérer
+- [ ] des fois, il n'y a pas accès au capteurs (revient après quitter et relancer Chrome)
+- [ ] des fois, ça marche pas -> recharger la page..., 
+      => ça ne marche toujours pas -> quitter le navigateur et relancer
 
 ### V2
 
-Jean-Philippe :
+Jean-Philippe :
 
 - [ ] après un arrêt, reprise depuis la mesure courante
+- [ ] transposition
+- [ ] beating
+  - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings. In `transport.js`, adapt  `timeSignature.count`, `tempo` and `position.beat`. Should be transparent at output, except maybe for beat change.
 
 Benjamin :
 
-- [ ] essayer la fonction de duplication de l’audio (semble cassé)
+- [x] essayer la fonction de duplication de l’audio, @note: c'est mort...
+
+latence
++ [ ] à tester truc padenot
 
 ### Dev
 
@@ -92,7 +136,7 @@ Everywhere (see scenarios):
   - [x] "trop tôt"
   - [x] "trop rapide"
   
-  Indications :
+  Indications :
   - [ ] tempo reached
   - [ ] too fast / too slow (10%)
   
@@ -136,24 +180,21 @@ Bugs:
   - [ ] transposition: advanced settings
   - [x] choose bar (number or slider): advanced settings
   - [ ] start end, loop: advanced settings
-- [ ] beating
-  - [ ] ratio: 2, 1/2, 3, 1/3: advanced settings. In `transport.js`, adapt  `timeSignature.count`, `tempo` and `position.beat`. Should be transparent at output, except maybe for beat change.
 - [ ] intensity
   - [x] lookahead: float 1/2 beat NO: better 1 quarter note
   - [x] smooth, specially on diminuendo
   - [x] relative intensity
   - [x] normalise score
-  - [ ] hold when transport does not stop with beating
-- [ ] global volume
+  - [? hold when transport does not stop with beating
+- [x] global volume
   - [x] compressor
   - [x] reverb
 - [x] start
 - [x] end
-  - [?] quicker
 - [ ] UI
   - [x] URL: load state `z` after specific to allow for easy overrides.
   - [prod, todo develop-editor-config] do not update on `requestnimationFrame`
-  - [ ] presets
+  - [?] presets
     - [ ] UI
     - [ ] beating
     - [ ] generalisation
@@ -163,15 +204,8 @@ Bugs:
   - [ ] users
   - [ ] debug
   - [ ] controller
-- [ ] log
-  - [ ] plugin logger
-  - [ ] errors and log from clients
-  - [ ] currents settings as meta-data
-  - [ ] user-agent
-  - [ ] audio settings (latency)
 
-
-- [ ] application
+- [ ] application mobile (février)
   - [ ] native, (React, Flutter)
   - [ ] format: JSON or flat
   - [ ] transport: WebSocket or OSC over UDP
@@ -223,6 +257,10 @@ If there is an error related to certificate, check system clock first, then on-l
 Currently 192.168.1.110-253 in order to comply with R-IoT.
 
 Should we change to 10.0.*.* or even 10.149.*.* to avoid collision?
+
+10.10.x.x
+
+> https://forge-2.ircam.fr/ismm/network/
 
 ## Sensors
 

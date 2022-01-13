@@ -48,38 +48,38 @@ const server = new Server();
 server.templateEngine = { compile };
 server.templateDirectory = path.join('.build', 'server', 'tmpl');
 
-if (config.env.auth) {
-  server.router.use((req, res, next) => {
+// if (config.env.auth) {
+//   server.router.use((req, res, next) => {
 
-    const isProtected  = config.env.auth.clients
-      .map(type => req.path.endsWith(`/${type}`))
-      .reduce((acc, value) => acc || value, false);
+//     const isProtected  = config.env.auth.clients
+//       .map(type => req.path.endsWith(`/${type}`))
+//       .reduce((acc, value) => acc || value, false);
 
-    if (isProtected) {
-      // authentication middleware
-      const auth = config.env.auth;
-      // parse login and password from headers
-      const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
-      const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
+//     if (isProtected) {
+//       // authentication middleware
+//       const auth = config.env.auth;
+//       // parse login and password from headers
+//       const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+//       const [login, password] = Buffer.from(b64auth, 'base64').toString().split(':');
 
-      // verify login and password are set and correct
-      if (login && password && login === auth.login && password === auth.password) {
-        // -> access granted...
-        return next()
-      }
+//       // verify login and password are set and correct
+//       if (login && password && login === auth.login && password === auth.password) {
+//         // -> access granted...
+//         return next()
+//       }
 
-      // -> access denied...
-      res.writeHead(401, {
-        'WWW-Authenticate':'Basic',
-        'Content-Type':'text/plain'
-      });
-      res.end('Authentication required.')
-    } else {
-      // route not protected
-      return next();
-    }
-  });
-}
+//       // -> access denied...
+//       res.writeHead(401, {
+//         'WWW-Authenticate':'Basic',
+//         'Content-Type':'text/plain'
+//       });
+//       res.end('Authentication required.')
+//     } else {
+//       // route not protected
+//       return next();
+//     }
+//   });
+// }
 
 server.router.use(serveStatic('public'));
 server.router.use('build', serveStatic(path.join('.build', 'public')));

@@ -92,6 +92,7 @@ class PlayerExperience extends AbstractExperience {
     this.$container = $container;
 
     this.sync = this.require('sync');
+    this.logger = this.require('vox-logger');
     this.rafId = null;
 
     this.player = null;
@@ -193,6 +194,9 @@ class PlayerExperience extends AbstractExperience {
 
   async start() {
     await super.start();
+
+    this.logWriter = await this.logger.create(`client-${this.como.client.id}.txt`);
+    this.logWriter.write('coucou');
 
     // playerProd only
     this.guiState = {

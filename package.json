@@ -27,6 +27,7 @@
     "@ircam/blocked": "^1.1.2",
     "@ircam/simple-components": "^1.1.4",
     "@soundworks/core": "^3.1.0-beta.5",
+    "@soundworks/plugin-logger": "^1.1.0",
     "@soundworks/template-helpers": "^1.2.3",
     "@webcomponents/webcomponentsjs": "^2.4.3",
     "como": "github:ircam-ismm/como#98bab40db4b793cf538d835296c72c7287ed0100",

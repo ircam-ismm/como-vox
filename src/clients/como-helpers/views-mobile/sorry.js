@@ -8,12 +8,12 @@ export function sorry(data, listeners) {
         margin-top: 200px;
         margin-left: 20px;
       "
-    >Sorry,</h1>
+    >Désolé,</h1>
     <h3 style="
         ${styles.h3}
         margin-top: 30px;
         margin-left: 20px;
       "
-    >${data.config.app.name} requires access<br />to the motion sensors to work</h3>
+    >${data.config.app.name} requiert l'access aux capteurs<br />de mouvement pour fonctionner</h3>
   </div>`
 }

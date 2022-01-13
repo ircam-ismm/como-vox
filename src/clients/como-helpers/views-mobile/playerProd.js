@@ -36,9 +36,7 @@ export function playerProd(data) {
 
   return html`
     <header>
-      <h1 class="title">
-        <img src="./images/logo.png" alt="como vox" />
-      </h1>
+      <h1 class="title"></h1>
       <button
         class="settings-btn${guiState.showAdvancedSettings ? ' active' : ''}"
         @click="${e => {

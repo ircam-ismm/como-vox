@@ -70,23 +70,29 @@ Benjamin (deadline 17/01) :
 
 - [ ] `render()`
   + [x] ajouter des `this.render()`
-  + [ ] le tempo de référence n'est pas mis à jour au chargement d'un nouveau morceau - à checker (affichage) manque un `render()`
+  + [?] le tempo de référence n'est pas mis à jour au chargement d'un nouveau morceau - à checker (affichage) manque un `render()`
+    -> ok de mon côté...
   + [ ] l'affichage du tempo courant ne suit pas (c’est ce que l’on voulait finalement ?); C’est pas si mal de pouvoir jeter un oeil de temps en temps. en mode le départ: le tempo du départ s’affiche se met à jour, puis ne bouge plus jusqu’au stop. Cette mise à jour “à moitié” est troublante. (ajouter un `this.render()` de temps en temps ?)
-  
+
+  -> pas pris de borne... again...
+
 - [x] fonts... (cf. old soundworks)
 
-- [ ] ajouter les logs (1 fichier par client) - install service
+- [x] ajouter les logs (1 fichier par client) - install service
   - [ ] général, pour l'utilisation
   - [ ] erreurs, à test `window.addEventListener('error', err => {});``
   - [ ] latence et user-agent 
 
+-> needs
 - [ ] Pas de battue possible avec Firefox
   - [ ] au moins un message d'erreur
 
-- [ ] traduire la page s'il n'y a pas d'accès aux capteurs (`sorry, this applications...`);
+- [x] traduire la page s'il n'y a pas d'accès aux capteurs (`sorry, this applications...`);
+  cf. `client/views-mobile/sorry.js`
 
-- [ ] "/" dans l'adresse
-  + [ ] hotfix - logo image
+- [x] "/" dans l'adresse
+  + [x] hotfix - logo image
+  + [ ] à tester
   + [ ] server - review url rewrite rules (check with system)
 
 - [ ] maquette logo + credits (cf. texte videos google.doc)

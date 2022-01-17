@@ -202,7 +202,7 @@ class PlayerExperience extends AbstractExperience {
     this.guiState = {
       showAdvancedSettings: false,
       showCalibrationScreen: false,
-      showCreditsScreen: true,
+      showCreditsScreen: false,
       showInvalidSensorFramerateScreen: false,
     };
 

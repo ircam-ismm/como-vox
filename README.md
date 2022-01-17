@@ -97,8 +97,8 @@ Benjamin (deadline 17/01) :
   + [ ] à tester
   + [ ] server - review url rewrite rules (check with system)
 
-- [ ] maquette logo + credits (cf. texte videos google.doc)
-  + [ ] cf. texte https://docs.google.com/document/d/1lqyqzASAxUw7EB59kRg7J7bpDhu88fW9/edit
+- [x] maquette logo + credits (cf. texte videos google.doc)
+  cf. texte https://docs.google.com/document/d/1lqyqzASAxUw7EB59kRg7J7bpDhu88fW9/edit
   
 - [?] enlever la sélection du texte sur l'interface
 - [?] sélectionner le texte des `input` en édition (pour remplacer facilement le chiffre)

@@ -366,7 +366,7 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
       // be sure to replicate the output of score, as this node is a filter
 
       const notesContainer = inputData['notes'];
-      if(notesContainer && notesContainer['metronome']) {
+      if(parameters.gestureControlsIntensity && notesContainer && notesContainer['metronome']) {
         const metronomeNotes = notesContainer['metronome'];
         metronomeNotes.forEach( (note) => {
           const intensityBoost = intensityScaleToMetronomeDynamicBoost.process(

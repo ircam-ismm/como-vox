@@ -84,8 +84,10 @@ Benjamin (deadline 17/01) :
   - [ ] latence et user-agent 
 
 -> needs
-- [ ] Pas de battue possible avec Firefox
-  - [ ] au moins un message d'erreur
+- [x] Pas de battue possible avec Firefox
+  - [x] au moins un message d'erreur
+
+  -> Cops, etc. did change anything, still 0.1s
 
 - [x] traduire la page s'il n'y a pas d'accès aux capteurs (`sorry, this applications...`);
   cf. `client/views-mobile/sorry.js`

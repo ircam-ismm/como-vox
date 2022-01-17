@@ -203,6 +203,7 @@ class PlayerExperience extends AbstractExperience {
       showAdvancedSettings: false,
       showCalibrationScreen: false,
       showCreditsScreen: false,
+      showInvalidSensorFramerateScreen: false,
     };
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');
@@ -225,6 +226,7 @@ class PlayerExperience extends AbstractExperience {
       url.update(voxPlayerSchema, this.state);
     });
 
+
     // 2. create a sensor source to be used within the graph.
     // We create a `RandomSource` if deviceMotion is not available for development
     // purpose, in most situations we might prefer to display a "sorry" screen
@@ -235,6 +237,20 @@ class PlayerExperience extends AbstractExperience {
     } else {
       source = new this.como.sources.RandomValues(this.como, player.get('id'));
     }
+
+    console.log('> hasDeviceMotion', this.como.hasDeviceMotion);
+
+    const sensorTest = e => {
+      source.removeListener(sensorTest);
+      // do not allow frame rate higher than 20ms
+      if (e.metas.period > 0.02) {
+        console.log('Invalid Sensor Rate', e.metas.period);
+        this.guiState.showInvalidSensorFramerateScreen = true;
+        this.render();
+      }
+    };
+
+    source.addListener(sensorTest);
 
     // @example - metas is a placeholder for application specific informations
     // player.set({
@@ -844,6 +860,8 @@ class PlayerExperience extends AbstractExperience {
 
     if (!this.como.hasDeviceMotion && !this.state['mockSensors'] ) {
       screen = views.sorry(viewData, listeners);
+    } else if (this.guiState.showInvalidSensorFramerateScreen) {
+      screen = views.sorryInvalidFrameRate(viewData, listeners);
     } else if (this.coMoPlayer.session === null) {
       if (!PLAYER_PROD) {
         screen = views.manageSessions(viewData, listeners, {

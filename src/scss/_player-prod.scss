@@ -2,25 +2,12 @@ $primary-color: #ffc20a;
 $secondary-color: #0c7bdc;
 $border-color: #777;
 
-@mixin font-face($family, $weight, $file) {
-  $filepath: "../fonts/" + $file;
-  @font-face {
-    font-family: "#{$family}";
-    font-weight: $weight;
-    src: url($filepath + ".ttf") format('truetype');
-  }
-}
-
-@include font-face('Quicksand', 100, 'Quicksand-Light');
-@include font-face('Quicksand', 400, 'Quicksand-Regular');
-@include font-face('Quicksand', 700, 'Quicksand-Bold');
-
 /* ------------------------------------------ */
 /* LAYOUT */
 /* ------------------------------------------ */
 
 * {
-  font-family: Quicksand, arial, sans-serif;
+  font-family: quicksand, arial, sans-serif;
 }
 
 &#__soundworks-container {
@@ -46,11 +33,16 @@ footer {
   height: 40px;
   display: block;
   margin-top: auto;
-  background-image: url(../images/credits.png);
-  background-position: 50% 50%;
-  background-size: contain;
-  background-repeat: no-repeat;
+  // background-image: url(../images/credits.png);
+  // background-position: 50% 50%;
+  // background-size: contain;
+  // background-repeat: no-repeat;
   border-top: 1px solid #efefef;
+
+  p {
+    text-align: right;
+    margin-right: 20px;
+  }
 }
 
 
@@ -517,6 +509,33 @@ header {
     background-size: contain;
   }
 
+  .logos {
+    .row {
+      display: flex;
+      justify-content: space-between;
+      height: 40px;
+      margin: 60px 0;
+
+      div {
+        display: inline-block;
+        height: 100%;
+        width: 50%;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: 50% 50%;
+
+        &#ircam { background-image: url("../images/logos/ircam.png"); }
+        &#cnrs { background-image: url("../images/logos/cnrs.png"); }
+        &#sorbonne { background-image: url("../images/logos/sorbonne.png"); }
+        &#min-culture { background-image: url("../images/logos/min-culture.png"); }
+        &#anr { background-image: url("../images/logos/anr.png"); }
+        &#min-education { background-image: url("../images/logos/min-education.png"); }
+        &#edu-up { background-image: url("../images/logos/edu-up.png"); }
+        &#radio-france { background-image: url("../images/logos/radio-france.png"); }
+        &#vox { background-image: url("../images/logos/vox.png"); }
+      }
+    }
+  }
 }
 
 /* ------------------------------------------ */

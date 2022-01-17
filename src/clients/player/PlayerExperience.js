@@ -202,7 +202,7 @@ class PlayerExperience extends AbstractExperience {
     this.guiState = {
       showAdvancedSettings: false,
       showCalibrationScreen: false,
-      showCreditsScreen: false,
+      showCreditsScreen: true,
       showInvalidSensorFramerateScreen: false,
     };
 
@@ -243,7 +243,7 @@ class PlayerExperience extends AbstractExperience {
     const sensorTest = e => {
       source.removeListener(sensorTest);
       // do not allow frame rate higher than 20ms
-      if (e.metas.period > 0.02) {
+      if (e.metas.period > 0.02 && !this.state['mockSensors']) {
         console.log('Invalid Sensor Rate', e.metas.period);
         this.guiState.showInvalidSensorFramerateScreen = true;
         this.render();
@@ -281,6 +281,7 @@ class PlayerExperience extends AbstractExperience {
 
     const loadedState = await url.parse(voxPlayerSchema);
     console.log("loadedState = ", loadedState);
+
     if(typeof loadedState.tempo !== 'undefined') {
       this.setScoreCallback = () => {
         this.events.emit('tempo', loadedState.tempo);
@@ -858,7 +859,7 @@ class PlayerExperience extends AbstractExperience {
 
     let screen = ``;
 
-    if (!this.como.hasDeviceMotion && !this.state['mockSensors'] ) {
+    if (!this.como.hasDeviceMotion && !this.state['mockSensors']) {
       screen = views.sorry(viewData, listeners);
     } else if (this.guiState.showInvalidSensorFramerateScreen) {
       screen = views.sorryInvalidFrameRate(viewData, listeners);

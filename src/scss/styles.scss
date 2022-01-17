@@ -1,3 +1,17 @@
+@mixin font-face($family, $weight, $file) {
+  $filepath: "../font/" + $file;
+
+  @font-face {
+    font-family: "#{$family}";
+    font-weight: $weight;
+    src: url($filepath + ".ttf");
+  }
+}
+
+@include font-face('quicksand', 'light', 'quicksand-light');
+@include font-face('quicksand', 'normal', 'quicksand-regular');
+@include font-face('quicksand', 'bold', 'quicksand-bold');
+
 // defaults
 @import 'soundworks';
 

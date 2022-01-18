@@ -11,7 +11,12 @@ Jean-Philippe :
   - [ ] Haendel à 74 à la blanche
   - [ ] Mozart à 82
   - [ ] enlever les morceaux inutiles ou de mauvaise qualité
-- [ ] messages locaux dans l'interface (1 à 2 secondes pour attendre la mise en route ou l'arrêt c'est trop long, ne coupe pas si déconnecté)
+
+- [ ] Permettre de charger un fichier (bien pour tester les nouvelles partitions
+- [ ] Permettre de charger une URL
+  - [ ] depuis l'interface et depuis un paramètre
+
+  - [ ] messages locaux dans l'interface (1 à 2 secondes pour attendre la mise en route ou l'arrêt c'est trop long, ne coupe pas si déconnecté)
   - [ ] vérifier les messages qui transitent par le réseau en continu (ralentissement de pire en pire au fur et à mesure de l'utilisation)
     - [ ] sur le serveur
     - [ ] en retour dans le client

@@ -472,6 +472,7 @@ export default {
   scoreReady: {
     type: 'boolean',
     default: false,
+    immediate: true,
     metas: {
       exported: false,
     },

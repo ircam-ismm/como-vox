@@ -196,7 +196,15 @@ class PlayerExperience extends AbstractExperience {
     await super.start();
 
     this.logWriter = await this.logger.create(`client-${this.como.client.id}.txt`);
-    this.logWriter.write('coucou');
+    this.logWriter.write(`[${new Date().toString()}] ${navigator.userAgent}`);
+
+    window.addEventListener('error', (err) => {
+      // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
+      let msg = `${err.message} ${err.filename}:${err.lineno}`;
+      this.logWriter.write(`[${new Date().toString()}] ${msg}`);
+    });
+
+    // setTimeout(() => { throw new Error('test log') }, 5000);
 
     // playerProd only
     this.guiState = {
@@ -217,9 +225,15 @@ class PlayerExperience extends AbstractExperience {
     this.initialiseState();
 
     const voxPlayerSchema = this.voxPlayerState.getSchema();
+
     this.voxPlayerState.subscribe(async (updates) => {
       for (let [key, value] of Object.entries(updates) ) {
         this.updateFromState(key, value);
+
+        if (key === 'audioLatencyMeasured') {
+          console.log('> audioLatencyMeasured', parseInt(updates.audioLatencyMeasured * 1e3));
+          this.logWriter.write(`[${new Date().toString()}] latency: ${updates.audioLatencyMeasured}`);
+        }
       }
 
       // update URL on state change, to avoid update for each parameter
@@ -464,9 +478,6 @@ class PlayerExperience extends AbstractExperience {
         case 'record': {
           this.events.on(key, (value) => {
             if (value && this.coMoPlayer && this.coMoPlayer.graph) {
-              // this.coMoPlayer.graph.modules['bridge'].addListener(frame => {
-              //   // console.log(frame);
-              // });
               this.updateFromEvent(key, value);
             } else {
               // do not update from event

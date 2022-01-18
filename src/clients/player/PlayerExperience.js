@@ -588,7 +588,7 @@ class PlayerExperience extends AbstractExperience {
       return Promise.resolve(null);
     }
 
-    const promise = new Promise( (resolve, reject) => {
+    const promise = new Promise( async (resolve, reject) => {
       this.events.emit('scoreReady', false);
       this.events.emit('scoreData', null);
 
@@ -640,8 +640,6 @@ class PlayerExperience extends AbstractExperience {
         }
       };
 
-      this.events.emit('scoreReady', false);
-      this.events.emit('scoreData', null);
       request.send(null);
     });
 

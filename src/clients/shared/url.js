@@ -109,7 +109,8 @@ async function _update(clientSchema, data) {
     const compressed = await codec.compress(exported);
     const pathname = window.location.pathname;
     const URL = `${origin}${pathname}#?${compressedKey}=${compressed}`;
-    window.location.replace(URL);
+    // window.location.replace(URL);
+    window.location.hash = `?${compressedKey}=${compressed}`;
   } catch(error) {
     new Error('Error while updating URL:' + error.message);
   }

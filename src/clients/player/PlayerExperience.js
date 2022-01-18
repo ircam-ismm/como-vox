@@ -375,9 +375,6 @@ class PlayerExperience extends AbstractExperience {
 
     window.addEventListener('resize', () => this.render());
 
-    PLAYER_PROD = !this.state.editorGUI;
-    console.log("start: PLAYER_PROD = ", PLAYER_PROD);
-
     if (!PLAYER_PROD) {
       const updateClock = () => {
         this.render();
@@ -827,9 +824,6 @@ class PlayerExperience extends AbstractExperience {
     // warning: syncTime is NOT compensated
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
                                                  {timeSignature: this.timeSignature});
-
-    PLAYER_PROD = !this.state.editorGUI;
-
 
     const viewData = {
       ...this.state,

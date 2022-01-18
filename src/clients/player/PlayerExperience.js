@@ -342,35 +342,33 @@ class PlayerExperience extends AbstractExperience {
     // @note - prevent session choice for development
     await this.coMoPlayer.player.set({ sessionId: 'test' });
 
-    // quick and drity fix...
-    this.coMoPlayer.onGraphCreated(async () => {
-      app.graph = this.coMoPlayer.graph;
+    app.graph = this.coMoPlayer.graph;
 
-      this.seekPosition(positionDefault);
+    this.seekPosition(positionDefault);
 
-      this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
-        this.position = frame['position'];
-        this.playback = frame['playback'];
+    this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
+      this.position = frame['position'];
+      this.playback = frame['playback'];
 
-        const score = frame['score'];
-        if(this.state.scoreControlsTempo && score && score.tempo) {
-          this.events.emit('tempo', score.tempo);
-        } else {
-          // internal stream: no propagation of update
-          this.setTempo(frame['tempo'], {referenceUpdate: false});
+      const score = frame['score'];
+
+      if(this.state.scoreControlsTempo && score && score.tempo) {
+        this.events.emit('tempo', score.tempo);
+      } else {
+        // internal stream: no propagation of update
+        this.setTempo(frame['tempo'], {referenceUpdate: false});
+      }
+
+      if(this.state.scoreControlsTimeSignature) {
+        if(score && score.timeSignature) {
+          this.events.emit('timeSignature', score.timeSignature);
         }
+      } else {
+        // internal stream: no propagation of update
+        this.setTimeSignature(frame['timeSignature']);
+      }
 
-        if(this.state.scoreControlsTimeSignature) {
-          if(score && score.timeSignature) {
-            this.events.emit('timeSignature', score.timeSignature);
-          }
-        } else {
-          // internal stream: no propagation of update
-          this.setTimeSignature(frame['timeSignature']);
-        }
-
-        this.updateLookAhead({allowMoreIncrement: 0});
-      });
+      this.updateLookAhead({allowMoreIncrement: 0});
     });
 
     window.addEventListener('resize', () => this.render());
@@ -409,6 +407,7 @@ class PlayerExperience extends AbstractExperience {
       this.state[key] = value;
 
       const shared = schema.isShared(voxPlayerSchema, key);
+
       if(shared
          && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
         this.voxPlayerState.set({[key]: value});

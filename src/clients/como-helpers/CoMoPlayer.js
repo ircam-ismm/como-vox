@@ -82,8 +82,6 @@ class CoMoPlayer {
         this.graph.setSource(this.source);
       }
 
-      this._emitGraphChange();
-
       this.player.set({ loading: false });
     }
   }
@@ -102,15 +100,6 @@ class CoMoPlayer {
         graph.delete();
       }
     }
-  }
-
-  onGraphCreated(func) {
-    this._graphCreatedSubscriptions.add(func);
-    return () => this._graphCreatedSubscriptions.delete(func);
-  }
-
-  _emitGraphChange() {
-    this._graphCreatedSubscriptions.forEach(func => func(this));
   }
 
   onChange(func) {

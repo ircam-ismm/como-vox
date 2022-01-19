@@ -12,13 +12,12 @@ import {player} from './player.js';
 const e = {};
 
 export function options(data) {
-    const dataOptions = {
-        ...data,
-        uiConfiguration: true,
-    };
+  const dataOptions = {
+      ...data,
+      uiConfiguration: true,
+  };
 
-    const voxPlayerState = data.voxPlayerState;
-
+  const voxPlayerState = data.voxPlayerState;
 
   return html`
     <div class="options">
@@ -38,7 +37,7 @@ export function options(data) {
     ` : '' }
 
     </div>
-`;
+  `;
 }
 Object.assign(e, {options});
 

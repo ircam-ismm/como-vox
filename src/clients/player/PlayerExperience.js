@@ -1,5 +1,6 @@
 import { AbstractExperience } from '@soundworks/core/client';
 import { render, html } from 'lit-html';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 
 import {EventEmitter} from 'events'; // node.js or babel
@@ -75,8 +76,12 @@ if(typeof app.state === 'undefined') {
 }
 
 // for simple debugging in browser...
-console.info('> to mock sensors for debugging purpose, append "&mockSensors=1" to URL');
+console.info('> to mock sensors for debugging purpose, append "&mockSensors=1" to URI');
 console.info('> to use audio for debugging purpose, append "&debugAudio=1" to URI');
+console.info('> to use advanced graphical user interface for debugging purpose, append "&editorGUI=1" to URI');
+
+let PLAYER_PROD = !url.paramGet('editorGUI', null);
+console.log("load: PLAYER_PROD = ", PLAYER_PROD);
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -87,6 +92,7 @@ class PlayerExperience extends AbstractExperience {
     this.$container = $container;
 
     this.sync = this.require('sync');
+    this.logger = this.require('vox-logger');
     this.rafId = null;
 
     this.player = null;
@@ -117,7 +123,6 @@ class PlayerExperience extends AbstractExperience {
     this.lookAheadSecondsMin = app.data.lookAheadSecondsMin;
 
     // in seconds
-    // @TODO discover and store in localStorage
     this.audioLatency = 0;
 
     this.metronomeSound = undefined;
@@ -128,17 +133,91 @@ class PlayerExperience extends AbstractExperience {
     // configure como w/ the given experience
     this.como.configureExperience(this);
     // default initialization views
-    renderInitializationScreens(como.client, config, $container);
+
+    if (!PLAYER_PROD) {
+      renderInitializationScreens(como.client, config, $container);
+    } else {
+      renderInitializationScreens(como.client, config, $container, {
+        screens: {
+          platform: (platform, config, containerInfos) => {
+            const pluginState = platform.state.getValues();
+
+            let msg;
+            let bindListener = undefined;
+            let blink = false;
+
+            if (pluginState.available === null) {
+              msg = 'Vérification...';
+            } else if (pluginState.authorized === null) {
+              msg = 'Autorisations...';
+            } else if (pluginState.initializing === null) {
+              msg = `Cliquez pour commencer<span>Merci d'accepter l'utilisation<br />des capteurs de mouvement</span>`;
+              blink = true;
+
+              bindListener = (e) => {
+                e.preventDefault();
+                platform.onUserGesture(e);
+              }
+            } else if (pluginState.initialized === null) {
+              msg = 'Initialisation...'
+            } else if (pluginState.finalized === null) {
+              msg = 'Finalisation...'
+            }
+
+            return html`
+              <section id="home" @click="${bindListener}">
+                <div class="logo"></div>
+                <svg class="button" viewbox="0 0 100 100">
+                  <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
+                </svg>
+                <p>${unsafeHTML(msg)}</p>
+              </section>
+              <footer></footer>
+            `;
+          },
+          default: (plugin, config, containerInfos) => {
+            return html`
+              <section id="home">
+                <img class="logo" src="./images/logo.png" alt="como vox" />
+                <svg class="button" viewbox="0 0 100 100">
+                  <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
+                </svg>
+                <p>Chargement de l'application...</p>
+              </section>
+              <footer></footer>
+            `;
+          }
+        },
+      });
+    }
   }
 
   async start() {
     await super.start();
-    // console.log('hasDeviceMotion', this.como.hasDeviceMotion);
+
+    this.logWriter = await this.logger.create(`client-${this.como.client.id}.txt`);
+    this.logWriter.write(`[${new Date().toString()}] ${navigator.userAgent}`);
+
+    window.addEventListener('error', (err) => {
+      // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
+      let msg = `${err.message} ${err.filename}:${err.lineno}`;
+      this.logWriter.write(`[${new Date().toString()}] ${msg}`);
+    });
+
+    // setTimeout(() => { throw new Error('test log') }, 5000);
+
+    // playerProd only
+    this.guiState = {
+      showAdvancedSettings: false,
+      showCalibrationScreen: false,
+      showCreditsScreen: false,
+      showInvalidSensorFramerateScreen: false,
+    };
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');
     this.voxApplicationState.subscribe( (updates) => {
       // ...
-    })
+    });
 
     // 1. create a como player instance w/ a unique id (we default to the nodeId)
     const player = await this.como.project.createPlayer(this.como.client.id);
@@ -146,14 +225,21 @@ class PlayerExperience extends AbstractExperience {
     this.initialiseState();
 
     const voxPlayerSchema = this.voxPlayerState.getSchema();
+
     this.voxPlayerState.subscribe(async (updates) => {
       for (let [key, value] of Object.entries(updates) ) {
         this.updateFromState(key, value);
+
+        if (key === 'audioLatencyMeasured') {
+          console.log('> audioLatencyMeasured', parseInt(updates.audioLatencyMeasured * 1e3));
+          this.logWriter.write(`[${new Date().toString()}] latency: ${updates.audioLatencyMeasured}`);
+        }
       }
 
       // update URL on state change, to avoid update for each parameter
       url.update(voxPlayerSchema, this.state);
     });
+
 
     // 2. create a sensor source to be used within the graph.
     // We create a `RandomSource` if deviceMotion is not available for development
@@ -165,6 +251,20 @@ class PlayerExperience extends AbstractExperience {
     } else {
       source = new this.como.sources.RandomValues(this.como, player.get('id'));
     }
+
+    console.log('> hasDeviceMotion', this.como.hasDeviceMotion);
+
+    const sensorTest = e => {
+      source.removeListener(sensorTest);
+      // do not allow frame rate higher than 20ms
+      if (e.metas.period > 0.02 && !this.state['mockSensors']) {
+        console.log('Invalid Sensor Rate', e.metas.period);
+        this.guiState.showInvalidSensorFramerateScreen = true;
+        this.render();
+      }
+    };
+
+    source.addListener(sensorTest);
 
     // @example - metas is a placeholder for application specific informations
     // player.set({
@@ -194,19 +294,42 @@ class PlayerExperience extends AbstractExperience {
     }
 
     const loadedState = await url.parse(voxPlayerSchema);
+    console.log("loadedState = ", loadedState);
+
+    if(typeof loadedState.tempo !== 'undefined') {
+      this.setScoreCallback = () => {
+        this.events.emit('tempo', loadedState.tempo);
+        delete this.setScoreCallback;
+      }
+    }
     for( const [key, value] of Object.entries(loadedState) ) {
       this.events.emit(key, value);
     }
 
-    const baseUrl = url.base
-          + '/soundfonts/acoustic_grand_piano';
-    // + '/soundfonts/bright_acoustic_piano';
-
+    // soundfonts/bright_acoustic_piano
     this.pianoSampleManager = new SampleManager({
       audioContext: this.audioContext,
-      baseUrl,
+      baseUrl: `${url.base}/soundfonts/acoustic_grand_piano`,
     });
     app.instruments.pianoSampleManager = this.pianoSampleManager;
+
+    this.speechSampleManager = new SampleManager({
+      audioContext: this.audioContext,
+      baseUrl: `${url.base}/speech/aurelie`,
+    });
+    app.instruments.speechSampleManager = this.speechSampleManager;
+
+    await this.speechSampleManager.update({
+      notes: [
+        'annule',
+        'c_est_a_vous',
+        'erreur',
+        'merci',
+        'pas_assez_regulier',
+        'trop_lent',
+        'trop_rapide',
+      ],
+    });
 
     // 4. react to gui controls.
     this.listeners = {
@@ -233,45 +356,56 @@ class PlayerExperience extends AbstractExperience {
     // @note - prevent session choice for development
     await this.coMoPlayer.player.set({ sessionId: 'test' });
 
-    // quick and drity fix...
-    this.coMoPlayer.onGraphCreated(async () => {
-      app.graph = this.coMoPlayer.graph;
+    app.graph = this.coMoPlayer.graph;
 
-      this.seekPosition(positionDefault);
+    this.seekPosition(positionDefault);
 
-      this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
-        this.position = frame['position'];
-        this.playback = frame['playback'];
+    this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
+      this.position = frame['position'];
+      this.playback = frame['playback'];
 
-        const score = frame['score'];
-        if(this.state.scoreControlsTempo && score && score.tempo) {
-          this.events.emit('tempo', score.tempo);
-        } else {
-          // internal stream: no propagation of update
-          this.setTempo(frame['tempo'], {referenceUpdate: false});
+      const score = frame['score'];
+
+      if(this.state.scoreControlsTempo && score && score.tempo) {
+        this.events.emit('tempo', score.tempo);
+      } else {
+        // internal stream: no propagation of update
+        this.setTempo(frame['tempo'], {referenceUpdate: false});
+      }
+
+      if(this.state.scoreControlsTimeSignature) {
+        if(score && score.timeSignature) {
+          this.events.emit('timeSignature', score.timeSignature);
         }
+      } else {
+        // internal stream: no propagation of update
+        this.setTimeSignature(frame['timeSignature']);
+      }
 
-        if(this.state.scoreControlsTimeSignature) {
-          if(score && score.timeSignature) {
-            this.events.emit('timeSignature', score.timeSignature);
-          }
-        } else {
-          // internal stream: no propagation of update
-          this.setTimeSignature(frame['timeSignature']);
-        }
-
-        this.updateLookAhead({allowMoreIncrement: 0});
-      });
+      this.updateLookAhead({allowMoreIncrement: 0});
     });
 
     window.addEventListener('resize', () => this.render());
 
-    const updateClock = () => {
-      this.render();
-      this.rafId = window.requestAnimationFrame(updateClock);
-    };
+    if (!PLAYER_PROD) {
+      const updateClock = () => {
+        this.render();
+        this.rafId = window.requestAnimationFrame(updateClock);
+      };
 
-    this.rafId = window.requestAnimationFrame(updateClock);
+      this.rafId = window.requestAnimationFrame(updateClock);
+    }
+
+    // update tempo
+    setInterval(() => {
+      this.render();
+    }, 1000);
+  }
+
+  // playerProd only - might be removed later
+  updateGuiState(state) {
+    this.guiState = state;
+    this.render();
   }
 
   updateFromState(key, value) {
@@ -281,7 +415,7 @@ class PlayerExperience extends AbstractExperience {
     if(event || JSON.stringify(value) !== JSON.stringify(this.state[key] ) ) {
       app.events.emit(key, value);
     }
-
+    this.render();
   }
 
   // immediate to data and asynchronously to voxPlayerState
@@ -292,16 +426,19 @@ class PlayerExperience extends AbstractExperience {
       this.state[key] = value;
 
       const shared = schema.isShared(voxPlayerSchema, key);
+
       if(shared
          && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
         this.voxPlayerState.set({[key]: value});
       }
 
       const stored = schema.isStored(voxPlayerSchema, key);
-      if(stored) {
+
+      if (stored) {
         storage.save(key, value);
       }
     }
+    this.render();
   }
 
   // declare everything if voxPlayerSchema
@@ -318,11 +455,20 @@ class PlayerExperience extends AbstractExperience {
           break;
         }
 
-        case 'audioLatency': {
+        case 'audioLatencyMeasured': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
-            this.setAudioLatency(value);
+            this.setAudioLatency();
           });
+          break;
+        }
+
+        case 'audioLatencyAdaptation': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.setAudioLatency();
+          });
+
           break;
         }
 
@@ -337,9 +483,6 @@ class PlayerExperience extends AbstractExperience {
         case 'record': {
           this.events.on(key, (value) => {
             if (value && this.coMoPlayer && this.coMoPlayer.graph) {
-              // this.coMoPlayer.graph.modules['bridge'].addListener(frame => {
-              //   // console.log(frame);
-              // });
               this.updateFromEvent(key, value);
             } else {
               // do not update from event
@@ -366,7 +509,11 @@ class PlayerExperience extends AbstractExperience {
                                    + scoreURIbase);
             }
             try {
-              await this.setScore(scoreURI)
+              await this.setScore(scoreURI);
+              if(typeof this.setScoreCallback === 'function') {
+                this.setScoreCallback();
+              }
+              this.render();
             } catch (error) {
               console.error('Error while loading score: ' + error.message);
             }
@@ -392,6 +539,7 @@ class PlayerExperience extends AbstractExperience {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
             this.setPlayback(value);
+            this.render();
           });
           break;
         }
@@ -456,7 +604,7 @@ class PlayerExperience extends AbstractExperience {
       return Promise.resolve(null);
     }
 
-    const promise = new Promise( (resolve, reject) => {
+    const promise = new Promise( async (resolve, reject) => {
       this.events.emit('scoreReady', false);
       this.events.emit('scoreData', null);
 
@@ -508,16 +656,21 @@ class PlayerExperience extends AbstractExperience {
         }
       };
 
-      this.events.emit('scoreReady', false);
-      this.events.emit('scoreData', null);
       request.send(null);
     });
 
     return promise;
   }
 
-  setAudioLatency(audioLatency) {
+  setAudioLatency() {
+    // 10 ms is no so bad as a default value
+    const audioLatency = (this.state.audioLatencyMeasured
+                          ? this.state.audioLatencyMeasured
+                          : 10e-3)
+          + this.state.audioLatencyAdaptation;
+
     this.audioLatency = audioLatency;
+    this.events.emit('audioLatency', audioLatency);
     this.updateLookAhead();
   }
 
@@ -681,7 +834,6 @@ class PlayerExperience extends AbstractExperience {
 
   render() {
     const syncTime = this.sync.getSyncTime();
-
     // warning: syncTime is NOT compensated
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
                                                  {timeSignature: this.timeSignature});
@@ -704,36 +856,63 @@ class PlayerExperience extends AbstractExperience {
       tempo: this.tempo, // override state tempo which is reference tempo
       voxApplicationState: this.voxApplicationState,
       voxPlayerState: this.voxPlayerState,
+
+      // player prod only
+      PLAYER_PROD,
+      guiState: this.guiState,
     };
 
     const listeners = this.listeners;
 
     let screen = ``;
 
-    if (!this.como.hasDeviceMotion && !this.state['mockSensors'] ) {
+    if (!this.como.hasDeviceMotion && !this.state['mockSensors']) {
       screen = views.sorry(viewData, listeners);
+    } else if (this.guiState.showInvalidSensorFramerateScreen) {
+      screen = views.sorryInvalidFrameRate(viewData, listeners);
     } else if (this.coMoPlayer.session === null) {
-      screen = views.manageSessions(viewData, listeners, {
-        enableCreation: false,
-        enableSelection: true,
-      });
+      if (!PLAYER_PROD) {
+        screen = views.manageSessions(viewData, listeners, {
+          enableCreation: false,
+          enableSelection: !PLAYER_PROD,
+        });
+      } else {
+        screen = html`
+          <section id="home">
+            <img class="logo" src="./images/logo.png" alt="como vox" />
+            <svg class="button" viewbox="0 0 100 100">
+              <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
+            </svg>
+            <p>Chargement de l'application...</p>
+          </section>
+          <footer></footer>
+        `
+      }
     } else {
-      screen = views[this.client.type](viewData, listeners, {
-        verbose: false,
-        enableSelection: false,
-      });
+      if (!PLAYER_PROD) {
+        screen = views[this.client.type](viewData, listeners, {
+          verbose: false,
+          enableSelection: false,
+        });
+      } else {
+        screen = views.playerProd(viewData, listeners);
+      }
     }
 
-    render(html`
-      <div style="
-        box-sizing: border-box;
-        width: 100%;
-        min-height: 100%;
-        padding: 20px;
-      ">
-        ${screen}
-      </div>
-    `, this.$container);
+    if (!PLAYER_PROD) {
+      render(html`
+        <div style="
+          box-sizing: border-box;
+          width: 100%;
+          min-height: 100%;
+          padding: 20px;
+        ">
+          ${screen}
+        </div>
+      `, this.$container);
+    } else {
+      render(screen, this.$container);
+    }
   }
 }
 

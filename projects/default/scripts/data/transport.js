@@ -34,7 +34,7 @@ function transport(graph, helpers, outputFrame) {
     playback: true,
     playbackStartAfterCount: {
       bar: 1,
-      beat: 1, // one more for upbeat before start
+      beat: 0,
     },
     playbackStopAfterCount: {
       bar: 1,
@@ -171,7 +171,9 @@ function transport(graph, helpers, outputFrame) {
     if(playback) {
       playbackStartNew = true;
     } else {
+      // aply offset and reset
       positionStopped = positionWithOffsetLast;
+      beatOffsetLast = 0;
 
       beatGestures.length = 0;
       beatGestureLastTime = 0;
@@ -388,12 +390,18 @@ function transport(graph, helpers, outputFrame) {
         }
       }
 
-      const timeDelta = (playback && positionLastTime.audio !== 0
+      const timeDelta = (!playbackStartNew
+                         && playback && positionLastTime.audio !== 0
                          ? now.audio - positionLastTime.audio
                          : 0);
-      const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
+      const beatDelta = (!playbackStartNew
+                         ? secondsToBeats(timeDelta, {tempo, timeSignature})
+                         : 0);
 
-      let position = positionAddBeats(positionLast, beatDelta, {timeSignature});
+      let position = (!playbackStartNew
+                      ? positionAddBeats(positionLast, beatDelta, {timeSignature})
+                      : positionStopped);
+
       let positionWithOffset = positionAddBeats(position, beatOffset, {timeSignature});
       if(isNaN(positionWithOffset.bar) || isNaN(positionWithOffset.beat) ) {
         debugger;
@@ -727,6 +735,7 @@ function transport(graph, helpers, outputFrame) {
         const startAfterBeatsWithLookAhead
               = parameters.playbackStartAfterCount.bar * barCount
               + parameters.playbackStartAfterCount.beat
+              + 1 // one more for upbeat before start
               - startLookAheadBeats;
 
         let {

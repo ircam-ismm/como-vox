@@ -47,10 +47,17 @@
       },
     },
     {
-      id: 'scenarioManager',
+      id: 'scenarioFull',
       type: 'ScriptData',
       options: {
-        scriptName: 'scenarioManager',
+        scriptName: 'scenarioFull',
+      },
+    },
+    {
+      id: 'scenarioIntensity',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioIntensity',
       },
     },
     {
@@ -58,6 +65,27 @@
       type: 'ScriptData',
       options: {
         scriptName: 'scenarioLatencyCalibration',
+      },
+    },
+    {
+      id: 'scenarioListening',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioListening',
+      },
+    },
+    {
+      id: 'scenarioTempo',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioTempo',
+      },
+    },
+    {
+      id: 'scenarioTempoIntensity',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioTempoIntensity',
       },
     },
     {
@@ -72,6 +100,16 @@
       type: 'ScriptData',
       options: {
         scriptName: 'scenarioSonification',
+      },
+    },
+    // WARNING: the manager must come after all scenarios
+    // (they must be instantiated before, for
+    // the manager to communicate with hem)
+    {
+      id: 'scenarioManager',
+      type: 'ScriptData',
+      options: {
+        scriptName: 'scenarioManager',
       },
     },
     {
@@ -190,7 +228,27 @@
     ],
     [
       'stillness',
+      'scenarioFull',
+    ],
+    [
+      'stillness',
+      'scenarioIntensity',
+    ],
+    [
+      'stillness',
       'scenarioLatencyCalibration',
+    ],
+    [
+      'stillness',
+      'scenarioListening',
+    ],
+    [
+      'stillness',
+      'scenarioTempo',
+    ],
+    [
+      'stillness',
+      'scenarioTempoIntensity',
     ],
     [
       'scenarioManager',

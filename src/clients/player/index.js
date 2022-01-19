@@ -1,10 +1,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { Client } from '@soundworks/core/client';
-import CoMo from 'como/client'
+import CoMo from '@ircam/como/client'
 import initQoS from '@soundworks/template-helpers/client/init-qos.js';
-import pluginSyncFactory from '@soundworks/plugin-sync/client';
+// import pluginSyncFactory from '@soundworks/plugin-sync/client';
+import pluginLoggerFactory from '@soundworks/plugin-logger/client';
 import PlayerExperience from './PlayerExperience.js';
+
+import url from '../shared/url.js';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
@@ -20,7 +23,8 @@ async function launch($container, index) {
     // // -------------------------------------------------------------------
     // // register plugins
     // // -------------------------------------------------------------------
-    // client.pluginManager.register('sync', pluginSyncFactory, {}, []);
+
+    client.pluginManager.register('vox-logger', pluginLoggerFactory, {}, []);
 
     // -------------------------------------------------------------------
     // launch application
@@ -57,6 +61,12 @@ const searchParams = new URLSearchParams(window.location.search);
 // enable instanciation of multiple clients in the same page to facilitate
 // development and testing (be careful in production...)
 const numEmulatedClients = parseInt(searchParams.get('emulate')) || 1;
+
+// switch to light mode for regular users
+if (url.paramGet('editorGUI') !== '1') {
+  $container.classList.add('player-prod');
+  document.body.classList.add('light');
+}
 
 // special logic for emulated clients (1 click to rule them all)
 if (numEmulatedClients > 1) {

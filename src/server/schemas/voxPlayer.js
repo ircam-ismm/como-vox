@@ -2,7 +2,7 @@ export default {
 
   audioIntensityRange: {
     type: 'float',
-    default: 24, // dB
+    default: 32, // dB
   },
 
   audioIntensityRangeUi: {
@@ -12,16 +12,35 @@ export default {
 
   audioLatency: {
     type: 'float',
-    default: 10e-3,
+    default: 0,
+    metas: {
+      exported: false,
+      stored: false,
+    },
+  },
+
+  audioLatencyMeasured: {
+    type: 'float',
+    default: null,
+    nullable: true,
     metas: {
       exported: false,
       stored: true,
     },
   },
 
-  audioLatencyUi: {
+  audioLatencyMeasuredUi: {
     type: 'boolean',
     default: true,
+  },
+
+  audioLatencyAdaptation: {
+    type: 'float',
+    default: 0,
+    metas: {
+      exported: false,
+      stored: true,
+    },
   },
 
   beatGestureWaitingDurationMax: {
@@ -52,6 +71,34 @@ export default {
   debugAudioUi: {
     type: 'boolean',
     default: false,
+  },
+
+  gestureAdaptationIntensityMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+      stored: true,
+    },
+  },
+
+  gestureAdaptationIntensityModeUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  gestureAdaptationTempoMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+      stored: true,
+    },
+  },
+
+  gestureAdaptationTempoModeUi: {
+    type: 'boolean',
+    default: true,
   },
 
   gestureControlsBeatOffset: {
@@ -115,7 +162,7 @@ export default {
 
   gestureIntensityInputMax: {
     type: 'float',
-    default: 0.3, // 0.4 for more energy
+    default: 0.5, // 0.3 for less energy
   },
 
   gestureIntensityInputMaxUi: {
@@ -185,7 +232,7 @@ export default {
 
   metronomeSound: {
     type: 'boolean',
-    default: false,
+    default: true,
   },
 
   metronomeSoundUi: {
@@ -216,7 +263,7 @@ export default {
     type: 'any',
     default: {
       bar: 1,
-      beat: 1, // one more for upbeat before start
+      beat: 0,
     },
   },
 
@@ -268,6 +315,66 @@ export default {
     nullable: true,
   },
 
+  scenarioFull: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioFullUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioIntensity: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioIntensityUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioListening: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioListeningUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioPlayback: {
+    type: 'boolean',
+    default: false,
+  },
+
+  scenarioPlaybackUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioTempo: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioTempoUi: {
+    type: 'boolean',
+    default: true,
+  },
+
+  scenarioTempoIntensity: {
+    type: 'boolean',
+    event: true,
+  },
+
+  scenarioTempoIntensityUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   scenarioStartStopWithBeating: {
     type: 'boolean',
     event: true,
@@ -289,6 +396,7 @@ export default {
     default: null,
     metas: {
       exported: false,
+      shared: false,
     },
   },
 
@@ -315,6 +423,7 @@ export default {
       exported: false,
       shared: false, // might be big
     },
+    immediate: true,
   },
 
   scoreFileName: {
@@ -364,9 +473,11 @@ export default {
   scoreReady: {
     type: 'boolean',
     default: false,
+    immediate: true,
     metas: {
       exported: false,
     },
+    immediate: true,
   },
 
   scoreUi: {

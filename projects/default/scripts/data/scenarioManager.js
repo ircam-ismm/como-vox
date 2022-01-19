@@ -1,22 +1,32 @@
 function scenarioManager(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
-  const scenarioNames = [
+  const restoreAfter = [
     'scenarioLatencyCalibration',
+    'scenarioListening',
+  ];
+
+  const scenarioNames = [
+    ...restoreAfter,
+    'scenarioFull',
+    'scenarioIntensity',
+    'scenarioTempo',
+    'scenarioTempoIntensity',
     'scenarioStartStopWithBeating',
   ];
 
   const noteChannel = 'scenario';
+  const speechChannel = 'scenario';
 
   const parameters = {
     scenarioCurrent: null,
+    scenarioLast: null,
   };
   scenarioNames.forEach( (scenarioName) => {
     parameters[scenarioName] = false;
   });
 
   const updateParams = (updates) => {
-
     if(typeof updates.scenarioCurrent !== 'undefined') {
       // exclusive scenarioCurrent: disable others
       parameters.scenarioCurrent = updates.scenarioCurrent;
@@ -40,7 +50,8 @@ function scenarioManager(graph, helpers, outputFrame) {
           const scenarioActive = updates[p];
           if(scenarioActive) {
             if(parameters.scenarioCurrent !== scenarioName) {
-              // active is new current
+              // switch scenario: active is new current
+              parameters.scenarioLast = parameters.scenarioCurrent;
               parameters.scenarioCurrent = scenarioName;
               app.events.emit('scenarioCurrent', parameters.scenarioCurrent);
             } else {
@@ -48,8 +59,15 @@ function scenarioManager(graph, helpers, outputFrame) {
             }
           } else if(scenarioName === parameters.scenarioCurrent) {
             // currently active was disabled, no current any more
-            parameters.scenarioCurrent = null;
-            app.events.emit('scenarioCurrent', parameters.scenarioCurrent);
+            const restore = restoreAfter.find( (s) => s === scenarioName);
+            if(restore) {
+              parameters.scenarioCurrent = scenarioName;
+              app.events.emit('scenarioCurrent', parameters.scenarioLast);
+            } else {
+              parameters.scenarioCurrent = null;
+              app.events.emit('scenarioCurrent', null);
+            }
+
           }
         }
       }
@@ -75,6 +93,13 @@ function scenarioManager(graph, helpers, outputFrame) {
       };
       registeredEvents.push([event, callback]);
       app.events.on(event, callback);
+    });
+
+    // apply current state after registering all events
+    // scenarioNames are pure events (no states)
+    [
+      'scenarioCurrent',
+    ].forEach( (event) => {
       // apply current state
       updateParams({[event]: app.state[event]});
     });
@@ -93,6 +118,12 @@ function scenarioManager(graph, helpers, outputFrame) {
       const notesContainer = inputData['notes'] || {};
       notesContainer[noteChannel] = notes;
       outputData['notes'] = notesContainer;
+
+      const speech = [];
+      // reset own channel
+      const speechContainer = inputData['speech'] || {};
+      speechContainer[speechChannel] = speech;
+      outputData['speech'] = speechContainer;
 
       return outputFrame;
     },

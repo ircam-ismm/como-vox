@@ -2,7 +2,9 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
+  const positionAddBeats = conversion.positionAddBeats;
   const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
+  const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
 
   // to restore after calibration
   const parametersBackup = {};
@@ -16,21 +18,22 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
     metronomeSound: true,
     playbackStopSeek: 'start',
     scoreFileName: null,
-    tempo: 60,
-    timeSignature: {count: 4, division: 4},
+    tempo: 70,
+    timeSignature: {count: 2, division: 4},
   };
 
+  // default values to register
   const parameters = {
     ...parametersScenario,
-    audioLatency: 0,
+    audioLatencyMeasured: 0,
     // @TODO: use playbackStartAfterCount
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
     beatingDuration: {bar: 4, beat: 0},
     beatingStandardDeviationMax: 0.25, // in seconds
     initialWaitingDuration: 1, // in seconds, before stillness
-    listeningDuration: {bar: 1, beat: 0}, // before beating
     playback: false,
     playbackLatency: 0,
+    playbackStartAfterCount: {bar: 1, beat: 0}, // upbeat and one bar
     scenarioStatus: 'off',
     stillnessWaitingDurationMax: 2, // in seconds, for time-out
     stillnessWaitingDurationMin: 0.5, // in seconds, before ready to start
@@ -124,10 +127,11 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
             ...Object.keys(parametersScenario),
             // declare own parameters
             ...[
-              'audioLatency',
+              'audioLatencyMeasured',
               'beatGestureWaitingDurationMax',
               'playback',
               'playbackLatency',
+              'playbackStartAfterCount',
               'scenarioLatencyCalibration',
               'scenarioStatus',
             ],
@@ -157,7 +161,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
         beat: beatGesture,
         playback,
         playbackLatency,
-        positon,
+        position,
         tempo,
         time,
         timeSignature,
@@ -171,47 +175,36 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
 
       switch(status) {
         case 'init': {
-          statusUpdate('waiting');
+          beatGestureTriggered = false;
+
+          // wait for 4 beats on 1/4 and 2/4 time signature
+          const barCount = (timeSignature.count >= 3
+                            ? timeSignature.count
+                            : 4);
+
+          const startAfterBeats
+                = parameters.playbackStartAfterCount.bar * barCount
+                + parameters.playbackStartAfterCount.beat;
+
+          const seekPosition = positionAddBeats({bar: 1, beat: 1},
+                                                -startAfterBeats,
+                                                {timeSignature});
+
+          app.events.emit('tempoReset', true);
+
+          app.events.emit('seekPosition', seekPosition);
+          app.events.emit('playback', true);
+          // @TODO: seek after playback for bug on seek (quick events?)
+          app.events.emit('seekPosition', seekPosition);
+          statusUpdate('precount');
           break;
         }
 
-        case 'waiting': {
-          if(time.local - statusTime >= parameters.initialWaitingDuration) {
-            timeoutTime = time.local;
-            statusUpdate('waitingForStillness');
-          }
-          break;
-        }
-
-        case 'waitingForStillness': {
-          if(time.local - timeoutTime >= parameters.stillnessWaitingDurationMax) {
-            statusUpdate('cancel');
-          } else if(!stillness.status) {
-            // not still, restart
-            statusUpdate('waitingForStillness');
-          } else if(time.local - statusTime >= parameters.stillnessWaitingDurationMin) {
-            timeoutTime = time.local;
-            beatGestureTriggered = false;
-            app.events.emit('seekPosition', {bar: 1, beat: 1});
-            app.events.emit('playback', true);
-            statusUpdate('listening');
-          }
-          break;
-        }
-
-        case 'listening': {
-          if(beatGesture && beatGesture.trigger) {
-            beatGestureTriggered = true;
-            statusUpdate('cancel');
-          }
-
-          const listeningDuration = positionDeltaToSeconds(parameters.listeningDuration, {
-               timeSignature,
-               tempo,
-          });
-
-          if(!beatGestureTriggered
-             && time.local - statusTime >= listeningDuration) {
+        case 'precount': {
+          // start with first beat
+          const precountEndPosition = {bar: 1, beat: 1};
+          if(positionsToBeatsDelta(position, precountEndPosition,
+                                   {timeSignature}) > 0) {
             app.events.emit('measuresClear', true);
             statusUpdate('ready');
           }
@@ -231,6 +224,7 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
                  >= parameters.beatGestureWaitingDurationMax) ) {
             // no start, cancel
             statusUpdate('cancel');
+            app.events.emit('playback', false);
           }
           break;
         }
@@ -260,8 +254,9 @@ function scenarioLatencyCalibration(graph, helpers, outputFrame) {
           } else if(standardDeviation >= parameters.beatingStandardDeviationMax) {
             statusUpdate('tooMuchJitter');
           } else {
-            const audioLatency = Math.max(0, parameters.audioLatency - median);
-            app.events.emit('audioLatency', audioLatency);
+            statusUpdate('complete');
+            const audioLatencyMeasured = Math.max(0, parameters.audioLatencyMeasured - median);
+            app.events.emit('audioLatencyMeasured', audioLatencyMeasured);
             app.events.emit('scenarioLatencyCalibration', false);
           }
           break;

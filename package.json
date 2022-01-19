@@ -1,11 +1,11 @@
 {
-  "name": "como-elements",
+  "name": "como-vox",
   "authors": [
     "Benjamin Matuszewski"
   ],
   "description": "experimental application of the CoMo framework",
   "license": "BSD-3-Clause",
-  "version": "3.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "npm run clean && (webpack --mode=development & soundworks-template-build -b)",

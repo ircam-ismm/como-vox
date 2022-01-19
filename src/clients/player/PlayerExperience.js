@@ -395,6 +395,11 @@ class PlayerExperience extends AbstractExperience {
 
       this.rafId = window.requestAnimationFrame(updateClock);
     }
+
+    // update tempo
+    setInterval(() => {
+      this.render();
+    }, 1000);
   }
 
   // playerProd only - might be removed later

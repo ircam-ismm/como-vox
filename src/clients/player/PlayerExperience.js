@@ -879,11 +879,11 @@ class PlayerExperience extends AbstractExperience {
       } else {
         screen = html`
           <section id="home">
-            <img class="logo" src="./images/logo.png" alt="como vox" />
+            <div class="logo"></div>
             <svg class="button" viewbox="0 0 100 100">
               <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
             </svg>
-            <p>Chargement de l'application...</p>
+            <p>Chargement de la session...</p>
           </section>
           <footer></footer>
         `

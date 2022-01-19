@@ -166,7 +166,7 @@ class PlayerExperience extends AbstractExperience {
 
             return html`
               <section id="home" @click="${bindListener}">
-                <img class="logo" src="./images/logo.png" alt="como vox" />
+                <div class="logo"></div>
                 <svg class="button" viewbox="0 0 100 100">
                   <polygon class="play-shape" points="30,20, 80,50, 30,80"></polygon>
                 </svg>

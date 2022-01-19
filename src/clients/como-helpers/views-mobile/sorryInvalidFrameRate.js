@@ -1,7 +1,7 @@
 import { html } from 'lit-html';
 import * as styles from './styles.js'
 
-export function sorry(data, listeners) {
+export function sorryInvalidFrameRate(data, listeners) {
   return html`<div>
     <h1 style="
         ${styles.h1}
@@ -14,6 +14,12 @@ export function sorry(data, listeners) {
         margin-top: 30px;
         margin-left: 20px;
       "
-    >${data.config.app.name} requiert l'access aux capteurs<br />de mouvement pour fonctionner</h3>
+    >
+      Le taux de rachaichissement des capteurs<br />
+      est trop bas pour le bon fonctionnement<br />
+      de l'application<br />
+      <br />
+      Merci d'essayer en utilisant Google Chrome
+    </h3>
   </div>`
 }

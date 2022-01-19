@@ -423,6 +423,7 @@ export default {
       exported: false,
       shared: false, // might be big
     },
+    immediate: true,
   },
 
   scoreFileName: {
@@ -472,9 +473,11 @@ export default {
   scoreReady: {
     type: 'boolean',
     default: false,
+    immediate: true,
     metas: {
       exported: false,
     },
+    immediate: true,
   },
 
   scoreUi: {

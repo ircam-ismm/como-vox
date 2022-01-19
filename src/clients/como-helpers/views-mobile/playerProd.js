@@ -36,9 +36,7 @@ export function playerProd(data) {
 
   return html`
     <header>
-      <h1 class="title">
-        <img src="./images/logo.png" alt="como vox" />
-      </h1>
+      <h1 class="title"></h1>
       <button
         class="settings-btn${guiState.showAdvancedSettings ? ' active' : ''}"
         @click="${e => {
@@ -228,21 +226,28 @@ export function playerProd(data) {
               }}"
             ></button>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              <b>CoMo Vox</b> est développée par l'Ircam et l'unité mixte de recherche Sciences et technologies de la musique et du son (STMS), soutenue par l'Ircam, le CNRS, le ministère de la Culture et Sorbonne Université.
             </p>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              Réalisée avec le soutien du ministère de l'Éducation Nationale, de la Jeunesse et des Sports (dispositif Édu-up), de l'Agence Nationale de la Recherche (projet ELEMENT), et en partenariat avec Radio France.
             </p>
+            <div class="logos">
+              <div class="row">
+                <div id="ircam"></div>
+                <div id="cnrs"></div>
+                <div id="sorbonne"></div>
+                <div id="min-culture"></div>
+                <div id="anr"></div>
+              </div>
+
+              <div class="row">
+                <div id="min-education"></div>
+                <div id="edu-up"></div>
+                <div></div>
+                <div id="radio-france"></div>
+                <div id="vox"></div>
+              </div>
+            </div>
           </div>
         `
       : nothing}
@@ -435,6 +440,8 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         guiState.showCreditsScreen = !guiState.showCreditsScreen;
         exp.updateGuiState(guiState);
       }}"
-    ></footer>
+    >
+      <p>Crédits</p>
+    </footer>
 `;
 }

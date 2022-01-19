@@ -30,3 +30,5 @@ package-lock.json
 Thumbs.db
 
 projects/default/recordings/
+
+logs

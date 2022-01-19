@@ -92,6 +92,7 @@ class PlayerExperience extends AbstractExperience {
     this.$container = $container;
 
     this.sync = this.require('sync');
+    this.logger = this.require('vox-logger');
     this.rafId = null;
 
     this.player = null;
@@ -194,11 +195,23 @@ class PlayerExperience extends AbstractExperience {
   async start() {
     await super.start();
 
+    this.logWriter = await this.logger.create(`client-${this.como.client.id}.txt`);
+    this.logWriter.write(`[${new Date().toString()}] ${navigator.userAgent}`);
+
+    window.addEventListener('error', (err) => {
+      // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
+      let msg = `${err.message} ${err.filename}:${err.lineno}`;
+      this.logWriter.write(`[${new Date().toString()}] ${msg}`);
+    });
+
+    // setTimeout(() => { throw new Error('test log') }, 5000);
+
     // playerProd only
     this.guiState = {
       showAdvancedSettings: false,
       showCalibrationScreen: false,
       showCreditsScreen: false,
+      showInvalidSensorFramerateScreen: false,
     };
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');
@@ -212,14 +225,21 @@ class PlayerExperience extends AbstractExperience {
     this.initialiseState();
 
     const voxPlayerSchema = this.voxPlayerState.getSchema();
+
     this.voxPlayerState.subscribe(async (updates) => {
       for (let [key, value] of Object.entries(updates) ) {
         this.updateFromState(key, value);
+
+        if (key === 'audioLatencyMeasured') {
+          console.log('> audioLatencyMeasured', parseInt(updates.audioLatencyMeasured * 1e3));
+          this.logWriter.write(`[${new Date().toString()}] latency: ${updates.audioLatencyMeasured}`);
+        }
       }
 
       // update URL on state change, to avoid update for each parameter
       url.update(voxPlayerSchema, this.state);
     });
+
 
     // 2. create a sensor source to be used within the graph.
     // We create a `RandomSource` if deviceMotion is not available for development
@@ -231,6 +251,20 @@ class PlayerExperience extends AbstractExperience {
     } else {
       source = new this.como.sources.RandomValues(this.como, player.get('id'));
     }
+
+    console.log('> hasDeviceMotion', this.como.hasDeviceMotion);
+
+    const sensorTest = e => {
+      source.removeListener(sensorTest);
+      // do not allow frame rate higher than 20ms
+      if (e.metas.period > 0.02 && !this.state['mockSensors']) {
+        console.log('Invalid Sensor Rate', e.metas.period);
+        this.guiState.showInvalidSensorFramerateScreen = true;
+        this.render();
+      }
+    };
+
+    source.addListener(sensorTest);
 
     // @example - metas is a placeholder for application specific informations
     // player.set({
@@ -261,6 +295,7 @@ class PlayerExperience extends AbstractExperience {
 
     const loadedState = await url.parse(voxPlayerSchema);
     console.log("loadedState = ", loadedState);
+
     if(typeof loadedState.tempo !== 'undefined') {
       this.setScoreCallback = () => {
         this.events.emit('tempo', loadedState.tempo);
@@ -321,41 +356,36 @@ class PlayerExperience extends AbstractExperience {
     // @note - prevent session choice for development
     await this.coMoPlayer.player.set({ sessionId: 'test' });
 
-    // quick and drity fix...
-    this.coMoPlayer.onGraphCreated(async () => {
-      app.graph = this.coMoPlayer.graph;
+    app.graph = this.coMoPlayer.graph;
 
-      this.seekPosition(positionDefault);
+    this.seekPosition(positionDefault);
 
-      this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
-        this.position = frame['position'];
-        this.playback = frame['playback'];
+    this.coMoPlayer.graph.modules['bridge'].subscribe(frame => {
+      this.position = frame['position'];
+      this.playback = frame['playback'];
 
-        const score = frame['score'];
-        if(this.state.scoreControlsTempo && score && score.tempo) {
-          this.events.emit('tempo', score.tempo);
-        } else {
-          // internal stream: no propagation of update
-          this.setTempo(frame['tempo'], {referenceUpdate: false});
+      const score = frame['score'];
+
+      if(this.state.scoreControlsTempo && score && score.tempo) {
+        this.events.emit('tempo', score.tempo);
+      } else {
+        // internal stream: no propagation of update
+        this.setTempo(frame['tempo'], {referenceUpdate: false});
+      }
+
+      if(this.state.scoreControlsTimeSignature) {
+        if(score && score.timeSignature) {
+          this.events.emit('timeSignature', score.timeSignature);
         }
+      } else {
+        // internal stream: no propagation of update
+        this.setTimeSignature(frame['timeSignature']);
+      }
 
-        if(this.state.scoreControlsTimeSignature) {
-          if(score && score.timeSignature) {
-            this.events.emit('timeSignature', score.timeSignature);
-          }
-        } else {
-          // internal stream: no propagation of update
-          this.setTimeSignature(frame['timeSignature']);
-        }
-
-        this.updateLookAhead({allowMoreIncrement: 0});
-      });
+      this.updateLookAhead({allowMoreIncrement: 0});
     });
 
     window.addEventListener('resize', () => this.render());
-
-    PLAYER_PROD = !this.state.editorGUI;
-    console.log("start: PLAYER_PROD = ", PLAYER_PROD);
 
     if (!PLAYER_PROD) {
       const updateClock = () => {
@@ -365,6 +395,11 @@ class PlayerExperience extends AbstractExperience {
 
       this.rafId = window.requestAnimationFrame(updateClock);
     }
+
+    // update tempo
+    setInterval(() => {
+      this.render();
+    }, 1000);
   }
 
   // playerProd only - might be removed later
@@ -391,6 +426,7 @@ class PlayerExperience extends AbstractExperience {
       this.state[key] = value;
 
       const shared = schema.isShared(voxPlayerSchema, key);
+
       if(shared
          && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
         this.voxPlayerState.set({[key]: value});
@@ -447,9 +483,6 @@ class PlayerExperience extends AbstractExperience {
         case 'record': {
           this.events.on(key, (value) => {
             if (value && this.coMoPlayer && this.coMoPlayer.graph) {
-              // this.coMoPlayer.graph.modules['bridge'].addListener(frame => {
-              //   // console.log(frame);
-              // });
               this.updateFromEvent(key, value);
             } else {
               // do not update from event
@@ -571,7 +604,7 @@ class PlayerExperience extends AbstractExperience {
       return Promise.resolve(null);
     }
 
-    const promise = new Promise( (resolve, reject) => {
+    const promise = new Promise( async (resolve, reject) => {
       this.events.emit('scoreReady', false);
       this.events.emit('scoreData', null);
 
@@ -623,8 +656,6 @@ class PlayerExperience extends AbstractExperience {
         }
       };
 
-      this.events.emit('scoreReady', false);
-      this.events.emit('scoreData', null);
       request.send(null);
     });
 
@@ -807,9 +838,6 @@ class PlayerExperience extends AbstractExperience {
     const positionCompensated = positionAddBeats(this.position, -this.lookAheadBeats,
                                                  {timeSignature: this.timeSignature});
 
-    PLAYER_PROD = !this.state.editorGUI;
-
-
     const viewData = {
       ...this.state,
       boundingClientRect: this.$container.getBoundingClientRect(),
@@ -838,8 +866,10 @@ class PlayerExperience extends AbstractExperience {
 
     let screen = ``;
 
-    if (!this.como.hasDeviceMotion && !this.state['mockSensors'] ) {
+    if (!this.como.hasDeviceMotion && !this.state['mockSensors']) {
       screen = views.sorry(viewData, listeners);
+    } else if (this.guiState.showInvalidSensorFramerateScreen) {
+      screen = views.sorryInvalidFrameRate(viewData, listeners);
     } else if (this.coMoPlayer.session === null) {
       if (!PLAYER_PROD) {
         screen = views.manageSessions(viewData, listeners, {

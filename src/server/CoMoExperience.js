@@ -6,6 +6,8 @@ class CoMoExperience extends AbstractExperience {
 
     this.como = como;
     this.como.configureExperience(this);
+
+    this.logger = this.require('vox-logger');
   }
 
   async start() {

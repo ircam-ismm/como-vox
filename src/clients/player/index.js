@@ -1,9 +1,10 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { Client } from '@soundworks/core/client';
-import CoMo from 'como/client'
+import CoMo from '@ircam/como/client'
 import initQoS from '@soundworks/template-helpers/client/init-qos.js';
-import pluginSyncFactory from '@soundworks/plugin-sync/client';
+// import pluginSyncFactory from '@soundworks/plugin-sync/client';
+import pluginLoggerFactory from '@soundworks/plugin-logger/client';
 import PlayerExperience from './PlayerExperience.js';
 
 import url from '../shared/url.js';
@@ -22,7 +23,8 @@ async function launch($container, index) {
     // // -------------------------------------------------------------------
     // // register plugins
     // // -------------------------------------------------------------------
-    // client.pluginManager.register('sync', pluginSyncFactory, {}, []);
+
+    client.pluginManager.register('vox-logger', pluginLoggerFactory, {}, []);
 
     // -------------------------------------------------------------------
     // launch application

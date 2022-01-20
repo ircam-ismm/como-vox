@@ -38,12 +38,18 @@ export function playerProd(data) {
     <header>
       <h1 class="title"></h1>
       <button
-        class="settings-btn${guiState.showAdvancedSettings ? ' active' : ''}"
+        class="settings-btn${guiState.showAdvancedSettings || guiState.showCalibrationScreen ? ' active' : ''}"
         @click="${e => {
-          if (loading || guiState.showCalibrationScreen) {
+          if (loading) {
             return;
           }
-          guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
+
+          if (guiState.showCalibrationScreen) {
+            guiState.showCalibrationScreen = false;
+          } else {
+            guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
+          }
+
           exp.updateGuiState(guiState);
         }}"
       ></button>
@@ -154,10 +160,10 @@ export function playerProd(data) {
             <h2>Adaptation au geste</h2>
             <p>
               Cette étape permet d'adapter l'application entre votre téléphone et votre geste.
-              Elle est nécéssaire pour accéder aux modes "Tempo", "Départ" et "Tempo & Nuance".
+              Elle est nécéssaire pour accéder aux modes <i>Tempo</i>, <i>Départ</i> et <i>Tempo & Nuance</i>.
             </p>
             <p>
-              Cliquez sur « Calibrer » et après 4 bips, c’est à vous. Faites un geste simple et précis à chaque temps.
+              Cliquez sur le bouton <i>Calibrer</i> et après 4 bips, faites un geste simple et précis à chaque temps.
             </p>
             <p>
               Le processus peut être un peu long, continuez régulièrement jusqu'à l'arrêt.
@@ -207,7 +213,7 @@ export function playerProd(data) {
                 guiState.showCalibrationScreen = false;
                 exp.updateGuiState(guiState);
               }}"
-            >Terminer</button>
+            >Retour</button>
           </div>
         `
       : nothing}
@@ -322,6 +328,9 @@ export function playerProd(data) {
         </div>
 
         <div class="exercise-type">
+          <p>
+            Sélectionner un exercice
+          </p>
           <button
             class="${data.scenarioCurrent === 'scenarioIntensity' ? 'selected' : ''}"
             @click="${e => {

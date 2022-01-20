@@ -104,8 +104,8 @@ header {
 
   .title {
     width: 100%;
-    height: 28px; //49px avec logo.png
-    margin: 1; //0
+    height: 30px;
+    margin: 12px 0 0 0;
     background-image: url(../images/logo-yellow.png);
     background-size: contain;
     background-repeat: no-repeat;
@@ -224,6 +224,10 @@ header {
     position: relative;
     margin-top: 20px;
 
+    p {
+      margin: 10px 0 7px 10px;
+    }
+
     button {
       width: calc(50% - 6px);
       height: 30px;
@@ -234,6 +238,8 @@ header {
       font-weight: bold;
       font-size: 0.9rem;
       white-space: nowrap;
+      padding: 0;
+      letter-spacing: -1px;
 
       &:nth-child(odd) {
         margin-right: 2px;
@@ -251,13 +257,12 @@ header {
       }
 
       &.locked {
-        background-color: #efefef;
+        background-color: #ffffff;
         background-image: url(../images/locked.png);
         background-size: contain;
         background-position: 100% 50%;
         background-repeat: no-repeat;
-        font-style: italic;
-        opacity: 0.7;
+        color: rgba(0, 0, 0, 0.6);
       }
     }
   }

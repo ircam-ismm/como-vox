@@ -253,14 +253,19 @@ class PlayerExperience extends AbstractExperience {
     }
 
     console.log('> hasDeviceMotion', this.como.hasDeviceMotion);
-
+    let errorFlag = false;
     const sensorTest = e => {
-      source.removeListener(sensorTest);
+      source.removeListener(sensorTest); // this doesn't work...
       // do not allow frame rate higher than 20ms
-      if (e.metas.period > 0.02 && !this.state['mockSensors']) {
+      if (e.metas.period > 0.02 && !this.state['mockSensors'] && !errorFlag) {
         console.log('Invalid Sensor Rate', e.metas.period);
         this.guiState.showInvalidSensorFramerateScreen = true;
         this.render();
+
+        let msg = `Aborting: sensors framerate is ${e.metas.period}s`;
+        this.logWriter.write(`[${new Date().toString()}] ${msg}`);
+
+        errorFlag = true;
       }
     };
 

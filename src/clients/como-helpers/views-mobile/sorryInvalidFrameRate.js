@@ -15,8 +15,8 @@ export function sorryInvalidFrameRate(data, listeners) {
         margin-left: 20px;
       "
     >
-      Le taux de rachaichissement des capteurs<br />
-      est trop bas pour le bon fonctionnement<br />
+      La précision des capteurs de mouvement<br />
+      est insuffisante pour le bon fonctionnement<br />
       de l'application<br />
       <br />
       Merci d'essayer en utilisant Google Chrome

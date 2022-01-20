@@ -58,7 +58,7 @@ footer {
     max-height: 150px;
     display: block;
     margin: 10px auto;
-    background-image: url('../images/logo.png');
+    background-image: url('../images/logo-yellow.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: 50% 50%;
@@ -68,7 +68,7 @@ footer {
     width: 40%;
     max-width: 128px;
     display: block;
-    background-color: $primary-color;
+    background-color: $secondary-color; //$primary-color;
     border-radius: 50%;
     margin: 60px auto;
 
@@ -104,9 +104,9 @@ header {
 
   .title {
     width: 100%;
-    height: 49px;
-    margin: 0;
-    background-image: url(../images/logo.png);
+    height: 28px; //49px avec logo.png
+    margin: 1; //0
+    background-image: url(../images/logo-yellow.png);
     background-size: contain;
     background-repeat: no-repeat;
     margin-left: 20px;

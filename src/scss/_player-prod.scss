@@ -233,6 +233,7 @@ header {
       border-radius: 4px;
       font-weight: bold;
       font-size: 0.9rem;
+      white-space: nowrap;
 
       &:nth-child(odd) {
         margin-right: 2px;

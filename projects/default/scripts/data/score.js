@@ -19,6 +19,7 @@ function scoreData(graph, helpers, outputFrame) {
   };
 
   let scoreData = null;
+  let scoreDataChanged = false;
 
   let scoreTempo = undefined;
   let scoreTempoChange = false;
@@ -72,6 +73,7 @@ function scoreData(graph, helpers, outputFrame) {
         scoreTimeSignatureChange = true;
       }
     }
+    scoreDataChanged = true;
   };
 
   const setPlayback = (playback) => {
@@ -174,6 +176,7 @@ function scoreData(graph, helpers, outputFrame) {
 
       if(!parameters.playback || !scoreData) {
         outputData['score'] = {
+          dataChanged: scoreDataChanged,
           tempo: outputTempo,
           timeSignature: outputTimeSignature,
         };
@@ -263,6 +266,7 @@ function scoreData(graph, helpers, outputFrame) {
       }
 
       outputData['score'] = {
+        dataChanged: scoreDataChanged,
         tempo: outputTempo,
         timeSignature: outputTimeSignature,
       };
@@ -287,6 +291,7 @@ function scoreData(graph, helpers, outputFrame) {
       // notesContainer['score'] = notes;
       // outputData['notes'] = notesContainer;
 
+      scoreDataChanged = false;
       return outputFrame;
     },
 

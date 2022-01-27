@@ -12,6 +12,12 @@ export function playerProd(data) {
                       ? Math.round(data.scoreData.masterTrack.tempo
                                    * data.scoreData.masterTrack.timeSignature.division / 4)
                       : 0);
+
+  const tempoReference = (data.scoreData
+                          ? Math.round(data.tempoReference
+                                       * data.scoreData.masterTrack.timeSignature.division / 4)
+                          : Math.round(data.tempoReference) );
+
   let scoreDivisionName = 'noire';
 
   if (data.scoreData) {
@@ -418,7 +424,7 @@ export function playerProd(data) {
         <div class="tempo-reference">
           <span class="label">Tempo de référence</span>
           <input
-            value="${data.scoreData ? scoreTempo : 0}"
+            value="${tempoReference}"
             type="number"
             class="value"
             @blur="${e => {

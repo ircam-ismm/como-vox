@@ -477,7 +477,6 @@ export default {
     metas: {
       exported: false,
     },
-    immediate: true,
   },
 
   scoreUi: {
@@ -528,6 +527,7 @@ export default {
   tempo: {
     type: 'float',
     default: 80,
+    immediate: true,
   },
 
   tempoLimits: {
@@ -558,6 +558,7 @@ export default {
   timeSignature: {
     type: 'any',
     default: {count: 4, division: 4},
+    immediate: true,
   },
 
   timeSignatureUi: {

@@ -388,6 +388,12 @@ class PlayerExperience extends AbstractExperience {
       }
 
       this.updateLookAhead({allowMoreIncrement: 0});
+
+      if(score && score.dataChanged) {
+        if(typeof this.setScoreCallback === 'function') {
+          this.setScoreCallback();
+        }
+      }
     });
 
     window.addEventListener('resize', () => this.render());
@@ -515,9 +521,6 @@ class PlayerExperience extends AbstractExperience {
             }
             try {
               await this.setScore(scoreURI);
-              if(typeof this.setScoreCallback === 'function') {
-                this.setScoreCallback();
-              }
               this.render();
             } catch (error) {
               console.error('Error while loading score: ' + error.message);
@@ -859,6 +862,7 @@ class PlayerExperience extends AbstractExperience {
                 : null),
       syncTime,
       tempo: this.tempo, // override state tempo which is reference tempo
+      tempoReference: this.tempoReference,
       voxApplicationState: this.voxApplicationState,
       voxPlayerState: this.voxPlayerState,
 

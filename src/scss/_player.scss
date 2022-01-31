@@ -150,6 +150,12 @@
     }
   }
 
+  .scoreUrlOpen {
+    input {
+      width: 100%;
+    }
+  }
+
   button.playback,
   button.scenarioPlayback {
     font-size: 3rem;

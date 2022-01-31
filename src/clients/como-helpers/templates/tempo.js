@@ -18,7 +18,7 @@ export function tempo(data) {
 
   return (data.uiConfiguration || groupUi ? html`
       <div class="${groupClasses(data, 'tempo', groupUi)}">
-        <span class="title text${extraClasses(groupUi)}">Tempo</span>
+        <span class="title text ${extraClasses(groupUi)}">Tempo</span>
 
         ${data.uiConfiguration || data.tempoUi ? html`
         <span class="${elementClasses(data, 'tempo')}">

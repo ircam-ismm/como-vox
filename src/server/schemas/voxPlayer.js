@@ -486,9 +486,14 @@ export default {
     },
   },
 
-  scoreUi: {
+  scoreFilesUi: {
     type: 'boolean',
     default: true,
+  },
+
+  scoreUrlOpenUi: {
+    type: 'boolean',
+    default: false,
   },
 
   sessionNameUi: {

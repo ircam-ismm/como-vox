@@ -15,6 +15,13 @@ if(!origin || origin === 'null') {
 
 const e = {};
 
+const validationPattern = new RegExp(/^(ftp|http|https):\/\/[^ "]+$/);
+
+export function validate(URI) {
+  return validationPattern.test(URI);
+}
+Object.assign(e, {validate});
+
 // Base URI of window.location, without optional parameters.
 // Be sure to include window.location.pathname to allow for non-root URL.
 export const base = origin + window.location.pathname;

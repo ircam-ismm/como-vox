@@ -510,7 +510,11 @@ class PlayerExperience extends AbstractExperience {
             this.updateFromEvent(key, value);
             let scoreURI;
             const scoreURIbase = this.state[key];
-            if(!scoreURIbase || scoreURIbase === 'none') {
+
+            if (url.validate(name) ) {
+              scoreURI = name;
+            }
+            else if (!scoreURIbase || scoreURIbase === 'none') {
               scoreURI = null;
             } else {
               scoreURI = encodeURI(url.base

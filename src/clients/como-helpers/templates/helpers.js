@@ -44,6 +44,13 @@ export function getPosition (event) {
 }
 Object.assign(e, {getPosition});
 
+export function getInputValue (event) {
+  const parentElement = event.srcElement.parentElement.parentElement;
+  const value = parentElement.querySelector('input').value;
+  return value;
+}
+Object.assign(e, {getInputValue});
+
 export function selfSelect(event) {
   const element = event.srcElement;
   try {

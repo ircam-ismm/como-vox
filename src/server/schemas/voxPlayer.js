@@ -567,6 +567,11 @@ export default {
     event: true,
   },
 
+  tempoResetUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   tempoUi: {
     type: 'boolean',
     default: true,

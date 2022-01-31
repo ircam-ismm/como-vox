@@ -12,6 +12,7 @@ const e = {};
 
 export function tempo(data) {
   const groupUi = data.tempoUi
+        || data.tempoResetUi
         || data.scoreControlsTempoUi
         || data.tempoLimitsUi;
   const voxPlayerState = data.voxPlayerState;
@@ -36,11 +37,17 @@ export function tempo(data) {
                        tempo: (parseFloat(
                        e.srcElement.value * 4 / data.timeSignature.division) || 60) }) } }"
           >
+          ${data.uiConfiguration ? displayToggle(data, 'tempoUi') : ''}
+        </span>
+        ` : ''}
+
+        ${data.uiConfiguration || data.tempoResetUi ? html`
+        <span class="${elementClasses(data, 'tempoReset')}">
 
           <button class="trigger tempo"
                   @click="${e => voxPlayerState.set({tempoReset: true}) }"
           >Remettre</button>
-          ${data.uiConfiguration ? displayToggle(data, 'tempoUi') : ''}
+          ${data.uiConfiguration ? displayToggle(data, 'tempoResetUi') : ''}
         </span>
         ` : ''}
 

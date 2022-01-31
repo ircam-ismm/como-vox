@@ -486,6 +486,11 @@ export default {
     },
   },
 
+  scoreFileOpenUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   scoreFilesUi: {
     type: 'boolean',
     default: true,

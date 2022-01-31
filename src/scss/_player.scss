@@ -151,9 +151,20 @@
   }
 
   .scoreUrlOpen {
+    width: 100%;
+    display: inline-flex;
+    flex-flow: row wrap;
+
     input {
-      width: 100%;
+      flex: 1 1 auto;
+      margin: 0.5rem;
     }
+
+    button {
+      flex: 0 0 auto;
+      margin: 0.5rem;
+    }
+
   }
 
   button.playback,

@@ -15,12 +15,28 @@ if(!origin || origin === 'null') {
 
 const e = {};
 
-const validationPattern = new RegExp(/^(ftp|http|https):\/\/[^ "]+$/);
+const UrlValidationPattern = new RegExp('^(ftp|http|https)://[^ "]+$');
+const dataUrlValidationPAttern = new RegExp('^data:.*,[^ "]+$');
+const blobValidationPattern = new RegExp('^blob:[^ "]+$');
 
-export function validate(URI) {
-  return validationPattern.test(URI);
+export function type(URI) {
+  let type;
+
+  if(URI === null) {
+    type = 'null';
+  } else if(UrlValidationPattern.test(URI) ) {
+    type = 'url';
+  } else if (dataUrlValidationPAttern.test(URI) ) {
+    type = 'dataUrl';
+  } else if (blobValidationPattern.test(URI) ) {
+    type = 'blob';
+  } else {
+    type = 'other';
+  }
+
+  return type;
 }
-Object.assign(e, {validate});
+Object.assign(e, {type});
 
 // Base URI of window.location, without optional parameters.
 // Be sure to include window.location.pathname to allow for non-root URL.

@@ -7,7 +7,9 @@ import {
   elementClasses,
   extraClasses,
   getInputValue,
+  getInputFile,
   groupClasses,
+  selfSelect,
 } from './helpers.js';
 
 const e = {};
@@ -24,12 +26,23 @@ function valueToFileName(value) {
 function valueToDisplay(value) {
   let display;
 
-  if(url.validate(value) ) {
-    display = 'lien';
-  } else if(value === 'none') {
-    display = 'aucune';
-  } else {
-    display = value;
+  switch(url.type(value) ) {
+    case 'null':
+      display = 'aucune';
+      break;
+
+    case 'url':
+      display = 'lien';
+      break;
+
+    case 'dataUrl':
+    case 'blob':
+      display = 'fichier';
+      break;
+
+    default:
+      display = value;
+      break;
   }
 
   return display;
@@ -37,6 +50,7 @@ function valueToDisplay(value) {
 
 export function score(data) {
   const groupUi = data.scoreFilesUi
+        || data.scoreFileOpenUi
         || data.scoreUrlOpenUi;
   const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
@@ -48,7 +62,7 @@ export function score(data) {
         ${data.uiConfiguration || data.scoreFilesUi ? html`
         <span class="${elementClasses(data, 'scoreFile')}">
           <select class="${
-                    !url.validate(data.scoreFileName) && !data.scoreReady
+                    url.type(data.scoreFileName) === 'other' && !data.scoreReady
                     ? 'invalid'
                     : ''}"
                   .value=${fileNameToValue(data.scoreFileName) }
@@ -73,11 +87,15 @@ export function score(data) {
         ${data.uiConfiguration || data.scoreUrlOpenUi ? html`
         <span class="${elementClasses(data, 'scoreUrlOpen')}">
           <input class="${
-                    url.validate(data.scoreFileName) && !data.scoreReady
+                    url.type(data.scoreFileName) === 'other' && !data.scoreReady
                     ? 'invalid'
-                    : ''}"type="url"
-                .value=${url.validate(data.scoreFileName) ? data.scoreFileName : ''}
-                placeholder="https://"
+                    : ''}"
+                 type="url"
+                 @click="${e => selfSelect(e)}"
+                 .value=${url.type(data.scoreFileName) === 'url'
+                          ? data.scoreFileName
+                          : ''}
+                 placeholder="(coller le lien ici)"
           >
           <button @click="${e => {
              const scoreFileName = getInputValue(e);
@@ -89,7 +107,37 @@ export function score(data) {
         </span>
         ` : ''}
 
+        ${data.uiConfiguration || data.scoreFileOpenUi ? html`
+        <span class="${elementClasses(data, 'scoreFileOpen')}">
+          <input type="file"
+                 accept="audio/midi"
+                 hidden
+                 @change="${e => {
+                   console.log('inputFile.click()', e);
+                   event.preventDefault();
+                   const fileList = e.target.files;
+                   for (let i = 0, numFiles = fileList.length; i < numFiles; i++) {
+                     const file = fileList[i];
+                     console.log('file', file);
+                     const reader = new FileReader();
+                     reader.addEventListener("load", () => {
+                       voxPlayerState.set({scoreFileName: reader.result});
+                     });
+                     reader.readAsDataURL(file);
+                   }
 
+                 } }"
+          >
+          <button @click="${e => {
+             console.log('button.click()', e);
+             const inputFile = getInputFile(e);
+             inputFile.click(event);
+           } }"
+          >Ouvrir un fichier</button>
+
+          ${data.uiConfiguration ? displayToggle(data, 'scoreFileOpenUi') : ''}
+        </span>
+        ` : ''}
 
       </div>
       ` : '');

@@ -51,6 +51,13 @@ export function getInputValue (event) {
 }
 Object.assign(e, {getInputValue});
 
+export function getInputFile (event) {
+  const parentElement = event.srcElement.parentElement.parentElement;
+  const inputFile = parentElement.querySelector('input[type=file]');
+  return inputFile;
+}
+Object.assign(e, {getInputFile});
+
 export function selfSelect(event) {
   const element = event.srcElement;
   try {

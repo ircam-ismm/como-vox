@@ -511,7 +511,11 @@ class PlayerExperience extends AbstractExperience {
             let scoreURI;
             const scoreURIbase = this.state[key];
 
-            if (url.validate(name) ) {
+            const urlType = url.type(name);
+
+            if (urlType === 'url'
+                || urlType === 'dataUrl'
+                || urlType === 'blob') {
               scoreURI = name;
             }
             else if (!scoreURIbase || scoreURIbase === 'none') {

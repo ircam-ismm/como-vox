@@ -73,6 +73,14 @@ export default {
     default: false,
   },
 
+  editorGUI: {
+    type: 'boolean',
+    default: false,
+    metas: {
+      exported: false,
+    },
+  },
+
   gestureAdaptationIntensityMode: {
     type: 'string',
     default: 'normal',

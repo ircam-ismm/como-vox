@@ -245,7 +245,6 @@ export default {
     default: false,
     metas: {
       exported: false,
-      stored: true,
     },
   },
 

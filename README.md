@@ -4,6 +4,13 @@
 
 ### V1
 
+- [ ] Calibration
+  - [ ] faire un vrai mode de scénario
+  - [ ] mettre un bouton dans l'interface principale (réduire le logo)
+  - [ ] quand on clique sur tempo et qu'on calibre la première fois, il faudrait revenir à tempo (et pas à nuance, le mode précédent)
+
+- [ ] Départ : affichage du play suivant `scenarioPlayback`
+
 Jean-Philippe :
 - [ ] latence min / max
 - [ ] info : dire « trop tôt » et « trop tard » plutôt qu'annulé pour la calibration et la latence
@@ -12,9 +19,9 @@ Jean-Philippe :
   - [ ] Mozart à 82
   - [ ] enlever les morceaux inutiles ou de mauvaise qualité
 
-- [ ] Permettre de charger un fichier (bien pour tester les nouvelles partitions
-- [ ] Permettre de charger une URL
-  - [ ] depuis l'interface et depuis un paramètre
+- [x] Permettre de charger un fichier (bien pour tester les nouvelles partitions
+- [x] Permettre de charger une URL
+  - [x] depuis l'interface et depuis un paramètre
 
   - [ ] messages locaux dans l'interface (1 à 2 secondes pour attendre la mise en route ou l'arrêt c'est trop long, ne coupe pas si déconnecté)
   - [ ] vérifier les messages qui transitent par le réseau en continu (ralentissement de pire en pire au fur et à mesure de l'utilisation)
@@ -50,12 +57,12 @@ Jean-Philippe :
 - [x] réglage de la plage de dynamique [-] [neutre] [+]
 - [x] départ : possibilité d’écouter l’original
 
-- [ ] define logs
-  - [ ] plugin logger
-  - [ ] errors and log from clients
+- [x] define logs
+  - [x] plugin logger
+  - [x] errors and log from clients
   - [ ] currents settings as meta-data
-  - [ ] user-agent
-  - [ ] audio settings (latency)
+  - [x] user-agent
+  - [x] audio settings (latency)
 
 
 Benjamin (deadline 17/01) :
@@ -84,9 +91,9 @@ Benjamin (deadline 17/01) :
 - [x] fonts... (cf. old soundworks)
 
 - [x] ajouter les logs (1 fichier par client) - install service
-  - [ ] général, pour l'utilisation
-  - [ ] erreurs, à test `window.addEventListener('error', err => {});``
-  - [ ] latence et user-agent 
+  - [x] général, pour l'utilisation
+  - [x] erreurs, à test `window.addEventListener('error', err => {});``
+  - [x] latence et user-agent 
 
 -> needs
 - [x] Pas de battue possible avec Firefox
@@ -109,8 +116,8 @@ Benjamin (deadline 17/01) :
 - [?] sélectionner le texte des `input` en édition (pour remplacer facilement le chiffre)
 
 Fred :
-- [ ] texte crédits
-- [ ] définir où on met les logos
+- [x] texte crédits
+- [x] définir où on met les logos
 
 ### Questions courantes (FAQ)
 
@@ -127,6 +134,8 @@ Fred :
 ### V2
 
 Jean-Philippe :
+
+- [ ] possibilité d'avoir des accents (sur le temps) en mode `nuances`
 
 - [ ] après un arrêt, reprise depuis la mesure courante
 - [ ] transposition
@@ -164,8 +173,8 @@ Quality of Service
 - do not disconnect (fine with local-only)
 
 Load MIDI
-- [ ] from file
-- [ ] from URL
+- [x] from file
+- [x] from URL
 
 Bugs:
  - [x] intensity drops
@@ -193,7 +202,7 @@ Bugs:
   - [ ] transposition: advanced settings
   - [x] choose bar (number or slider): advanced settings
   - [ ] start end, loop: advanced settings
-- [ ] intensity
+- [x] intensity
   - [x] lookahead: float 1/2 beat NO: better 1 quarter note
   - [x] smooth, specially on diminuendo
   - [x] relative intensity

@@ -6,6 +6,7 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 import {EventEmitter} from 'events'; // node.js or babel
 import {Blocked} from '@ircam/blocked';
 
+import log from '../shared/log.js';
 import url from '../shared/url.js';
 import schema from '../../shared/schema.js';
 import storage from '../shared/storage.js';
@@ -196,12 +197,12 @@ class PlayerExperience extends AbstractExperience {
     await super.start();
 
     this.logWriter = await this.logger.create(`client-${this.como.client.id}.txt`);
-    this.logWriter.write(`[${new Date().toString()}] ${navigator.userAgent}`);
+    this.log(navigator.userAgent);
 
     window.addEventListener('error', (err) => {
       // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
       let msg = `${err.message} ${err.filename}:${err.lineno}`;
-      this.logWriter.write(`[${new Date().toString()}] ${msg}`);
+      this.log(msg);
     });
 
     // setTimeout(() => { throw new Error('test log') }, 5000);
@@ -229,11 +230,6 @@ class PlayerExperience extends AbstractExperience {
     this.voxPlayerState.subscribe(async (updates) => {
       for (let [key, value] of Object.entries(updates) ) {
         this.updateFromState(key, value);
-
-        if (key === 'audioLatencyMeasured') {
-          console.log('> audioLatencyMeasured', parseInt(updates.audioLatencyMeasured * 1e3));
-          this.logWriter.write(`[${new Date().toString()}] latency: ${updates.audioLatencyMeasured}`);
-        }
       }
 
       // update URL on state change, to avoid update for each parameter
@@ -263,7 +259,7 @@ class PlayerExperience extends AbstractExperience {
         this.render();
 
         let msg = `Aborting: sensors framerate is ${e.metas.period}s`;
-        this.logWriter.write(`[${new Date().toString()}] ${msg}`);
+        this.log(msg);
 
         errorFlag = true;
       }
@@ -411,6 +407,11 @@ class PlayerExperience extends AbstractExperience {
     setInterval(() => {
       this.render();
     }, 1000);
+  }
+
+  log(message) {
+    // console.info(`[log] ${message}`);
+    this.logWriter.write(`[${log.date()}] ${message}`);
   }
 
   // playerProd only - might be removed later
@@ -687,6 +688,9 @@ class PlayerExperience extends AbstractExperience {
 
     this.audioLatency = audioLatency;
     this.events.emit('audioLatency', audioLatency);
+
+    const message = (`audioLatencyMeasured: ${this.state.audioLatencyMeasured}; audioLatencyAdaptation ${this.state.audioLatencyAdaptation}; audioLatency: ${this.audioLatency}`);
+    this.log(message);
     this.updateLookAhead();
   }
 

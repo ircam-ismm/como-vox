@@ -113,12 +113,10 @@ export function score(data) {
                  accept="audio/midi"
                  hidden
                  @change="${e => {
-                   console.log('inputFile.click()', e);
                    event.preventDefault();
                    const fileList = e.target.files;
                    for (let i = 0, numFiles = fileList.length; i < numFiles; i++) {
                      const file = fileList[i];
-                     console.log('file', file);
                      const reader = new FileReader();
                      reader.addEventListener("load", () => {
                        voxPlayerState.set({scoreFileName: reader.result});
@@ -129,7 +127,6 @@ export function score(data) {
                  } }"
           >
           <button @click="${e => {
-             console.log('button.click()', e);
              const inputFile = getInputFile(e);
              inputFile.click(event);
            } }"

@@ -9,7 +9,9 @@
   - [ ] mettre un bouton dans l'interface principale (réduire le logo)
   - [ ] quand on clique sur tempo et qu'on calibre la première fois, il faudrait revenir à tempo (et pas à nuance, le mode précédent)
 
-- [ ] Départ : affichage du play suivant `scenarioPlayback`
+- [x] Départ : affichage du play suivant `scenarioPlayback` et arrêt
+
+- [ ] faire la battue 6/8 à la noire pointée
 
 Jean-Philippe :
 - [ ] latence min / max

@@ -136,9 +136,11 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
     // stop
     if(parameters.scenarioStartStopWithBeating
        && (parameters.playback === true && updates.playback === false
-           || parameters.scenarioPlayback && updates.scenarioPlayback === false)
+           || parameters.scenarioPlayback === true && updates.scenarioPlayback === false)
        && status !== 'off') {
       statusUpdate('off');
+      app.events.emit('gestureControlsPlaybackStart', false);
+      app.events.emit('gestureControlsPlaybackStop', false);
       app.events.emit('scenarioPlayback', false);
       app.events.emit('playback', false);
     }
@@ -168,7 +170,6 @@ function scenarioStartStopWithBeating(graph, helpers, outputFrame) {
             // declare own parameters
             ...[
               'beatGestureWaitingDurationMax',
-              'gestureControlsPlaybackStart',
               'gestureControlsPlaybackStartStatus',
               'playback',
               'playbackStopSeek',

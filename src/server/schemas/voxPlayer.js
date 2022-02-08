@@ -439,6 +439,21 @@ export default {
     nullable: true,
   },
 
+  scoreFileCloseUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  scoreFileOpenUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  scoreFilesUi: {
+    type: 'boolean',
+    default: true,
+  },
+
   scoreIntensityCompressionMax: {
     type: 'float',
     default: 120, // keep some headroom
@@ -484,16 +499,6 @@ export default {
     metas: {
       exported: false,
     },
-  },
-
-  scoreFileOpenUi: {
-    type: 'boolean',
-    default: false,
-  },
-
-  scoreFilesUi: {
-    type: 'boolean',
-    default: true,
   },
 
   scoreUrlOpenUi: {

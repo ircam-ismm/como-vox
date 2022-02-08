@@ -41,7 +41,11 @@ function valueToDisplay(value) {
       break;
 
     default:
-      display = value;
+      if(value === 'none') {
+        display = 'aucune';
+      } else {
+        display = value;
+      }
       break;
   }
 
@@ -51,6 +55,7 @@ function valueToDisplay(value) {
 export function score(data) {
   const groupUi = data.scoreFilesUi
         || data.scoreFileOpenUi
+        || data.scoreFileCloseUi
         || data.scoreUrlOpenUi;
   const voxApplicationState = data.voxApplicationState;
   const voxPlayerState = data.voxPlayerState;
@@ -133,6 +138,17 @@ export function score(data) {
           >Ouvrir un fichier</button>
 
           ${data.uiConfiguration ? displayToggle(data, 'scoreFileOpenUi') : ''}
+        </span>
+        ` : ''}
+
+        ${data.uiConfiguration || data.scoreFileCloseUi ? html`
+        <span class="${elementClasses(data, 'scoreFileClose')}">
+          <button @click="${e => {
+             voxPlayerState.set({scoreFileName: null});
+           } }"
+          >Fermer</button>
+
+          ${data.uiConfiguration ? displayToggle(data, 'scoreFileCloseUi') : ''}
         </span>
         ` : ''}
 

@@ -197,7 +197,8 @@ class PlayerExperience extends AbstractExperience {
     await super.start();
 
     this.logWriter = await this.logger.create(`client-${this.como.client.id}.txt`);
-    this.log(navigator.userAgent);
+    this.log(`navigator.userAgent: ${navigator.userAgent}`);
+    this.log(`navigator.userAgentData: ${JSON.stringify(navigator.userAgentData)}`);
 
     window.addEventListener('error', (err) => {
       // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent

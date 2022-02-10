@@ -42,9 +42,17 @@ describe(`Check beats conversion helpers`, () => {
     [{tempo: 60, timeSignature: {division: 4}},
      1,
      1],
+    // half-note and a half
+    [{tempo: 60, timeSignature: {division: 4/3}},
+     1,
+     3],
     [{tempo: 60, timeSignature: {division: 8}},
      1,
      0.5],
+    // quarter-note and a half
+    [{tempo: 60, timeSignature: {division: 8/3}},
+     1,
+     1.5],
     [{tempo: 60, timeSignature: {division: 8}},
      -1,
      -0.5],

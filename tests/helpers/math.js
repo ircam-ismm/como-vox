@@ -5,6 +5,7 @@ import {assertWithRelativeError} from '../shared/utils.js';
 
 import {
   almostEquals,
+  closest,
   modulo,
   median,
   mean,
@@ -33,6 +34,28 @@ describe(`Check almostEquals`, () => {
       const result = almostEquals(values[0], values[1], values[2]);
 
       assert.equal(result, values[3], message);
+    });
+
+  });
+});
+
+describe(`Check closest`, () => {
+
+  const testValues = [
+    [ [1, 2, 3, 4, 5], 0, 1],
+    [ [1, 2, 3, 4, 5], 1, 1],
+    [ [1, 2, 3, 4, 5], 2, 2],
+    [ [1, 2, 3, 4, 5], 2.2, 2],
+    [ [1, 2, 3, 4, 5], 6, 5],
+    [ [1, 2, 3, 4, 5], 5, 5],
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const message = `closest ${JSON.stringify({values})}`;
+      const result = closest(values[0], values[1]);
+
+      assert.equal(result, values[2], message);
     });
 
   });

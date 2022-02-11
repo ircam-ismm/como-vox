@@ -13,6 +13,15 @@ export function almostEquals(value, reference, tolerance = Number.EPSILON) {
 }
 Object.assign(e, {almostEquals});
 
+export function closest(values, target) {
+  return values.reduce( (previous, current) => {
+    return (Math.abs(current - target) < Math.abs(previous - target)
+            ? current
+            : previous);
+  });
+}
+Object.assign(e, {closest});
+
 // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder
 export function modulo(value, modulus) {
   return ( ( (value) % modulus ) + modulus) % modulus;

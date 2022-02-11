@@ -1,6 +1,7 @@
 import {html} from 'lit-html';
 
 import {audioIntensity} from './audioIntensity.js';
+import {beating} from './beating.js';
 import {clock} from './clock.js';
 import {gestureControl} from './gestureControl.js';
 import {gestureIntensity} from './gestureIntensity.js';
@@ -27,6 +28,7 @@ export function player(data) {
     ${scenario(data)}
     ${score(data)}
     ${tempo(data)}
+    ${beating(data)}
     ${audioIntensity(data)}
     ${scoreIntensity(data)}
     ${gestureIntensity(data)}

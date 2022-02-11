@@ -58,6 +58,28 @@ export default {
     default: false,
   },
 
+  beatingUnit: {
+    type: 'float',
+    // 1 eighth note: 1/8
+    // 1 dotted quarter note: count: 1.5/4
+    default: 1/4,
+  },
+
+  beatingUnitUi: {
+    type: 'boolean',
+    default: false,
+  },
+
+  beatingUnitMode: {
+    type: 'string',
+    default: 'auto', // 'auto', 'timeSignature' or 'fixed'
+  },
+
+  beatingUnitModeUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   clockTimeUi: {
     type: 'boolean',
     default: false,

@@ -115,6 +115,12 @@
     background-color: color.$group-background-color;
   }
 
+  .beating {
+    select {
+      width: fit-content;
+    }
+  }
+
   .clockTime {
     .text {
       font-size: 60px;

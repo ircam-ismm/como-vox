@@ -4,6 +4,7 @@ import {assert, should} from 'chai';
 import {assertWithRelativeError} from '../shared/utils.js';
 
 import {
+  almostEquals,
   modulo,
   median,
   mean,
@@ -14,6 +15,28 @@ import {
 } from '../../src/server/helpers/math.js';
 
 const epsilon = 1e-7;
+
+describe(`Check almostEquals`, () => {
+
+  const testValues = [
+    [1, 1 + 1e-6, 2e-6, true],
+    [1, 1 - 1e-6, 2e-6, true],
+    [-1, -1 + 1e-6, 2e-6, true],
+    [-1, -1 - 1e-6, 2e-6, true],
+    [5, 6, 0.5, false],
+    [5, 6, 1.1, true],
+ ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const message = `almostEquals ${JSON.stringify({values})}`;
+      const result = almostEquals(values[0], values[1], values[2]);
+
+      assert.equal(result, values[3], message);
+    });
+
+  });
+});
 
 describe(`Check modulo`, () => {
 

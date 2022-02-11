@@ -1,5 +1,18 @@
 const e = {};
 
+/**
+ * Test whether a value is around a reference, given a tolerance.
+ *
+ * @param {Number} value
+ * @param {Number} reference
+ * @param {Number} [tolerance=Number.EPSILON]
+ * @returns {Number} Math.abs(value - reference) <= tolerance;
+ */
+export function almostEquals(value, reference, tolerance = Number.EPSILON) {
+  return Math.abs(value - reference) <= tolerance;
+}
+Object.assign(e, {almostEquals});
+
 // cf. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder
 export function modulo(value, modulus) {
   return ( ( (value) % modulus ) + modulus) % modulus;

@@ -55,6 +55,7 @@ export function playerProd(data) {
           } else {
             guiState.showAdvancedSettings = !guiState.showAdvancedSettings;
           }
+          guiState.showTip = null;
 
           exp.updateGuiState(guiState);
         }}"
@@ -217,6 +218,7 @@ export function playerProd(data) {
                 }
 
                 guiState.showCalibrationScreen = false;
+                guiState.showTip = null;
                 exp.updateGuiState(guiState);
               }}"
             >Retour</button>
@@ -234,6 +236,7 @@ export function playerProd(data) {
               class="close"
               @click="${e => {
                 guiState.showCreditsScreen = false;
+                guiState.showTip = null;
                 exp.updateGuiState(guiState);
               }}"
             ></button>
@@ -271,6 +274,7 @@ export function playerProd(data) {
         class="main"
         @click="${e => {
           if (guiState.showAdvancedSettings === true) {
+            guiState.showTip = null;
             guiState.showAdvancedSettings = false;
             exp.updateGuiState(guiState);
           }
@@ -337,6 +341,33 @@ export function playerProd(data) {
           <p>
             Sélectionner un exercice
           </p>
+          ${data.audioLatencyMeasured === null ?
+            html`
+              <div class="tip"
+                @click="${e => {
+                  if (guiState.showTip === 'locked-exercise') {
+                    guiState.showTip = null;
+                  } else {
+                    guiState.showTip = 'locked-exercise';
+                  }
+
+                  exp.updateGuiState(guiState);
+                }}"
+              >
+                <div class="icon"></div>
+                ${guiState.showTip === 'locked-exercise' ?
+                  html`
+                    <div class="details-locked-exercise">
+                      Les modes <i>Tempo</i>, <i>Départ</i> et <i>Tempo & Nuance</i>
+                      requièrent une étape spéciale pour adapter votre téléphone à
+                      votre geste. Pour débloquer ces modes cliquez sur un des boutons
+                      et suivez les instructions !
+                    </div>
+                  ` : nothing
+                }
+              </div>
+            ` : nothing
+          }
           <button
             class="${data.scenarioCurrent === 'scenarioIntensity' ? 'selected' : ''}"
             @click="${e => {
@@ -348,12 +379,13 @@ export function playerProd(data) {
             }}"
           >Nuance</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}"
+            class="${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
               if (data.audioLatencyMeasured === null) {
                 guiState.showCalibrationScreen = true;
+                guiState.showTip = null;
                 exp.updateGuiState(guiState);
               } else if (data.scenarioCurrent !== 'scenarioTempo') {
                 voxPlayerState.set({ scenarioTempo: true });
@@ -361,12 +393,13 @@ export function playerProd(data) {
             }}"
           >Tempo</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}"
+            class="${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
               if (data.audioLatencyMeasured === null) {
                 guiState.showCalibrationScreen = true;
+                guiState.showTip = null;
                 exp.updateGuiState(guiState);
               } else if (data.scenarioCurrent !== 'scenarioTempoIntensity') {
                 voxPlayerState.set({ scenarioTempoIntensity: true });
@@ -374,12 +407,13 @@ export function playerProd(data) {
             }}"
           >Tempo & Nuance</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}"
+            class="${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
               if (data.audioLatencyMeasured === null) {
                 guiState.showCalibrationScreen = true;
+                guiState.showTip = null;
                 exp.updateGuiState(guiState);
               } else if (data.scenarioCurrent !== 'scenarioStartStopWithBeating') {
                 voxPlayerState.set({ scenarioStartStopWithBeating: true });
@@ -448,11 +482,26 @@ export function playerProd(data) {
             }}"
           ></button>
         </div>
+
+        <button
+          class="calibration-button"
+          @click="${e => {
+            if (guiState.showAdvancedSettings) {
+              data.voxPlayerState.set({ scenarioPlayback: false });
+            }
+
+            guiState.showAdvancedSettings = false;
+            guiState.showCalibrationScreen = true;
+            guiState.showTip = null;
+            exp.updateGuiState(guiState);
+          }}"
+        >Calibration</button>
       </div>
     </section>
     <footer
       @click="${e => {
         guiState.showCreditsScreen = !guiState.showCreditsScreen;
+        guiState.showTip = null;
         exp.updateGuiState(guiState);
       }}"
     >

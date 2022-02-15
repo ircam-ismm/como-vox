@@ -483,19 +483,25 @@ export function playerProd(data) {
           ></button>
         </div>
 
-        <button
-          class="calibration-button"
-          @click="${e => {
-            if (guiState.showAdvancedSettings) {
-              data.voxPlayerState.set({ scenarioPlayback: false });
-            }
+        <div class="calibration-button">
+          <span class="label">&nbsp;</span>
+          <button
+            class="value"
+            @click="${e => {
+              if (guiState.showAdvancedSettings) {
+                data.voxPlayerState.set({ scenarioPlayback: false });
+              }
 
-            guiState.showAdvancedSettings = false;
-            guiState.showCalibrationScreen = true;
-            guiState.showTip = null;
-            exp.updateGuiState(guiState);
-          }}"
-        >Calibration</button>
+              guiState.showAdvancedSettings = false;
+              guiState.showCalibrationScreen = true;
+              guiState.showTip = null;
+              exp.updateGuiState(guiState);
+            }}"
+          >Calibration</button>
+        </div>
+
+
+
       </div>
     </section>
     <footer

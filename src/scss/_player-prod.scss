@@ -378,12 +378,12 @@ header {
   }
 
   .calibration-button {
-    width: 100%;
+    width: 128px;
     height: 30px;
     border: 1px solid $border-color;
     border-radius: 4px;
-    background-color: $secondary-color;
-    margin-top: 2px;
+    background-color: white;
+    float: right;
   }
 }
 

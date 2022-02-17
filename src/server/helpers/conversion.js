@@ -188,6 +188,32 @@ export function positionAddSeconds(position, seconds, {
 }
 Object.assign(e, {positionAddSeconds});
 
+/**
+ * Convert a position to a new time-signature.
+ *
+ * @param position to convert to new time-signature
+ * @param reference is position of the last time-signature change
+ * @param timeSignature is original time-signature until position
+ * @param timeSignatureNew is the new time-signature at position
+ *
+ * @return
+ */
+export function positionChangeTimeSignature(position, {
+  reference = positionDefault,
+  timeSignature = timeSignatureDefault,
+  timeSignatureNew = timeSignatureDefault,
+} = {}) {
+  const beatsFromReferenceOriginal = positionsToBeatsDelta(position,
+                                                           reference,
+                                                           {timeSignature});
+  const beatsRatio = timeSignatureNew.division / timeSignature.division;
+  const beatsFromReferenceNew = beatsFromReferenceOriginal * beatsRatio;
+  return positionAddBeats(reference,
+                          beatsFromReferenceNew,
+                          {timeSignature: timeSignatureNew});
+}
+Object.assign(e, {positionChangeTimeSignature});
+
 export function positionRoundBeats(position, {timeSignature = timeSignatureDefault}) {
   return positionAddBeats(
     {
@@ -207,6 +233,15 @@ export function barBeatToPosition(event) {
   return { ...{position}, ...event};
 };
 Object.assign(e, {barBeatToPosition});
+
+export function tempoChangeTimeSignature(tempo, {
+  timeSignature = timeSignatureDefault,
+  timeSignatureNew = timeSignatureDefault,
+} = {}) {
+  const beatsRatio = timeSignatureNew.division / timeSignature.division;
+  return tempo * beatsRatio;
+}
+Object.assign(e, {tempoChangeTimeSignature});
 
 export function timeDeltaToTempo(timeDelta, beatDelta = 1, {
   timeSignature = timeSignatureDefault,

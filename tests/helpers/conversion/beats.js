@@ -12,12 +12,14 @@ import {
   secondsToNotes,
   notesToBeats,
   beatsToNotes,
+  positionAddBeats,
+  positionAddSeconds,
+  positionChangeTimeSignature,
   positionDeltaToSeconds,
   positionsToBeatsDelta,
   positionsToSecondsDelta,
-  positionAddBeats,
-  positionAddSeconds,
   positionRoundBeats,
+  tempoChangeTimeSignature,
   timeDeltaToTempo,
 } from '../../../src/server/helpers/conversion.js';
 
@@ -373,7 +375,7 @@ JSON.stringify({...values[0], positionDelta: values[1]})
 });
 
 
-describe(`Check positionsAddBeats conversion helper`, () => {
+describe(`Check positionAddBeats conversion helper`, () => {
 
   const testValues = [
     [{timeSignature: {count: 4} },
@@ -472,7 +474,7 @@ JSON.stringify({...values[0], position: values[1], beats: values[2]})
   });
 });
 
-describe(`Check positionsAddSeconds conversion helper`, () => {
+describe(`Check positionAddSeconds conversion helper`, () => {
 
   const testValues = [
     [{timeSignature: {count: 4, division: 4}, tempo: 60},
@@ -579,6 +581,79 @@ JSON.stringify({...values[0], position: values[1], seconds: values[2]})
   });
 });
 
+
+describe(`Check positionChangeTimeSignature conversion helper`, () => {
+
+  const testValues = [
+    {
+      position: {bar: 2, beat: 1},
+      timeSignature: {count: 4, division: 4},
+      timeSignatureNew: {count: 8, division: 8},
+      positionExpected: {bar: 2, beat: 1},
+    },
+    {
+      position: {bar: 2, beat: 1},
+      timeSignature: {count: 4, division: 4},
+      timeSignatureNew: {count: 4, division: 8},
+      positionExpected: {bar: 4, beat: 1},
+    },
+    {
+      position: {bar: 3, beat: 1},
+      timeSignature: {count: 4, division: 4},
+      reference: {bar: 2, beat: 1}, // position of time-signature change
+      timeSignatureNew: {count: 4, division: 8},
+      positionExpected: {bar: 4, beat: 1},
+    },
+    {
+      position: {bar: 2, beat: 1},
+      timeSignature: {count: 4, division: 4},
+      timeSignatureNew: {count: 3, division: 4},
+      positionExpected: {bar: 2, beat: 2},
+    },
+    {
+      position: {bar: 1, beat: 4},
+      timeSignature: {count: 6, division: 8},
+      timeSignatureNew: {count: 6/3, division: 8/3}, // dotted quarter-note
+      positionExpected: {bar: 1, beat: 2},
+    },
+    {
+      // no bar change expected
+      position: {bar: 21, beat: 4},
+      timeSignature: {count: 6, division: 8},
+      timeSignatureNew: {count: 6/3, division: 8/3}, // dotted quarter-note
+      positionExpected: {bar: 21, beat: 2},
+    },
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const {
+        position,
+        reference,
+        timeSignature,
+        timeSignatureNew,
+        positionExpected,
+      } = values;
+      const positionResult = positionChangeTimeSignature(position, {
+        reference,
+        timeSignature,
+        timeSignatureNew,
+      });
+
+      assertWithRelativeError(positionResult.beat,
+                              positionExpected.beat,
+                              epsilon,
+                              `beat ${
+JSON.stringify({...values, positionResult})
+}`);
+
+    });
+
+  });
+
+});
+
+
 describe(`Check positionsRoundBeats conversion helper`, () => {
 
   const testValues = [
@@ -620,7 +695,69 @@ JSON.stringify({...values[0], position: values[1] })
 
 });
 
-describe(`Check beatTimeDeltaToTempo conversion helper`, () => {
+describe(`Check tempoChangeTimeSignature conversion helper`, () => {
+
+  const testValues = [
+    {
+      tempo: 60,
+      timeSignature: {count: 4, division: 4},
+      timeSignatureNew: {count: 8, division: 8},
+      tempoExpected: 120,
+    },
+    {
+      tempo: 60,
+      timeSignature: {count: 4, division: 4},
+      timeSignatureNew: {count: 4, division: 8},
+      tempoExpected: 120,
+    },
+    {
+      tempo: 120,
+      timeSignature: {count: 8, division: 8},
+      timeSignatureNew: {count: 4, division: 4},
+      tempoExpected: 60,
+    },
+    {
+      tempo: 60,
+      timeSignature: {count: 4, division: 4},
+      timeSignatureNew: {count: 3, division: 4},
+      tempoExpected: 60,
+    },
+    {
+      tempo: 180,
+      timeSignature: {count: 6, division: 8},
+      timeSignatureNew: {count: 6/3, division: 8/3}, // dotted quarter-note
+      tempoExpected: 60,
+    },
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const {
+        tempo,
+        timeSignature,
+        timeSignatureNew,
+        tempoExpected,
+      } = values;
+      const tempoResult = tempoChangeTimeSignature(tempo, {
+        timeSignature,
+        timeSignatureNew,
+      });
+
+      assertWithRelativeError(tempoResult,
+                              tempoExpected,
+                              epsilon,
+                              `tempo ${
+JSON.stringify({...values, tempoResult})
+}`);
+
+    });
+
+  });
+
+});
+
+
+describe(`Check timeDeltaToTempo conversion helper`, () => {
 
   const testValues = [
     [{timeSignature: {division: 4} },

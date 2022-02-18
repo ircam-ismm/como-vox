@@ -52,7 +52,8 @@ function clickGenerator(graph, helpers, outputFrame) {
       const bar = position.bar;
       const beat = position.beat;
 
-      const trigger = parameters.metronomeSound && position.beatChange;
+      const trigger = parameters.metronomeSound
+            && (position.beatChange || position.barChange);
 
       if(!trigger) {
         // empty notes container
@@ -60,7 +61,7 @@ function clickGenerator(graph, helpers, outputFrame) {
         return outputFrame;
       }
 
-      if(Math.floor(beat) === 1) {
+      if(position.barChange) {
         pitch = pitchHigh;
       } else {
         pitch = pitchLow;

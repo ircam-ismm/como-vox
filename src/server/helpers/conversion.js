@@ -215,7 +215,7 @@ export function positionChangeBeatingUnit(position, {
     },
   });
 }
-Object.assign(e, {positionChangeTimeSignature});
+Object.assign(e, {positionChangeBeatingUnit});
 
 /**
  * Convert a position to a new time-signature.

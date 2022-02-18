@@ -6,24 +6,24 @@ import {assertWithRelativeError} from '../../shared/utils.js';
 const epsilon = 1e-3;
 
 import {
-  beatsToSeconds,
-  secondsToBeats,
-  notesToSeconds,
-  secondsToNotes,
-  notesToBeats,
   beatsToNotes,
+  beatsToSeconds,
+  notesToBeats,
+  notesToSeconds,
   positionAddBeats,
   positionAddSeconds,
   positionChangeBeatingUnit,
   positionChangeTimeSignature,
   positionDeltaToSeconds,
+  positionRoundBeats,
   positionsToBeatsDelta,
   positionsToSecondsDelta,
-  positionRoundBeats,
-  timeSignatureChangeBeatingUnit,
+  secondsToBeats,
+  secondsToNotes,
   tempoChangeBeatingUnit,
   tempoChangeTimeSignature,
   timeDeltaToTempo,
+  timeSignatureChangeBeatingUnit,
 } from '../../../src/server/helpers/conversion.js';
 
 describe(`Check beats conversion helpers`, () => {

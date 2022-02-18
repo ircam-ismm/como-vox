@@ -19,6 +19,8 @@ import {
   positionsToBeatsDelta,
   positionsToSecondsDelta,
   positionRoundBeats,
+  timeSignatureChangeBeatingUnit,
+  tempoChangeBeatingUnit,
   tempoChangeTimeSignature,
   timeDeltaToTempo,
 } from '../../../src/server/helpers/conversion.js';
@@ -694,6 +696,108 @@ JSON.stringify({...values[0], position: values[1] })
   });
 
 });
+
+describe(`Check timeSignatureChangeBeatingUnit conversion helper`, () => {
+
+  const testValues = [
+    {
+      timeSignature: {count: 6, division: 8},
+      beatingUnitNew: 1/8,
+      timeSignatureExpected: {count: 6, division: 8},
+    },
+    {
+      timeSignature: {count: 8, division: 8},
+      beatingUnitNew: 1/4,
+      timeSignatureExpected: {count: 4, division: 4},
+    },
+    {
+      timeSignature: {count: 6, division: 8},
+      beatingUnitNew: 3/8, // dotted quarter-note
+      timeSignatureExpected: {count: 2, division: 8/3},
+    },
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const {
+        timeSignature,
+        beatingUnitNew,
+        timeSignatureExpected,
+      } = values;
+      const timeSignatureResult = timeSignatureChangeBeatingUnit(timeSignature, {
+        beatingUnitNew,
+      });
+
+      assertWithRelativeError(timeSignatureResult.count,
+                              timeSignatureExpected.count,
+                              epsilon,
+                              `timeSignature count ${
+JSON.stringify({...values, timeSignatureResult})
+}`);
+
+      assertWithRelativeError(timeSignatureResult.division,
+                              timeSignatureExpected.division,
+                              epsilon,
+                              `timeSignature division ${
+JSON.stringify({...values, timeSignatureResult})
+}`);
+
+    });
+
+  });
+
+});
+
+
+describe(`Check tempoChangeBeatingUnit conversion helper`, () => {
+
+  const testValues = [
+    {
+      tempo: 60,
+      timeSignature: {count: 4, division: 4},
+      beatingUnitNew: 1/8,
+      tempoExpected: 120,
+    },
+    {
+      tempo: 120,
+      timeSignature: {count: 8, division: 8},
+      beatingUnitNew: 1/4,
+      tempoExpected: 60,
+    },
+    {
+      tempo: 180,
+      timeSignature: {count: 6, division: 8},
+      beatingUnitNew: 3/8, // dotted quarter-note
+      tempoExpected: 60,
+    },
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const {
+        tempo,
+        timeSignature,
+        beatingUnitNew,
+        tempoExpected,
+      } = values;
+      const tempoResult = tempoChangeBeatingUnit(tempo, {
+        timeSignature,
+        beatingUnitNew,
+      });
+
+      assertWithRelativeError(tempoResult,
+                              tempoExpected,
+                              epsilon,
+                              `tempo ${
+JSON.stringify({...values, tempoResult})
+}`);
+
+    });
+
+  });
+
+});
+
 
 describe(`Check tempoChangeTimeSignature conversion helper`, () => {
 

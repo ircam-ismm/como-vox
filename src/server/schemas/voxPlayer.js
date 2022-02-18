@@ -61,7 +61,7 @@ export default {
   beatingUnit: {
     type: 'float',
     // 1 eighth note: 1/8
-    // 1 dotted quarter note: count: 1.5/4
+    // 1 dotted quarter is 3 eighth notes: 3/8
     default: 1/4,
   },
 

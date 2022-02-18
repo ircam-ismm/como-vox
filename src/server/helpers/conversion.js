@@ -234,6 +234,17 @@ export function barBeatToPosition(event) {
 };
 Object.assign(e, {barBeatToPosition});
 
+export function tempoChangeBeatingUnit(tempo, {
+  timeSignature = timeSignatureDefault,
+  beatingUnit = 1 / timeSignature.division,
+  beatingUnitNew = 1 / timeSignature.division,
+} = {}) {
+  const beatsRatio =  (1 / beatingUnit) / timeSignature.division;
+  const beatsRatioNew = (1 / beatingUnitNew) / timeSignature.division;
+  return tempo / beatsRatio * beatsRatioNew;
+}
+Object.assign(e, {tempoChangeBeatingUnit});
+
 export function tempoChangeTimeSignature(tempo, {
   timeSignature = timeSignatureDefault,
   timeSignatureNew = timeSignatureDefault,
@@ -242,6 +253,21 @@ export function tempoChangeTimeSignature(tempo, {
   return tempo * beatsRatio;
 }
 Object.assign(e, {tempoChangeTimeSignature});
+
+export function timeSignatureChangeBeatingUnit(timeSignature, {
+  beatingUnit = 1 / timeSignature.division,
+  beatingUnitNew = 1 / timeSignature.division,
+} = {}) {
+  const beatingRatio = (1 / beatingUnit) / timeSignature.division;
+  const beatingRatioNew = (1 / beatingUnitNew) / timeSignature.division;
+  let {count, division} = timeSignature;
+  count *= beatingRatioNew / beatingRatio;
+  division *= beatingRatioNew / beatingRatio;
+  return {count, division};
+}
+Object.assign(e, {timeSignatureChangeBeatingUnit})
+
+
 
 export function timeDeltaToTempo(timeDelta, beatDelta = 1, {
   timeSignature = timeSignatureDefault,

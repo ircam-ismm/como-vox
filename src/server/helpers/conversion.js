@@ -189,6 +189,35 @@ export function positionAddSeconds(position, seconds, {
 Object.assign(e, {positionAddSeconds});
 
 /**
+ * Convert a position to a new beating unit.
+ *
+ * @param position to convert to new time-signature
+ * @param reference is position of the last time-signature or beating unit change
+ * @param timeSignature is original time-signature until position
+ * @param beatingUnit is the new beatingUnit until position
+ * @param beatingUnitNew is the new beatingUnit at position
+ *
+ * @return
+ */
+export function positionChangeBeatingUnit(position, {
+  reference = positionDefault,
+  timeSignature = timeSignatureDefault,
+  beatingUnit = 1 / timeSignature.division,
+  beatingUnitNew = 1 / timeSignature.division,
+} = {}) {
+  const beatsRatio = beatingUnitNew / beatingUnit;
+  return positionChangeTimeSignature(position, {
+    reference,
+    timeSignature,
+    timeSignatureNew: {
+      count: timeSignature.count * beatsRatio,
+      division: timeSignature.division * beatsRatio,
+    },
+  });
+}
+Object.assign(e, {positionChangeTimeSignature});
+
+/**
  * Convert a position to a new time-signature.
  *
  * @param position to convert to new time-signature

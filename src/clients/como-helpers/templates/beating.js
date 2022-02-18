@@ -12,18 +12,17 @@ import {
   almostEquals,
   closest,
 } from '../../../server/helpers/math.js';
-const epsilon = 0.1;
+const epsilon = 0.01;
 
 const unitsAndNames = [
-  ['1', 'ronde'],
-  ['1.5', 'ronde pointée'],
-  ['2', 'blanche'],
-  ['3', 'blanche pointée'],
-  ['4', 'noire'],
-  ['6', 'noire pointée'],
-  ['8', 'croche'],
-  ['12', 'croche pointée'],
-  ['16', 'double-croche'],
+  [1, 'ronde'],
+  [3/4, 'blanche pointée'],
+  [1/2, 'blanche'],
+  [3/8, 'noire pointée'],
+  [1/4, 'noire'],
+  [3/16, 'croche pointée'],
+  [1/8, 'croche'],
+  [1/16, 'double-croche'],
 ];
 
 const units = unitsAndNames.map( (e) => e[0]);

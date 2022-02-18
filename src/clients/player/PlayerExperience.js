@@ -298,9 +298,20 @@ class PlayerExperience extends AbstractExperience {
     const loadedState = await url.parse(voxPlayerSchema);
     console.log("loadedState = ", loadedState);
 
-    if(typeof loadedState.tempo !== 'undefined') {
+    // be sure to restore tempo and beatingUnit after a load
+    // no matter the modes
+    if(typeof loadedState.tempo !== 'undefined'
+       || typeof loadedState.beatingUnit) {
+      const {tempo, beatingUnit} = loadedState;
       this.setScoreCallback = () => {
-        this.events.emit('tempo', loadedState.tempo);
+        if(tempo) {
+          this.events.emit('tempo', tempo);
+        }
+
+        if(beatingUnit) {
+          this.events.emit('beatingUnit', beatingUnit);
+        }
+
         delete this.setScoreCallback;
       }
     }
@@ -485,6 +496,14 @@ class PlayerExperience extends AbstractExperience {
           break;
         }
 
+        case 'beatingUnitMode': {
+          this.events.on(key, (value) => {
+            this.updateFromEvent(key, value);
+            this.updateBeatingUnit();
+          });
+          break;
+        }
+
         case 'lookAheadNotesRequest': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
@@ -592,6 +611,7 @@ class PlayerExperience extends AbstractExperience {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
             this.setTimeSignature(value);
+            this.updateBeatingUnit();
           });
           break;
         }
@@ -751,6 +771,93 @@ class PlayerExperience extends AbstractExperience {
     app.data.playbackLatency = notesToSeconds(this.lookAheadNotes, {
       tempo: this.tempo,
     });
+  }
+
+  updateBeatingUnit() {
+    switch(this.state.beatingUnitMode) {
+      case 'auto': {
+        // medium tempo, easy for beating (andate)
+        const tempoTarget = 92;
+
+        // only group those
+        const groupableDivisions = [8, 16, 32];
+
+        // try to divide, in order
+        const groupableCounts = [3, 2];
+
+
+        // tempo is always for quarter-note
+        const tempo = app.state.tempo * app.state.timeSignature.division / 4;
+
+        if(!groupableDivisions.some( (division) => {
+          return app.state.timeSignature.division === division;
+        }) ) {
+          //default;
+          this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
+          break;
+        }
+
+        // if(!app.state.timeSignature.division === 8
+        //    && !app.state.timeSignature.division === 16
+        //    && !app.state.timeSignature.division === 32) {
+        //   this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
+        //   break;
+        // }
+
+        if(!groupableCounts.some( (count) => {
+          if(app.state.timeSignature.count % count === 0
+             && (tempo > app.state.tempoLimits.absoluteMax
+                 || (Math.abs((tempo / count) - tempoTarget)
+                     < Math.abs(tempo - tempoTarget) ) ) ) {
+            this.events.emit('beatingUnit', count / app.state.timeSignature.division);
+            return true; // break
+          }
+          return false; // continue
+        }) ) {
+          // default
+          this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
+        }
+
+        break;
+
+        // if(app.state.timeSignature.count % 3 === 0) {
+
+        //   if(tempo > app.state.tempoLimits.absoluteMax
+        //      || (Math.abs((tempo / 3) - tempoTarget)
+        //          < Math.abs(tempo - tempoTarget) ) ) {
+        //     this.events.emit('beatingUnit', 3 / app.state.timeSignature.division);
+        //     break;
+        //   }
+        // }
+
+        // if(app.state.timeSignature.count % 2 === 0) {
+
+        //   if(tempo > app.state.tempoLimits.absoluteMax
+        //      || (Math.abs((tempo / 2) - tempoTarget)
+        //          < Math.abs(tempo - tempoTarget) ) ) {
+        //     this.events.emit('beatingUnit', 2 / app.state.timeSignature.division);
+        //     break;
+        //   }
+        // }
+
+        // this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
+        // break;
+      }
+
+      case 'timeSignature': {
+        this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
+        break;
+      }
+
+      case 'fixed': {
+        break;
+      }
+
+      default: {
+        break;
+      }
+
+    }
   }
 
   setTempo(tempo, {

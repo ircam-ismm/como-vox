@@ -8,6 +8,8 @@ import {
   selfSelect,
 } from './helpers.js';
 
+import {tempoChangeBeatingUnit} from '../../../server/helpers/conversion.js';
+
 const e = {};
 
 export function tempo(data) {
@@ -29,13 +31,23 @@ export function tempo(data) {
                  step="10"
                  .value=${
                  // tempo for quarter-note
-                 Math.round(data.tempo * data.timeSignature.division / 4)}
+                   Math.round(tempoChangeBeatingUnit(data.tempo, {
+                     timeSignature: data.timeSignature,
+                     beatingUnit: 1/4,
+                     beatingUnitNew: data.beatingUnit
+                   }))
+                 }
                  @click="${e => selfSelect(e)}"
                  @change="${e => {
+                       const value = parseFloat(e.srcElement.value) || 60;
                        // tempo for quarter-note
-                       voxPlayerState.set({
-                       tempo: (parseFloat(
-                       e.srcElement.value * 4 / data.timeSignature.division) || 60) }) } }"
+                       const tempo = tempoChangeBeatingUnit(value, {
+                         timeSignature: data.timeSignature,
+                         beatingUnit: data.beatingUnit,
+                         beatingUnitNew: 1/4,
+                      });
+                       voxPlayerState.set({tempo});
+                 } }"
           >
           ${data.uiConfiguration ? displayToggle(data, 'tempoUi') : ''}
         </span>

@@ -2,22 +2,30 @@ function transport(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
-  const notesToSeconds = conversion.notesToSeconds;
-  const notesToBeats = conversion.notesToBeats;
-  const secondsToBeats = conversion.secondsToBeats;
-  const beatsToSeconds = conversion.beatsToSeconds;
-  const positionAddBeats = conversion.positionAddBeats;
-  const positionDeltaToSeconds = conversion.positionDeltaToSeconds;
-  const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
-  const positionsToSecondsDelta = conversion.positionsToSecondsDelta;
-  const positionRoundBeats = conversion.positionRoundBeats;
-  const timeDeltaToTempo = conversion.timeDeltaToTempo;
+  const {
+    beatsToSeconds,
+    notesToBeats,
+    notesToSeconds,
+    positionAddBeats,
+    positionChangeBeatingUnit,
+    positionDeltaToSeconds,
+    positionRoundBeats,
+    positionsToBeatsDelta,
+    positionsToSecondsDelta,
+    secondsToBeats,
+    tempoChangeBeatingUnit,
+    tempoChangeTimeSignature,
+    timeDeltaToTempo,
+    timeSignatureChangeBeatingUnit,
+  } = conversion;
 
   const math = app.imports.helpers.math;
-  const modulo = math.modulo;
-  const median = math.median;
-  const mean = math.mean;
-  const weightedMean = math.weightedMean;
+  const {
+    mean,
+    median,
+    modulo,
+    weightedMean,
+  } = math;
 
   const Scaler = app.imports.helpers.Scaler;
 
@@ -305,6 +313,8 @@ function transport(graph, helpers, outputFrame) {
       const now = inputData['time'];
 
       const timeSignature = parameters.timeSignature;
+      const beatingUnit = app.state.beatingUnit;
+      const beatingRatio = timeSignature.division * beatingUnit;
 
       // do not alias playback as it may change
 
@@ -419,29 +429,53 @@ function transport(graph, helpers, outputFrame) {
 
       const barLast = positionWithOffsetLast.bar;
       const beatLast = positionWithOffsetLast.beat;
+      const positionWithOffsetLastBeating
+            = positionChangeBeatingUnit(positionWithOffsetLast, {
+              timeSignature,
+              beatingUnitNew: beatingUnit,
+            });
 
       const bar = positionWithOffset.bar;
       const beat = positionWithOffset.beat;
+      const positionWithOffsetBeating
+            = positionChangeBeatingUnit(positionWithOffset, {
+              timeSignature,
+              beatingUnitNew: beatingUnit,
+            });
+
       if(playback
          && (positionLastTime.audio === 0 || playbackStartNew) ) {
         // start
-        beatChange = positionStopped.beat === Math.floor(positionStopped.beat);
-        barChange = beatChange && positionStopped.beat === 1;
+        const positionStoppedBeating = positionChangeBeatingUnit(positionStopped, {
+          timeSignature,
+          beatingUnitNew: beatingUnit,
+        });
+
+        beatChange = positionStoppedBeating.beat
+          === Math.floor(positionStoppedBeating.beat);
+        barChange = beatChange && positionStoppedBeating.beat === 1;
       } else {
-        barChange = bar !== barLast;
+
+        // change according to beating unit
+        barChange = positionWithOffsetBeating.bar !== positionWithOffsetLast.bar;
         // on beat change
-        beatChange = (Math.floor(beat) !== Math.floor(beatLast)
-                      || barChange); // count to 1
+        beatChange = (Math.floor(positionWithOffsetBeating.beat)
+                      !== Math.floor(positionWithOffsetLastBeating.beat) )
+          || barChange; // count to 1
       }
 
       if(beatChange) {
-        const bar = positionWithOffset.bar;
-        const beat = positionWithOffset.beat;
-
-        const positionWithOffsetRounded = {
-          bar,
-          beat: Math.floor(beat),
+        const positionWithOffsetBeatingRounded = {
+          bar: positionWithOffsetBeating.bar,
+          beat: Math.floor(positionWithOffsetBeating.beat),
         };
+
+        const positionWithOffsetRounded = positionChangeBeatingUnit(
+          positionWithOffsetBeatingRounded, {
+            timeSignature,
+            beatingUnit,
+            // no new beating unit to reset
+          });
 
         const beatChangeLastTimeOffset = positionsToSecondsDelta(
           positionWithOffsetRounded, positionWithOffset, {
@@ -459,13 +493,15 @@ function transport(graph, helpers, outputFrame) {
           time: beatChangeLastTime,
           tempo,
           timeSignature,
+          beatingUnit,
           playbackLatency,
         });
 
         // maximum number of beats from last beat (local time)
         // and minimum number of beat changes
+        // adapt to beating unit, with no change in bar count
         const beatDeltaMax = beatChangesWindow.bar * timeSignature.count
-              + beatChangesWindow.beat;
+              + beatChangesWindow.beat * beatingRatio;
 
         // remove old beat changes
         for(let g = 0; g < beatChanges.length; ++g) {
@@ -516,6 +552,7 @@ function transport(graph, helpers, outputFrame) {
                                  time: now,
                                  tempo,
                                  timeSignature,
+                                 beatingUnit,
                                  playbackLatency,
                                });
 
@@ -528,8 +565,10 @@ function transport(graph, helpers, outputFrame) {
 
         // maximum number of beats from last beat (local time)
         // and minimum number of tempo gestures
+
+        // adapt to beating unit with no change in bar count
         const beatDeltaMax = parameters.gestureWindow.bar * timeSignature.count
-              + parameters.gestureWindow.beat;
+              + parameters.gestureWindow.beat * beatingRatio;
 
         // remove old gestures
         for(let g = 0; g < beatGestures.length; ++g) {
@@ -551,43 +590,69 @@ function transport(graph, helpers, outputFrame) {
       if( (parameters.gestureControlsTempo
            || parameters.measures)
           && beatGesture && beatGesture.trigger) {
-        let {
+        const {
           absoluteMin,
           absoluteMax,
           relativeMin,
           relativeMax,
         } = parameters.tempoLimits;
 
-        // tempo is always for quarter-notes
-        absoluteMin *= 4 / timeSignature.division;
-        absoluteMax *= 4 / timeSignature.division;
-
         let tempos = [];
         let beatDeltas = [];
         for(let g = beatGestures.length - 1; g > 0; --g) {
+          const {beatReference} = beatGestures[g];
+          // use values at beat reference moment
+          const{tempo, timeSignature, beatingUnit} = beatReference;
+          const beatingRatio = timeSignature.division * beatingUnit;
+          const timeSignatureBeating
+                = timeSignatureChangeBeatingUnit(timeSignature, {
+                  beatingUnitNew: beatingUnit,
+                });
+
+          // from (quarter-note) reference tempo
+          const tempoBeating = tempoChangeTimeSignature(tempo, {
+            timeSignature: {division: 4},
+            timeSignatureNew: timeSignatureBeating,
+          });
+
+          // compute tempo relative to beating
           const timeDelta = beatGestures[g].time - beatGestures[g - 1].time;
-          const beatDelta = secondsToBeats(timeDelta, {tempo, timeSignature});
+
+          const beatDelta = secondsToBeats(timeDelta, {
+            tempo, // (quarter-note) reference tempo
+            timeSignature: timeSignatureBeating,
+          });
+
           const beatDeltaRounded = (beatDelta >=1
                                     ? Math.round(beatDelta)
                                     : (beatDelta > 0
                                        ? 1/Math.round(1/beatDelta)
                                        : 1) );
-
           if(beatDeltaRounded >= relativeMin && beatDeltaRounded < relativeMax) {
-            const tempoFromGesture = timeDeltaToTempo(timeDelta,
-                                                      beatDeltaRounded,
-                                                      {timeSignature});
+            const tempoFromGesture
+                  = timeDeltaToTempo(timeDelta, beatDeltaRounded, {
+                    // reference tempo: do not convert, yet
+                    timeSignature: {division: 4},
+                  });
+
             if(tempoFromGesture > absoluteMin
                && tempoFromGesture < absoluteMax
-               && tempoFromGesture > relativeMin * tempo
-               && tempoFromGesture < relativeMax * tempo) {
+               && tempoFromGesture > relativeMin * tempoBeating
+               && tempoFromGesture < relativeMax * tempoBeating) {
+
+              // convert tempo to quarter-note
+              const tempoQuarterNote = tempoChangeTimeSignature(tempoFromGesture, {
+                timeSignature: timeSignatureBeating,
+                timeSignatureNew: {division: 4},
+              });
+
               if(parameters.gestureControlsTempo) {
-                tempos.push(tempoFromGesture);
+                tempos.push(tempoQuarterNote);
                 beatDeltas.push(beatDeltaRounded);
               }
 
               if(parameters.measures && g === beatGestures.length - 1) {
-                app.measures.tempos.push(tempoFromGesture);
+                app.measures.tempos.push(tempoQuarterNote);
               }
             }
           }
@@ -642,20 +707,25 @@ function transport(graph, helpers, outputFrame) {
           // time related to scheduled audio output:
           // compensate for look-ahead latency
           const beatDeltaFromPlayback = secondsToBeats(
-            beatChangeLastTime.local - (beatGesture.time - beatReference.playbackLatency),
-            {timeSignature, tempo});
+            beatChangeLastTime.local
+              - (beatGesture.time - beatReference.playbackLatency), {
+                timeSignature,
+                tempo,
+              });
 
           // consider only one bar from now,
           // plus and one beat for the fluctuations
-          if(beatDeltaFromPlayback > timeSignature.count + 1) {
+          if(beatDeltaFromPlayback
+             > (parameters.gestureWindow.bar * timeSignature.count
+                + parameters.gestureWindow.beat * beatingRatio) ) {
             break;
           }
 
           // time related to scheduled audio output:
           // compensate for look-ahead latency
           const beatDeltaFromReference = secondsToBeats(
-             beatReference.time.local - (beatGesture.time - beatReference.playbackLatency),
-            {
+            beatReference.time.local
+              - (beatGesture.time - beatReference.playbackLatency), {
               timeSignature: beatReference.timeSignature,
               tempo: beatReference.tempo,
             });
@@ -673,31 +743,43 @@ function transport(graph, helpers, outputFrame) {
               timeSignature: beatReference.timeSignature,
             });
 
-          const beatGesturePositionRounded
-                = positionRoundBeats(beatGesturePosition, {
+          const beatGestureBeating
+                = positionChangeBeatingUnit(beatGesturePosition, {
                   timeSignature: beatReference.timeSignature,
+                  beatingUnitNew: beatReference.beatingUnit,
                 });
-          const offset
-                = positionsToBeatsDelta(beatGesturePosition,
-                                        beatGesturePositionRounded,
-                                        {
-                                          timeSignature: beatReference.timeSignature,
+
+          const timeSignatureBeating
+                = timeSignatureChangeBeatingUnit(beatReference.timeSignature, {
+                  beatingUnitNew: beatReference.beatingUnit,
+                });
+
+          const beatGestureBeatingRounded
+                = positionRoundBeats(beatGestureBeating, {
+                  timeSignature: timeSignatureBeating,
+                });
+
+          const offsetBeating
+                = positionsToBeatsDelta(beatGestureBeating,
+                                        beatGestureBeatingRounded, {
+                                          timeSignature: timeSignatureBeating,
                                         });
-          if(isNaN(offset) ) {
+
+          if(isNaN(offsetBeating) ) {
             debugger;
           }
 
           if(parameters.gestureControlsBeatOffset) {
-            offsets.push(offset);
-            const offsetWeight = beatOffsetGestureWeigthGet(offset);
+            offsets.push(offsetBeating);
+            const offsetWeight = beatOffsetGestureWeigthGet(offsetBeating);
             offsetWeights.push(offsetWeight);
           }
 
           if(parameters.measures && g === beatGestures.length - 1) {
-            app.measures.beatOffsetsBeats.push(offset);
-            app.measures.beatOffsetsSeconds.push(beatsToSeconds(offset, {
+            app.measures.beatOffsetsBeats.push(offsetBeating);
+            app.measures.beatOffsetsSeconds.push(beatsToSeconds(offsetBeating, {
               tempo: beatReference.tempo,
-              timeSignature: beatReference.timeSignature
+              timeSignature: timeSignatureBeating,
             }));
           }
         }

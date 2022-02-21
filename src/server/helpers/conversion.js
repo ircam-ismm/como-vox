@@ -205,7 +205,7 @@ export function positionChangeBeatingUnit(position, {
   beatingUnit = 1 / timeSignature.division,
   beatingUnitNew = 1 / timeSignature.division,
 } = {}) {
-  const beatsRatio = beatingUnitNew / beatingUnit;
+  const beatsRatio = beatingUnit / beatingUnitNew;
   return positionChangeTimeSignature(position, {
     reference,
     timeSignature,

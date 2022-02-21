@@ -28,6 +28,7 @@ import {
 
 describe(`Check beats conversion helpers`, () => {
 
+  // tempo of quarter-notes
   const testValues = [
     [{tempo: 120},
      4,
@@ -47,14 +48,14 @@ describe(`Check beats conversion helpers`, () => {
     [{tempo: 60, timeSignature: {division: 4}},
      1,
      1],
-    // half-note and a half
+    // dotted half-note
     [{tempo: 60, timeSignature: {division: 4/3}},
      1,
      3],
     [{tempo: 60, timeSignature: {division: 8}},
      1,
      0.5],
-    // quarter-note and a half
+    // dotted quarter-note
     [{tempo: 60, timeSignature: {division: 8/3}},
      1,
      1.5],
@@ -280,6 +281,7 @@ JSON.stringify({...values[0], position: values[1], reference: values[2]})
 
 describe(`Check positionsToSecondsDelta conversion helper`, () => {
 
+  // tempo of quarter-notes
   const testValues = [
     [{timeSignature: {count: 4, division: 4}, tempo: 60 },
      {bar:1, beat: 1},
@@ -591,39 +593,39 @@ describe(`Check positionChangeBeatingUnit conversion helper`, () => {
       // preserve bar change
       position: {bar: 2, beat: 1},
       timeSignature: {count: 4, division: 4},
-      beatingUnit: 1/8,
+      beatingUnitNew: 1/8,
       positionExpected: {bar: 2, beat: 1},
     },
     {
       // preserve bar change
       position: {bar: 2, beat: 1},
       timeSignature: {count: 8, division: 8},
-      beatingUnit: 1/4,
+      beatingUnitNew: 1/4,
       positionExpected: {bar: 2, beat: 1},
     },
     {
       position: {bar: 2, beat: 2},
       timeSignature: {count: 4, division: 4},
-      beatingUnit: 1/8,
+      beatingUnitNew: 1/8,
       positionExpected: {bar: 2, beat: 3},
     },
     {
       position: {bar: 2, beat: 3},
       timeSignature: {count: 8, division: 8},
-      beatingUnit: 1/4,
+      beatingUnitNew: 1/4,
       positionExpected: {bar: 2, beat: 2},
     },
     {
       position: {bar: 1, beat: 4},
       timeSignature: {count: 6, division: 8},
-      beatingUnit: 3/8, // dotted quarter-note
+      beatingUnitNew: 3/8, // dotted quarter-note
       positionExpected: {bar: 1, beat: 2},
     },
     {
       // no bar change expected
       position: {bar: 21, beat: 4},
       timeSignature: {count: 6, division: 8},
-      beatingUnit: 3/8, // dotted quarter-note
+      beatingUnitNew: 3/8, // dotted quarter-note
       positionExpected: {bar: 21, beat: 2},
     },
   ];

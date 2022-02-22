@@ -6,6 +6,7 @@ import {assertWithRelativeError} from '../../shared/utils.js';
 const epsilon = 1e-3;
 
 import {
+  beatsChangeBeatingUnit,
   beatsToNotes,
   beatsToSeconds,
   notesToBeats,
@@ -195,6 +196,65 @@ describe(`Check note conversion helpers`, () => {
         values[1],
         `secondsToNotes values: ${JSON.stringify(values[0])}, ${values[3]}`);
     });
+  });
+
+});
+
+
+describe(`Check beatsChangeBeatingUnit conversion helper`, () => {
+
+  const testValues = [
+    {
+      beats: 1,
+      timeSignature: {count: 4, division: 4},
+      beatingUnitNew: 1/4,
+      beatsExpected: 1,
+    },
+    {
+      beats: 2,
+      timeSignature: {count: 4, division: 4},
+      beatingUnitNew: 1/8,
+      beatsExpected: 4,
+    },
+    {
+      beats: 3,
+      timeSignature: {count: 4, division: 4},
+      beatingUnit: 1/8,
+      beatingUnitNew: 3/8,
+      beatsExpected: 1,
+    },
+    {
+      beats: -6,
+      timeSignature: {count: 6, division: 8},
+      beatingUnitNew: 3/8,
+      beatsExpected: -2,
+    },
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const {
+        beats,
+        timeSignature,
+        beatingUnit,
+        beatingUnitNew,
+        beatsExpected,
+      } = values;
+      const beatsResult = beatsChangeBeatingUnit(beats, {
+        timeSignature,
+        beatingUnit,
+        beatingUnitNew,
+      });
+
+      assertWithRelativeError(beatsResult,
+                              beatsExpected,
+                              epsilon,
+                              `beats ${
+JSON.stringify({...values, beatsResult})
+}`);
+
+    });
+
   });
 
 });
@@ -854,11 +914,13 @@ describe(`Check tempoChangeBeatingUnit conversion helper`, () => {
       const {
         tempo,
         timeSignature,
+        beatingUnit,
         beatingUnitNew,
         tempoExpected,
       } = values;
       const tempoResult = tempoChangeBeatingUnit(tempo, {
         timeSignature,
+        beatingUnit,
         beatingUnitNew,
       });
 

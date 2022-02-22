@@ -97,6 +97,17 @@ export function beatsToSeconds(beats = 1, {
 }
 Object.assign(e, {beatsToSeconds});
 
+export function beatsChangeBeatingUnit(beats, {
+  timeSignature = timeSignatureDefault,
+  beatingUnit = 1 / timeSignature.division,
+  beatingUnitNew = 1 / timeSignature.division,
+} = {}) {
+  const beatingRatio = (1 / beatingUnit) / timeSignature.division;
+  const beatingRatioNew = (1 / beatingUnitNew) / timeSignature.division;
+  return beats * beatingRatioNew / beatingRatio;
+}
+Object.assign(e, {beatsChangeBeatingUnit});
+
 export function secondsToBeats(seconds = 1, {
   tempo = tempoDefault,
   timeSignature = timeSignatureDefault,

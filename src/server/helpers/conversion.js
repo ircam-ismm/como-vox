@@ -108,6 +108,15 @@ export function beatsChangeBeatingUnit(beats, {
 }
 Object.assign(e, {beatsChangeBeatingUnit});
 
+export function beatsChangeTimeSignature(beats, {
+  timeSignature = timeSignatureDefault,
+  timeSignatureNew = timeSignatureDefault,
+} = {}) {
+  const divisionRatio = timeSignatureNew.division / timeSignature.division;
+  return beats * divisionRatio;
+}
+Object.assign(e, {beatsChangeTimeSignature});
+
 export function secondsToBeats(seconds = 1, {
   tempo = tempoDefault,
   timeSignature = timeSignatureDefault,

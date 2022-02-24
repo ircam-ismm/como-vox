@@ -7,6 +7,7 @@ const epsilon = 1e-3;
 
 import {
   beatsChangeBeatingUnit,
+  beatsChangeTimeSignature,
   beatsToNotes,
   beatsToSeconds,
   notesToBeats,
@@ -258,6 +259,64 @@ JSON.stringify({...values, beatsResult})
   });
 
 });
+
+describe(`Check beatsChangeTimeSignature conversion helper`, () => {
+
+  const testValues = [
+    {
+      beats: 1,
+      timeSignature: {count: 4, division: 4},
+      timeSignatureNew: {count: 4, division: 4},
+      beatsExpected: 1,
+    },
+    {
+      beats: 2,
+      timeSignature: {count: 4, division: 4},
+      timeSignatureNew: {count: 6, division: 8},
+      beatsExpected: 4,
+    },
+    {
+      beats: 3,
+      timeSignature: {count: 6, division: 8},
+      // dotted quarter-note
+      timeSignatureNew: {count: 6/3, division: 8/3},
+      beatsExpected: 1,
+    },
+    {
+      beats: -6,
+      timeSignature: {count: 6, division: 8},
+      // dotted quarter-note
+      timeSignatureNew: {count: 6/3, division: 8/3},
+      beatsExpected: -2,
+    },
+  ];
+
+  it(`should validate values`, () => {
+    testValues.forEach( (values) => {
+      const {
+        beats,
+        timeSignature,
+        timeSignatureNew,
+        beatsExpected,
+      } = values;
+      const beatsResult = beatsChangeTimeSignature(beats, {
+        timeSignature,
+        timeSignatureNew,
+      });
+
+      assertWithRelativeError(beatsResult,
+                              beatsExpected,
+                              epsilon,
+                              `beats ${
+JSON.stringify({...values, beatsResult})
+}`);
+
+    });
+
+  });
+
+});
+
 
 describe(`Check positionsToBeatsDelta conversion helper`, () => {
 

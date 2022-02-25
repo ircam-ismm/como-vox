@@ -1035,10 +1035,16 @@ function transport(graph, helpers, outputFrame) {
 
       //////////// auto stop
       if(playback && parameters.gestureControlsPlaybackStop) {
+        const timeSignatureBeating
+              = timeSignatureChangeBeatingUnit(timeSignature, {
+                beatingUnitNew: beatingUnit,
+              });
+
         // wait for 4 beats on 1/4 and 2/4 time signature
-        const barCount = (timeSignature.count >= 3
-                          ? timeSignature.count
+        const barCount = (timeSignatureBeating.count >= 3
+                          ? timeSignatureBeating.count
                           : 4);
+
         const stopAfterBeats
               = parameters.playbackStopAfterCount.bar * barCount
               + parameters.playbackStopAfterCount.beat;

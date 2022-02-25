@@ -24,6 +24,7 @@ const beatsToSeconds = conversion.beatsToSeconds;
 const notesToBeats = conversion.notesToBeats;
 const notesToSeconds = conversion.notesToSeconds;
 const positionAddBeats = conversion.positionAddBeats;
+const positionChangeBeatingUnit = conversion.positionChangeBeatingUnit;
 
 const audio = app.imports.helpers.audio;
 
@@ -444,6 +445,7 @@ class PlayerExperience extends AbstractExperience {
 
   // immediate to data and asynchronously to voxPlayerState
   updateFromEvent(key, value) {
+    // console.log('updateFromEvent', key, value);
     const voxPlayerSchema = this.voxPlayerState.getSchema();
     const event = schema.isEvent(voxPlayerSchema, key);
     if(!event) {
@@ -912,10 +914,28 @@ class PlayerExperience extends AbstractExperience {
       }
       switch(app.state['playbackStopSeek']) {
         case 'barStart': {
-          this.seekPosition({
-            bar: app.data.position.bar,
-            beat: 1,
+          const {
+            timeSignature,
+            beatingUnit,
+          } = app.state;
+
+          // convert to beating
+          const positionBeating = positionChangeBeatingUnit(app.data.position, {
+            timeSignature,
+            beatingUnitNew: beatingUnit,
           });
+
+          const positionStart = positionChangeBeatingUnit({
+            // first bar of beating
+            bar: positionBeating.bar,
+            beat: 1,
+          }, {
+            // convert back to position
+            timeSignature,
+            beatingUnit,
+            // no new beating unit to reset
+          });
+          this.seekPosition(positionStart);
           break;
         }
 

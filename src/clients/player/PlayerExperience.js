@@ -36,7 +36,7 @@ if(typeof app.measures === 'undefined') {
 }
 
 const beatingSoundDefault = false;
-const lookAheadNotesDefault = 0.125; // 1 quarter-note
+const lookAheadNotesDefault = 1/8; // 1 eighth-note
 const metronomeSoundDefault = false;
 const positionDefault = {bar: 1, beat: 1};
 const tempoDefault = 80;

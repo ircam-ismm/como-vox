@@ -224,7 +224,7 @@ export default {
   // minimum as a request, actual value may be more
   lookAheadNotesRequest: {
     type: 'float',
-    default: 0.125, // 1 quarter-note
+    default: 1/8, // 1 eighth-note
   },
 
   lookAheadNotesRequestUi: {
@@ -235,7 +235,7 @@ export default {
   // actual value, depending on audio latency and maximum tempo
   lookAheadNotes: {
     type: 'float',
-    default: 0.125, // 1 quarter-note
+    default: 1/8, // 1 eighth-note
     metas: {
       exported: false,
     },

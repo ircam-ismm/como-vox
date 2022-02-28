@@ -3,6 +3,7 @@ function transport(graph, helpers, outputFrame) {
 
   const conversion = app.imports.helpers.conversion;
   const {
+    beatsChangeBeatingUnit,
     beatsToSeconds,
     notesToBeats,
     notesToSeconds,
@@ -301,6 +302,18 @@ function transport(graph, helpers, outputFrame) {
     });
   }
 
+  console.log('TODO: ******************** auto stop **********************');
+
+  // bar count:
+  // - transport (auto start)
+  // - all scenarios (start and auto start)
+  console.log('TODO: ******************** playback pre-count *************');
+  console.log('TODO: ******************** scenarioStart ******************');
+  console.log('TODO: ******************** scenarioFull *******************');
+
+  // keep 1 eighth note ?
+  console.log('TODO: ******************** lookAheadNotes *****************');
+
   return {
     updateParams,
 
@@ -315,6 +328,9 @@ function transport(graph, helpers, outputFrame) {
       const timeSignature = parameters.timeSignature;
       const beatingUnit = app.state.beatingUnit;
       const beatingRatio = timeSignature.division * beatingUnit;
+      const timeSignatureBeating = timeSignatureChangeBeatingUnit(timeSignature, {
+        beatingUnitNew: beatingUnit,
+      });
 
       // do not alias playback as it may change
 
@@ -367,6 +383,12 @@ function transport(graph, helpers, outputFrame) {
       }
 
       const tempo = tempoSmoother.process(now.audio);
+      // from (quarter-note) reference tempo
+      const tempoBeating = tempoChangeBeatingUnit(tempo, {
+        timeSignature: {division: 4},
+        beatingUnitNew: beatingUnit,
+      });
+
       // const tempo = tempoSmoother.process(now.audio) * 1.05;
       const beatOffset = beatOffsetSmoother.process(now.audio);
 
@@ -442,7 +464,6 @@ function transport(graph, helpers, outputFrame) {
               timeSignature,
               beatingUnitNew: beatingUnit,
             });
-
       if(playback
          && (positionLastTime.audio === 0 || playbackStartNew) ) {
         // start
@@ -457,7 +478,8 @@ function transport(graph, helpers, outputFrame) {
       } else {
 
         // change according to beating unit
-        barChange = positionWithOffsetBeating.bar !== positionWithOffsetLast.bar;
+        barChange = positionWithOffsetBeating.bar
+          !== positionWithOffsetLastBeating.bar;
         // on beat change
         beatChange = (Math.floor(positionWithOffsetBeating.beat)
                       !== Math.floor(positionWithOffsetLastBeating.beat) )
@@ -608,12 +630,6 @@ function transport(graph, helpers, outputFrame) {
                 = timeSignatureChangeBeatingUnit(timeSignature, {
                   beatingUnitNew: beatingUnit,
                 });
-
-          // from (quarter-note) reference tempo
-          const tempoBeating = tempoChangeTimeSignature(tempo, {
-            timeSignature: {division: 4},
-            timeSignatureNew: timeSignatureBeating,
-          });
 
           // compute tempo relative to beating
           const timeDelta = beatGestures[g].time - beatGestures[g - 1].time;
@@ -804,14 +820,17 @@ function transport(graph, helpers, outputFrame) {
       //////////// auto start
       if(!playback && parameters.gestureControlsPlaybackStart
          && !playbackStartRequest) {
+
         // wait for 4 beats on 1/4 and 2/4 time signature
-        const barCount = (timeSignature.count >= 3
-                          ? timeSignature.count
+        const barCount = (timeSignatureBeating.count >= 3
+                          ? timeSignatureBeating.count
                           : 4);
 
         // keep some beats for look-ahead
         const startLookAheadBeats =
-              notesToBeats(lookAheadNotes, {timeSignature});
+              notesToBeats(lookAheadNotes, {
+                timeSignature: timeSignatureBeating,
+              });
 
         // warning: this is a float
         const startAfterBeatsWithLookAhead
@@ -820,15 +839,12 @@ function transport(graph, helpers, outputFrame) {
               + 1 // one more for upbeat before start
               - startLookAheadBeats;
 
-        let {
+        const {
           absoluteMin: tempoAbsoluteMin,
           absoluteMax: tempoAbsoluteMax,
           relativeMin: tempoRelativeMin,
           relativeMax: tempoRelativeMax,
         } = parameters.tempoLimits;
-        // tempo is always for quarter-notes
-        tempoAbsoluteMin *= 4 / timeSignature.division;
-        tempoAbsoluteMax *= 4 / timeSignature.division;
 
         const beatGesturesStart = [];
         // keep gestures after stop, do not change ordering
@@ -849,12 +865,14 @@ function transport(graph, helpers, outputFrame) {
                 - beatGesturesStart[last].time
                 - playbackLatency
                 - parameters.beatGestureWaitingDurationMax;
-          const tempoNow = timeDeltaToTempo(timeDelta,
-                                            1,
-                                            {timeSignature});
+          const tempoNow = timeDeltaToTempo(timeDelta, 1, {
+            // do not convert tempo, yet
+            timeSignature: {division: 4},
+          });
+
           if(tempoNow > 0 &&
              (tempoNow < tempoAbsoluteMin
-              || tempoNow < tempoRelativeMin * tempo) ) {
+              || tempoNow < tempoRelativeMin * tempoBeating) ) {
             console.log('no start, no more beating', tempoNow);
             app.events.emit('gestureControlsPlaybackStartStatus', 'tooSlow');
             app.events.emit('gestureControlsPlaybackStart', false);
@@ -866,27 +884,29 @@ function transport(graph, helpers, outputFrame) {
           const last = beatGesturesStart.length - 1;
 
           const timeDelta = beatGesturesStart[last].time - beatGesturesStart[last - 1].time;
-          const tempoFromGesture = timeDeltaToTempo(timeDelta,
-                                                    1,
-                                                    {timeSignature});
+          const tempoFromGesture = timeDeltaToTempo(timeDelta, 1, {
+            // do not convert tempo, yet
+            timeSignature: {division: 4},
+          });
+
           if(tempoFromGesture < tempoAbsoluteMin
-             || tempoFromGesture < tempoRelativeMin * tempo) {
+             || tempoFromGesture < tempoRelativeMin * tempoBeating) {
             console.log('no start, tap tempo out of bounds', tempoFromGesture,
                         'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
-                        'relative to', tempo,
-                        tempoRelativeMin, tempoRelativeMin * tempo,
-                        tempoRelativeMax, tempoRelativeMax * tempo);
+                        'relative to', tempoBeating,
+                        tempoRelativeMin, tempoRelativeMin * tempoBeating,
+                        tempoRelativeMax, tempoRelativeMax * tempoBeating);
             app.events.emit('gestureControlsPlaybackStartStatus', 'tooSlow');
             app.events.emit('gestureControlsPlaybackStart', false);
           }
 
           else if(tempoFromGesture > tempoAbsoluteMax
-             || tempoFromGesture > tempoRelativeMax * tempo) {
+             || tempoFromGesture > tempoRelativeMax * tempoBeating) {
             console.log('no start, tap tempo out of bounds', tempoFromGesture,
                         'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
-                        'relative to', tempo,
-                        tempoRelativeMin, tempoRelativeMin * tempo,
-                        tempoRelativeMax, tempoRelativeMax * tempo);
+                        'relative to', tempoBeating,
+                        tempoRelativeMin, tempoRelativeMin * tempoBeating,
+                        tempoRelativeMax, tempoRelativeMax * tempoBeating);
             app.events.emit('gestureControlsPlaybackStartStatus', 'tooFast');
             app.events.emit('gestureControlsPlaybackStart', false);
           }
@@ -896,16 +916,23 @@ function transport(graph, helpers, outputFrame) {
         // note: there is one beat less than the possible maximum, to cope with
         // the added latency of beat gesture analysis and audio playback
         if(beatGesturesStart.length >= Math.floor(startAfterBeatsWithLookAhead) ) {
-          // restart on first beat of current bar
-          const positionStart = {
-            bar: positionStopped.bar,
+          // convert to beating
+          const positionStoppedBeating = positionChangeBeatingUnit(positionStopped, {
+            timeSignature,
+            beatingUnitNew: beatingUnit,
+          });
+
+          const beatingStart = {
+            // first bar of beating
+            bar: positionStoppedBeating.bar,
             beat: 1,
           };
 
-          const positionsStart = [];
-
+          const beatingsStart = [];
           for(let g = beatGesturesStart.length; g > 0; --g) {
-            positionsStart.push(positionAddBeats(positionStart, -1 - g, {timeSignature}) );
+            beatingsStart.push(positionAddBeats(beatingStart, -1 -g, {
+              timeSignatureBeating,
+            }) );
           }
 
           ////// tempo
@@ -914,25 +941,27 @@ function transport(graph, helpers, outputFrame) {
           let tempos = [];
           for(let g = 1; g < beatGesturesStart.length; ++g) {
             const timeDelta = beatGesturesStart[g].time - beatGesturesStart[g - 1].time;
-            const tempoFromGesture = timeDeltaToTempo(timeDelta,
-                                                      1,
-                                                      {timeSignature});
+            const tempoFromGesture = timeDeltaToTempo(timeDelta, 1, {
+              // do not convert, to reference, yet
+              timeSignature: {division: 4},
+            });
+
             if(tempoFromGesture < tempoAbsoluteMin
-               || tempoFromGesture < tempoRelativeMin * tempo) {
+               || tempoFromGesture < tempoRelativeMin * tempoBeating) {
               console.log('no start, tap tempo out of bounds', tempoFromGesture,
                           'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
-                          'relative to', tempo,
-                          tempoRelativeMin, tempoRelativeMin * tempo,
-                          tempoRelativeMax, tempoRelativeMax * tempo);
+                          'relative to', tempoBeating,
+                          tempoRelativeMin, tempoRelativeMin * tempoBeating,
+                          tempoRelativeMax, tempoRelativeMax * tempoBeating);
               app.events.emit('gestureControlsPlaybackStartStatus', 'tooSlow');
               app.events.emit('gestureControlsPlaybackStart', false);
             } else if(tempoFromGesture > tempoAbsoluteMax
-                      || tempoFromGesture > tempoRelativeMax * tempo) {
+                      || tempoFromGesture > tempoRelativeMax * tempoBeating) {
               console.log('no start, tap tempo out of bounds', tempoFromGesture,
                           'absolute', tempoAbsoluteMin, tempoAbsoluteMax,
-                          'relative to', tempo,
-                          tempoRelativeMin, tempoRelativeMin * tempo,
-                          tempoRelativeMax, tempoRelativeMax * tempo);
+                          'relative to', tempoBeating,
+                          tempoRelativeMin, tempoRelativeMin * tempoBeating,
+                          tempoRelativeMax, tempoRelativeMax * tempoBeating);
               app.events.emit('gestureControlsPlaybackStartStatus', 'tooFast');
               app.events.emit('gestureControlsPlaybackStart', false);
             } else {
@@ -953,8 +982,8 @@ function transport(graph, helpers, outputFrame) {
             // last index of gesture corresponding to the first beat of a bar
             // (or first beat gesture)
             let beatGestureStartReference = 0;
-            for(let g = 0; g < positionsStart.length; ++g) {
-              if(positionsStart[g].beat === 1) {
+            for(let g = 0; g < beatingsStart.length; ++g) {
+              if(beatingsStart[g].beat === 1) {
                 beatGestureStartReference = g;
               }
             }
@@ -968,12 +997,14 @@ function transport(graph, helpers, outputFrame) {
 
             // includes all gestures for global estimation, including reference
             for(let g = 0; g < beatGesturesStart.length; ++g) {
+
               // time related to first beat
               const beatDeltaFromReference = secondsToBeats(
-                beatGesturesStart[beatGestureStartReference].time
-                  - beatGesturesStart[g].time,
+                beatGesturesStart[g].time
+                  - beatGesturesStart[beatGestureStartReference].time,
                 {
-                  timeSignature,
+                  // do no convert tempo
+                  timeSignature: {division: 4},
                   tempo: tempoStart,
                 });
 
@@ -985,49 +1016,75 @@ function transport(graph, helpers, outputFrame) {
               // current one.
               // do not use positionWithOffset, to reset offset
               const beatGesturePosition
-                    = positionAddBeats(positionsStart[beatGestureStartReference],
+                    = positionAddBeats(beatingsStart[beatGestureStartReference],
                                        beatDeltaFromReference,
-                                       {timeSignature});
+                                       {timeSignature: timeSignatureBeating});
 
               const beatGesturePositionRounded
-                    = positionRoundBeats(beatGesturePosition, {timeSignature});
-              const offset = positionsToBeatsDelta(beatGesturePosition,
-                                                   beatGesturePositionRounded,
-                                                   {timeSignature});
+                    = positionRoundBeats(beatGesturePosition, {
+                      timeSignature: timeSignatureBeating
+                    });
+              const offset = positionsToBeatsDelta(
+                beatGesturePosition,
+                beatGesturePositionRounded,
+                {
+                  timeSignature: timeSignatureBeating,
+                });
               offsets.push(offset);
-              const offsetWeight = beatOffsetGestureWeigthGet(offset);
-              offsetWeights.push(offsetWeight);
+              // no weights here: when starting, we adapt to any offset
             }
 
             const beatOffsetStart = mean(offsets);
 
             // restart on first beat of current bar
-            const positionStart = {
-              bar: positionStopped.bar,
+            const positionStartBeating = {
+              bar: positionStoppedBeating.bar,
               beat: 1,
             };
 
+            const positionStart = positionChangeBeatingUnit(positionStartBeating, {
+              timeSignature,
+              beatingUnit,
+              // no beatingUnitNew to revert beatingUnit
+            });
+
             // Start time from first beat gesture whose offset is 0
-            const durationFromReferenceGesture =positionDeltaToSeconds({
+            const durationFromReferenceGesture = positionDeltaToSeconds({
               bar: 0,
               beat: startAfterBeatsWithLookAhead - beatGestureStartReference,
             }, {
               tempo: tempoStart,
-              timeSignature
+              timeSignature: {
+                count: timeSignature.count,
+                // do not convert tempo, yet
+                division: 4,
+              },
             })
 
-            //
+            const timeOffsetStart = beatsToSeconds(beatOffsetStart, {
+              tempo: tempoStart,
+              // do not convert tempo, yet
+              timeSignature: {division: 4},
+            });
+
             const timeStart = beatGesturesStart[beatGestureStartReference].time
                   + durationFromReferenceGesture
-                  + beatOffsetStart;
+                  + timeOffsetStart;
 
+            const tempoQuarterNote = tempoChangeTimeSignature(tempoStart, {
+              timeSignature: timeSignatureBeating,
+              // quarter-note tempo
+              timeSignatureNew: {division: 4},
+            });
+
+            const beatOffsetStartMetric = beatOffsetStart * beatingRatio;
             // start without beatOffset but do feed the smoother
             // (for continuity with the next beating gestures)
             playbackStartRequest = {
               time: timeStart,
               position: positionStart,
-              tempo: tempoStart,
-              beatOffset: beatOffsetStart,
+              tempo: tempoQuarterNote,
+              beatOffset: beatOffsetStartMetric,
             };
           }
         }
@@ -1049,7 +1106,10 @@ function transport(graph, helpers, outputFrame) {
               = parameters.playbackStopAfterCount.bar * barCount
               + parameters.playbackStopAfterCount.beat;
 
-        const stopAfterDuration = beatsToSeconds(stopAfterBeats, {tempo, timeSignature});
+        const stopAfterDuration = beatsToSeconds(stopAfterBeats, {
+          tempoBeating,
+          timeSignature: timeSignatureBeating,
+        });
 
         const stop = now.local > beatGestureLastTime + stopAfterDuration;
         if(stop) {

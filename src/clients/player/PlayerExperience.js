@@ -215,6 +215,7 @@ class PlayerExperience extends AbstractExperience {
       showCalibrationScreen: false,
       showCreditsScreen: false,
       showInvalidSensorFramerateScreen: false,
+      showTip: null, // 'locked-exercise'
     };
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');

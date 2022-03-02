@@ -302,8 +302,6 @@ function transport(graph, helpers, outputFrame) {
     });
   }
 
-  console.log('TODO: ******************** auto stop **********************');
-
   // bar count:
   // - transport (auto start)
   // - all scenarios (start and auto start)
@@ -367,11 +365,6 @@ function transport(graph, helpers, outputFrame) {
           audio: now.audio + timeOffsetFromNow,
           local: now.local + timeOffsetFromNow,
         };
-
-        // positionLastTime = {
-        //   audio: 0,
-        //   local: 0,
-        // };
 
         app.events.emit('playback', true);
         playbackStartRequest = null;

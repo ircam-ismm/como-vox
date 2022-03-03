@@ -8,11 +8,7 @@ import {
   selfSelect,
 } from './helpers.js';
 
-import {
-  almostEquals,
-  closest,
-} from '../../../server/helpers/math.js';
-const epsilon = 0.01;
+import {closest} from '../../../server/helpers/math.js';
 
 const unitsAndNames = [
   [1, 'ronde'],

@@ -1,5 +1,21 @@
 import { html, nothing } from 'lit-html';
 
+import {tempoChangeBeatingUnit} from '../../../server/helpers/conversion.js';
+import {closest} from '../../../server/helpers/math.js';
+
+const beatingUnitsAndNames = [
+  [1, 'ronde'],
+  [3/4, 'blanche pointée'],
+  [1/2, 'blanche'],
+  [3/8, 'noire pointée'],
+  [1/4, 'noire'],
+  [3/16, 'croche pointée'],
+  [1/8, 'croche'],
+  [1/16, 'double-croche'],
+];
+
+const beatingUnits = beatingUnitsAndNames.map( (e) => e[0]);
+
 export function playerProd(data) {
   const guiState = data.guiState;
   const exp = data.experience;
@@ -8,37 +24,24 @@ export function playerProd(data) {
   const voxPlayerState = data.voxPlayerState;
   const loading = data.scoreFileName && !data.scoreReady;
 
-  const scoreTempo = (data.scoreData
-                      ? Math.round(data.scoreData.masterTrack.tempo
-                                   * data.scoreData.masterTrack.timeSignature.division / 4)
-                      : 0);
+  const scoreTempo
+        = (data.scoreData
+           ? Math.round(tempoChangeBeatingUnit(data.scoreData.masterTrack.tempo, {
+             timeSignature: data.timeSignature,
+             beatingUnit: 1/4, // tempo for quarter-note
+             beatingUnitNew: data.beatingUnit
+           }))
+           : 0);
 
-  const tempoReference = (data.scoreData
-                          ? Math.round(data.tempoReference
-                                       * data.scoreData.masterTrack.timeSignature.division / 4)
-                          : Math.round(data.tempoReference) );
+  const tempoReference
+        = Math.round(tempoChangeBeatingUnit(data.tempoReference, {
+             timeSignature: data.timeSignature,
+             beatingUnit: 1/4, // tempo for quarter-note
+             beatingUnitNew: data.beatingUnit
+        }));
 
-  let scoreDivisionName = 'noire';
-
-  if (data.scoreData) {
-    switch(data.scoreData.masterTrack.timeSignature.division) {
-      case 1:
-        scoreDivisionName = 'ronde';
-        break;
-      case 2:
-        scoreDivisionName = 'blanche';
-        break;
-      case 4:
-        scoreDivisionName = 'noire';
-        break;
-      case 8:
-        scoreDivisionName = 'croche';
-        break;
-      case 16:
-        scoreDivisionName = 'double-croche';
-        break;
-    }
-  }
+  const beatingUnitValue = closest(beatingUnits, data.beatingUnit);
+  const beatingUnitName = beatingUnitsAndNames.find(e => e[0] === beatingUnitValue)[1];
 
   return html`
     <header>
@@ -144,7 +147,7 @@ export function playerProd(data) {
                 <p>Latence</p>
                 <input
                   type="number"
-                  value="${parseInt((data.audioLatencyMeasured ? data.audioLatencyMeasured : 0) * 1e3)}"
+                  .value="${parseInt((data.audioLatencyMeasured ? data.audioLatencyMeasured : 0) * 1e3)}"
                   @blur="${e => {
                     const value = parseFloat(e.currentTarget.value);
                     if (!Number.isNaN(value)) {
@@ -330,7 +333,7 @@ export function playerProd(data) {
             ? html`
                 <p class="track-infos">
                   ${data.timeSignature.count}/${data.timeSignature.division}
-                  - tempo ${scoreTempo} à la ${scoreDivisionName}
+                  - tempo ${scoreTempo} à la ${beatingUnitName}
                 </p>
               `
             : html`<p class="track-infos">&nbsp;</p>`
@@ -452,18 +455,30 @@ export function playerProd(data) {
 
         <div class="tempo-current">
           <span class="label">Tempo courant</span>
-          <span class="value">${Math.round(data.tempo * data.timeSignature.division / 4)}</span>
+          <span class="value">${
+              Math.round(tempoChangeBeatingUnit(data.tempo, {
+                timeSignature: data.timeSignature,
+                beatingUnit: 1/4, // tempo for quarter-note
+                beatingUnitNew: data.beatingUnit
+              }))
+          }</span>
         </div>
 
         <div class="tempo-reference">
           <span class="label">Tempo de référence</span>
           <input
-            value="${tempoReference}"
+            .value="${tempoReference}"
             type="number"
             class="value"
             @blur="${e => {
               const value = parseFloat(e.currentTarget.value);
-              const tempo = (value * 4 / data.timeSignature.division) || 60;
+              const tempo = (value
+                             ? tempoChangeBeatingUnit(value, {
+                                 timeSignature: data.timeSignature,
+                                 beatingUnit: data.beatingUnit,
+                                 beatingUnitNew: 1/4, // tempo for quarter-note
+                               })
+                             : data.tempoReference);
               voxPlayerState.set({ tempo });
             }}"
           />

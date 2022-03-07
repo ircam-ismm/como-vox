@@ -2,8 +2,12 @@ function scenarioIntensity(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
-  const positionAddBeats = conversion.positionAddBeats;
-  const positionsToBeatsDelta = conversion.positionsToBeatsDelta;
+  const {
+    positionAddBeats,
+    positionChangeBeatingUnit,
+    positionsToBeatsDelta,
+    timeSignatureChangeBeatingUnit,
+  } = conversion;
 
   // to restore after calibration
   const parametersBackup = {};
@@ -165,24 +169,40 @@ function scenarioIntensity(graph, helpers, outputFrame) {
         stillness
       } = inputData;
 
+      const beatingUnit = app.state.beatingUnit;
+      const timeSignatureBeating
+            = timeSignatureChangeBeatingUnit(timeSignature, {
+              beatingUnitNew: beatingUnit,
+            });
+
       if(!parameters.scenarioIntensity) {
         return outputFrame;
       }
 
       switch(status) {
         case 'init': {
+
           // wait for 4 beats on 1/4 and 2/4 time signature
-          const barCount = (timeSignature.count >= 3
-                            ? timeSignature.count
+          const barCount = (timeSignatureBeating.count >= 3
+                            ? timeSignatureBeating.count
                             : 4);
 
           const startAfterBeats
                 = parameters.playbackStartAfterCount.bar * barCount
-                + parameters.playbackStartAfterCount.beat;
+                + parameters.playbackStartAfterCount.beat
 
-          const seekPosition = positionAddBeats({bar: 1, beat: 1},
-                                                -startAfterBeats,
-                                                {timeSignature});
+          const seekPositionBeating
+                = positionAddBeats({bar: 1, beat: 1},
+                                   -startAfterBeats,
+                                   {
+                                     timeSignature: timeSignatureBeating,
+                                   });
+
+          const seekPosition = positionChangeBeatingUnit(seekPositionBeating, {
+            timeSignature,
+            beatingUnit,
+            // new beatingUnitNew to revert to timeSignature.division
+          });
 
           app.events.emit('tempoReset', true);
           app.events.emit('seekPosition', seekPosition);

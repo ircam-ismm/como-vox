@@ -2,8 +2,14 @@ function scenarioFull(graph, helpers, outputFrame) {
   const app = (typeof global !== 'undefined' ? global.app : window.app);
 
   const conversion = app.imports.helpers.conversion;
-  const beatsToSeconds = conversion.beatsToSeconds;
-  const notesToBeats = conversion.notesToBeats;
+  const {
+    beatsToSeconds,
+    notesToBeats,
+    positionAddBeats,
+    positionChangeBeatingUnit,
+    positionsToBeatsDelta,
+    timeSignatureChangeBeatingUnit,
+  } = conversion;
 
   // to restore after calibration
   const parametersBackup = {};
@@ -123,6 +129,7 @@ function scenarioFull(graph, helpers, outputFrame) {
       // over-rides
       app.events.emit('gestureControlsPlaybackStart', false);
       app.events.emit('gestureControlsPlaybackStop', true);
+      app.events.emit('gestureControlsIntensity', true);
       // must start at the beginning of a bar (from start is fine, too)
       if(app.state.playbackStopSeek !== 'start'
          && app.state.playbackStopSeek !== 'barStart') {
@@ -140,6 +147,7 @@ function scenarioFull(graph, helpers, outputFrame) {
       statusUpdate('off');
       app.events.emit('gestureControlsPlaybackStart', false);
       app.events.emit('gestureControlsPlaybackStop', false);
+      app.events.emit('gestureControlsIntensity', false);
       app.events.emit('scenarioPlayback', false);
       app.events.emit('playback', false);
     }
@@ -209,6 +217,12 @@ function scenarioFull(graph, helpers, outputFrame) {
         timeSignature,
       } = inputData;
 
+      const beatingUnit = app.state.beatingUnit;
+      const timeSignatureBeating
+            = timeSignatureChangeBeatingUnit(timeSignature, {
+              beatingUnitNew: beatingUnit,
+            });
+
       if(!parameters.scenarioFull
         || !stillness) {
         return outputFrame;
@@ -253,24 +267,26 @@ function scenarioFull(graph, helpers, outputFrame) {
           }
 
           // wait for 4 beats on 1/4 and 2/4 time signature
-          const barCount = (timeSignature.count >= 3
-                            ? timeSignature.count
+          const barCount = (timeSignatureBeating.count >= 3
+                            ? timeSignatureBeating.count
                             : 4);
 
           // keep some beats for look-ahead
-          const lookAheadBeats =
-                notesToBeats(lookAheadNotes, {timeSignature});
+          const stopLookAheadBeats =
+                notesToBeats(lookAheadNotes, {
+                  timeSignature: timeSignatureBeating,
+                });
 
           // warning: this is a float
           const stopAfterBeatsWithLookAhead
                 = parameters.playbackStartAfterCount.bar * barCount
                 + parameters.playbackStartAfterCount.beat
-                + 1
-                - lookAheadBeats;
+                + 1 // one more for upbeat before start
+                - stopLookAheadBeats;
 
           const stopAfterDuration = beatsToSeconds(stopAfterBeatsWithLookAhead, {
             tempo,
-            timeSignature,
+            timeSignature: timeSignatureBeating,
           });
 
           // wait until hearing playback: add playbackLatency

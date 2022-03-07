@@ -302,16 +302,6 @@ function transport(graph, helpers, outputFrame) {
     });
   }
 
-  // bar count:
-  // - transport (auto start)
-  // - all scenarios (start and auto start)
-  console.log('TODO: ******************** playback pre-count *************');
-  console.log('TODO: ******************** scenarioStart ******************');
-  console.log('TODO: ******************** scenarioFull *******************');
-
-  // keep 1 eighth note ?
-  console.log('TODO: ******************** lookAheadNotes *****************');
-
   return {
     updateParams,
 

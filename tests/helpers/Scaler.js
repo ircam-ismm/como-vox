@@ -48,6 +48,24 @@ describe(`Check Scaler object`, () => {
         [55, 3, 47],
       ],
     ],
+    // start > end
+    [
+      {
+        inputStart: 47,
+        inputEnd: 5,
+        outputStart: -12,
+        outputEnd: 3,
+        base: 1,
+        clip: true,
+      },
+      [ // input, scaled, inverse
+        [5, 3, 5],
+        [47, -12, 47],
+        // clip, then inverse
+        [-12, 3, 5],
+        [55, -12, 47],
+      ],
+    ],
     // no input or output range
     [
       // linear

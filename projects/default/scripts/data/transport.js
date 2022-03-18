@@ -116,8 +116,8 @@ function transport(graph, helpers, outputFrame) {
   const beatOffsetSmoothDurationFromTempo = new Scaler({
     inputStart: 60, // bpm
     inputEnd: 120,
-    outputStart: 1, // seconds
-    outputEnd: 1, // 2
+    outputStart: 0.5, // seconds  // smoothing   1
+    outputEnd: 0.5, // 2 // smoothing   1
     type: 'linear',
     clip: true,
   });

@@ -366,13 +366,15 @@ function transport(graph, helpers, outputFrame) {
       }
 
       const tempo = tempoSmoother.process(now.audio);
+      // little pull-up
+      // const tempo = tempoSmoother.process(now.audio) * 1.05;
+
       // from (quarter-note) reference tempo
       const tempoBeating = tempoChangeBeatingUnit(tempo, {
         timeSignature: {division: 4},
         beatingUnitNew: beatingUnit,
       });
 
-      // const tempo = tempoSmoother.process(now.audio) * 1.05;
       const beatOffset = beatOffsetSmoother.process(now.audio);
 
       const playbackLatency = inputData['playbackLatency'];

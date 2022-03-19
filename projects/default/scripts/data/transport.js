@@ -788,7 +788,7 @@ function transport(graph, helpers, outputFrame) {
         if(parameters.gestureControlsBeatOffset
            && offsets.length >= 2) {
           const beatOffsetSmoothDuration
-                = beatOffsetSmoothDurationFromTempo.process(tempo);
+                = beatOffsetSmoothDurationFromTempo.process(tempoBeating);
           const beatOffsetNew = weightedMean(offsets, offsetWeights);
           beatOffsetSmoother.set({
             inputStart: now.audio,

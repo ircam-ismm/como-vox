@@ -8,9 +8,9 @@ function compressor(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     attack:
     10e-3, // seconds, quick
     release: 500e-3, // seconds, slow
-    threshold: -3, // dB
+    threshold: -6, // dB
     ratio: 20, // ratio, hard limiter
-    knee: 3, // dB
+    knee: 6, // dB
     preGain: 6,
     postGain: -2, // dB, little headroom
   };

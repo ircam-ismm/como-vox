@@ -366,13 +366,15 @@ function transport(graph, helpers, outputFrame) {
       }
 
       const tempo = tempoSmoother.process(now.audio);
+      // little pull-up
+      // const tempo = tempoSmoother.process(now.audio) * 1.05;
+
       // from (quarter-note) reference tempo
       const tempoBeating = tempoChangeBeatingUnit(tempo, {
         timeSignature: {division: 4},
         beatingUnitNew: beatingUnit,
       });
 
-      // const tempo = tempoSmoother.process(now.audio) * 1.05;
       const beatOffset = beatOffsetSmoother.process(now.audio);
 
       const playbackLatency = inputData['playbackLatency'];
@@ -788,7 +790,7 @@ function transport(graph, helpers, outputFrame) {
         if(parameters.gestureControlsBeatOffset
            && offsets.length >= 2) {
           const beatOffsetSmoothDuration
-                = beatOffsetSmoothDurationFromTempo.process(tempo);
+                = beatOffsetSmoothDurationFromTempo.process(tempoBeating);
           const beatOffsetNew = weightedMean(offsets, offsetWeights);
           beatOffsetSmoother.set({
             inputStart: now.audio,

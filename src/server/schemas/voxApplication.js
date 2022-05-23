@@ -15,7 +15,7 @@ export default {
     type: 'any',
     default: {
       '-': -50e-3,
-      'normal': 0,
+      'normal': 0,   // default
       '+': 50e-3,
     },
   },

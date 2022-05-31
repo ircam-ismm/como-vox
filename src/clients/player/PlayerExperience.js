@@ -146,7 +146,7 @@ class PlayerExperience extends AbstractExperience {
     this.como.configureExperience(this);
     // default initialization views
 
-    if (!PLAYER_PROD || !PLAYER_ELECTRON) {
+    if (!PLAYER_PROD && !PLAYER_ELECTRON) {
       renderInitializationScreens(como.client, config, $container);
     } else {
       renderInitializationScreens(como.client, config, $container, {

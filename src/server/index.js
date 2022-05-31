@@ -11,12 +11,15 @@ import JSON5 from 'json5';
 
 import pluginLoggerFactory from '@soundworks/plugin-logger/server';
 
-import CoMoExperience from './CoMoExperience';
+import CoMoExperience from './CoMoExperience.js';
 
-import voxPlayerSchema from './schemas/voxPlayer';
-import voxApplicationSchema from './schemas/voxApplication';
+import voxPlayerSchema from './schemas/voxPlayer.js';
+import voxApplicationSchema from './schemas/voxApplication.js';
+// used in electron app
+import comoteSchema from './schemas/comote.js';
 
 import getConfig from './utils/getConfig.js';
+import electron from './electron.js';
 
 import './imports.js';
 
@@ -68,6 +71,10 @@ server.pluginManager.register('vox-logger', pluginLoggerFactory, {
   directory: 'logs',
 }, []);
 
+server.stateManager.registerSchema('vox-application', voxApplicationSchema);
+server.stateManager.registerSchema('vox-player', voxPlayerSchema);
+server.stateManager.registerSchema('comote', comoteSchema);
+
 (async function launch() {
   try {
     // @todo - check how this behaves with a node client...
@@ -85,33 +92,34 @@ server.pluginManager.register('vox-logger', pluginLoggerFactory, {
         }
       };
     });
+
     await como.init();
 
-    const experience = new CoMoExperience(como);
-
-    // start all the things
-    await server.start();
-    await como.start();
-
-    // util since node v8
-    // fs.promises since node v11
+    // @notes : `util` since node v8, `fs.promises` since node v11
     const scoresPath = 'scores';
-    const scores = await util.promisify(fs.readdir)(path.join('assets', scoresPath) )
-          .then( (files) => {
-            return files.filter( (file) => {
-              const extension = path.extname(file).toLowerCase();
-              return (extension === '.mid' || extension === '.midi');
-            });
-          });
+    const scores = await util.promisify(fs.readdir)(path.join('assets', scoresPath))
+      .then((files) => {
+        return files.filter( (file) => {
+          const extension = path.extname(file).toLowerCase();
+          return (extension === '.mid' || extension === '.midi');
+        });
+      });
 
-    server.stateManager.registerSchema('vox-application', voxApplicationSchema);
     const voxApplicationState = await server.stateManager.create('vox-application');
+
     voxApplicationState.set({
       scoresPath,
       scores,
     });
 
-    server.stateManager.registerSchema('vox-player', voxPlayerSchema);
+    const experience = new CoMoExperience(como);
+    // start all the things
+    await server.start();
+    await como.start();
+
+    if (process.env.ENV === 'electron') {
+      await electron.init(server, como);
+    }
 
   } catch (err) {
     console.error(err.stack);

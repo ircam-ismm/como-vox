@@ -54,6 +54,12 @@ button {
 /* ------------------------------------------ */
 
 #home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  cursor: pointer;
+
   .logo {
     width: 80%;
     max-width: 300px;
@@ -625,3 +631,129 @@ header {
   background-position: 50% 50%;
 }
 
+/* ------------------------------------------ */
+/* Special styles for electron
+/* ------------------------------------------ */
+
+#electron {
+  $rightColumnWidth: 450px;
+  $headerAndFooterHeight: 106px;
+
+  header {
+    position: relative;
+    z-index: 10;
+  }
+
+  .connect-first-overlay {
+    position: absolute;
+    width: calc(100vw - $rightColumnWidth - 10px);
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 300;
+    display: flex;
+    align-content: space-around;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+
+    p {
+      font-size: 24px;
+      width: 60%;
+      line-height: 40px;
+      position: relative;
+      text-align: right;
+    }
+  }
+
+  .main {
+    width: calc(100vw - $rightColumnWidth);
+    min-height: calc(100vh - $headerAndFooterHeight);
+    float: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-content: center;
+    flex-wrap: wrap;
+
+    .exercise-control {
+      .button {
+        width: 200px;
+        height: 200px;
+      }
+    }
+
+    > div {
+      max-width: 1000px;
+    }
+
+    .preview {
+      position: relative;
+    }
+  }
+
+  .column-right {
+    width: $rightColumnWidth;
+    float: right;
+    box-shadow: -3px 1px 5px -2px #909090;
+    background-color: #efefef;
+    // height: calc(100vh - $headerAndFooterHeight);
+    height: 100%;
+    overflow-y: auto;
+
+    & > div {
+      position: relative;
+    }
+
+    .calibration,
+    .settings,
+    .comote-settings {
+      background-color: transparent;
+      padding: 20px;
+      border: none;
+      box-shadow: none;
+      min-height: auto;
+
+      border-bottom: 1px solid #909090;
+    }
+
+    .comote-settings {
+      img {
+        width: calc(100% - 20px);
+      }
+
+      ol {
+        padding-left: 20px;
+
+        li {
+          padding-bottom: 12px;
+        }
+      }
+
+      .info {
+        color: #787878;
+      }
+
+      .connection-status {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        float: right;
+        margin-right: 10px;
+        background-color: #dc3545;
+        border: 1px solid darken(#dc3545, 20%);
+
+        &.connected {
+          background-color: #28a745;
+          border: 1px solid darken(#28a745, 20%);
+        }
+      }
+    }
+  }
+
+  footer {
+    // position: relative;
+    // z-index: 100000000;
+  }
+}

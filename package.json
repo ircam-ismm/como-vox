@@ -10,13 +10,12 @@
   "scripts": {
     "build": "npm run clean && (webpack --mode=development & soundworks-template-build -b)",
     "build:production": "npm run clean && (webpack --mode=production & soundworks-template-build -b -m)",
-    "build-watch": "npm run clean && npm run build && (webpack --mode=development --watch & soundworks-template-build -b -w)",
     "clean": "soundworks-template-build -c",
+    "watch-build": "webpack --mode=development --watch & soundworks-template-build -b -w",
     "watch-process": "webpack --mode=development --watch & soundworks-template-build -p",
     "watch-process:inspect": "webpack --mode=development --watch & soundworks-template-build -i -p",
     "dev": "npm run build && (webpack --mode=development --watch & npm run watch-process:inspect server & soundworks-template-build -b -w)",
     "postinstall": "mkdir -p .vendors/public && cp -R node_modules/@webcomponents/webcomponentsjs .vendors/public",
-    "prepare-electron": "electron-rebuild -v 18.2.4",
     "test": "mocha 'tests/**/*.js'",
     "test-watch": "mocha --watch 'tests/**/*.js'",
     "start": "node .build/server/index.js"

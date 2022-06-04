@@ -18,9 +18,7 @@ import * as CoMoteQRCode from '@ircam/comote-helpers/qrcode.js';
 views.playerElectron = playerElectron;
 
 import midi from '../../shared/score/midi.js';
-
-import {SampleManager} from '../shared/SampleManager.js';
-
+import { SampleManager } from '../shared/SampleManager.js';
 // in case of electron app
 import ComoteSource from './electron/ComoteSource.js';
 

@@ -45,9 +45,9 @@ export function playerElectron(data) {
   const beatingUnitName = beatingUnitsAndNames.find(e => e[0] === beatingUnitValue)[1];
 
   return html`
-    <header>
+    <!-- <header>
       <h1 class="title"></h1>
-    </header>
+    </header> -->
 
     <section id="electron">
       <!-- ---------------------------------- -->

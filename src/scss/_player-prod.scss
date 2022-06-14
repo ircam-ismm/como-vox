@@ -646,7 +646,7 @@ header {
 
   .connect-first-overlay {
     position: absolute;
-    width: calc(100vw - $rightColumnWidth - 10px);
+    width: calc(100% - $rightColumnWidth - 10px);
     height: 100%;
     top: 0;
     left: 0;
@@ -667,7 +667,7 @@ header {
   }
 
   .main {
-    width: calc(100vw - $rightColumnWidth);
+    width: calc(100% - $rightColumnWidth);
     min-height: calc(100vh - $headerAndFooterHeight);
     float: left;
     display: flex;

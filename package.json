@@ -1,9 +1,11 @@
 {
   "name": "como-vox",
   "authors": [
-    "Benjamin Matuszewski"
+    "Jean-Philippe Lambert",
+    "Benjamin Matuszewski",
+    "Frederic Bevilacqua"
   ],
-  "description": "experimental application of the CoMo framework",
+  "description": "CoMo application to familiarize with conducting gestures",
   "license": "BSD-3-Clause",
   "version": "1.0.0",
   "private": true,
@@ -27,7 +29,7 @@
   "dependencies": {
     "@babel/runtime-corejs3": "^7.17.0",
     "@ircam/blocked": "^1.1.2",
-    "@ircam/como": "^0.1.6",
+    "@ircam/como": "^1.0.0-beta.0",
     "@ircam/comote-helpers": "^0.1.1",
     "@ircam/simple-components": "^1.3.1",
     "@soundworks/core": "^3.2.0",

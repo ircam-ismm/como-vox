@@ -13,7 +13,7 @@ export default {
     const wifiInfos = await getWifiInfos();
     const comoteConfig = {
       id: 'como-vox',
-      interval: 20, // period in ms
+      interval: 16, // period in ms
       ws: {
         port: comotePort,
         hostname: wifiInfos.ip,

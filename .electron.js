@@ -4,6 +4,7 @@ const config = {
   // avoid spaces in product name, this crashes the build process
   productName: 'CoMo Vox',
   buildVersion: pkg.version,
+  // buildNumber: 1,
   appId: 'fr.ircam.ismm.como-vox',
   icon: './media/icon.png',
   publish: [

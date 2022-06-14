@@ -9,6 +9,7 @@
 # ignore all config except default
 /config/env/*
 !/config/env/default.json
+!/config/env/electron.json
 /config/como-*.json
 
 # application instance specific

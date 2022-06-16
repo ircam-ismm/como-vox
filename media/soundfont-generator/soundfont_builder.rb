@@ -36,7 +36,7 @@ require 'parallel'
 require 'digest/sha1'
 include FileUtils
 
-BUILD_DIR = "../assets/soundfonts-new"  # Output path
+BUILD_DIR = "./soundfonts-new"  # Output path
 # SOUNDFONT = "./FluidR3_GM.sf2" # Soundfont file path
 SOUNDFONT = "./MuseScore_General.sf3" # Soundfont file path
 
@@ -335,6 +335,9 @@ puts
 puts "Sending output to: " + BUILD_DIR
 puts
 
+
+FileUtils.mkdir_p "#{BUILD_DIR}"
+
 raise "Can't find soundfont: #{SOUNDFONT}" unless File.exists? SOUNDFONT
 raise "Can't find 'oggenc' command" if OGGENC.empty?
 raise "Can't find 'lame' command" if LAME.empty?
@@ -361,7 +364,7 @@ NOTES = {
 
 MIDI_C0 = 12
 VELOCITY = 60
-DURATION = Integer(3000) # milliseconds
+DURATION = Integer(4000) # milliseconds
 TEMP_FILE = "#{BUILD_DIR}/%s%stemp.midi"
 FLUIDSYNTH_RAW = "%s.raw"
 

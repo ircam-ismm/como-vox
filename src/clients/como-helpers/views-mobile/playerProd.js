@@ -1,7 +1,9 @@
-import { html, nothing } from 'lit-html';
+import { html, svg, nothing } from 'lit-html';
 
 import {tempoChangeBeatingUnit} from '../../../server/helpers/conversion.js';
 import {closest} from '../../../server/helpers/math.js';
+
+import createTempoStatsPlot from '../templates/createTempoStatsPlot.js';
 
 const beatingUnitsAndNames = [
   [1, 'ronde'],
@@ -147,11 +149,11 @@ export function playerProd(data) {
                 <p>Latence</p>
                 <input
                   type="number"
-                  .value="${parseInt((data.audioLatencyMeasured ? data.audioLatencyMeasured : 0) * 1e3)}"
+                  .value="${data.audioLatencyMeasured ? data.audioLatencyMeasured.toFixed(3) : 0}"
                   @blur="${e => {
                     const value = parseFloat(e.currentTarget.value);
                     if (!Number.isNaN(value)) {
-                      voxPlayerState.set({ audioLatencyMeasured: value * 1e-3 });
+                      voxPlayerState.set({ audioLatencyMeasured: value });
                     }
                   }}"
                 />
@@ -178,6 +180,9 @@ export function playerProd(data) {
             <p>
               Le processus peut être un peu long, continuez régulièrement jusqu'à l'arrêt.
             </p>
+            <p>
+              Notez que la valeur estimée est dépendante du téléphone utilisé et peut-être comprise entre environ 0.02 et 0.3s, il n'y a donc pas de "bonne valeur".
+            </p>
 
             ${
               data.audioLatencyMeasured === null && data.scenarioStatus === 'cancel' ?
@@ -190,7 +195,7 @@ export function playerProd(data) {
                 </p>` :
               data.audioLatencyMeasured !== null ?
                 html`<p class="info success">
-                  La latence estimée entre votre geste et le son est de ${parseInt(data.audioLatencyMeasured * 1e3)} ms.
+                  La latence estimée entre votre geste et le son est de ${data.audioLatencyMeasured.toFixed(3)} s.
                 </p>` :
                 html`<p class="info">
                   &nbsp;<br />&nbsp;
@@ -269,6 +274,37 @@ export function playerProd(data) {
           </div>
         `
       : nothing}
+
+      ${guiState.showTempoStats ?
+        html`
+          <div class="stats">
+            <button
+              class="close"
+              @click="${e => {
+                guiState.showTempoStats = false;
+                exp.updateGuiState(guiState);
+              }}"
+            ></button>
+
+            ${createTempoStatsPlot(data.tempoStack, data.tempoStats, tempoReference)}
+
+            <ul>
+              <li>Tempo de référence: ${tempoReference}</li>
+              <li>Tempo moyen: ${Math.round(data.tempoStats.mean)}</li>
+              <li>Tempo maximum: ${Math.round(data.tempoStats.max)}</li>
+              <li>Tempo minimum: ${Math.round(data.tempoStats.min)}</li>
+            </ul>
+
+            <button
+              class="color-default"
+              @click="${e => {
+                guiState.showTempoStats = false;
+                exp.updateGuiState(guiState);
+              }}"
+            >Continuer</button>
+          </div>
+        ` : nothing
+      }
 
       <!-- ---------------------------------- -->
       <!-- MAIN SCREEN                        -->
@@ -382,7 +418,10 @@ export function playerProd(data) {
             }}"
           >Nuance</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="
+              ${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}
+              ${data.audioLatencyMeasured === null ? ' locked' : ''}
+              ${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
@@ -396,7 +435,11 @@ export function playerProd(data) {
             }}"
           >Tempo</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="
+              ${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}
+              ${data.audioLatencyMeasured === null ? ' locked' : ''}
+              ${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}
+            "
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
@@ -410,7 +453,11 @@ export function playerProd(data) {
             }}"
           >Tempo & Nuance</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="
+              ${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}
+              ${data.audioLatencyMeasured === null ? ' locked' : ''}
+              ${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}
+            "
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 

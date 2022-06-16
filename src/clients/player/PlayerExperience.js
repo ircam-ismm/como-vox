@@ -21,6 +21,7 @@ import midi from '../../shared/score/midi.js';
 import { SampleManager } from '../shared/SampleManager.js';
 // in case of electron app
 import ComoteSource from './electron/ComoteSource.js';
+import { tempoChangeBeatingUnit } from '../../server/helpers/conversion.js';
 
 // window.app from CoMoPlayer
 const app = window.app;
@@ -138,6 +139,10 @@ class PlayerExperience extends AbstractExperience {
     this.metronomeSound = undefined;
     this.beatingSound = undefined;
 
+    // to avoid freezing phone the stack is clamped to 6000 values (~2mn), see `setTempo`
+    this.tempoStack = [];
+    this.tempoStats = {};
+
     app.experience = this;
 
     // configure como w/ the given experience
@@ -227,8 +232,17 @@ class PlayerExperience extends AbstractExperience {
       showCalibrationScreen: false,
       showCreditsScreen: false,
       showInvalidSensorFramerateScreen: false,
+      showTempoStats: false,
       showTip: null, // 'locked-exercise'
     };
+
+    // debug tempo stats.....
+    // for (let i = 0; i < 1000; i++) {
+    //   this.tempoStack.push(Math.random() * 30 + 60);
+    // }
+    // this.doTempoStats();
+    // this.guiState.showTempoStats = true;
+    // end debug.............
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');
     this.voxApplicationState.subscribe( (updates) => {
@@ -249,6 +263,17 @@ class PlayerExperience extends AbstractExperience {
 
       // update URL on state change, to avoid update for each parameter
       url.update(voxPlayerSchema, this.state);
+
+      if ('scenarioPlayback' in updates) {
+        if (!updates.scenarioPlayback) {
+          console.log('do stats and show');
+          this.doTempoStats();
+          this.guiState.showTempoStats = true;
+        } else {
+          console.log('reset');
+          this.tempoStack.length = 0; // reset stack
+        }
+      }
     });
 
     // 2. create a sensor source to be used within the graph.
@@ -336,18 +361,20 @@ class PlayerExperience extends AbstractExperience {
     if (typeof loadedState.tempo !== 'undefined'
        || typeof loadedState.beatingUnit) {
       const {tempo, beatingUnit} = loadedState;
+
       this.setScoreCallback = () => {
-        if(tempo) {
+        if (tempo) {
           this.events.emit('tempo', tempo);
         }
 
-        if(beatingUnit) {
+        if (beatingUnit) {
           this.events.emit('beatingUnit', beatingUnit);
         }
 
         delete this.setScoreCallback;
       }
     }
+
     for (const [key, value] of Object.entries(loadedState) ) {
       this.events.emit(key, value);
     }
@@ -416,6 +443,18 @@ class PlayerExperience extends AbstractExperience {
       } else {
         // internal stream: no propagation of update
         this.setTempo(frame['tempo'], {referenceUpdate: false});
+
+        // store values for stats
+        if (this.voxPlayerState.get('scenarioPlayback')) {
+          if (this.tempoStack.length < 6000) { // around 2 minutes
+            const tempo = tempoChangeBeatingUnit(frame['tempo'], {
+              timeSignature: this.state.timeSignature,
+              beatingUnit: 1/4, // tempo for quarter-note
+              beatingUnitNew: this.state.beatingUnit
+            });
+            this.tempoStack.push(tempo);
+          }
+        }
       }
 
       if (this.state.scoreControlsTimeSignature) {
@@ -896,11 +935,11 @@ class PlayerExperience extends AbstractExperience {
   setTempo(tempo, {
     referenceUpdate = true,
   } = {}) {
-    if(!tempo || (tempo === this.tempo && tempo == this.tempoReference) ) {
+    if (!tempo || (tempo === this.tempo && tempo == this.tempoReference)) {
       return;
     }
 
-    if(referenceUpdate) {
+    if (referenceUpdate) {
       this.tempoReference = tempo;
     }
 
@@ -908,6 +947,35 @@ class PlayerExperience extends AbstractExperience {
 
     app.data.tempo = tempo;
     this.updateLookAhead();
+  }
+
+  // just find min max for now
+  doTempoStats() {
+    let min = +Infinity;
+    let max = -Infinity;
+    let sum = 0;
+
+    // remove few frames in the beginning, seems that it could be garbage
+    for (let i = 0; i < 5; i++) {
+      this.tempoStack.shift();
+    }
+
+    for (let i = 0; i < this.tempoStack.length; i++) {
+      const value = this.tempoStack[i];
+      if (value > max) {
+        max = value;
+      }
+
+      if (value < min) {
+        min = value;
+      }
+
+      sum += value;
+    }
+
+    const mean = sum / this.tempoStack.length;
+
+    this.tempoStats = { min, max, mean };
   }
 
   resetTempo() {
@@ -1044,6 +1112,9 @@ class PlayerExperience extends AbstractExperience {
       // electron only, undefined otherwise
       comoteState: this.comoteState,
       qrCode: this.qrCode,
+
+      tempoStack: this.tempoStack,
+      tempoStats: this.tempoStats,
     };
 
     const listeners = this.listeners;

@@ -613,6 +613,52 @@ header {
   }
 }
 
+
+/* ------------------------------------------ */
+/* STATS
+/* ------------------------------------------ */
+.stats {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  height: 100%;
+  width: 100%;
+  padding: 40px 20px 20px 20px;
+  background-color: #ffffff;
+  overflow-y: auto;
+
+  .close {
+    display: block;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    background-color: transparent;
+    border: none;
+    background-image: url(../images/close.png);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: contain;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin: 40px 0;
+  }
+
+  button {
+    height: 30px;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    background-color: $secondary-color;
+    width: 100%;
+    margin-bottom: 10px;
+    display: block;
+  }
+}
+
 /* ------------------------------------------ */
 /* Calibration
 /* ------------------------------------------ */

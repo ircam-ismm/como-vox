@@ -2,7 +2,7 @@ export default {
 
   audioIntensityRange: {
     type: 'float',
-    default: 32, // dB
+    default: 60, // dB
   },
 
   audioIntensityRangeUi: {
@@ -483,12 +483,12 @@ export default {
 
   scoreIntensityCompressionMinFixed: {
     type: 'float',
-    default: 80, // keep some dynamics
+    default: 30, // keep some dynamics
   },
 
   scoreIntensityCompressionMinGesture: {
     type: 'float',
-    default: 110, // flatter than fixed
+    default: 90, // flatter than fixed
   },
 
   scoreIntensityCompressionMinMaxUi : {

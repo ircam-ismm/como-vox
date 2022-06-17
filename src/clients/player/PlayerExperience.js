@@ -12,10 +12,16 @@ import schema from '../../shared/schema.js';
 import storage from '../shared/storage.js';
 import CoMoPlayer from '../como-helpers/CoMoPlayer';
 import views from '../como-helpers/views-mobile/index.js';
+import { playerElectron } from '../como-helpers/views-electron/playerElectron.js';
+import * as CoMoteQRCode from '@ircam/comote-helpers/qrcode.js';
+
+views.playerElectron = playerElectron;
 
 import midi from '../../shared/score/midi.js';
-
-import {SampleManager} from '../shared/SampleManager.js';
+import { SampleManager } from '../shared/SampleManager.js';
+// in case of electron app
+import ComoteSource from './electron/ComoteSource.js';
+import { tempoChangeBeatingUnit } from '../../server/helpers/conversion.js';
 
 // window.app from CoMoPlayer
 const app = window.app;
@@ -28,11 +34,11 @@ const positionChangeBeatingUnit = conversion.positionChangeBeatingUnit;
 
 const audio = app.imports.helpers.audio;
 
-if(typeof app.instruments === 'undefined') {
+if (typeof app.instruments === 'undefined') {
   app.instruments = {};
 }
 
-if(typeof app.measures === 'undefined') {
+if (typeof app.measures === 'undefined') {
   app.measures = {};
 }
 
@@ -44,7 +50,7 @@ const tempoDefault = 80;
 const timeSignatureDefault = {count: 4, division: 4};
 const playbackDefault = true;
 
-if(typeof app.data === 'undefined') {
+if (typeof app.data === 'undefined') {
   app.data = {};
 }
 
@@ -83,7 +89,10 @@ console.info('> to use audio for debugging purpose, append "&debugAudio=1" to UR
 console.info('> to use advanced graphical user interface for debugging purpose, append "&editorGUI=1" to URI');
 
 let PLAYER_PROD = !url.paramGet('editorGUI', null);
+let PLAYER_ELECTRON = url.paramGet('target', false) == 'electron' ? true : false;
+
 console.log("load: PLAYER_PROD = ", PLAYER_PROD);
+console.log("load: PLAYER_ELECTRON = ", PLAYER_ELECTRON);
 
 class PlayerExperience extends AbstractExperience {
   constructor(como, config, $container) {
@@ -130,13 +139,17 @@ class PlayerExperience extends AbstractExperience {
     this.metronomeSound = undefined;
     this.beatingSound = undefined;
 
+    // to avoid freezing phone the stack is clamped to 6000 values (~2mn), see `setTempo`
+    this.tempoStack = [];
+    this.tempoStats = {};
+
     app.experience = this;
 
     // configure como w/ the given experience
     this.como.configureExperience(this);
     // default initialization views
 
-    if (!PLAYER_PROD) {
+    if (!PLAYER_PROD && !PLAYER_ELECTRON) {
       renderInitializationScreens(como.client, config, $container);
     } else {
       renderInitializationScreens(como.client, config, $container, {
@@ -153,7 +166,13 @@ class PlayerExperience extends AbstractExperience {
             } else if (pluginState.authorized === null) {
               msg = 'Autorisations...';
             } else if (pluginState.initializing === null) {
-              msg = `Cliquez pour commencer<span>Merci d'accepter l'utilisation<br />des capteurs de mouvement</span>`;
+              msg = `Cliquez pour commencer`;
+
+              // only for web mobile version
+              if (!PLAYER_ELECTRON) {
+                msg += `<span>Merci d'accepter l'utilisation<br />des capteurs de mouvement</span>`;
+              }
+
               blink = true;
 
               bindListener = (e) => {
@@ -174,7 +193,6 @@ class PlayerExperience extends AbstractExperience {
                 </svg>
                 <p>${unsafeHTML(msg)}</p>
               </section>
-              <footer></footer>
             `;
           },
           default: (plugin, config, containerInfos) => {
@@ -186,7 +204,6 @@ class PlayerExperience extends AbstractExperience {
                 </svg>
                 <p>Chargement de l'application...</p>
               </section>
-              <footer></footer>
             `;
           }
         },
@@ -215,8 +232,17 @@ class PlayerExperience extends AbstractExperience {
       showCalibrationScreen: false,
       showCreditsScreen: false,
       showInvalidSensorFramerateScreen: false,
+      showTempoStats: false,
       showTip: null, // 'locked-exercise'
     };
+
+    // debug tempo stats.....
+    // for (let i = 0; i < 1000; i++) {
+    //   this.tempoStack.push(Math.random() * 30 + 60);
+    // }
+    // this.doTempoStats();
+    // this.guiState.showTempoStats = true;
+    // end debug.............
 
     this.voxApplicationState = await this.client.stateManager.attach('vox-application');
     this.voxApplicationState.subscribe( (updates) => {
@@ -237,15 +263,44 @@ class PlayerExperience extends AbstractExperience {
 
       // update URL on state change, to avoid update for each parameter
       url.update(voxPlayerSchema, this.state);
-    });
 
+      if ('scenarioPlayback' in updates) {
+        if (!updates.scenarioPlayback) {
+          console.log('do stats and show');
+          this.doTempoStats();
+          this.guiState.showTempoStats = true;
+        } else {
+          console.log('reset');
+          this.tempoStack.length = 0; // reset stack
+        }
+      }
+    });
 
     // 2. create a sensor source to be used within the graph.
     // We create a `RandomSource` if deviceMotion is not available for development
     // purpose, in most situations we might prefer to display a "sorry" screen
     let source;
-    // @todo - finish decoupling `streamId` from `playerId`
-    if (this.como.hasDeviceMotion) {
+
+    if (PLAYER_ELECTRON) {
+      this.comoteState = await this.client.stateManager.attach('comote');
+      source = new ComoteSource(this.como, player.get('id'));
+
+      this.comoteState.subscribe(updates => {
+        for (let [key, value] of Object.entries(updates)) {
+          switch (key) {
+            case 'devicemotion':
+              source.process(updates.devicemotion);
+              break;
+            case 'connected':
+              this.render();
+              break;
+          }
+        }
+      });
+      // this should never change
+      this.qrCode = await CoMoteQRCode.dataURL(this.comoteState.get('config'));
+      console.log(this.qrCode);
+    } else if (this.como.hasDeviceMotion) {
       source = new this.como.sources.DeviceMotion(this.como, player.get('id'));
     } else {
       source = new this.como.sources.RandomValues(this.como, player.get('id'));
@@ -288,10 +343,11 @@ class PlayerExperience extends AbstractExperience {
 
     this.audioContext = this.como.audioContext;
 
-    for(const key of Object.keys(voxPlayerSchema) ) {
-      if(schema.isStored(voxPlayerSchema, key)) {
+    for (const key of Object.keys(voxPlayerSchema) ) {
+      if (schema.isStored(voxPlayerSchema, key)) {
         const value = storage.load(key);
-        if(typeof value !== 'undefined') {
+
+        if (typeof value !== 'undefined') {
           this.events.emit(key, value);
         }
       }
@@ -302,22 +358,24 @@ class PlayerExperience extends AbstractExperience {
 
     // be sure to restore tempo and beatingUnit after a load
     // no matter the modes
-    if(typeof loadedState.tempo !== 'undefined'
+    if (typeof loadedState.tempo !== 'undefined'
        || typeof loadedState.beatingUnit) {
       const {tempo, beatingUnit} = loadedState;
+
       this.setScoreCallback = () => {
-        if(tempo) {
+        if (tempo) {
           this.events.emit('tempo', tempo);
         }
 
-        if(beatingUnit) {
+        if (beatingUnit) {
           this.events.emit('beatingUnit', beatingUnit);
         }
 
         delete this.setScoreCallback;
       }
     }
-    for( const [key, value] of Object.entries(loadedState) ) {
+
+    for (const [key, value] of Object.entries(loadedState) ) {
       this.events.emit(key, value);
     }
 
@@ -367,7 +425,6 @@ class PlayerExperience extends AbstractExperience {
     // e.g. when displaying the session choice screen
     this.como.project.subscribe(() => this.render());
 
-
     // @note - prevent session choice for development
     await this.coMoPlayer.player.set({ sessionId: 'test' });
 
@@ -381,15 +438,27 @@ class PlayerExperience extends AbstractExperience {
 
       const score = frame['score'];
 
-      if(this.state.scoreControlsTempo && score && score.tempo) {
+      if (this.state.scoreControlsTempo && score && score.tempo) {
         this.events.emit('tempo', score.tempo);
       } else {
         // internal stream: no propagation of update
         this.setTempo(frame['tempo'], {referenceUpdate: false});
+
+        // store values for stats
+        if (this.voxPlayerState.get('scenarioPlayback')) {
+          if (this.tempoStack.length < 6000) { // around 2 minutes
+            const tempo = tempoChangeBeatingUnit(frame['tempo'], {
+              timeSignature: this.state.timeSignature,
+              beatingUnit: 1/4, // tempo for quarter-note
+              beatingUnitNew: this.state.beatingUnit
+            });
+            this.tempoStack.push(tempo);
+          }
+        }
       }
 
-      if(this.state.scoreControlsTimeSignature) {
-        if(score && score.timeSignature) {
+      if (this.state.scoreControlsTimeSignature) {
+        if (score && score.timeSignature) {
           this.events.emit('timeSignature', score.timeSignature);
         }
       } else {
@@ -399,8 +468,8 @@ class PlayerExperience extends AbstractExperience {
 
       this.updateLookAhead({allowMoreIncrement: 0});
 
-      if(score && score.dataChanged) {
-        if(typeof this.setScoreCallback === 'function') {
+      if (score && score.dataChanged) {
+        if (typeof this.setScoreCallback === 'function') {
           this.setScoreCallback();
         }
       }
@@ -792,9 +861,9 @@ class PlayerExperience extends AbstractExperience {
         // tempo is always for quarter-note
         const tempo = app.state.tempo * app.state.timeSignature.division / 4;
 
-        if(!groupableDivisions.some( (division) => {
+        if (!groupableDivisions.some( (division) => {
           return app.state.timeSignature.division === division;
-        }) ) {
+        })) {
           //default;
           this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
           break;
@@ -807,8 +876,8 @@ class PlayerExperience extends AbstractExperience {
         //   break;
         // }
 
-        if(!groupableCounts.some( (count) => {
-          if(app.state.timeSignature.count % count === 0
+        if (!groupableCounts.some( (count) => {
+          if (app.state.timeSignature.count % count === 0
              && (tempo > app.state.tempoLimits.absoluteMax
                  || (Math.abs((tempo / count) - tempoTarget)
                      < Math.abs(tempo - tempoTarget) ) ) ) {
@@ -816,7 +885,7 @@ class PlayerExperience extends AbstractExperience {
             return true; // break
           }
           return false; // continue
-        }) ) {
+        })) {
           // default
           this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
         }
@@ -866,11 +935,11 @@ class PlayerExperience extends AbstractExperience {
   setTempo(tempo, {
     referenceUpdate = true,
   } = {}) {
-    if(!tempo || (tempo === this.tempo && tempo == this.tempoReference) ) {
+    if (!tempo || (tempo === this.tempo && tempo == this.tempoReference)) {
       return;
     }
 
-    if(referenceUpdate) {
+    if (referenceUpdate) {
       this.tempoReference = tempo;
     }
 
@@ -878,6 +947,35 @@ class PlayerExperience extends AbstractExperience {
 
     app.data.tempo = tempo;
     this.updateLookAhead();
+  }
+
+  // just find min max for now
+  doTempoStats() {
+    let min = +Infinity;
+    let max = -Infinity;
+    let sum = 0;
+
+    // remove few frames in the beginning, seems that it could be garbage
+    for (let i = 0; i < 5; i++) {
+      this.tempoStack.shift();
+    }
+
+    for (let i = 0; i < this.tempoStack.length; i++) {
+      const value = this.tempoStack[i];
+      if (value > max) {
+        max = value;
+      }
+
+      if (value < min) {
+        min = value;
+      }
+
+      sum += value;
+    }
+
+    const mean = sum / this.tempoStack.length;
+
+    this.tempoStats = { min, max, mean };
   }
 
   resetTempo() {
@@ -905,12 +1003,12 @@ class PlayerExperience extends AbstractExperience {
     const playbackChanged = this.playback !== playback;
     this.playback = playback;
 
-    if(playback) {
-      if(app.state['measures'] && playbackChanged) {
+    if (playback) {
+      if (app.state['measures'] && playbackChanged) {
         app.events.emit('measuresClear', true);
       }
     } else {
-      if(app.state['measures'] && playbackChanged) {
+      if (app.state['measures'] && playbackChanged) {
         app.events.emit('measuresFinalise', true);
       }
       switch(app.state['playbackStopSeek']) {
@@ -958,8 +1056,8 @@ class PlayerExperience extends AbstractExperience {
   }
 
   setDebugAudio(enabled) {
-    if(!enabled) {
-      if(this.debugAudioHandler) {
+    if (!enabled) {
+      if (this.debugAudioHandler) {
         this.debugAudioHandler.stop();
       }
       this.debugAudioHandler = null;
@@ -972,7 +1070,7 @@ class PlayerExperience extends AbstractExperience {
       gain: -30, // dB
     });
 
-    this.debugAudioHandler = new Blocked( (duration) => {
+    this.debugAudioHandler = new Blocked((duration) => {
       console.warn(`---------- blocked for ${duration} ms ---------`);
       audio.playBuffer(noiseBuffer, {
         audioContext: this.audioContext,
@@ -1010,13 +1108,20 @@ class PlayerExperience extends AbstractExperience {
       // player prod only
       PLAYER_PROD,
       guiState: this.guiState,
+
+      // electron only, undefined otherwise
+      comoteState: this.comoteState,
+      qrCode: this.qrCode,
+
+      tempoStack: this.tempoStack,
+      tempoStats: this.tempoStats,
     };
 
     const listeners = this.listeners;
 
     let screen = ``;
 
-    if (!this.como.hasDeviceMotion && !this.state['mockSensors']) {
+    if (!PLAYER_ELECTRON && !this.como.hasDeviceMotion && !this.state['mockSensors']) {
       screen = views.sorry(viewData, listeners);
     } else if (this.guiState.showInvalidSensorFramerateScreen) {
       screen = views.sorryInvalidFrameRate(viewData, listeners);
@@ -1039,13 +1144,15 @@ class PlayerExperience extends AbstractExperience {
         `
       }
     } else {
-      if (!PLAYER_PROD) {
+      if (PLAYER_ELECTRON) {
+        screen = views.playerElectron(viewData, listeners);
+      } else if (PLAYER_PROD) {
+        screen = views.playerProd(viewData, listeners);
+      } else {
         screen = views[this.client.type](viewData, listeners, {
           verbose: false,
           enableSelection: false,
         });
-      } else {
-        screen = views.playerProd(viewData, listeners);
       }
     }
 

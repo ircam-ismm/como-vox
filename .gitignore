@@ -9,6 +9,7 @@
 # ignore all config except default
 /config/env/*
 !/config/env/default.json
+!/config/env/electron.json
 /config/como-*.json
 
 # application instance specific
@@ -24,6 +25,12 @@
 # python
 /**/__pycache__/
 
+# ardour
+
+/media/**/peaks
+/media/**/export
+/media/**/mp3
+
 # junk files
 package-lock.json
 .DS_Store
@@ -33,3 +40,5 @@ projects/default/recordings/
 
 NOTES.md
 logs
+
+electron-build

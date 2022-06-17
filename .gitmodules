@@ -2,3 +2,6 @@
 	path = dns/dnsmasq
 	url = git://thekelleys.org.uk/dnsmasq.git
   branch = master
+[submodule ".electron"]
+	path = .electron
+	url = http://github.com/collective-soundworks/soundworks-electron-wrapper

@@ -25,6 +25,12 @@
 # python
 /**/__pycache__/
 
+# ardour
+
+/media/**/peaks
+/media/**/export
+/media/**/mp3
+
 # junk files
 package-lock.json
 .DS_Store

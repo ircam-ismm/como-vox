@@ -2,7 +2,7 @@ export default {
 
   audioIntensityRange: {
     type: 'float',
-    default: 60, // dB
+    default: 40, // dB
   },
 
   audioIntensityRangeUi: {

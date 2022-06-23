@@ -266,11 +266,14 @@ class PlayerExperience extends AbstractExperience {
 
       if ('scenarioPlayback' in updates) {
         if (!updates.scenarioPlayback) {
-          console.log('do stats and show');
-          this.doTempoStats();
-          this.guiState.showTempoStats = true;
+          // only show stats when it make sens
+          if (this.state.scenarioCurrent === 'scenarioTempo' ||
+            this.state.scenarioCurrent === 'scenarioTempoIntensity'
+          ) {
+            this.doTempoStats();
+            this.guiState.showTempoStats = true;
+          }
         } else {
-          console.log('reset');
           this.tempoStack.length = 0; // reset stack
         }
       }
@@ -299,7 +302,6 @@ class PlayerExperience extends AbstractExperience {
       });
       // this should never change
       this.qrCode = await CoMoteQRCode.dataURL(this.comoteState.get('config'));
-      console.log(this.qrCode);
     } else if (this.como.hasDeviceMotion) {
       source = new this.como.sources.DeviceMotion(this.como, player.get('id'));
     } else {

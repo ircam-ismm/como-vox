@@ -429,7 +429,9 @@ export function playerProd(data) {
                 guiState.showCalibrationScreen = true;
                 guiState.showTip = null;
                 exp.updateGuiState(guiState);
-              } else if (data.scenarioCurrent !== 'scenarioTempo') {
+              }
+
+              if (data.scenarioCurrent !== 'scenarioTempo') {
                 voxPlayerState.set({ scenarioTempo: true });
               }
             }}"
@@ -447,7 +449,9 @@ export function playerProd(data) {
                 guiState.showCalibrationScreen = true;
                 guiState.showTip = null;
                 exp.updateGuiState(guiState);
-              } else if (data.scenarioCurrent !== 'scenarioTempoIntensity') {
+              }
+
+              if (data.scenarioCurrent !== 'scenarioTempoIntensity') {
                 voxPlayerState.set({ scenarioTempoIntensity: true });
               }
             }}"
@@ -465,7 +469,9 @@ export function playerProd(data) {
                 guiState.showCalibrationScreen = true;
                 guiState.showTip = null;
                 exp.updateGuiState(guiState);
-              } else if (data.scenarioCurrent !== 'scenarioStartStopWithBeating') {
+              }
+
+              if (data.scenarioCurrent !== 'scenarioStartStopWithBeating') {
                 voxPlayerState.set({ scenarioStartStopWithBeating: true });
               }
             }}"

@@ -4,6 +4,9 @@ import { tempoChangeBeatingUnit } from '../../../server/helpers/conversion.js';
 import { closest } from '../../../server/helpers/math.js';
 import '@ircam/simple-components/sc-dragndrop.js';
 
+import createTempoStatsPlot from '../templates/createTempoStatsPlot.js';
+import '../templates/comote-intensity.js';
+
 const beatingUnitsAndNames = [
   [1, 'ronde'],
   [3/4, 'blanche pointée'],
@@ -99,6 +102,40 @@ export function playerElectron(data) {
         `
       : nothing}
 
+      <!-- ---------------------------------- -->
+      <!-- STATS OVERLAY                      -->
+      <!-- ---------------------------------- -->
+      ${guiState.showTempoStats ?
+        html`
+          <div class="stats">
+            <button
+              class="close"
+              @click="${e => {
+                guiState.showTempoStats = false;
+                exp.updateGuiState(guiState);
+              }}"
+            ></button>
+
+            ${createTempoStatsPlot(data.tempoStack, data.tempoStats, tempoReference, true)}
+
+            <ul>
+              <li>Tempo de référence: ${tempoReference}</li>
+              <li>Tempo moyen: ${Math.round(data.tempoStats.mean)}</li>
+              <li>Tempo maximum: ${Math.round(data.tempoStats.max)}</li>
+              <li>Tempo minimum: ${Math.round(data.tempoStats.min)}</li>
+            </ul>
+
+            <button
+              class="color-default"
+              @click="${e => {
+                guiState.showTempoStats = false;
+                exp.updateGuiState(guiState);
+              }}"
+            >Continuer</button>
+          </div>
+        ` : nothing
+      }
+
       <div class="column-right">
         <!-- ---------------------------------- -->
         <!-- ADVANCED SETTINGS MENU             -->
@@ -107,6 +144,10 @@ export function playerElectron(data) {
         <div class="comote-settings">
           <h2>CoMo.te
             <div class="connection-status${data.comoteState.get('connected') ? ' connected' : ''}"></div>
+            ${data.comoteState.get('connected')
+              ? html`<comote-intensity .source="${data.source}" width="50" height="30"></comote-intensity>`
+              : nothing
+            }
           </h2>
           ${data.comoteState.get('connected') === false
             ? html`
@@ -136,7 +177,7 @@ export function playerElectron(data) {
         ${data.comoteState.get('connected') === true
           ? html`
             <!-- ---------------------------------- -->
-            <!-- CALIBRATION OVERLAY                -->
+            <!-- CALIBRATION ZONE                   -->
             <!-- ---------------------------------- -->
             <div class="calibration">
               <h2>Calibration</h2>
@@ -162,7 +203,7 @@ export function playerElectron(data) {
                   </p>` :
                 data.audioLatencyMeasured !== null ?
                   html`<p class="info success">
-                    La latence estimée entre votre geste et le son est de ${parseInt(data.audioLatencyMeasured * 1e3)} ms.
+                    La latence estimée entre votre geste et le son est de ${data.audioLatencyMeasured.toFixed(3)} s.
                   </p>` :
                   html`<p class="info">
                     &nbsp;<br />&nbsp;
@@ -284,59 +325,69 @@ export function playerElectron(data) {
               </select>
               <div class="select-arrow"></div>
             </div>
-
-            ${data.scoreFileName && data.scoreData
-              ? html`
-                  <p class="track-infos">
-                    ${data.timeSignature.count}/${data.timeSignature.division}
-                    - tempo ${scoreTempo} à la ${beatingUnitName}
-                  </p>
-                `
-              : html`<p class="track-infos">&nbsp;</p>`
-            }
           </div>
         </div>
         <div class="track-drop">
           <h2>Ou importer un fichier</h2>
           <sc-dragndrop
             label="Glissez votre fichier midi ici"
-            width="400"
+            width="510"
             height="100"
             @change=${e => {
-              const first = Object.keys(e.detail.value)[0];
-              if (first) {
-                const file = e.detail.value[first];
-                console.log(file);
-                voxPlayerState.set({ scoreFileName: file });
+              const name = Object.keys(e.detail.value)[0];
+
+              if (name) {
+                const file = e.detail.value[name];
+                // abuse the gui state to be able to have the filename of a dropped midi file
+                guiState.electron.droppedMidiFile = file;
+                voxPlayerState.set({ scoreFileName: name });
               }
             }}
           >
           </sc-dragndrop>
         </div>
-
         <div class="track">
-          <h2>Écouter le morceau</h2>
-          <svg
-            class="listen-track
-              ${data.scenarioCurrent === 'scenarioListening' ? ' active' : ''}
-              ${data.scenarioPlayback ? ' disabled' : ''}
-            "
-            viewbox="0 0 100 100"
-            @click="${e => {
-              if (data.scenarioPlayback) {
-                return;
-              }
+          <h2>
+            Informations sur le morceau
+          </h2>
+          ${data.scoreFileName && data.scoreData
+            ? html`
+                <p>
+                  ${data.scoreFileName}
+                </p>
+                <p>
+                  ${data.timeSignature.count}/${data.timeSignature.division}
+                  - tempo ${scoreTempo} à la ${beatingUnitName}
+                </p>
+              `
+            : html`
+              <p class="track-infos">Aucun morceau sélectionné</p>
+              <p class="track-infos">&nbsp;</p>
+            `
+          }
+          <p><i>Écouter le morceau</i>
+            <svg
+              class="listen-track
+                ${data.scenarioCurrent === 'scenarioListening' ? ' active' : ''}
+                ${data.scenarioPlayback ? ' disabled' : ''}
+              "
+              viewbox="0 0 100 100"
+              @click="${e => {
+                if (data.scenarioPlayback) {
+                  return;
+                }
 
-              if (data.scenarioCurrent !== 'scenarioListening') {
-                voxPlayerState.set({ scenarioListening: true });
-              } else {
-                voxPlayerState.set({ scenarioListening: false });
-              }
-            }}"
-          >
-            <polygon class="play-shape" points="20,15, 80,50, 20,85"></polygon>
-            <polygon class="stop-shape" points="20,20, 80,20, 80,80, 20,80"></polygon>
-          </svg>
+                if (data.scenarioCurrent !== 'scenarioListening') {
+                  voxPlayerState.set({ scenarioListening: true });
+                } else {
+                  voxPlayerState.set({ scenarioListening: false });
+                }
+              }}"
+            >
+              <polygon class="play-shape" points="20,15, 80,50, 20,85"></polygon>
+              <polygon class="stop-shape" points="20,20, 80,20, 80,80, 20,80"></polygon>
+            </svg>
+          </p>
         </div>
 
         <div class="exercise-type">
@@ -371,7 +422,7 @@ export function playerElectron(data) {
             ` : nothing
           }
           <button
-            class="${data.scenarioCurrent === 'scenarioIntensity' ? 'selected' : ''}"
+            class="exercise ${data.scenarioCurrent === 'scenarioIntensity' ? 'selected' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
@@ -381,7 +432,7 @@ export function playerElectron(data) {
             }}"
           >Nuance</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="exercise ${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
@@ -395,7 +446,7 @@ export function playerElectron(data) {
             }}"
           >Tempo</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="exercise ${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
@@ -409,7 +460,7 @@ export function playerElectron(data) {
             }}"
           >Tempo & Nuance</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="exercise ${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 

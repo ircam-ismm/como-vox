@@ -275,6 +275,9 @@ export function playerProd(data) {
         `
       : nothing}
 
+      <!-- ---------------------------------- -->
+      <!-- STATS OVERLAY                      -->
+      <!-- ---------------------------------- -->
       ${guiState.showTempoStats ?
         html`
           <div class="stats">

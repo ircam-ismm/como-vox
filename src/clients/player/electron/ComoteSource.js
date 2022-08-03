@@ -18,6 +18,8 @@ class ComoteSource extends BaseSource {
 
   addListener(callback) {
     super.addListener(callback);
+
+    return () => this.removeListener(callback);
   }
 
   removeListener(callback) {

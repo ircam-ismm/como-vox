@@ -3,6 +3,23 @@ import { getWifiInfos } from '@ircam/comote-helpers/wifi-infos.js';
 import { Server as CoMoteServer } from '@ircam/comote-helpers/server.js';
 import * as CoMoteQRCode from '@ircam/comote-helpers/qrcode.js';
 
+async function getComoteConfig(comotePort) {
+  const wifiInfos = await getWifiInfos();
+
+  const config = {
+    id: 'como-vox',
+    interval: 16, // period in ms
+    ws: {
+      port: comotePort,
+      hostname: wifiInfos.ip,
+      autostart: true,
+    },
+    osc: null,
+  };
+
+  return { config, wifiInfos };
+}
+
 // special logic needed by electron app
 export default {
   async init(server, como) {
@@ -10,30 +27,12 @@ export default {
     const comotePort = await portfinder.getPortPromise();
 
     // 1. run como.te server
-    const wifiInfos = await getWifiInfos();
-    const comoteConfig = {
-      id: 'como-vox',
-      interval: 16, // period in ms
-      ws: {
-        port: comotePort,
-        hostname: wifiInfos.ip,
-        autostart: true,
-      },
-      osc: null,
-    };
+    const comoteConfig = await getComoteConfig(comotePort);
 
-    const comote = await server.stateManager.create('comote', {
-      wifiInfos,
-      config: comoteConfig,
-    });
+    const comote = await server.stateManager.create('comote', comoteConfig);
 
-    const comoteServer = new CoMoteServer(comoteConfig, { verbose: false });
+    const comoteServer = new CoMoteServer(comoteConfig.config, { verbose: false });
     await comoteServer.start();
-
-    console.log('[electron] comote connect');
-    console.log('+ CoMo.te link:', CoMoteQRCode.rawLink(comoteConfig));
-    console.log('');
-    console.log(await CoMoteQRCode.terminal(comoteConfig));
 
     let disconnectTimeout = null
     const disconnect = () => comote.set({ connected: false });
@@ -66,5 +65,11 @@ export default {
       type: 'soundworks:ready',
       payload: {},
     }));
+
+    // pull configuration regularly if network change
+    setInterval(async () => {
+      const comoteConfig = await getComoteConfig(comotePort);
+      comote.set(comoteConfig);
+    }, 5000);
   }
 }

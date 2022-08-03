@@ -601,7 +601,6 @@ class PlayerExperience extends AbstractExperience {
         case 'scoreFileName': {
           this.events.on(key, async (value) => {
             const name = (value ? value : undefined);
-            document.title = `CoMo-Vo!x${name ? ` | ${name}` : ''}`;
             this.updateFromEvent(key, value);
             let scoreURI;
             const scoreURIbase = this.state[key];

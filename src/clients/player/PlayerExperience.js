@@ -295,6 +295,11 @@ class PlayerExperience extends AbstractExperience {
               source.process(updates.devicemotion);
               break;
             case 'connected':
+              // stop every that could play on disconnection
+              if (value === false) {
+                this.voxPlayerState.set({ scenarioListening: false });
+                this.voxPlayerState.set({ scenarioPlayback: false });
+              }
               this.render();
               break;
           }

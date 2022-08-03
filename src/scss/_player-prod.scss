@@ -621,7 +621,7 @@ header {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 20;
+  z-index: 30;
   height: 100%;
   width: 100%;
   padding: 40px 20px 20px 20px;
@@ -682,6 +682,9 @@ header {
 /* ------------------------------------------ */
 
 #electron {
+  button, svg.button, svg.listen-track {
+    cursor: pointer;
+  }
   /* remove arrows on input[number] */
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {

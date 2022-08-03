@@ -24,12 +24,12 @@ function createPath(values, width, valueToY) {
   return path;
 }
 
-export default function createTempoStatsPlot(stack, stats, reference) {
+export default function createTempoStatsPlot(stack, stats, reference, desktop = false) {
   console.log(stack.length);
   console.log(stats);
 
   const width = window.innerWidth - 40;
-  const height = 200;
+  const height = desktop ? 500 : 200;
 
   const min = stats.min - 5;
   const max = stats.max + 5;

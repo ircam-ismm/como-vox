@@ -4,6 +4,8 @@ import { tempoChangeBeatingUnit } from '../../../server/helpers/conversion.js';
 import { closest } from '../../../server/helpers/math.js';
 import '@ircam/simple-components/sc-dragndrop.js';
 
+import createTempoStatsPlot from '../templates/createTempoStatsPlot.js';
+
 const beatingUnitsAndNames = [
   [1, 'ronde'],
   [3/4, 'blanche pointée'],
@@ -99,6 +101,40 @@ export function playerElectron(data) {
         `
       : nothing}
 
+      <!-- ---------------------------------- -->
+      <!-- STATS OVERLAY                      -->
+      <!-- ---------------------------------- -->
+      ${guiState.showTempoStats ?
+        html`
+          <div class="stats">
+            <button
+              class="close"
+              @click="${e => {
+                guiState.showTempoStats = false;
+                exp.updateGuiState(guiState);
+              }}"
+            ></button>
+
+            ${createTempoStatsPlot(data.tempoStack, data.tempoStats, tempoReference, true)}
+
+            <ul>
+              <li>Tempo de référence: ${tempoReference}</li>
+              <li>Tempo moyen: ${Math.round(data.tempoStats.mean)}</li>
+              <li>Tempo maximum: ${Math.round(data.tempoStats.max)}</li>
+              <li>Tempo minimum: ${Math.round(data.tempoStats.min)}</li>
+            </ul>
+
+            <button
+              class="color-default"
+              @click="${e => {
+                guiState.showTempoStats = false;
+                exp.updateGuiState(guiState);
+              }}"
+            >Continuer</button>
+          </div>
+        ` : nothing
+      }
+
       <div class="column-right">
         <!-- ---------------------------------- -->
         <!-- ADVANCED SETTINGS MENU             -->
@@ -136,7 +172,7 @@ export function playerElectron(data) {
         ${data.comoteState.get('connected') === true
           ? html`
             <!-- ---------------------------------- -->
-            <!-- CALIBRATION OVERLAY                -->
+            <!-- CALIBRATION ZONE                   -->
             <!-- ---------------------------------- -->
             <div class="calibration">
               <h2>Calibration</h2>
@@ -324,7 +360,7 @@ export function playerElectron(data) {
               <p class="track-infos">&nbsp;</p>
             `
           }
-          <p><i>Écouter le morceau<i>
+          <p><i>Écouter le morceau</i>
             <svg
               class="listen-track
                 ${data.scenarioCurrent === 'scenarioListening' ? ' active' : ''}

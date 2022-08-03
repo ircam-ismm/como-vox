@@ -5,6 +5,7 @@ import { closest } from '../../../server/helpers/math.js';
 import '@ircam/simple-components/sc-dragndrop.js';
 
 import createTempoStatsPlot from '../templates/createTempoStatsPlot.js';
+import '../templates/comote-intensity.js';
 
 const beatingUnitsAndNames = [
   [1, 'ronde'],
@@ -143,6 +144,10 @@ export function playerElectron(data) {
         <div class="comote-settings">
           <h2>CoMo.te
             <div class="connection-status${data.comoteState.get('connected') ? ' connected' : ''}"></div>
+            ${data.comoteState.get('connected')
+              ? html`<comote-intensity .source="${data.source}" width="50" height="30"></comote-intensity>`
+              : nothing
+            }
           </h2>
           ${data.comoteState.get('connected') === false
             ? html`

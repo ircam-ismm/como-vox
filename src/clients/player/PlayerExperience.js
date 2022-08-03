@@ -341,6 +341,8 @@ class PlayerExperience extends AbstractExperience {
       source = new this.como.sources.RandomValues(this.como, player.get('id'));
     }
 
+    this.source = source;
+
     console.log('> hasDeviceMotion', this.como.hasDeviceMotion);
     let errorFlag = false;
 
@@ -1173,6 +1175,8 @@ class PlayerExperience extends AbstractExperience {
 
       tempoStack: this.tempoStack,
       tempoStats: this.tempoStats,
+      // for electron - display some ffedback
+      source: this.source,
     };
 
     const listeners = this.listeners;

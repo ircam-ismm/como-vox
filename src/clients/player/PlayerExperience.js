@@ -292,13 +292,13 @@ class PlayerExperience extends AbstractExperience {
       this.comoteState = await this.client.stateManager.attach('comote');
       source = new ComoteSource(this.como, player.get('id'));
 
-      this.comoteState.subscribe(updates => {
+      this.comoteState.subscribe(async updates => {
         for (let [key, value] of Object.entries(updates)) {
           switch (key) {
             case 'devicemotion':
               source.process(updates.devicemotion);
               break;
-            case 'connected':
+            case 'connected': {
               // stop every that could play on disconnection
               if (value === false) {
                 this.voxPlayerState.set({ scenarioListening: false });
@@ -306,10 +306,34 @@ class PlayerExperience extends AbstractExperience {
               }
               this.render();
               break;
+            }
+            case 'config': {
+              console.log('> new network config received');
+              this.qrCode = await CoMoteQRCode.dataURL(this.comoteState.get('config'));
+              this.render();
+              break;
+            }
+            case 'buttonA': {
+              if (value == true) {
+                const $btns = Array.from(document.querySelectorAll('.exercise'));
+                const indexSelected = $btns.findIndex($btn => $btn.classList.contains('selected'));
+                const nextIndex = indexSelected !== -1 ? (indexSelected + 1) % $btns.length : 0;
+                const $nextBtn = $btns[nextIndex];
+                $nextBtn.click();
+              }
+              break;
+            }
+            case 'buttonB': {
+              if (value == true) {
+                let playback = this.voxPlayerState.get('scenarioPlayback');
+                this.voxPlayerState.set({ scenarioPlayback: !playback });
+              }
+              break;
+            }
           }
         }
       });
-      // this should never change
+      // init QRCode
       this.qrCode = await CoMoteQRCode.dataURL(this.comoteState.get('config'));
     } else if (this.como.hasDeviceMotion) {
       source = new this.como.sources.DeviceMotion(this.como, player.get('id'));

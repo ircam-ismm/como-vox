@@ -682,6 +682,13 @@ header {
 /* ------------------------------------------ */
 
 #electron {
+  /* remove arrows on input[number] */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   $rightColumnWidth: 450px;
   $headerAndFooterHeight: 106px;
 
@@ -722,6 +729,10 @@ header {
     align-content: center;
     flex-wrap: wrap;
 
+    .select {
+      width: 510px;
+    }
+
     .exercise-control {
       .button {
         width: 200px;
@@ -735,6 +746,13 @@ header {
 
     .preview {
       position: relative;
+    }
+
+    .track .listen-track {
+      position: relative;
+      display: inline-block;
+      top: 12px;
+      left: 90px;
     }
   }
 

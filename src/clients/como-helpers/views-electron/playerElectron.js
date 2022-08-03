@@ -290,10 +290,11 @@ export function playerElectron(data) {
           <h2>Ou importer un fichier</h2>
           <sc-dragndrop
             label="Glissez votre fichier midi ici"
-            width="400"
+            width="510"
             height="100"
             @change=${e => {
               const name = Object.keys(e.detail.value)[0];
+
               if (name) {
                 const file = e.detail.value[name];
                 // abuse the gui state to be able to have the filename of a dropped midi file
@@ -304,44 +305,48 @@ export function playerElectron(data) {
           >
           </sc-dragndrop>
         </div>
-        <div class="track-infos">
-          ${data.scoreFileName && data.scoreData
-              ? html`
-                  <p>
-                    ${data.scoreFileName}
-                  </p>
-                  <p class="track-infos">
-                    ${data.timeSignature.count}/${data.timeSignature.division}
-                    - tempo ${scoreTempo} à la ${beatingUnitName}
-                  </p>
-                `
-              : html`<p class="track-infos">&nbsp;</p>`
-            }
-        </div>
-
         <div class="track">
-          <h2>Écouter le morceau</h2>
-          <svg
-            class="listen-track
-              ${data.scenarioCurrent === 'scenarioListening' ? ' active' : ''}
-              ${data.scenarioPlayback ? ' disabled' : ''}
-            "
-            viewbox="0 0 100 100"
-            @click="${e => {
-              if (data.scenarioPlayback) {
-                return;
-              }
+          <h2>
+            Informations sur le morceau
+          </h2>
+          ${data.scoreFileName && data.scoreData
+            ? html`
+                <p>
+                  ${data.scoreFileName}
+                </p>
+                <p>
+                  ${data.timeSignature.count}/${data.timeSignature.division}
+                  - tempo ${scoreTempo} à la ${beatingUnitName}
+                </p>
+              `
+            : html`
+              <p class="track-infos">Aucun morceau sélectionné</p>
+              <p class="track-infos">&nbsp;</p>
+            `
+          }
+          <p><i>Écouter le morceau<i>
+            <svg
+              class="listen-track
+                ${data.scenarioCurrent === 'scenarioListening' ? ' active' : ''}
+                ${data.scenarioPlayback ? ' disabled' : ''}
+              "
+              viewbox="0 0 100 100"
+              @click="${e => {
+                if (data.scenarioPlayback) {
+                  return;
+                }
 
-              if (data.scenarioCurrent !== 'scenarioListening') {
-                voxPlayerState.set({ scenarioListening: true });
-              } else {
-                voxPlayerState.set({ scenarioListening: false });
-              }
-            }}"
-          >
-            <polygon class="play-shape" points="20,15, 80,50, 20,85"></polygon>
-            <polygon class="stop-shape" points="20,20, 80,20, 80,80, 20,80"></polygon>
-          </svg>
+                if (data.scenarioCurrent !== 'scenarioListening') {
+                  voxPlayerState.set({ scenarioListening: true });
+                } else {
+                  voxPlayerState.set({ scenarioListening: false });
+                }
+              }}"
+            >
+              <polygon class="play-shape" points="20,15, 80,50, 20,85"></polygon>
+              <polygon class="stop-shape" points="20,20, 80,20, 80,80, 20,80"></polygon>
+            </svg>
+          </p>
         </div>
 
         <div class="exercise-type">
@@ -376,7 +381,7 @@ export function playerElectron(data) {
             ` : nothing
           }
           <button
-            class="${data.scenarioCurrent === 'scenarioIntensity' ? 'selected' : ''}"
+            class="exercise ${data.scenarioCurrent === 'scenarioIntensity' ? 'selected' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
@@ -386,7 +391,7 @@ export function playerElectron(data) {
             }}"
           >Nuance</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="exercise ${data.scenarioCurrent === 'scenarioTempo' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
@@ -400,7 +405,7 @@ export function playerElectron(data) {
             }}"
           >Tempo</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="exercise ${data.scenarioCurrent === 'scenarioTempoIntensity' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
@@ -414,7 +419,7 @@ export function playerElectron(data) {
             }}"
           >Tempo & Nuance</button>
           <button
-            class="${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
+            class="exercise ${data.scenarioCurrent === 'scenarioStartStopWithBeating' ? 'selected' : ''}${data.audioLatencyMeasured === null ? ' locked' : ''}${data.audioLatencyMeasured === null && guiState.showTip === 'locked-exercise' ? ' highlight' : ''}"
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 

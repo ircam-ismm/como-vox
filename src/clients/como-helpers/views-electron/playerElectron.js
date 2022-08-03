@@ -284,16 +284,6 @@ export function playerElectron(data) {
               </select>
               <div class="select-arrow"></div>
             </div>
-
-            ${data.scoreFileName && data.scoreData
-              ? html`
-                  <p class="track-infos">
-                    ${data.timeSignature.count}/${data.timeSignature.division}
-                    - tempo ${scoreTempo} à la ${beatingUnitName}
-                  </p>
-                `
-              : html`<p class="track-infos">&nbsp;</p>`
-            }
           </div>
         </div>
         <div class="track-drop">
@@ -303,15 +293,30 @@ export function playerElectron(data) {
             width="400"
             height="100"
             @change=${e => {
-              const first = Object.keys(e.detail.value)[0];
-              if (first) {
-                const file = e.detail.value[first];
-                console.log(file);
-                voxPlayerState.set({ scoreFileName: file });
+              const name = Object.keys(e.detail.value)[0];
+              if (name) {
+                const file = e.detail.value[name];
+                // abuse the gui state to be able to have the filename of a dropped midi file
+                guiState.electron.droppedMidiFile = file;
+                voxPlayerState.set({ scoreFileName: name });
               }
             }}
           >
           </sc-dragndrop>
+        </div>
+        <div class="track-infos">
+          ${data.scoreFileName && data.scoreData
+              ? html`
+                  <p>
+                    ${data.scoreFileName}
+                  </p>
+                  <p class="track-infos">
+                    ${data.timeSignature.count}/${data.timeSignature.division}
+                    - tempo ${scoreTempo} à la ${beatingUnitName}
+                  </p>
+                `
+              : html`<p class="track-infos">&nbsp;</p>`
+            }
         </div>
 
         <div class="track">

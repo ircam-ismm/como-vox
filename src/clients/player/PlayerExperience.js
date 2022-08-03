@@ -224,8 +224,6 @@ class PlayerExperience extends AbstractExperience {
       this.log(msg);
     });
 
-    // setTimeout(() => { throw new Error('test log') }, 5000);
-
     // playerProd only
     this.guiState = {
       showAdvancedSettings: false,
@@ -234,6 +232,12 @@ class PlayerExperience extends AbstractExperience {
       showInvalidSensorFramerateScreen: false,
       showTempoStats: false,
       showTip: null, // 'locked-exercise'
+
+      // abuse the gui state to be able to have the filename of a dropped midi file
+      // this is really dirty...
+      electron: {
+        droppedMidiFile: null,
+      }
     };
 
     // debug tempo stats.....
@@ -315,6 +319,7 @@ class PlayerExperience extends AbstractExperience {
 
     console.log('> hasDeviceMotion', this.como.hasDeviceMotion);
     let errorFlag = false;
+
     const sensorTest = e => {
       source.removeListener(sensorTest); // this doesn't work...
       // do not allow frame rate higher than 20ms
@@ -514,7 +519,7 @@ class PlayerExperience extends AbstractExperience {
     const voxPlayerSchema = this.voxPlayerState.getSchema();
     const event = schema.isEvent(voxPlayerSchema, key);
 
-    if(event || JSON.stringify(value) !== JSON.stringify(this.state[key] ) ) {
+    if(event || JSON.stringify(value) !== JSON.stringify(this.state[key])) {
       app.events.emit(key, value);
     }
     this.render();
@@ -531,7 +536,7 @@ class PlayerExperience extends AbstractExperience {
       const shared = schema.isShared(voxPlayerSchema, key);
 
       if(shared
-         && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key) ) ) {
+         && JSON.stringify(value) !== JSON.stringify(this.voxPlayerState.get(key))) {
         this.voxPlayerState.set({[key]: value});
       }
 
@@ -546,10 +551,10 @@ class PlayerExperience extends AbstractExperience {
 
   // declare everything if voxPlayerSchema
   initialiseState() {
-    for(const [key, value] of Object.entries(this.voxPlayerState.getValues() ) ) {
+    for (const [key, value] of Object.entries(this.voxPlayerState.getValues())) {
       this.state[key] = value;
-      switch(key) {
 
+      switch(key) {
         case 'debugAudio': {
           this.events.on(key, (value) => {
             this.updateFromEvent(key, value);
@@ -605,32 +610,54 @@ class PlayerExperience extends AbstractExperience {
 
         case 'scoreFileName': {
           this.events.on(key, async (value) => {
-            const name = (value ? value : undefined);
-            this.updateFromEvent(key, value);
-            let scoreURI;
-            const scoreURIbase = this.state[key];
+            // dirty hack to be able to have title when drag and drop a midi file
+            // scoreFileName should not be able to contain a encoded base64 file
+            // this is weird...
+            // this is a drag and dropped file, bypass previous logic
+            if (this.guiState.electron.droppedMidiFile !== null) {
+              // console.log('drop n drop file');
+              const scoreURI = this.guiState.electron.droppedMidiFile;
+              this.guiState.electron.droppedMidiFile = null;
 
-            const urlType = url.type(name);
+              this.updateFromEvent(key, value);
 
-            if (urlType === 'url'
-                || urlType === 'dataUrl'
-                || urlType === 'blob') {
-              scoreURI = name;
-            }
-            else if (!scoreURIbase || scoreURIbase === 'none') {
-              scoreURI = null;
+              try {
+                await this.setScore(scoreURI);
+                this.render();
+              } catch (error) {
+                console.error('Error while loading score: ' + error.message);
+              }
             } else {
-              scoreURI = encodeURI(url.base
-                                   + '/'
-                                   + this.voxApplicationState.get('scoresPath')
-                                   + '/'
-                                   + scoreURIbase);
-            }
-            try {
-              await this.setScore(scoreURI);
-              this.render();
-            } catch (error) {
-              console.error('Error while loading score: ' + error.message);
+              // there is a bit too much magic here...
+              const name = (value ? value : undefined);
+              this.updateFromEvent(key, value);
+
+              const scoreURIbase = this.state[key];
+              const urlType = url.type(name);
+              let scoreURI;
+
+              if (urlType === 'url'
+                  || urlType === 'dataUrl'
+                  || urlType === 'blob')
+              {
+                scoreURI = name;
+              } else if (!scoreURIbase || scoreURIbase === 'none') {
+                scoreURI = null;
+              } else {
+                scoreURI = encodeURI(url.base
+                                     + '/'
+                                     + this.voxApplicationState.get('scoresPath')
+                                     + '/'
+                                     + scoreURIbase);
+              }
+
+              // console.log(scoreURIbase, urlType, scoreURI);
+              try {
+                await this.setScore(scoreURI);
+                this.render();
+              } catch (error) {
+                console.error('Error while loading score: ' + error.message);
+              }
             }
           });
           break;
@@ -712,7 +739,7 @@ class PlayerExperience extends AbstractExperience {
   }
 
   async setScore(scoreURI) {
-    if(!scoreURI) {
+    if (!scoreURI) {
       this.events.emit('scoreData', null);
       this.events.emit('scoreReady', true);
 
@@ -742,9 +769,11 @@ class PlayerExperience extends AbstractExperience {
           const scoreData = midi.parse(request.response);
           // no duplicates in set
           const notes = new Set();
-          if(typeof scoreData.metas === 'undefined') {
+
+          if (typeof scoreData.metas === 'undefined') {
             scoreData.metas = {};
           }
+
           scoreData.metas.noteIntensityMin = 127;
           scoreData.metas.noteIntensityMax = 0;
           scoreData.partSet.forEach( (part, p) => {
@@ -767,8 +796,7 @@ class PlayerExperience extends AbstractExperience {
           this.events.emit('scoreReady', true);
           resolve(this.scoreData);
         } catch (error) {
-          reject(new Error(`Error with midi file ${scoreURI}: `
-                           + error.message) );
+          reject(new Error(`Error with midi file ${scoreURI}: ${error.message}`));
         }
       };
 

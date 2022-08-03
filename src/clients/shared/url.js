@@ -49,8 +49,7 @@ export function paramGet(name, defaultValue) {
     const results = new RegExp('[\?&#]' + name + '=([^\?&#]*)').exec(location);
     if (results == null){
        return defaultValue;
-    }
-    else {
+    } else {
        return decodeURI(results[1]) || defaultValue;
     }
 }
@@ -63,7 +62,7 @@ export async function parse(clientSchema) {
   // the URL
   try {
     const compressed = paramGet(compressedKey, undefined);
-    if(compressed) {
+    if (compressed) {
       const decompressed = await codec.decompress(compressed);
       Object.assign(data, decompressed);
     }
@@ -76,32 +75,34 @@ export async function parse(clientSchema) {
   // split on search: first special character (any one)
   // remove URI: anything before
   const URIArray = URI.split(parametersSplitExpression);
-  if(URIArray.length > 1) {
+
+  if (URIArray.length > 1) {
     parametersArray = URIArray.slice(1);
   }
 
-  for(const parameterString of parametersArray) {
-
+  for (const parameterString of parametersArray) {
     // split on first '='
     const parameterArray = parameterString.split('=');
-    if(parameterArray.length === 2) {
+
+    if (parameterArray.length === 2) {
       const key = parameterArray[0];
       let value = parameterArray[1];
+
       try {
-        if(key === compressedKey) {
+        if (key === compressedKey) {
           continue;
         } else {
-          if(!clientSchema.hasOwnProperty(key)) {
+          if (!clientSchema.hasOwnProperty(key)) {
             throw new Error(`Unkown parameter '${key}'`);
           }
 
           const type = clientSchema[key].type;
 
-          if(type !== 'string') {
+          if (type !== 'string') {
             value = JSON.parse(value);
           }
 
-          if(type === 'boolean') {
+          if (type === 'boolean') {
             // coerce 0 and 0 to boolean
             value = (value ? true : false);
           }
@@ -119,13 +120,14 @@ export async function parse(clientSchema) {
 
   return data;
 }
-Object.assign(e, {parse} );
+
+Object.assign(e, {parse});
 
 async function _update(clientSchema, data) {
   try {
     const exported = {}
-    for(const key of Object.keys(data) ) {
-      if(schema.isExported(clientSchema, key) ) {
+    for (const key of Object.keys(data)) {
+      if (schema.isExported(clientSchema, key) ) {
         exported[key] = data[key];
       }
     }
@@ -137,7 +139,6 @@ async function _update(clientSchema, data) {
   } catch(error) {
     new Error('Error while updating URL:' + error.message);
   }
-
 }
 
 // limit URL update period to 500 ms

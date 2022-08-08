@@ -40,7 +40,7 @@
   // protect pages w/ password
   auth: {
     clients: ['script-editor', 'controller', 'controller-measures', 'designer'],
-    login: 'ismm',
-    password: 'in3action',
+    login: 'my-login',
+    password: 'my-password',
   },
 }

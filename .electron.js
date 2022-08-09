@@ -4,6 +4,7 @@ const config = {
   // do not touch these ones
   buildVersion: pkg.version,
   name: pkg.name,
+  author: 'Ircam ISMM',
   // product infos
   productName: 'CoMo Vox',
   appId: 'fr.ircam.ismm.como-vox',

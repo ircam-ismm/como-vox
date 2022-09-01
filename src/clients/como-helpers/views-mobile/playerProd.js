@@ -275,6 +275,9 @@ export function playerProd(data) {
         `
       : nothing}
 
+      <!-- ---------------------------------- -->
+      <!-- STATS OVERLAY                      -->
+      <!-- ---------------------------------- -->
       ${guiState.showTempoStats ?
         html`
           <div class="stats">
@@ -425,12 +428,14 @@ export function playerProd(data) {
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
+              if (data.scenarioCurrent !== 'scenarioTempo') {
+                voxPlayerState.set({ scenarioTempo: true });
+              }
+
               if (data.audioLatencyMeasured === null) {
                 guiState.showCalibrationScreen = true;
                 guiState.showTip = null;
                 exp.updateGuiState(guiState);
-              } else if (data.scenarioCurrent !== 'scenarioTempo') {
-                voxPlayerState.set({ scenarioTempo: true });
               }
             }}"
           >Tempo</button>
@@ -443,12 +448,14 @@ export function playerProd(data) {
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
+              if (data.scenarioCurrent !== 'scenarioTempoIntensity') {
+                voxPlayerState.set({ scenarioTempoIntensity: true });
+              }
+
               if (data.audioLatencyMeasured === null) {
                 guiState.showCalibrationScreen = true;
                 guiState.showTip = null;
                 exp.updateGuiState(guiState);
-              } else if (data.scenarioCurrent !== 'scenarioTempoIntensity') {
-                voxPlayerState.set({ scenarioTempoIntensity: true });
               }
             }}"
           >Tempo & Nuance</button>
@@ -461,12 +468,14 @@ export function playerProd(data) {
             @click="${e => {
               if (data.scenarioPlayback === true) { return; }
 
+              if (data.scenarioCurrent !== 'scenarioStartStopWithBeating') {
+                voxPlayerState.set({ scenarioStartStopWithBeating: true });
+              }
+
               if (data.audioLatencyMeasured === null) {
                 guiState.showCalibrationScreen = true;
                 guiState.showTip = null;
                 exp.updateGuiState(guiState);
-              } else if (data.scenarioCurrent !== 'scenarioStartStopWithBeating') {
-                voxPlayerState.set({ scenarioStartStopWithBeating: true });
               }
             }}"
           >Départ</button>

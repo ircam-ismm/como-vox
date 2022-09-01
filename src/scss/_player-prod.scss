@@ -621,7 +621,7 @@ header {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 20;
+  z-index: 30;
   height: 100%;
   width: 100%;
   padding: 40px 20px 20px 20px;
@@ -682,6 +682,16 @@ header {
 /* ------------------------------------------ */
 
 #electron {
+  button, svg.button, svg.listen-track {
+    cursor: pointer;
+  }
+  /* remove arrows on input[number] */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   $rightColumnWidth: 450px;
   $headerAndFooterHeight: 106px;
 
@@ -722,6 +732,10 @@ header {
     align-content: center;
     flex-wrap: wrap;
 
+    .select {
+      width: 510px;
+    }
+
     .exercise-control {
       .button {
         width: 200px;
@@ -735,6 +749,13 @@ header {
 
     .preview {
       position: relative;
+    }
+
+    .track .listen-track {
+      position: relative;
+      display: inline-block;
+      top: 12px;
+      left: 90px;
     }
   }
 
@@ -778,6 +799,11 @@ header {
 
       .info {
         color: #787878;
+      }
+
+      comote-intensity {
+        float: right;
+        margin-right: 10px;
       }
 
       .connection-status {

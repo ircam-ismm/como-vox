@@ -100,6 +100,8 @@ export async function parse(clientSchema) {
 
           if (type !== 'string') {
             value = JSON.parse(value);
+          } else {
+            value = decodeURIComponent(value);
           }
 
           if (type === 'boolean') {

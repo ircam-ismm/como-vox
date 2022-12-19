@@ -15,3 +15,6 @@ CoMo-Vox est disponible sous deux versions complémentaires : « web-app » ou �
 ## License
 
 BSD-3-Clause
+
+## Acknowledgments:
+With the support of Ministère de l'Éducation Nationale, de la Jeunesse et des Sports (dispositif Édu-up), and from the French National Research Agency (project ANR-18-CE33-0002 ELEMENT), in partneship of Radio France.

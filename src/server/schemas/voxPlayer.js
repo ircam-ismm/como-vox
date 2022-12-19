@@ -338,6 +338,36 @@ export default {
     },
   },
 
+  samplePlayerFilterNoteIntensityMin: {
+    type: 'float',
+    default: 0, // MIDI intensity
+  },
+
+  samplePlayerFilterNoteIntensityMax: {
+    type: 'float',
+    default: 127, // MIDI intensity
+  },
+
+  samplePlayerFilterRelativePitchMin: {
+    type: 'float',
+    default: 12, // MIDI pitch, relative to note (12 is one octave)
+  },
+
+  samplePlayerFilterRelativePitchMax: {
+    type: 'float',
+    default: 84, // MIDI pitch, relative to note
+  },
+
+  samplePlayerFilterFrequencyMin: {
+    type: 'float',
+    default: 3000, // in Hz
+  },
+
+  samplePlayerFilterFrequencyMax: {
+    type: 'float',
+    default: 22050, // in Hz
+  },
+
   scenarioCurrent: {
     type: 'string',
     default: null,

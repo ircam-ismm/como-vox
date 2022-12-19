@@ -23,6 +23,8 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const positionsToSecondsDelta = conversion.positionsToSecondsDelta;
   const beatsToSeconds = conversion.beatsToSeconds;
 
+  const Scaler = app.imports.helpers.Scaler;
+
   const audioContext = graph.como.audioContext;
 
   const pianoSampleManager = app.instruments.pianoSampleManager;
@@ -30,7 +32,37 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const fadeOutDuration = 0.1; // in seconds
 
   const parameters = {
-    audioIntensityRange: 40, // in dB
+    audioIntensityRange: 30, // in dB
+    samplePlayerFilterNoteIntensityMin: 0, // MIDI intensity
+    samplePlayerFilterNoteIntensityMax: 127, // MIDI intensity
+    samplePlayerFilterRelativePitchMin: 12, // MIDI pitch, relative to note (12 is one octave)
+    samplePlayerFilterRelativePitchMax: 84, // MIDI pitch, relative to note
+    samplePlayerFilterFrequencyMin: 3000, // in Hz
+    samplePlayerFilterFrequencyMax: 22050, // in Hz
+  };
+
+  const intensityToRelativePitch = new Scaler({
+    inputStart: parameters.samplePlayerFilterNoteIntensityMin,
+    inputEnd: parameters.samplePlayerFilterNoteIntensityMax,
+    outputStart: parameters.samplePlayerFilterRelativePitchMin,
+    outputEnd: parameters.samplePlayerFilterRelativePitchMax,
+    type: 'linear',
+    clip: true,
+  });
+
+  const noteToFilterFrequency = ({
+    pitch,
+    intensity,
+  }) => {
+    const relativePitch = intensityToRelativePitch.process(intensity);
+
+    const frequency = Math.min(parameters.samplePlayerFilterFrequencyMax,
+                               Math.max(parameters.samplePlayerFilterFrequencyMin,
+                                        midiPichToHertz(pitch + relativePitch)
+                                       )
+                              );
+
+    return frequency;
   };
 
   const noteOn = ({
@@ -46,15 +78,23 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       const source = audioContext.createBufferSource();
       source.buffer = buffer;
 
+      const filter = audioContext.createBiquadFilter();
+      source.connect(filter);
+
+      filter.type = 'lowpass';
+      filter.Q.value = 0.5; // no resonance
+      filter.frequency.value = noteToFilterFrequency({pitch, intensity});
+
       const envelope = audioContext.createGain();
-      source.connect(envelope);
+      filter.connect(envelope);
+
       envelope.gain.value = midiIntensityToAmplitude(intensity, {
         range: parameters.audioIntensityRange,
       });
 
       envelope.connect(audioOutNode);
 
-      samplesPlaying.set(pitch, {source, envelope});
+      samplesPlaying.set(pitch, {source, filter, envelope});
       source.start(time);
     } else {
       // sample sound not available (yet?)
@@ -103,6 +143,34 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       if(parameters.hasOwnProperty(p) ) {
         parameters[p] = updates[p];
       }
+    }
+
+    const {
+      samplePlayerFilterNoteIntensityMin,
+      samplePlayerFilterNoteIntensityMax,
+      samplePlayerFilterRelativePitchMin,
+      samplePlayerFilterRelativePitchMax,
+      samplePlayerFilterFrequencyMin,
+      samplePlayerFilterFrequencyMax,
+    } = updates;
+
+    const samplePlayerFilterUpdate
+          = typeof samplePlayerFilterNoteIntensityMin !== 'undefined'
+          || typeof samplePlayerFilterNoteIntensityMax !== 'undefined'
+          || typeof samplePlayerFilterRelativePitchMin !=='undefined'
+          || typeof samplePlayerFilterRelativePitchMax !=='undefined'
+          || typeof samplePlayerFilterFrequencyMin !=='undefined'
+          || typeof samplePlayerFilterFrequencyMax !=='undefined';
+
+    if(samplePlayerFilterUpdate) {
+      intensityToRelativePitch.set({
+        samplePlayerFilterNoteIntensityMin,
+        samplePlayerFilterNoteIntensityMax,
+        samplePlayerFilterRelativePitchMin,
+        samplePlayerFilterRelativePitchMax,
+        samplePlayerFilterFrequencyMin,
+        samplePlayerFilterFrequencyMax,
+      });
     }
   };
 

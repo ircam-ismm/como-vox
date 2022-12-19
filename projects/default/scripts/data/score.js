@@ -9,7 +9,8 @@ function scoreData(graph, helpers, outputFrame) {
   let eventsNext = [];
   let positionToSeek = undefined; // undefined to seek to current
 
-  const humaniseJitter = 20e-3; // in seconds
+  const humaniseJitter = 30e-3; // in seconds
+  const humaniseIntensity = 30; // in MIDI intensity
 
   const parameters = {
     playback: true,
@@ -250,6 +251,20 @@ function scoreData(graph, helpers, outputFrame) {
               noteEvent.position = positionHumanised;
               noteEvent.bar = positionHumanised.bar;
               noteEvent.beat = positionHumanised.beat;
+
+
+              if(event.type === 'noteOn') {
+                const intensityHumanised
+                      = Math.max(0,
+                                 Math.min(127,
+                                          noteEvent.data.intensity
+                                          + humaniseIntensity * (Math.random() - 0.5)
+                                         ),
+                                );
+
+                noteEvent.data.intensity = intensityHumanised;
+              }
+
             }
             notes.push(noteEvent);
           }

@@ -99,7 +99,7 @@ export async function parse(clientSchema) {
           const type = clientSchema[key].type;
 
           if (type !== 'string') {
-            value = JSON.parse(value);
+            value = JSON.parse(decodeURIComponent(value) );
           } else {
             value = decodeURIComponent(value);
           }

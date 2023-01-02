@@ -135,10 +135,9 @@ function transport(graph, helpers, outputFrame) {
   // auto start
   let beatGestureStartTime = positionStoppedTime;
 
-  // half a beat before and half a beat after
-  const beatOffsetRange = 1;
+  // a beat before and a beat after
+  const beatOffsetRange = 2; //was intially set to 1
   const beatOffsetRangeInverse = 1 / beatOffsetRange;
-
   // triangle window    :
   //                    X 1
   //                   /:\

@@ -22,16 +22,16 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
   const parametersPublic = {
     gestureControlsIntensity: false,
 
-    gestureIntensityInputMediumRelative: 0.5, // relative to inputMax
-    gestureIntensityInputMax: 0.3, // 0.4 for more energy
-    gestureIntensityNormalisedMedium: 0.75, // gentle compression
+    gestureIntensityInputMediumRelative: 0.5, // relative to inputMax 0.5
+    gestureIntensityInputMax: 0.3, // 0.4 for more energy 0.3
+    gestureIntensityNormalisedMedium: 0.75, // gentle compression 0.75
 
-    metronomeDynamicBoostMin: -40, // MIDI intensity
-    metronomeDynamicBoostMax: 20, // MIDI intensity
+    metronomeDynamicBoostMin: -40, // MIDI intensity -40
+    metronomeDynamicBoostMax: 20, // MIDI intensity 20
 
-    scoreIntensityCompressionMax: 120, // keep some headroom
-    scoreIntensityCompressionMinFixed: 90,
-    scoreIntensityCompressionMinGesture: 110, // flatter
+    scoreIntensityCompressionMax: 120, // keep some headroom 120
+    scoreIntensityCompressionMinFixed: 90, // 90 
+    scoreIntensityCompressionMinGesture: 110, // flatter 110
     // 'auto' uses 'gesture' when 'gestureControlsIntensity' is true, or 'default'
     scoreIntensityCompressionMode:'auto', // 'off', 'fixed', 'gesture'
   };

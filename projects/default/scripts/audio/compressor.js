@@ -6,13 +6,13 @@ function compressor(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const parameters = {
     attack:
-    10e-3, // seconds, quick
-    release: 500e-3, // seconds, slow
-    threshold: -6, // dB
-    ratio: 20, // ratio, hard limiter
-    knee: 6, // dB
-    preGain: 6,
-    postGain: -2, // dB, little headroom
+    10e-3, // seconds, quick 10e-3,
+    release: 500e-3, // seconds, slow  500e-3
+    threshold: -6, // dB -6
+    ratio: 20, // ratio, hard limiter 20
+    knee: 6, // dB  6
+    preGain: 6, // 6
+    postGain: -2, // dB, little headroom -2
   };
 
   const compressorNode = new CompressorNode({

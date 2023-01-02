@@ -32,13 +32,13 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const fadeOutDuration = 0.1; // in seconds
 
   const parameters = {
-    audioIntensityRange: 30, // in dB
-    samplePlayerFilterNoteIntensityMin: 0, // MIDI intensity
-    samplePlayerFilterNoteIntensityMax: 127, // MIDI intensity
-    samplePlayerFilterRelativePitchMin: 12, // MIDI pitch, relative to note (12 is one octave)
-    samplePlayerFilterRelativePitchMax: 84, // MIDI pitch, relative to note
-    samplePlayerFilterFrequencyMin: 3000, // in Hz
-    samplePlayerFilterFrequencyMax: 22050, // in Hz
+    audioIntensityRange: 30, // in dB 30
+    samplePlayerFilterNoteIntensityMin: 0, // MIDI intensity 0
+    samplePlayerFilterNoteIntensityMax: 127, // MIDI intensity 127 
+    samplePlayerFilterRelativePitchMin: 12, // MIDI pitch, relative to note (12 is one octave) 12
+    samplePlayerFilterRelativePitchMax: 84, // MIDI pitch, relative to note 84 
+    samplePlayerFilterFrequencyMin: 3000, // in Hz 3000
+    samplePlayerFilterFrequencyMax: 22050, // in Hz 22050
   };
 
   const intensityToRelativePitch = new Scaler({
@@ -56,6 +56,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   }) => {
     const relativePitch = intensityToRelativePitch.process(intensity);
 
+    
     const frequency = Math.min(parameters.samplePlayerFilterFrequencyMax,
                                Math.max(parameters.samplePlayerFilterFrequencyMin,
                                         midiPichToHertz(pitch + relativePitch)
@@ -82,7 +83,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       source.connect(filter);
 
       filter.type = 'lowpass';
-      filter.Q.value = 0.5; // no resonance
+      filter.Q.value = 0.5; // no resonance 0.5
       filter.frequency.value = noteToFilterFrequency({pitch, intensity});
 
       const envelope = audioContext.createGain();
@@ -163,14 +164,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
           || typeof samplePlayerFilterFrequencyMax !=='undefined';
 
     if(samplePlayerFilterUpdate) {
-      intensityToRelativePitch.set({
-        samplePlayerFilterNoteIntensityMin,
-        samplePlayerFilterNoteIntensityMax,
-        samplePlayerFilterRelativePitchMin,
-        samplePlayerFilterRelativePitchMax,
-        samplePlayerFilterFrequencyMin,
-        samplePlayerFilterFrequencyMax,
-      });
+      intensityToRelativePitch.set(updates);
     }
   };
 

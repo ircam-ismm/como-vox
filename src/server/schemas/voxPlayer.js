@@ -224,7 +224,7 @@ export default {
   // minimum as a request, actual value may be more
   lookAheadNotesRequest: {
     type: 'float',
-    default: 1/8, // 1 eighth-note
+    default: 1/16, // 1 sixteenth-note
   },
 
   lookAheadNotesRequestUi: {
@@ -235,7 +235,7 @@ export default {
   // actual value, depending on audio latency and maximum tempo
   lookAheadNotes: {
     type: 'float',
-    default: 1/8, // 1 eighth-note
+    default: 1/16, // 1 sixteenth-note
     metas: {
       exported: false,
     },
@@ -340,7 +340,7 @@ export default {
 
   samplePlayerFilterNoteIntensityMin: {
     type: 'float',
-    default: 0, // MIDI intensity
+    default: 0, // MIDI intensity 0
   },
 
   samplePlayerFilterNoteIntensityMax: {
@@ -350,17 +350,17 @@ export default {
 
   samplePlayerFilterRelativePitchMin: {
     type: 'float',
-    default: 12, // MIDI pitch, relative to note (12 is one octave)
+    default: 12, // MIDI pitch, relative to note (12 is one octave)  12
   },
 
   samplePlayerFilterRelativePitchMax: {
     type: 'float',
-    default: 84, // MIDI pitch, relative to note
+    default: 84, // MIDI pitch, relative to note 84
   },
 
   samplePlayerFilterFrequencyMin: {
     type: 'float',
-    default: 3000, // in Hz
+    default: 3000, // in Hz  3000
   },
 
   samplePlayerFilterFrequencyMax: {
@@ -513,7 +513,7 @@ export default {
 
   scoreIntensityCompressionMinFixed: {
     type: 'float',
-    default: 30, // keep some dynamics
+    default: 45, // keep some dynamics 30
   },
 
   scoreIntensityCompressionMinGesture: {
@@ -607,10 +607,10 @@ export default {
   tempoLimits: {
     type: 'any',
     default: {
-      absoluteMin: 40,
-      absoluteMax: 160,
-      relativeMin: 0.76,
-      relativeMax: 1.24,
+      absoluteMin: 40,   // 40
+      absoluteMax: 150,  // 160
+      relativeMin: 0.75, // 0.76
+      relativeMax: 1.5, //1.24
     },
   },
 

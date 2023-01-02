@@ -363,7 +363,7 @@ NOTES = {
 }
 
 MIDI_C0 = 12
-VELOCITY = 84
+VELOCITY = 60
 DURATION = Integer(4000) # milliseconds
 TEMP_FILE = "#{BUILD_DIR}/%s%stemp.midi"
 FLUIDSYNTH_RAW = "%s.raw"

@@ -9,8 +9,8 @@ function scoreData(graph, helpers, outputFrame) {
   let eventsNext = [];
   let positionToSeek = undefined; // undefined to seek to current
 
-  const humaniseJitter = 30e-3; // in seconds
-  const humaniseIntensity = 30; // in MIDI intensity
+  const humaniseJitter = 30e-3; // in seconds 30
+  const humaniseIntensity = 30; // in MIDI intensity 30
 
   const parameters = {
     playback: true,
@@ -196,6 +196,18 @@ function scoreData(graph, helpers, outputFrame) {
 
       const eventContainer = {};
 
+      function gaussianRandom() {
+        // approximation based on Central-limit theorem, 
+        // #56 https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
+        var rand = 0;
+
+        for (var i = 0; i < 6; i += 1) {
+        rand += Math.random();
+        }
+
+       return rand / 6;
+      }
+
       scoreData.partSet.parts.forEach( (part, p) => {
         const events = part.events;
 
@@ -246,7 +258,8 @@ function scoreData(graph, helpers, outputFrame) {
             if(parameters.humanise) {
               const positionHumanised
                     = positionAddSeconds(noteEvent.position,
-                                         Math.random() * humaniseJitter,
+                                         //Math.random() * humaniseJitter,
+                                         gaussianRandom() * humaniseJitter,
                                          {timeSignature, tempo});
               noteEvent.position = positionHumanised;
               noteEvent.bar = positionHumanised.bar;
@@ -258,7 +271,8 @@ function scoreData(graph, helpers, outputFrame) {
                       = Math.max(0,
                                  Math.min(127,
                                           noteEvent.data.intensity
-                                          + humaniseIntensity * (Math.random() - 0.5)
+                                          + humaniseIntensity * (gaussianRandom() - 0.5)
+                                          //+ humaniseIntensity * (Math.random() - 0.5)
                                          ),
                                 );
 

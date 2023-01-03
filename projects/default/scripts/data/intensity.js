@@ -90,7 +90,7 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
   });
 
   const lowpassPositionDeltaDown = {
-    bar: 0.5,
+    bar: 0.75, //0.5
     beat: 0,
   }; // 1 bar to go down
 

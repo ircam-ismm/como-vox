@@ -652,6 +652,7 @@ class PlayerExperience extends AbstractExperience {
                 this.render();
               } catch (error) {
                 console.error('Error while loading score: ' + error.message);
+                this.voxPlayerState.set({ scoreFileName: null });
               }
             } else {
               // there is a bit too much magic here...
@@ -683,6 +684,7 @@ class PlayerExperience extends AbstractExperience {
                 this.render();
               } catch (error) {
                 console.error('Error while loading score: ' + error.message);
+                this.voxPlayerState.set({ scoreFileName: null });
               }
             }
           });

@@ -24,6 +24,7 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const beatsToSeconds = conversion.beatsToSeconds;
 
   const Scaler = app.imports.helpers.Scaler;
+  const Clipper = app.imports.helpers.Clipper;
 
   const audioContext = graph.como.audioContext;
 
@@ -32,12 +33,12 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
   const fadeOutDuration = 0.1; // in seconds
 
   const parameters = {
-    audioIntensityRange: 30, // in dB 30
+    audioIntensityRange: 40, // in dB 30
     samplePlayerFilterNoteIntensityMin: 0, // MIDI intensity 0
-    samplePlayerFilterNoteIntensityMax: 127, // MIDI intensity 127 
+    samplePlayerFilterNoteIntensityMax: 127, // MIDI intensity 127
     samplePlayerFilterRelativePitchMin: 12, // MIDI pitch, relative to note (12 is one octave) 12
-    samplePlayerFilterRelativePitchMax: 84, // MIDI pitch, relative to note 84 
-    samplePlayerFilterFrequencyMin: 3000, // in Hz 3000
+    samplePlayerFilterRelativePitchMax: 84, // MIDI pitch, relative to note 84
+    samplePlayerFilterFrequencyMin: 1000, // in Hz 3000
     samplePlayerFilterFrequencyMax: 22050, // in Hz 22050
   };
 
@@ -50,18 +51,27 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
     clip: true,
   });
 
+  const filterFrequencyClipper = new Clipper({
+    min: parameters.samplePlayerFilterFrequencyMin,
+    max: parameters.samplePlayerFilterFrequencyMax,
+  });
+
   const noteToFilterFrequency = ({
     pitch,
     intensity,
   }) => {
     const relativePitch = intensityToRelativePitch.process(intensity);
 
-    
-    const frequency = Math.min(parameters.samplePlayerFilterFrequencyMax,
-                               Math.max(parameters.samplePlayerFilterFrequencyMin,
-                                        midiPichToHertz(pitch + relativePitch)
-                                       )
-                              );
+    const frequency = filterFrequencyClipper.process(
+      midiPichToHertz(pitch + relativePitch)
+    );
+
+    // console.log("noteToFilterFrequency",
+    //             "pitch", pitch,
+    //             'intensity', intensity,
+    //             "relativePitch", relativePitch,
+    //             "frequency = ", frequency,
+    //            );
 
     return frequency;
   };
@@ -155,17 +165,42 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       samplePlayerFilterFrequencyMax,
     } = updates;
 
-    const samplePlayerFilterUpdate
-          = typeof samplePlayerFilterNoteIntensityMin !== 'undefined'
-          || typeof samplePlayerFilterNoteIntensityMax !== 'undefined'
-          || typeof samplePlayerFilterRelativePitchMin !=='undefined'
-          || typeof samplePlayerFilterRelativePitchMax !=='undefined'
-          || typeof samplePlayerFilterFrequencyMin !=='undefined'
-          || typeof samplePlayerFilterFrequencyMax !=='undefined';
 
-    if(samplePlayerFilterUpdate) {
-      intensityToRelativePitch.set(updates);
+    if(typeof samplePlayerFilterNoteIntensityMin !== 'undefined') {
+      intensityToRelativePitch.set({
+        inputStart: samplePlayerFilterNoteIntensityMin,
+      });
     }
+    if(typeof samplePlayerFilterNoteIntensityMax !== 'undefined') {
+      intensityToRelativePitch.set({
+        inputEnd: samplePlayerFilterNoteIntensityMax,
+      });
+    }
+
+    if(typeof samplePlayerFilterRelativePitchMin !=='undefined') {
+      intensityToRelativePitch.set({
+        outputStart: samplePlayerFilterRelativePitchMin,
+      });
+    }
+    if(typeof samplePlayerFilterRelativePitchMax !=='undefined') {
+      intensityToRelativePitch.set({
+        outputEnd: samplePlayerFilterRelativePitchMax,
+      });
+    }
+
+    if(typeof samplePlayerFilterFrequencyMin !=='undefined') {
+      filterFrequencyClipper.set({
+        min: samplePlayerFilterFrequencyMin,
+      });
+    }
+    if(typeof samplePlayerFilterFrequencyMax !=='undefined') {
+      filterFrequencyClipper.set({
+        max: samplePlayerFilterFrequencyMax,
+      });
+    }
+
+
+
   };
 
   ///// Events and data (defined only in browser)

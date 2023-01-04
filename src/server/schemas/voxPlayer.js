@@ -609,8 +609,8 @@ export default {
     default: {
       absoluteMin: 40,   // 40
       absoluteMax: 150,  // 160
-      relativeMin: 0.75, // 0.76
-      relativeMax: 1.5, //1.24
+      relativeMin: 0.76, // 0.76
+      relativeMax: 1.24, //1.24
     },
   },
 

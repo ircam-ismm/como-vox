@@ -147,6 +147,15 @@
     width: 3.5em;
   }
 
+  .intensityLimit.relative,
+  .pitchLimit.relative {
+    width: 3.5em;
+  }
+
+  .frequencyLimit.relative {
+    width: 5.5em;
+  }
+
   .scoreIntensityCompressionMinMax {
     display: inline-flex;
     flex-flow: row wrap;

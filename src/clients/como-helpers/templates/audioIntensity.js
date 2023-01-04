@@ -11,7 +11,13 @@ import {
 const e = {};
 
 export function audioIntensity(data) {
-  const groupUi = data.audioIntensityRangeUi;
+
+  const samplePlayerFilterUi = data.samplePlayerFilterNoteIntensityUi
+        || data.samplePlayerFilterRelativePitchUi
+        || data.samplePlayerFilterFrequencyUi;
+
+  const groupUi = data.audioIntensityRangeUi
+        || samplePlayerFilterUi;
 
   const voxPlayerState = data.voxPlayerState;
 
@@ -41,6 +47,131 @@ export function audioIntensity(data) {
           ${data.uiConfiguration ? displayToggle(data, 'audioIntensityRangeUi') : ''}
         </span>
         ` : ''}
+
+        <span class="separator"></span>
+
+        ${data.uiConfiguration || samplePlayerFilterUi ? html`
+          <span class="title text ${extraClasses(samplePlayerFilterUi)}">Filtre</span>
+        ` : ''}
+
+        ${data.uiConfiguration || data.samplePlayerFilterNoteIntensityUi ? html`
+        <span class="${elementClasses(data, 'samplePlayerFilterNoteIntensity')}">
+          <span class="text">depuis intensité</span>
+          <span class="valueUnit">
+            <input class="intensityLimit relative"
+                   type="number"
+                   min="0"
+                   max="127"
+                   step="10"
+                   .value=${data.samplePlayerFilterNoteIntensityMin}
+                   @click="${e => selfSelect(e)}"
+                   @change="${e => {
+                               voxPlayerState.set({
+                                 samplePlayerFilterNoteIntensityMin: parseFloat(e.srcElement.value),
+                               });
+                             } }"
+            >
+          </span>
+
+          <span class="text">à</span>
+          <span class="valueUnit">
+            <input class="intensityLimit relative"
+                   type="number"
+                   min="0"
+                   max="127"
+                   step="10"
+                   .value=${data.samplePlayerFilterNoteIntensityMax}
+                   @click="${e => selfSelect(e)}"
+                   @change="${e => {
+                               voxPlayerState.set({
+                                 samplePlayerFilterNoteIntensityMax: parseFloat(e.srcElement.value),
+                               });
+                             } }"
+            ><span class="text">MIDI</span>
+
+          ${data.uiConfiguration ? displayToggle(data, 'samplePlayerFilterNoteIntensityUi') : ''}
+        </span>
+        ` : ''}
+
+        ${data.uiConfiguration || data.samplePlayerFilterRelativePitchUi ? html`
+        <span class="${elementClasses(data, 'samplePlayerFilterRelativePitch')}">
+          <span class="text">vers hauteur relative</span>
+          <span class="valueUnit">
+            <input class="pitchLimit relative"
+                   type="number"
+                   min="-127"
+                   max="127"
+                   step="10"
+                   .value=${data.samplePlayerFilterRelativePitchMin}
+                   @click="${e => selfSelect(e)}"
+                   @change="${e => {
+                               voxPlayerState.set({
+                                 samplePlayerFilterRelativePitchMin: parseFloat(e.srcElement.value),
+                               });
+                             } }"
+            >
+          </span>
+
+          <span class="text">à</span>
+          <span class="valueUnit">
+            <input class="pitchLimit relative"
+                   type="number"
+                   min="-127"
+                   max="127"
+                   step="10"
+                   .value=${data.samplePlayerFilterRelativePitchMax}
+                   @click="${e => selfSelect(e)}"
+                   @change="${e => {
+                               voxPlayerState.set({
+                                 samplePlayerFilterRelativePitchMax: parseFloat(e.srcElement.value),
+                               });
+                             } }"
+            ><span class="text">MIDI</span>
+
+          ${data.uiConfiguration ? displayToggle(data, 'samplePlayerFilterRelativePitchUi') : ''}
+        </span>
+        ` : ''}
+
+        ${data.uiConfiguration || data.samplePlayerFilterFrequencyUi ? html`
+        <span class="${elementClasses(data, 'samplePlayerFilterFrequency')}">
+          <span class="text">limité de</span>
+          <span class="valueUnit">
+            <input class="frequencyLimit relative"
+                   type="number"
+                   min="0"
+                   max="22050"
+                   step="100"
+                   .value=${data.samplePlayerFilterFrequencyMin}
+                   @click="${e => selfSelect(e)}"
+                   @change="${e => {
+                               voxPlayerState.set({
+                                 samplePlayerFilterFrequencyMin: parseFloat(e.srcElement.value),
+                               });
+                             } }"
+            >
+          </span>
+
+          <span class="text">à</span>
+          <span class="valueUnit">
+            <input class="frequencyLimit relative"
+                   type="number"
+                   min="0"
+                   max="22050"
+                   step="100"
+                   .value=${data.samplePlayerFilterFrequencyMax}
+                   @click="${e => selfSelect(e)}"
+                   @change="${e => {
+                               voxPlayerState.set({
+                                 samplePlayerFilterFrequencyMax: parseFloat(e.srcElement.value),
+                               });
+                             } }"
+            ><span class="text">Hz</span>
+
+          ${data.uiConfiguration ? displayToggle(data, 'samplePlayerFilterFrequencyUi') : ''}
+        </span>
+        ` : ''}
+
+
 
       </div>
       ` : '');

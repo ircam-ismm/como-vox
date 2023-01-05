@@ -86,6 +86,16 @@ function scenarioIntensity(graph, helpers, outputFrame) {
       }
     }
 
+    // update saved metronomeSound while playing
+    if(parameters.scenarioIntensity
+       && parameters.scenarioPlayback === true
+       && status !== 'precount'
+       && status !== 'init'
+       && typeof updates.metronomeSound !== 'undefined') {
+      // update to changes since scenario is active
+      parametersBackup.metronomeSound = updates.metronomeSound;
+    }
+
     // start
     if(parameters.scenarioIntensity
        && parameters.scenarioPlayback === false
@@ -206,6 +216,7 @@ function scenarioIntensity(graph, helpers, outputFrame) {
 
           app.events.emit('tempoReset', true);
           app.events.emit('seekPosition', seekPosition);
+          app.events.emit('metronomeSound', true);
           app.events.emit('playback', true);
           statusUpdate('precount');
           break;

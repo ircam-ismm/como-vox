@@ -913,7 +913,8 @@ class PlayerExperience extends AbstractExperience {
         // medium tempo, easy for beating (andate)
         const tempoTarget = 92;
 
-        // only group those
+        // if tempo is already within limits,
+        // groups those to get closer to tempoTarget
         const groupableDivisions = [8, 16, 32];
 
         // try to divide, in order
@@ -923,20 +924,21 @@ class PlayerExperience extends AbstractExperience {
         // tempo is always for quarter-note
         const tempo = app.state.tempo * app.state.timeSignature.division / 4;
 
-        if (!groupableDivisions.some( (division) => {
+        const {
+          absoluteMax: tempoMax,
+          absoluteMin: tempoMin,
+        } = this.state.tempoLimits;
+
+
+        if (tempo >= tempoMin
+            && tempo <= tempoMax
+            && !groupableDivisions.some( (division) => {
           return app.state.timeSignature.division === division;
         })) {
           //default;
           this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
           break;
         }
-
-        // if(!app.state.timeSignature.division === 8
-        //    && !app.state.timeSignature.division === 16
-        //    && !app.state.timeSignature.division === 32) {
-        //   this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
-        //   break;
-        // }
 
         if (!groupableCounts.some( (count) => {
           if (app.state.timeSignature.count % count === 0
@@ -953,29 +955,6 @@ class PlayerExperience extends AbstractExperience {
         }
 
         break;
-
-        // if(app.state.timeSignature.count % 3 === 0) {
-
-        //   if(tempo > app.state.tempoLimits.absoluteMax
-        //      || (Math.abs((tempo / 3) - tempoTarget)
-        //          < Math.abs(tempo - tempoTarget) ) ) {
-        //     this.events.emit('beatingUnit', 3 / app.state.timeSignature.division);
-        //     break;
-        //   }
-        // }
-
-        // if(app.state.timeSignature.count % 2 === 0) {
-
-        //   if(tempo > app.state.tempoLimits.absoluteMax
-        //      || (Math.abs((tempo / 2) - tempoTarget)
-        //          < Math.abs(tempo - tempoTarget) ) ) {
-        //     this.events.emit('beatingUnit', 2 / app.state.timeSignature.division);
-        //     break;
-        //   }
-        // }
-
-        // this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
-        // break;
       }
 
       case 'timeSignature': {

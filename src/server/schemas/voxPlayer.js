@@ -278,6 +278,24 @@ export default {
     },
   },
 
+  // depends on score and scoreCompression
+  noteIntensityMax: {
+    type: 'float',
+    default: 127, // MIDI intensity
+    metas: {
+      exported: false,
+    },
+  },
+
+  // depends on score and scoreCompression
+  noteIntensityMin: {
+    type: 'float',
+    default: 0, // MIDI intensity
+    metas: {
+      exported: false,
+    },
+  },
+
   playback: {
     type: 'boolean',
     default: false,
@@ -355,12 +373,12 @@ export default {
 
   samplePlayerFilterRelativePitchMin: {
     type: 'float',
-    default: 12, // MIDI pitch, relative to note (12 is one octave)  12
+    default: 12, // MIDI pitch, relative to note (12 is one octave),was 12
   },
 
   samplePlayerFilterRelativePitchMax: {
     type: 'float',
-    default: 84, // MIDI pitch, relative to note 84
+    default: 64, // MIDI pitch, relative to note, was 84
   },
 
   samplePlayerFilterRelativePitchUi: {
@@ -370,7 +388,7 @@ export default {
 
   samplePlayerFilterFrequencyMin: {
     type: 'float',
-    default: 1000, // in Hz  3000
+    default: 500, // in Hz, was 1000
   },
 
   samplePlayerFilterFrequencyMax: {
@@ -523,7 +541,7 @@ export default {
 
   scoreIntensityCompressionMax: {
     type: 'float',
-    default: 120, // keep some headroom
+    default: 100, // keep some headroom
   },
 
   scoreIntensityCompressionMinFixed: {
@@ -533,7 +551,7 @@ export default {
 
   scoreIntensityCompressionMinGesture: {
     type: 'float',
-    default: 90, // flatter than fixed
+    default: 60, // flatter than fixed
   },
 
   scoreIntensityCompressionMinMaxUi : {

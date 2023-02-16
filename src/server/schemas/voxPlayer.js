@@ -539,6 +539,13 @@ export default {
     default: true,
   },
 
+  scoreMetadata: {
+    type: 'any',
+    default: null,
+    nullable: true,
+
+  },
+
   scoreIntensityCompressionMax: {
     type: 'float',
     default: 100, // keep some headroom

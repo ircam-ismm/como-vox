@@ -4,9 +4,9 @@ export default {
   gestureAdaptationIntensityModes: {
     type: 'any',
     default: {
-      '-': 0.7,
+      '-': 0.7, // more dynamics
       'normal': 0.5,
-      '+': 0.3,
+      '+': 0.3, // for low-intensity gestures
     },
   },
 
@@ -14,9 +14,9 @@ export default {
   gestureAdaptationTempoModes: {
     type: 'any',
     default: {
-      '-': -50e-3,
-      'normal': 0,   // default 
-      '+': 50e-3,
+      '-': -50e-3, // advance
+      'normal': 0,
+      '+': 50e-3, // delay
     },
   },
 

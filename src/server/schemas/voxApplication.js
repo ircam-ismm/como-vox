@@ -34,7 +34,7 @@ export default {
         },
       },
 
-      'sensitive': {
+      '+': {
         peakThresholdSensitive: 30,
         beatOffsetRange: 1,
         tempoLimits: {
@@ -46,7 +46,7 @@ export default {
 
       },
 
-      'expert': {
+      '++': {
         peakThresholdSensitive: 30,
         beatOffsetRange: 2,
         tempoLimits: {

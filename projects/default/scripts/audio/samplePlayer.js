@@ -32,14 +32,21 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
 
   const fadeOutDuration = 0.1; // in seconds
 
+  let noteIntensityHeadroom = 0; // in MIDI intensity
+
   const parameters = {
     audioIntensityRange: 40, // in dB 30
+
     samplePlayerFilterNoteIntensityMin: 0, // MIDI intensity 0
     samplePlayerFilterNoteIntensityMax: 127, // MIDI intensity 127
     samplePlayerFilterRelativePitchMin: 12, // MIDI pitch, relative to note (12 is one octave) 12
     samplePlayerFilterRelativePitchMax: 84, // MIDI pitch, relative to note 84
     samplePlayerFilterFrequencyMin: 1000, // in Hz 3000
     samplePlayerFilterFrequencyMax: 22050, // in Hz 22050
+
+    noteIntensityMax: 120,
+
+    scoreIntensityCompressionMax: 120,
   };
 
   const intensityToRelativePitch = new Scaler({
@@ -165,7 +172,6 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       samplePlayerFilterFrequencyMax,
     } = updates;
 
-
     if(typeof samplePlayerFilterNoteIntensityMin !== 'undefined') {
       intensityToRelativePitch.set({
         inputStart: samplePlayerFilterNoteIntensityMin,
@@ -199,7 +205,13 @@ function samplePlayer(graph, helpers, audioInNode, audioOutNode, outputFrame) {
       });
     }
 
-
+    if(typeof updates.noteIntensityMax !== 'undefined') {
+      noteIntensityHeadroom
+        = Math.max(0,
+                   Math.min(127,
+                            parameters.scoreIntensityCompressionMax
+                            - parameters.noteIntensityMax));
+    }
 
   };
 

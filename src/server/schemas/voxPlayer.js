@@ -48,6 +48,17 @@ export default {
     default: 2, // in seconds, for time-out
   },
 
+  // around beat: half of this value before, half after
+  beatOffsetRange: {
+    type: 'float',
+    default: 1, // in beats
+  },
+
+  beatOffsetRangeUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   beatingSound: {
     type: 'boolean',
     default: false,
@@ -101,6 +112,20 @@ export default {
     metas: {
       exported: false,
     },
+  },
+
+  gestureAdaptationBeatingMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+      stored: true,
+    },
+  },
+
+  gestureAdaptationBeatingModeUi: {
+    type: 'boolean',
+    default: true,
   },
 
   gestureAdaptationIntensityMode: {
@@ -278,6 +303,40 @@ export default {
     },
   },
 
+  // depends on score and scoreCompression
+  noteIntensityMax: {
+    type: 'float',
+    default: 127, // MIDI intensity
+    metas: {
+      exported: false,
+    },
+  },
+
+  // depends on score and scoreCompression
+  noteIntensityMin: {
+    type: 'float',
+    default: 0, // MIDI intensity
+    metas: {
+      exported: false,
+    },
+  },
+
+  // used by beatTriggerFromGesturePeakAdapt
+  peakThresholdUi: {
+    type: 'boolean',
+    default: false, // beat energy
+  },
+
+  peakThresholdSafe: {
+    type: 'float',
+    default: 100, // beat energy
+  },
+
+  peakThresholdSensitive: {
+    type: 'float',
+    default: 30, // beat energy
+  },
+
   playback: {
     type: 'boolean',
     default: false,
@@ -355,12 +414,12 @@ export default {
 
   samplePlayerFilterRelativePitchMin: {
     type: 'float',
-    default: 12, // MIDI pitch, relative to note (12 is one octave)  12
+    default: 12, // MIDI pitch, relative to note (12 is one octave),was 12
   },
 
   samplePlayerFilterRelativePitchMax: {
     type: 'float',
-    default: 84, // MIDI pitch, relative to note 84
+    default: 64, // MIDI pitch, relative to note, was 84
   },
 
   samplePlayerFilterRelativePitchUi: {
@@ -370,7 +429,7 @@ export default {
 
   samplePlayerFilterFrequencyMin: {
     type: 'float',
-    default: 1000, // in Hz  3000
+    default: 500, // in Hz, was 1000
   },
 
   samplePlayerFilterFrequencyMax: {
@@ -521,9 +580,16 @@ export default {
     default: true,
   },
 
+  scoreMetadata: {
+    type: 'any',
+    default: null,
+    nullable: true,
+
+  },
+
   scoreIntensityCompressionMax: {
     type: 'float',
-    default: 120, // keep some headroom
+    default: 100, // keep some headroom
   },
 
   scoreIntensityCompressionMinFixed: {
@@ -533,7 +599,7 @@ export default {
 
   scoreIntensityCompressionMinGesture: {
     type: 'float',
-    default: 90, // flatter than fixed
+    default: 60, // flatter than fixed
   },
 
   scoreIntensityCompressionMinMaxUi : {
@@ -624,8 +690,8 @@ export default {
     default: {
       absoluteMin: 40,   // 40
       absoluteMax: 150,  // 160
-      relativeMin: 0.75, // 0.76
-      relativeMax: 1.5, //1.24
+      relativeMin: 0.76, // 0.76
+      relativeMax: 1.24, //1.24
     },
   },
 

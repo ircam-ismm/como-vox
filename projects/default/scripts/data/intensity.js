@@ -29,6 +29,8 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
     metronomeDynamicBoostMin: -40, // MIDI intensity -40
     metronomeDynamicBoostMax: 20, // MIDI intensity 20
 
+    scoreData: null,
+
     scoreIntensityCompressionMax: 120, // keep some headroom 120
     scoreIntensityCompressionMinFixed: 90, // 90 
     scoreIntensityCompressionMinGesture: 110, // flatter 110
@@ -165,25 +167,6 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
   };
 
   const updateParams = (updates) => {
-    if(typeof updates.scoreData !== 'undefined') {
-      let noteIntensityMin = (updates.scoreData
-                              && updates.scoreData.metas
-                              && updates.scoreData.metas.noteIntensityMin
-                              ? updates.scoreData.metas.noteIntensityMin
-                              : parameters.noteIntensityCompressedMin);
-
-      let noteIntensityMax = (updates.scoreData
-                              && updates.scoreData.metas
-                              && updates.scoreData.metas.noteIntensityMax
-                              ? updates.scoreData.metas.noteIntensityMax
-                              : parameters.noteIntensityCompressedMax);
-
-      noteIntensityCompressor.set({
-        inputStart: noteIntensityMin,
-        inputEnd: noteIntensityMax,
-      });
-    }
-
     for(const p of Object.keys(updates) ) {
       if(parameters.hasOwnProperty(p) ) {
         parameters[p] = updates[p];
@@ -222,19 +205,69 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
           || typeof updates.gestureControlsIntensity !== 'undefined'
           || typeof updates.scoreIntensityCompressionMax !== 'undefined'
           || typeof updates.scoreIntensityCompressionMinFixed !== 'undefined'
-          || typeof updates.scoreIntensityCompressionMinGesture !== 'undefined';
+          || typeof updates.scoreIntensityCompressionMinGesture !== 'undefined'
+          || typeof updates.scoreData !== 'undefined';
     if(noteIntensityCompressorOutputUpdate) {
+      let inputStart = (parameters.scoreData
+                         && parameters.scoreData.metas
+                         && typeof parameters.scoreData.metas.noteIntensityMin !== 'undefined'
+                         ? parameters.scoreData.metas.noteIntensityMin
+                         : parameters.noteIntensityCompressedMin);
+
+      let inputEnd = (parameters.scoreData
+                      && parameters.scoreData.metas
+                      && typeof parameters.scoreData.metas.noteIntensityMax !== 'undefined'
+                      ? parameters.scoreData.metas.noteIntensityMax
+                      : parameters.noteIntensityCompressedMax);
+
+
       let outputStart;
+
       if(parameters.gestureControlsIntensity
          && (parameters.scoreIntensityCompressionMode === 'auto'
              || parameters.scoreIntensityCompressionMode === 'gesture') ) {
         outputStart = parameters.scoreIntensityCompressionMinGesture;
       } else {
-        outputStart = parameters.scoreIntensityCompressionMinFixed;
+        outputStart = (parameters.scoreData
+                       && parameters.scoreData.metas
+                       && typeof parameters.scoreData.metas.noteIntensityMin !== 'undefined'
+                       ? parameters.scoreData.metas.noteIntensityMin
+                       : 0);
+        outputStart = Math.max(
+          outputStart,
+          parameters.scoreIntensityCompressionMinFixed
+        );
       }
 
-      const outputEnd = parameters.scoreIntensityCompressionMax;
-      noteIntensityCompressor.set({outputStart, outputEnd});
+      let outputEnd;
+
+      // defaut for gesture control or without score metadata
+      if(parameters.gestureControlsIntensity
+         && (parameters.scoreIntensityCompressionMode === 'auto'
+             || parameters.scoreIntensityCompressionMode === 'gesture')
+         || !parameters.scoreData
+         || !parameters.scoreData.metas
+         || typeof parameters.scoreData.metas.noteIntensityMin == 'undefined'
+         || typeof parameters.scoreData.metas.noteIntensityMax == 'undefined') {
+        outputEnd = parameters.scoreIntensityCompressionMax;
+      } else {
+        const {noteIntensityMin, noteIntensityMax} = parameters.scoreData.metas;
+        const scoreRange = noteIntensityMax - noteIntensityMin;
+        outputEnd = Math.min(outputStart + scoreRange,
+                             parameters.scoreIntensityCompressionMax);
+
+      }
+
+      noteIntensityCompressor.set({
+        inputStart,
+        inputEnd,
+        outputStart,
+        outputEnd,
+      });
+
+      // report for samplePlayer
+      app.events.emit('noteIntensityMin', outputStart);
+      app.events.emit('noteIntensityMax', outputEnd);
     }
 
   };
@@ -244,7 +277,6 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
   if(app.events && app.state) {
     [
       ...Object.keys(parametersPublic),
-      'scoreData',
     ].forEach( (event) => {
       const callback = (value) => {
         // compatibility with setGraphOption
@@ -359,7 +391,7 @@ function intensityFromGestureHysteresis(graph, helpers, outputFrame) {
             if(event.type === 'noteOn') {
               event.data.intensity = noteIntensityClipper.process(event.data.intensity);
             }
-         });
+          });
         };
       }
 

@@ -13,16 +13,6 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   const meanThresholdAdapt =  1.; // factor to multiply standars deviation //1
   const meanThresholdMin = 10; // min threshold 5
 
-  // @TODO: useless
-  const rotationThresholdSensitive = 1; // sensitive
-  const rotationThresholdSafe = 1; // safe
-  let rotationThreshold = rotationThresholdSafe;
-
-  const peakThresholdSensitive = 30; // sensitive
-  const peakThresholdSafe = 100; // safe
-  let peakThreshold = peakThresholdSafe;
-
-
   const intensityRotationUnfilteredMax = 100; // clip for hysteresis
   let inhibitionLimits = {
     min: 0.25, // seconds
@@ -133,14 +123,32 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   };
   const peakSearches = new Set();
 
+  // @TODO: useless
+  const rotationThresholdSensitive = 1; // sensitive
+  const rotationThresholdSafe = 1; // safe
+  let rotationThreshold = rotationThresholdSafe;
+
   // shared parameters, according to player schema
   const parameters = {
     handedness: null,
+    peakThresholdSafe: 100,
+    peakThresholdSensitive: 30,
     playback : 0,
+  };
+
+  let peakThreshold = parameters.peakThresholdSafe;
+  const peakThresholdUpdate = () => {
+    peakThreshold = (parameters.playback
+                     ? parameters.peakThresholdSensitive
+                     : parameters.peakThresholdSafe);
   };
 
   const updateParams = (updates) => {
     for(const p of Object.keys(updates) ) {
+      if(parameters.hasOwnProperty(p) ) {
+        parameters[p] = updates[p];
+      }
+
       switch(p) {
         case 'handedness': {
           handednessNormalisation = (updates['handedness'] === 'left'
@@ -154,21 +162,25 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
           rotationThreshold = (playback
                                ? rotationThresholdSensitive
                                : rotationThresholdSafe);
-
-          peakThreshold = (playback
-                           ? peakThresholdSensitive
-                           : peakThresholdSafe);
+          peakThresholdUpdate();
           break;
         };
+
+        case 'peakThresholdSafe': {
+          peakThresholdUpdate();
+          break;
+        }
+
+        case 'peakThresholdSensitive': {
+          peakThresholdUpdate();
+          break;
+        }
 
         default: {
           break;
         }
       }
 
-      if(parameters.hasOwnProperty(p) ) {
-        parameters[p] = updates[p];
-      }
     }
   };
 
@@ -177,6 +189,8 @@ function beatTriggerFromGesturePeakAdapt(graph, helpers, outputFrame) {
   if(app.events && app.state) {
     [
       'handedness',
+      'peakThresholdSafe',
+      'peakThresholdSensitive',
       'playback',
     ].forEach( (event) => {
       const callback = (value) => {

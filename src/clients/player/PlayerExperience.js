@@ -17,6 +17,8 @@ import * as CoMoteQRCode from '@ircam/comote-helpers/qrcode.js';
 
 views.playerElectron = playerElectron;
 
+import {fetchAll as fetchOverrides} from '../shared/overrides.js';
+
 import midi from '../../shared/score/midi.js';
 import { SampleManager } from '../shared/SampleManager.js';
 // in case of electron app
@@ -215,6 +217,10 @@ class PlayerExperience extends AbstractExperience {
   async start() {
     await super.start();
 
+    this.overrides = await fetchOverrides({
+      baseUrl: url.base,
+    });
+
     this.logWriter = await this.logger.create(`client-${this.como.client.id}.txt`);
     this.log(`navigator.userAgent: ${navigator.userAgent}`);
     this.log(`navigator.userAgentData: ${JSON.stringify(navigator.userAgentData)}`);
@@ -392,7 +398,9 @@ class PlayerExperience extends AbstractExperience {
       }
     }
 
-    const loadedState = await url.parse(voxPlayerSchema);
+    const loadedState = await url.parse(voxPlayerSchema, {
+      overrides: this.overrides.url,
+    });
     console.log("loadedState = ", loadedState);
 
     // be sure to restore tempo and beatingUnit after a load
@@ -554,7 +562,6 @@ class PlayerExperience extends AbstractExperience {
 
   // immediate to data and asynchronously to voxPlayerState
   updateFromEvent(key, value) {
-    // console.log('updateFromEvent', key, value);
     const voxPlayerSchema = this.voxPlayerState.getSchema();
     const event = schema.isEvent(voxPlayerSchema, key);
     if(!event) {
@@ -576,7 +583,7 @@ class PlayerExperience extends AbstractExperience {
     this.render();
   }
 
-  // declare everything if voxPlayerSchema
+  // declare everything in voxPlayerSchema
   initialiseState() {
     for (const [key, value] of Object.entries(this.voxPlayerState.getValues())) {
       this.state[key] = value;
@@ -653,6 +660,7 @@ class PlayerExperience extends AbstractExperience {
                 this.render();
               } catch (error) {
                 console.error('Error while loading score: ' + error.message);
+                this.voxPlayerState.set({ scoreFileName: null });
               }
             } else {
               // there is a bit too much magic here...
@@ -678,12 +686,12 @@ class PlayerExperience extends AbstractExperience {
                                      + scoreURIbase);
               }
 
-              // console.log(scoreURIbase, urlType, scoreURI);
               try {
                 await this.setScore(scoreURI);
                 this.render();
               } catch (error) {
                 console.error('Error while loading score: ' + error.message);
+                this.voxPlayerState.set({ scoreFileName: null });
               }
             }
           });
@@ -819,6 +827,20 @@ class PlayerExperience extends AbstractExperience {
 
           await this.pianoSampleManager.update({notes});
 
+          // deep copy
+          const overrides = {...this.overrides.score["defaults"]};
+          const scoreOverrides = this.overrides.score[this.state.scoreFileName];
+          if(typeof scoreOverrides !== 'undefined') {
+            Object.assign(overrides, scoreOverrides);
+          }
+
+          for (const [key, value] of Object.entries(overrides) ) {
+            if(key === 'tempo') {
+              this.setTempo(value);
+            }
+            this.events.emit(key, value);
+          }
+
           this.events.emit('scoreData', scoreData);
           this.events.emit('scoreReady', true);
           resolve(this.scoreData);
@@ -912,7 +934,8 @@ class PlayerExperience extends AbstractExperience {
         // medium tempo, easy for beating (andate)
         const tempoTarget = 92;
 
-        // only group those
+        // if tempo is already within limits,
+        // groups those to get closer to tempoTarget
         const groupableDivisions = [8, 16, 32];
 
         // try to divide, in order
@@ -922,20 +945,21 @@ class PlayerExperience extends AbstractExperience {
         // tempo is always for quarter-note
         const tempo = app.state.tempo * app.state.timeSignature.division / 4;
 
-        if (!groupableDivisions.some( (division) => {
+        const {
+          absoluteMax: tempoMax,
+          absoluteMin: tempoMin,
+        } = this.state.tempoLimits;
+
+
+        if (tempo >= tempoMin
+            && tempo <= tempoMax
+            && !groupableDivisions.some( (division) => {
           return app.state.timeSignature.division === division;
         })) {
           //default;
           this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
           break;
         }
-
-        // if(!app.state.timeSignature.division === 8
-        //    && !app.state.timeSignature.division === 16
-        //    && !app.state.timeSignature.division === 32) {
-        //   this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
-        //   break;
-        // }
 
         if (!groupableCounts.some( (count) => {
           if (app.state.timeSignature.count % count === 0
@@ -952,29 +976,6 @@ class PlayerExperience extends AbstractExperience {
         }
 
         break;
-
-        // if(app.state.timeSignature.count % 3 === 0) {
-
-        //   if(tempo > app.state.tempoLimits.absoluteMax
-        //      || (Math.abs((tempo / 3) - tempoTarget)
-        //          < Math.abs(tempo - tempoTarget) ) ) {
-        //     this.events.emit('beatingUnit', 3 / app.state.timeSignature.division);
-        //     break;
-        //   }
-        // }
-
-        // if(app.state.timeSignature.count % 2 === 0) {
-
-        //   if(tempo > app.state.tempoLimits.absoluteMax
-        //      || (Math.abs((tempo / 2) - tempoTarget)
-        //          < Math.abs(tempo - tempoTarget) ) ) {
-        //     this.events.emit('beatingUnit', 2 / app.state.timeSignature.division);
-        //     break;
-        //   }
-        // }
-
-        // this.events.emit('beatingUnit', 1 / app.state.timeSignature.division);
-        // break;
       }
 
       case 'timeSignature': {

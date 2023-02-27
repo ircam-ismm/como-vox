@@ -1,0 +1,43 @@
+// Key is value of scoreFileName in URL
+
+// Overrides are voxPlayer schema entries.
+
+// They are applied on score loading, *before* other URL parameters.
+// Changes after selecting a score are recorded in URL as usual.
+
+// Warning: undefined is not allowed in JSON, use null instead.
+{
+  // be sure to use defaults to revert changes
+  "defaults": {
+    "beatingUnitMode": "auto",  // try to decompose
+    "scoreControlsTempo": true, // tempo from MIDI file
+    "scoreMetadata": null, // 'any' type declared in schema
+  },
+
+  // tempo:
+  //  - value is always for quarter-notes (no matter beatingUnit)
+  //  - be sure to set "scoreControlsTempo" to false
+
+  // beatingUnit:
+  //  - be sure to set "beatingUnitMode" to "fixed"
+  //  - 1 eighth note: 1/8 = 0.125
+  //  - 1 dotted quarter note is 3 eighth notes: 3/8 = 0.375
+
+  // examples
+
+  // "1 - PROKOFIEV danse 2-4 90.mid": {
+  //   "tempo": 88,
+  //   "scoreControlsTempo": false,
+  //   "scoreMetadata": {
+  //     "title": "La danse des chevaliers",
+  //   },
+  // },
+
+  // "2 - MOZART Symphony 40 2-2 94.mid": {
+  //   "beatingUnitMode": "fixed",
+  //   "beatingUnit": 0.125,
+  //   "scoreControlsTempo": false,
+  //   "tempo": 200,
+  // },
+
+}

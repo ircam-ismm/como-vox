@@ -84,6 +84,16 @@ function scenarioListening(graph, helpers, outputFrame) {
       }
     }
 
+    // update saved metronomeSound while playing
+    if(parameters.scenarioListening
+       && status !== 'precount'
+       && status !== 'init'
+       && typeof updates.metronomeSound !== 'undefined') {
+      // update to changes since scenario is active
+      parametersBackup.metronomeSound = updates.metronomeSound;
+    }
+
+    // stop
     if(parameters.scenarioListening
        && parameters.playback === true
        && updates.playback === false
@@ -191,6 +201,7 @@ function scenarioListening(graph, helpers, outputFrame) {
 
           // @TODO: bug on seek with quick events
           app.events.emit('seekPosition', seekPosition);
+          app.events.emit('metronomeSound', true);
           app.events.emit('playback', true);
           app.events.emit('seekPosition', seekPosition);
           statusUpdate('precount');

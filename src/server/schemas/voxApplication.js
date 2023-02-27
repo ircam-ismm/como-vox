@@ -20,6 +20,47 @@ export default {
     },
   },
 
+  gestureAdaptationBeatingModes: {
+    type: 'any',
+    default: {
+      'normal': {
+        peakThresholdSensitive: 30,
+        beatOffsetRange: 1,
+        tempoLimits: {
+          absoluteMin: 40,
+          absoluteMax: 150,
+          relativeMin: 0.76,
+          relativeMax: 1.24,
+        },
+      },
+
+      'sensitive': {
+        peakThresholdSensitive: 30,
+        beatOffsetRange: 1,
+        tempoLimits: {
+          absoluteMin: 40,
+          absoluteMax: 150,
+          relativeMin: 0.51,
+          relativeMax: 1.49,
+        },
+
+      },
+
+      'expert': {
+        peakThresholdSensitive: 30,
+        beatOffsetRange: 2,
+        tempoLimits: {
+          absoluteMin: 40,
+          absoluteMax: 150,
+          relativeMin: 0.51,
+          relativeMax: 1.49,
+        },
+
+      },
+
+    },
+  },
+
   scores: {
     type: 'any',
     default: [],

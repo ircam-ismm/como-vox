@@ -48,6 +48,17 @@ export default {
     default: 2, // in seconds, for time-out
   },
 
+  // around beat: half of this value before, half after
+  beatOffsetRange: {
+    type: 'float',
+    default: 1, // in beats
+  },
+
+  beatOffsetRangeUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   beatingSound: {
     type: 'boolean',
     default: false,
@@ -101,6 +112,20 @@ export default {
     metas: {
       exported: false,
     },
+  },
+
+  gestureAdaptationBeatingMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+      stored: true,
+    },
+  },
+
+  gestureAdaptationBeatingModeUi: {
+    type: 'boolean',
+    default: true,
   },
 
   gestureAdaptationIntensityMode: {
@@ -294,6 +319,22 @@ export default {
     metas: {
       exported: false,
     },
+  },
+
+  // used by beatTriggerFromGesturePeakAdapt
+  peakThresholdUi: {
+    type: 'boolean',
+    default: false, // beat energy
+  },
+
+  peakThresholdSafe: {
+    type: 'float',
+    default: 100, // beat energy
+  },
+
+  peakThresholdSensitive: {
+    type: 'float',
+    default: 30, // beat energy
   },
 
   playback: {

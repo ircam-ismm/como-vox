@@ -1,5 +1,7 @@
 import { html } from 'lit-html';
 
+import isEqual from 'lodash/isEqual';
+
 import {displayToggle} from './displayToggle.js';
 import {
   elementClasses,
@@ -16,8 +18,8 @@ export function gestureAdaptation(data) {
   const voxPlayerState = data.voxPlayerState;
 
   const groupUi = data.gestureAdaptationIntensityModeUi
-        || data.gestureAdaptationTempoModeUi;
-
+        || data.gestureAdaptationTempoModeUi
+        || data.gestureAdaptationBeatingModeUI;
 
   return (data.uiConfiguration || groupUi ? html`
       <div class="${groupClasses(data, 'gestureAdaptation', groupUi)}">
@@ -62,6 +64,31 @@ export function gestureAdaptation(data) {
           </span>
 
           ${data.uiConfiguration ? displayToggle(data, 'gestureAdaptationTempoModeUi') : ''}
+        </span>
+        ` : ''}
+
+        ${data.uiConfiguration || data.gestureAdaptationBeatingModeUi ? html`
+        <span class="${elementClasses(data, 'gestureAdaptationBeatingMode')}">
+            <span class="text">Beating</span>
+            <span class="selection">
+          ${Object.entries(voxApplicationState.get('gestureAdaptationBeatingModes') ).map( ([name, value]) => {
+                const references
+                      = voxApplicationState.get('gestureAdaptationBeatingModes')[name];
+                const matched = Object.entries(references).every( ([k, v]) => {
+                  return isEqual(voxPlayerState.get(k), v);
+                });
+                return html`
+              <button class="option gestureAdaptation ${matched ? 'selected' : ''}"
+                      @click="${e => {
+                voxPlayerState.set(references)}
+              }">
+              ${name}
+              </button>
+              `;
+              }) }
+          </span>
+
+          ${data.uiConfiguration ? displayToggle(data, 'gestureAdaptationBeatingModeUi') : ''}
         </span>
         ` : ''}
 

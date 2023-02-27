@@ -16,7 +16,9 @@ export function tempo(data) {
   const groupUi = data.tempoUi
         || data.tempoResetUi
         || data.scoreControlsTempoUi
-        || data.tempoLimitsUi;
+        || data.peakThresholdUi
+        || data.tempoLimitsUi
+        || data.beatOffsetRangeUi;
   const voxPlayerState = data.voxPlayerState;
 
   return (data.uiConfiguration || groupUi ? html`
@@ -106,6 +108,70 @@ export function tempo(data) {
             ><span class="text">%</span>
           </span>
           ${data.uiConfiguration ? displayToggle(data, 'tempoLimitsUi') : ''}
+        </span>
+        ` : ''}
+
+
+        ${data.uiConfiguration || data.beatOffsetRangeUi ? html`
+          <span class="${elementClasses(data, 'beatOffsetRange')}">
+            <span class="text">Limite de recalage de phase</span>
+            <span class="valueUnit">
+              <input type="number"
+                     min="1"
+                     max="2"
+                     step="0.25"
+                     .value=${Math.round(data.beatOffsetRange * 100) / 100}
+                     @click="${e => selfSelect(e)}"
+                     @change="${e => {
+                       // do not change the absolute limits
+                       const beatOffsetRange
+                         = Math.max(0, parseFloat(e.target.value) );
+                       voxPlayerState.set({beatOffsetRange});
+                       } }"
+            ><span class="text">temps</span>
+          </span>
+          ${data.uiConfiguration ? displayToggle(data, 'beatOffsetRangeUi') : ''}
+        </span>
+        ` : ''}
+
+
+        ${data.uiConfiguration || data.peakThresholdUi ? html`
+          <span class="${elementClasses(data, 'peakThreshold')}">
+            <span class="text">Énergie de la battue</span>
+            <span class="valueUnit">
+              <input type="number"
+                     min="10"
+                     max="200"
+                     step="10"
+                     .value=${Math.round(data.peakThresholdSensitive * 100) / 100}
+                     @click="${e => selfSelect(e)}"
+                     @change="${e => {
+                           // do not change the absolute limits
+                           const peakThresholdSensitive
+                           = Math.max(0, parseFloat(e.target.value) );
+                           voxPlayerState.set({peakThresholdSensitive});
+                           } }"
+              ><span class="text">sensible</span>
+            </span>
+
+            <span class="valueUnit">
+              <input type="number"
+                     min="10"
+                     max="200"
+                     step="10"
+                     .value=${Math.round(data.peakThresholdSafe * 100) / 100}
+                     @click="${e => selfSelect(e)}"
+                     @change="${e => {
+                           // do not change the absolute limits
+                           const peakThresholdSafe
+                           = Math.max(0, parseFloat(e.target.value) );
+                           voxPlayerState.set({peakThresholdSafe});
+                           } }"
+              ><span class="text">sûr</span>
+            </span>
+
+
+          ${data.uiConfiguration ? displayToggle(data, 'peakThresholdUi') : ''}
         </span>
         ` : ''}
 

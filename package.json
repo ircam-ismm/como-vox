@@ -43,7 +43,7 @@
     "jzz-midi-smf": "^1.6.8",
     "lit-element": "^2.2.1",
     "lit-html": "^1.1.2",
-    "lodash.debounce": "^4.0.8",
+    "lodash": "^4.17.21",
     "portfinder": "^1.0.28",
     "regenerator-runtime": "^0.13.7",
     "serve-static": "^1.15.0",

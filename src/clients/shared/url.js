@@ -1,4 +1,4 @@
-import debounce from 'lodash.debounce';
+import debounce from 'lodash/debounce';
 
 import jsonURL from 'json-url';
 const codec = jsonURL('lzstring');

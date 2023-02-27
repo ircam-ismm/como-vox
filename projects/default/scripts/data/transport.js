@@ -54,10 +54,10 @@ function transport(graph, helpers, outputFrame) {
     gestureControlsBeatOffset: false,
     gestureControlsTempo: false,
     // 1 bar + 1 beat to get 4 periods for tempo
-    // + 1 bar for the gestures fluctuations
+    // (during video tutorials: + 1 bar for the gestures fluctuations)
     gestureWindow: {
       bar: 1,
-      beat: 1,
+      beat: 2,
     },
     measures: true,
     tempoLimits: {

@@ -79,7 +79,8 @@ Object.assign(app.data, {
 
 app.events = new EventEmitter();
 app.events.setMaxListeners(0);
-if(typeof app.state === 'undefined') {
+
+if (typeof app.state === 'undefined') {
   app.state = {};
 }
 

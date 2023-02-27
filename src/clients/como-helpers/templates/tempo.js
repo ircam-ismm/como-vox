@@ -95,7 +95,7 @@ export function tempo(data) {
                        const {absoluteMin, absoluteMax} = data.tempoLimits;
                        const percentMax = Math.max(0, parseFloat(e.target.value) );
                        const relativeMax = (percentMax / 100) + 1;
-                       const relativeMin = 1 / relativeMax;
+                       const relativeMin = 2 - relativeMax;
                        voxPlayerState.set({tempoLimits: {
                          absoluteMin,
                          absoluteMax,

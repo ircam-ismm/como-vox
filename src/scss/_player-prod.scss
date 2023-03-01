@@ -90,6 +90,7 @@ button {
     font-size: 1.2rem;
     line-height: 1.6rem;
     text-align: center;
+    padding-bottom: 120px;
 
     span {
       font-size: 1rem;
@@ -478,6 +479,27 @@ header {
       }
     }
   }
+
+  button.back.color-light-grey {
+    height: 30px;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    background-color: white;
+    width: 100%;
+    margin-bottom: 10px;
+    display: block;
+    background-color: #efefef !important;
+    width: 100%;
+  }
+
+
+    // &:active {
+    //   background-color: $secondary-color;
+    // }
+
+    // &.back {
+    //   // margin-top: auto;
+    // }
 }
 
 /* ------------------------------------------ */

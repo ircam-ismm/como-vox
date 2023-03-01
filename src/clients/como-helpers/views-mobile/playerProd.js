@@ -83,8 +83,8 @@ export function playerProd(data) {
       ${guiState.showAdvancedSettings ?
         html`
           <div class="settings">
-            <div class="adjust-param param-nuance">
-              <p>Réactivité de la nuance</p>
+            <div class="adjust-param param-sensibility">
+              <p>Sensibilité de la battue</p>
               <div
                 class="col-3"
                 @click="${e => {
@@ -94,11 +94,16 @@ export function playerProd(data) {
                   e.target.classList.add('selected');
                 }}"
               >
-                ${Object.entries(voxApplicationState.get('gestureAdaptationIntensityModes')).map(([name, value]) => {
+                ${Object.entries(voxApplicationState.get('gestureAdaptationBeatingModes') ).map(([name, value]) => {
+                  const references = voxApplicationState.get('gestureAdaptationBeatingModes')[name];
+                  const matched = Object.entries(references).every(([k, v]) => {
+                    return isEqual(voxPlayerState.get(k), v);
+                  });
+
                   return html`
                     <button
-                      class="option ${data.gestureIntensityInputMax === value ? 'selected' : ''}"
-                      @click="${e => voxPlayerState.set({ gestureIntensityInputMax: (value) })}"
+                      class="option gestureAdaptation ${matched ? 'selected' : ''}"
+                      @click="${e => voxPlayerState.set(references)}"
                     >${name}</button>
                   `;
                 })}
@@ -127,8 +132,8 @@ export function playerProd(data) {
               </div>
             </div>
 
-            <div class="adjust-param param-sensibility">
-              <p>Sensibilité de la battue</p>
+            <div class="adjust-param param-nuance">
+              <p>Réactivité de la nuance</p>
               <div
                 class="col-3"
                 @click="${e => {
@@ -138,16 +143,11 @@ export function playerProd(data) {
                   e.target.classList.add('selected');
                 }}"
               >
-                ${Object.entries(voxApplicationState.get('gestureAdaptationBeatingModes') ).map(([name, value]) => {
-                  const references = voxApplicationState.get('gestureAdaptationBeatingModes')[name];
-                  const matched = Object.entries(references).every(([k, v]) => {
-                    return isEqual(voxPlayerState.get(k), v);
-                  });
-
+                ${Object.entries(voxApplicationState.get('gestureAdaptationIntensityModes')).map(([name, value]) => {
                   return html`
                     <button
-                      class="option gestureAdaptation ${matched ? 'selected' : ''}"
-                      @click="${e => voxPlayerState.set(references)}"
+                      class="option ${data.gestureIntensityInputMax === value ? 'selected' : ''}"
+                      @click="${e => voxPlayerState.set({ gestureIntensityInputMax: (value) })}"
                     >${name}</button>
                   `;
                 })}
@@ -187,6 +187,16 @@ export function playerProd(data) {
                 />
               </div>
             </div>
+
+            <hr />
+
+            <button
+              class="back color-light-grey"
+              @click="${e => {
+                guiState.showAdvancedSettings = false;
+                exp.updateGuiState(guiState);
+              }}"
+            >Retour</button>
           </div>
         `
       : nothing}

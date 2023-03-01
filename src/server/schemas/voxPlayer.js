@@ -238,7 +238,7 @@ export default {
 
   gestureIntensityNormalisedMedium: {
     type: 'float',
-    default: 0.75, // gentle compression
+    default: 0.9, // gentle compression
   },
 
   gestureIntensityNormalisedMediumUi: {
@@ -688,10 +688,10 @@ export default {
   tempoLimits: {
     type: 'any',
     default: {
-      absoluteMin: 40,   // 40
-      absoluteMax: 150,  // 160
-      relativeMin: 0.76, // 0.76
-      relativeMax: 1.24, //1.24
+      absoluteMin: 40,
+      absoluteMax: 150,
+      relativeMin: 0.51,
+      relativeMax: 1.49,
     },
   },
 

@@ -23,7 +23,7 @@ export default {
   gestureAdaptationBeatingModes: {
     type: 'any',
     default: {
-      'normal': {
+      '-': {
         peakThresholdSensitive: 30,
         beatOffsetRange: 1,
         tempoLimits: {
@@ -34,7 +34,7 @@ export default {
         },
       },
 
-      '+': {
+      'normal': {
         peakThresholdSensitive: 30,
         beatOffsetRange: 1,
         tempoLimits: {
@@ -46,7 +46,7 @@ export default {
 
       },
 
-      '++': {
+      '+': {
         peakThresholdSensitive: 30,
         beatOffsetRange: 2,
         tempoLimits: {

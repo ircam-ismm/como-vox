@@ -49,17 +49,18 @@ export class Hysteresis {
   }
 
   process(inputValue) {
-    const direction = (typeof this.outputValueLast !== 'undefined'
-                       && inputValue > this.outputValueLast
+    if(typeof this.outputValueLast === 'undefined') {
+      this.outputValueLast = inputValue;
+    }
+
+    const direction = (inputValue > this.outputValueLast
                        ? 'up'
                        : 'down');
 
     const {inputScale, feedbackScale} = this[direction];
     // be sure to recompute feedback now with last output value
     // for smooth transition of frequency change
-    const feedback = (typeof this.outputValueLast !== 'undefined'
-                      ? this.outputValueLast * feedbackScale
-                      : 0);
+    const feedback = this.outputValueLast * feedbackScale;
 
     const outputValue = inputValue * inputScale + feedback;
     this.outputValueLast = outputValue;

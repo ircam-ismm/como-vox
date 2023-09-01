@@ -54,10 +54,10 @@ function transport(graph, helpers, outputFrame) {
     gestureControlsBeatOffset: false,
     gestureControlsTempo: false,
     // 1 bar + 1 beat to get 4 periods for tempo
-    // + 1 bar for the gestures fluctuations
+    // (during video tutorials: + 1 bar for the gestures fluctuations)
     gestureWindow: {
       bar: 1,
-      beat: 1,
+      beat: 2,
     },
     measures: true,
     tempoLimits: {
@@ -66,6 +66,7 @@ function transport(graph, helpers, outputFrame) {
       relativeMin: 0.76,
       relativeMax: 1.24,
     },
+    beatOffsetRange: 1, // in beats
     beatGestureWaitingDurationMax: 2, // in seconds, for time-out
   };
 
@@ -135,9 +136,8 @@ function transport(graph, helpers, outputFrame) {
   // auto start
   let beatGestureStartTime = positionStoppedTime;
 
-  // a beat before and a beat after
-  const beatOffsetRange = 1; //was intially set to 1
-  const beatOffsetRangeInverse = 1 / beatOffsetRange;
+  // beatOffsetRange is total range around beat
+  // half before and a half after
   // triangle window    :
   //                    X 1
   //                   /:\
@@ -151,10 +151,11 @@ function transport(graph, helpers, outputFrame) {
   // allows to minimise the contribution of out of phase samples,
   // and to stabilise around 0
   const beatOffsetGestureWeigthGet = (offset) => {
+    const {beatOffsetRange} = parameters;
     const offsetBounded = Math.max(Math.min(offset,
                                            beatOffsetRange * 0.5),
                                    -beatOffsetRange * 0.5);
-    return 1 - Math.abs(offsetBounded) * 2 * beatOffsetRangeInverse;
+    return 1 - Math.abs(offsetBounded) * 2 / beatOffsetRange;
   }
 
   const setGestureControlsPlaybackStart = (control) => {
@@ -277,6 +278,7 @@ function transport(graph, helpers, outputFrame) {
   if(app.events && app.state) {
     [
       'beatGestureWaitingDurationMax',
+      'beatOffsetRange',
       'gestureControlsBeatOffset',
       'gestureControlsPlaybackStart',
       'gestureControlsPlaybackStop',

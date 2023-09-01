@@ -4,9 +4,9 @@ export default {
   gestureAdaptationIntensityModes: {
     type: 'any',
     default: {
-      '-': 0.7,
+      '-': 0.7, // more dynamics
       'normal': 0.5,
-      '+': 0.3,
+      '+': 0.3, // for low-intensity gestures
     },
   },
 
@@ -14,9 +14,50 @@ export default {
   gestureAdaptationTempoModes: {
     type: 'any',
     default: {
-      '-': -50e-3,
-      'normal': 0,   // default 
-      '+': 50e-3,
+      '-': -50e-3, // advance
+      'normal': 0,
+      '+': 50e-3, // delay
+    },
+  },
+
+  gestureAdaptationBeatingModes: {
+    type: 'any',
+    default: {
+      '-': {
+        peakThresholdSensitive: 30,
+        beatOffsetRange: 1,
+        tempoLimits: {
+          absoluteMin: 40,
+          absoluteMax: 150,
+          relativeMin: 0.76,
+          relativeMax: 1.24,
+        },
+      },
+
+      'normal': {
+        peakThresholdSensitive: 30,
+        beatOffsetRange: 1,
+        tempoLimits: {
+          absoluteMin: 40,
+          absoluteMax: 150,
+          relativeMin: 0.51,
+          relativeMax: 1.49,
+        },
+
+      },
+
+      '+': {
+        peakThresholdSensitive: 30,
+        beatOffsetRange: 2,
+        tempoLimits: {
+          absoluteMin: 40,
+          absoluteMax: 150,
+          relativeMin: 0.51,
+          relativeMax: 1.49,
+        },
+
+      },
+
     },
   },
 

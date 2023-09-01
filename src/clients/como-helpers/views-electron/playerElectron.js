@@ -273,6 +273,33 @@ export function playerElectron(data) {
                       })}
                     </div>
                   </div>
+
+                  <div class="adjust-param param-sensibility">
+                    <p>Sensibilité de la battue</p>
+                    <div
+                      class="col-3"
+                      @click="${e => {
+                        // @note - the buttons should be activated from the state
+                        const buttons = e.currentTarget.querySelectorAll('button');
+                        Array.from(buttons).forEach(b => b.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                      }}"
+                    >
+                      ${Object.entries(voxApplicationState.get('gestureAdaptationBeatingModes') ).map(([name, value]) => {
+                        const references = voxApplicationState.get('gestureAdaptationBeatingModes')[name];
+                        const matched = Object.entries(references).every(([k, v]) => {
+                          return isEqual(voxPlayerState.get(k), v);
+                        });
+
+                        return html`
+                          <button
+                            class="option gestureAdaptation ${matched ? 'selected' : ''}"
+                            @click="${e => voxPlayerState.set(references)}"
+                          >${name}</button>
+                        `;
+                      })}
+                    </div>
+                  </div>
                 </div>
               ` : nothing
             }

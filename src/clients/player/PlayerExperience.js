@@ -17,6 +17,8 @@ import * as CoMoteQRCode from '@ircam/comote-helpers/qrcode.js';
 
 views.playerElectron = playerElectron;
 
+import {fetchAll as fetchOverrides} from '../shared/overrides.js';
+
 import midi from '../../shared/score/midi.js';
 import { SampleManager } from '../shared/SampleManager.js';
 // in case of electron app
@@ -79,7 +81,8 @@ Object.assign(app.data, {
 
 app.events = new EventEmitter();
 app.events.setMaxListeners(0);
-if(typeof app.state === 'undefined') {
+
+if (typeof app.state === 'undefined') {
   app.state = {};
 }
 
@@ -213,6 +216,10 @@ class PlayerExperience extends AbstractExperience {
 
   async start() {
     await super.start();
+
+    this.overrides = await fetchOverrides({
+      baseUrl: url.base,
+    });
 
     this.logWriter = await this.logger.create(`client-${this.como.client.id}.txt`);
     this.log(`navigator.userAgent: ${navigator.userAgent}`);
@@ -391,7 +398,9 @@ class PlayerExperience extends AbstractExperience {
       }
     }
 
-    const loadedState = await url.parse(voxPlayerSchema);
+    const loadedState = await url.parse(voxPlayerSchema, {
+      overrides: this.overrides.url,
+    });
     console.log("loadedState = ", loadedState);
 
     // be sure to restore tempo and beatingUnit after a load
@@ -553,7 +562,6 @@ class PlayerExperience extends AbstractExperience {
 
   // immediate to data and asynchronously to voxPlayerState
   updateFromEvent(key, value) {
-    // console.log('updateFromEvent', key, value);
     const voxPlayerSchema = this.voxPlayerState.getSchema();
     const event = schema.isEvent(voxPlayerSchema, key);
     if(!event) {
@@ -575,7 +583,7 @@ class PlayerExperience extends AbstractExperience {
     this.render();
   }
 
-  // declare everything if voxPlayerSchema
+  // declare everything in voxPlayerSchema
   initialiseState() {
     for (const [key, value] of Object.entries(this.voxPlayerState.getValues())) {
       this.state[key] = value;
@@ -678,7 +686,6 @@ class PlayerExperience extends AbstractExperience {
                                      + scoreURIbase);
               }
 
-              // console.log(scoreURIbase, urlType, scoreURI);
               try {
                 await this.setScore(scoreURI);
                 this.render();
@@ -819,6 +826,20 @@ class PlayerExperience extends AbstractExperience {
           });
 
           await this.pianoSampleManager.update({notes});
+
+          // deep copy
+          const overrides = {...this.overrides.score["defaults"]};
+          const scoreOverrides = this.overrides.score[this.state.scoreFileName];
+          if(typeof scoreOverrides !== 'undefined') {
+            Object.assign(overrides, scoreOverrides);
+          }
+
+          for (const [key, value] of Object.entries(overrides) ) {
+            if(key === 'tempo') {
+              this.setTempo(value);
+            }
+            this.events.emit(key, value);
+          }
 
           this.events.emit('scoreData', scoreData);
           this.events.emit('scoreReady', true);

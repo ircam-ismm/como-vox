@@ -67,7 +67,7 @@ export class SampleManager {
             });
           } catch (error) {
             this.samplesLoading.delete(pitch);
-            reject(new Error(`Error while decoding audio file ${sourceURI}: `
+            reject(new Error(`Error while decoding audio file ${sourceUrl}: `
                              + error.message) );
           }
         };

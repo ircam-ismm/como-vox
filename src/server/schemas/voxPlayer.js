@@ -48,6 +48,17 @@ export default {
     default: 2, // in seconds, for time-out
   },
 
+  // around beat: half of this value before, half after
+  beatOffsetRange: {
+    type: 'float',
+    default: 1, // in beats
+  },
+
+  beatOffsetRangeUi: {
+    type: 'boolean',
+    default: false,
+  },
+
   beatingSound: {
     type: 'boolean',
     default: false,
@@ -101,6 +112,20 @@ export default {
     metas: {
       exported: false,
     },
+  },
+
+  gestureAdaptationBeatingMode: {
+    type: 'string',
+    default: 'normal',
+    metas: {
+      exported: false,
+      stored: true,
+    },
+  },
+
+  gestureAdaptationBeatingModeUi: {
+    type: 'boolean',
+    default: true,
   },
 
   gestureAdaptationIntensityMode: {
@@ -213,7 +238,7 @@ export default {
 
   gestureIntensityNormalisedMedium: {
     type: 'float',
-    default: 0.75, // gentle compression
+    default: 0.9, // gentle compression
   },
 
   gestureIntensityNormalisedMediumUi: {
@@ -294,6 +319,22 @@ export default {
     metas: {
       exported: false,
     },
+  },
+
+  // used by beatTriggerFromGesturePeakAdapt
+  peakThresholdUi: {
+    type: 'boolean',
+    default: false, // beat energy
+  },
+
+  peakThresholdSafe: {
+    type: 'float',
+    default: 100, // beat energy
+  },
+
+  peakThresholdSensitive: {
+    type: 'float',
+    default: 30, // beat energy
   },
 
   playback: {
@@ -539,6 +580,13 @@ export default {
     default: true,
   },
 
+  scoreMetadata: {
+    type: 'any',
+    default: null,
+    nullable: true,
+
+  },
+
   scoreIntensityCompressionMax: {
     type: 'float',
     default: 100, // keep some headroom
@@ -640,10 +688,10 @@ export default {
   tempoLimits: {
     type: 'any',
     default: {
-      absoluteMin: 40,   // 40
-      absoluteMax: 150,  // 160
-      relativeMin: 0.76, // 0.76
-      relativeMax: 1.24, //1.24
+      absoluteMin: 40,
+      absoluteMax: 150,
+      relativeMin: 0.51,
+      relativeMax: 1.49,
     },
   },
 

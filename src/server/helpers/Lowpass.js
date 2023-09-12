@@ -13,8 +13,6 @@ export class Lowpass {
 
   set(attributes) {
     Object.assign(this, attributes);
-    console.log("attributes = ", attributes);
-
     this.init();
   }
 
